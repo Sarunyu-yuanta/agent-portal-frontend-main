@@ -2,15 +2,15 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Chip, SearchInput, Tag, TabGroup } from "@sarunyu/system-one";
-import { ArrowUpLeftIcon, ChartLineUpIcon } from "@phosphor-icons/react";
+import { ArrowUpLeftIcon } from "@phosphor-icons/react";
 import { ChipScroller } from "@/components/ui/chip-scroller";
-import { EmptyState } from "@/components/ui/empty-state";
 import { FixedIncomeTab } from "./FixedIncomeTab";
 import { FixedIncomeDetail } from "./FixedIncomeDetail";
 import { FixedIncomeCompanyDetail } from "./FixedIncomeCompanyDetail";
 import type { FixedIncomeBond } from "./fixed-income-data";
 import { GlobalBondTab } from "./GlobalBondTab";
 import { MutualFundTab } from "./MutualFundTab";
+import { StockTab } from "./StockTab";
 import { RoboAdvisoryTab } from "./RoboAdvisoryTab";
 import { MutualFundDetail } from "./MutualFundDetail";
 import {
@@ -672,15 +672,11 @@ export function ProductCatalogTab({
 
       {/* ── Tab content ─────────────────────────────────────────────────────── */}
       <FadeIn key={activeProductTab} className="flex flex-col w-full">
-        {/* Stock and Robo Advisory have no data behind them yet, so there is
-            nothing for a loading skeleton to stand in for — go straight to
-            the empty state. */}
+        {/* Stock and Robo Advisory have no loading state to speak of (their
+            data is local mock content, not fetched), so both skip straight
+            past the catalog's shared loading skeleton. */}
         {activeProductTab === "stock" ? (
-          <EmptyState
-            icon={<ChartLineUpIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-            title="No stocks yet"
-            body="Stock products will appear here soon."
-          />
+          <StockTab />
         ) : activeProductTab === "robo-advisory" ? (
           <RoboAdvisoryTab
             onRoboAdvisorySelect={nav.onRoboAdvisorySelect}
