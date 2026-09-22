@@ -33,6 +33,8 @@ import {
   normalizeMutualFundCategoryId,
 } from "./client/[id]/mutual-fund-data";
 import { getThaiStructuredProduct } from "./client/[id]/thai-structured-data";
+import { getSetIndustrySectorPage } from "./client/[id]/stock-industry-sector-data";
+import { getStockProductDetail } from "./client/[id]/stock-product-detail-data";
 import {
   catalogCategoryForPath,
   catalogListHref,
@@ -141,11 +143,15 @@ function trailBreadcrumb(
   // Entering a section straight on a detail page leaves no root in the trail.
   // Cross-section entries already carry the referrer section's rungs — don't
   // prepend this section's root on top of them.
+  //
+  // Category is taken from the *origin* of the trail, not the current page —
+  // opening a Thai / FI / bond detail from a stock related-product list should
+  // keep "Stock" in the crumb, not jump to that product's native catalog tab.
   if (
     !crossTrail &&
     rungs[0].label !== SECTION_ROOT[section].label
   ) {
-    rungs.unshift(...rootCrumbs(section, pathname));
+    rungs.unshift(...rootCrumbs(section, urlPathname(trail[0])));
   }
   return rungs.length > 1 ? finish(rungs) : null;
 }
@@ -267,6 +273,8 @@ const THAI = /^\/product-catalog\/thai-structured\/(.+)$/;
 const MUTUAL_FUND_TOP_PERFORMERS = /^\/product-catalog\/mutual-fund\/top-performers\/(.+)$/;
 const MUTUAL_FUND_INSIGHTS = /^\/product-catalog\/mutual-fund\/insights(\/|$)/;
 const MUTUAL_FUND = /^\/product-catalog\/mutual-fund\/(.+)$/;
+const STOCK_SECTOR = /^\/product-catalog\/stock\/([^/]+)$/;
+const STOCK_SECTOR_STATIC = new Set(["dr", "etf"]);
 
 function catalogLabel(pathname: string): string | null {
   const segment = (re: RegExp) => {
@@ -323,6 +331,19 @@ function catalogLabel(pathname: string): string | null {
 
   const fundId = segment(MUTUAL_FUND);
   if (fundId) return getMutualFundSymbol(fundId) ?? "Mutual Fund";
+
+  const stockSectorId = segment(STOCK_SECTOR);
+  if (stockSectorId && !STOCK_SECTOR_STATIC.has(stockSectorId)) {
+    const decoded = decodeURIComponent(stockSectorId);
+    return (
+      getSetIndustrySectorPage(decoded)?.sector.name ??
+      getStockProductDetail(decoded)?.symbol ??
+      "SET Industry Sector"
+    );
+  }
+
+  if (pathname === "/product-catalog/stock/dr") return "DR (Depositary Receipt)";
+  if (pathname === "/product-catalog/stock/etf") return "ETF (Exchange Traded Fund)";
 
   if (pathname === "/product-catalog/robo-advisory") return "Robo Advisory";
   if (pathname === "/product-catalog/definit") return "Definit x Yuanta";

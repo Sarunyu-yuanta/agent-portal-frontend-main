@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button, Chip } from "@sarunyu/system-one";
 import {
@@ -51,6 +52,8 @@ import {
   type StockRow,
   type Trend,
 } from "./stock-data";
+import { setIndustrySectorHref } from "./stock-industry-sector-data";
+import { stockProductHref } from "./stock-product-detail-data";
 
 /** Matches the catalog's other card shadow tokens (`MutualFundCard.tsx`'s
  *  `LIST_CARD_CLASS`), just the slightly heavier variant Figma uses here. */
@@ -233,6 +236,7 @@ function InstrumentRow({
   showBorder,
   currency = "THB",
   logo,
+  onSelect,
 }: {
   symbol: string;
   subtitle: string;
@@ -245,11 +249,11 @@ function InstrumentRow({
   showBorder: boolean;
   currency?: string;
   logo?: string;
+  onSelect?: () => void;
 }) {
-  return (
-    <div
-      className={`flex gap-4 items-center py-4 px-3 w-full ${showBorder ? "border-b border-black/10" : ""}`}
-    >
+  const className = `flex gap-4 items-center py-4 px-3 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "hover:bg-black/[0.02]" : ""}`;
+  const inner = (
+    <>
       <div className="flex flex-col flex-1 min-w-0">
         <div className="flex gap-2 items-center h-6">
           {logo && (
@@ -287,8 +291,18 @@ function InstrumentRow({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
+
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={className}>
+        {inner}
+      </button>
+    );
+  }
+
+  return <div className={className}>{inner}</div>;
 }
 
 // ── Stock Recommendation ────────────────────────────────────────────────────
@@ -306,6 +320,7 @@ function RecommendationCard({
   rows: StockRow[];
   currency: string;
 }) {
+  const router = useRouter();
   return (
     <div className={`flex-1 flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
       <div className="flex gap-2 items-center px-6 py-3 shrink-0" style={{ backgroundColor: "#f9f9f9" }}>
@@ -329,6 +344,7 @@ function RecommendationCard({
             logo={row.logo}
             currency={currency}
             showBorder={i < rows.length - 1}
+            onSelect={() => router.push(stockProductHref(row.symbol))}
           />
         ))}
       </div>
@@ -531,6 +547,7 @@ function CrossSellCard({
   icon,
   headerFrom,
   rows,
+  onNavigate,
 }: {
   title: string;
   icon: ReactNode;
@@ -538,21 +555,34 @@ function CrossSellCard({
    *  the Figma "BG overlay" mask gradient rather than a flat pastel fill. */
   headerFrom: string;
   rows: CrossSellRow[];
+  /** Opens the product's full asset-card list (Figma "3.4 DR_detail" /
+   *  "3.6 ETF_detail") — omit to render the header as a plain, unclickable
+   *  label. */
+  onNavigate?: () => void;
 }) {
+  const header = (
+    <div
+      className="flex gap-2 items-center justify-between px-6 py-4"
+      style={{ background: `linear-gradient(to bottom, ${headerFrom}, #ffffff)` }}
+    >
+      <div className="flex gap-2 items-center">
+        {icon}
+        <p className="font-bold text-base" style={{ color: "#101828" }}>
+          {title}
+        </p>
+      </div>
+      <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />
+    </div>
+  );
   return (
     <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
-      <div
-        className="flex gap-2 items-center justify-between px-6 py-4"
-        style={{ background: `linear-gradient(to bottom, ${headerFrom}, #ffffff)` }}
-      >
-        <div className="flex gap-2 items-center">
-          {icon}
-          <p className="font-bold text-base" style={{ color: "#101828" }}>
-            {title}
-          </p>
-        </div>
-        <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />
-      </div>
+      {onNavigate ? (
+        <button type="button" onClick={onNavigate} className="text-left w-full hover:brightness-[0.98] transition-[filter]">
+          {header}
+        </button>
+      ) : (
+        header
+      )}
       <div className="flex flex-col px-6">
         {rows.map((row, i) => (
           <CrossSellInstrumentRow
@@ -586,6 +616,7 @@ function CrossSellSection({
   catalog: MarketCatalog;
 }) {
   const isUsEtf = catalog.crossSell === "etf-gain-loss";
+  const router = useRouter();
   return (
     <div className="relative w-full overflow-hidden" style={{ paddingTop: 24, paddingBottom: 24 }}>
       <Image
@@ -674,12 +705,14 @@ function CrossSellSection({
                 icon={<PaperPlaneTiltIcon size={24} className="text-[#0084d1]" />}
                 headerFrom="#e7f3fb"
                 rows={STOCK_DR_ROWS}
+                onNavigate={() => router.push("/product-catalog/stock/dr")}
               />
               <CrossSellCard
                 title="ETF (Exchange Traded Fund)"
                 icon={<GlobeIcon size={24} className="text-[#d08700]" />}
                 headerFrom="#faf3e5"
                 rows={STOCK_ETF_ROWS}
+                onNavigate={() => router.push("/product-catalog/stock/etf")}
               />
             </>
           )}
@@ -730,9 +763,17 @@ function SectorGlyph({ id, size }: { id: string; size: number }) {
   return Icon ? <Icon size={size} weight="fill" /> : null;
 }
 
-function SectorListRow({ sector, showBorder }: { sector: SectorRow; showBorder: boolean }) {
-  return (
-    <div className={`flex gap-4 items-center px-6 py-4 w-full ${showBorder ? "border-b border-black/10" : ""}`}>
+function SectorListRow({
+  sector,
+  showBorder,
+  onNavigate,
+}: {
+  sector: SectorRow;
+  showBorder: boolean;
+  onNavigate?: () => void;
+}) {
+  const inner = (
+    <>
       <div className="flex gap-4 items-center flex-1 min-w-0">
         {/* Figma "Sector_list" row icons render solid brand blue regardless of
          *  the sector's own trend color (node 26739:57814 family). */}
@@ -771,8 +812,17 @@ function SectorListRow({ sector, showBorder }: { sector: SectorRow; showBorder: 
         </div>
       )}
       <CaretRightIcon size={24} className="text-[#4a5565] shrink-0" />
-    </div>
+    </>
   );
+  const className = `flex gap-4 items-center px-6 py-4 w-full ${showBorder ? "border-b border-black/10" : ""}`;
+  if (onNavigate) {
+    return (
+      <button type="button" onClick={onNavigate} className={`${className} text-left w-full hover:bg-black/[0.02] transition-colors`}>
+        {inner}
+      </button>
+    );
+  }
+  return <div className={className}>{inner}</div>;
 }
 
 const HEATMAP_TILE_BG: Record<Trend, string> = { up: "#f0fdf4", down: "#fef2f2", flat: "#f9fafb" };
@@ -996,10 +1046,14 @@ function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: Heat
 function SetIndustrySectorSection({
   sectors,
   layout,
+  linkSectors,
 }: {
   sectors: SectorRow[];
   layout: HeatmapLayout;
+  /** When true, list rows open the SET Industry Sector detail route (Thai catalog). */
+  linkSectors?: boolean;
 }) {
+  const router = useRouter();
   return (
     <div className={`flex flex-col gap-4 bg-white rounded-xl p-6 w-full ${CARD_SHADOW}`}>
       <div className="flex gap-4 items-center justify-between w-full flex-wrap">
@@ -1018,7 +1072,14 @@ function SetIndustrySectorSection({
       <div className="flex gap-10 items-stretch w-full">
         <div className="flex-1 min-w-0">
           {sectors.map((s, i) => (
-            <SectorListRow key={s.id} sector={s} showBorder={i < sectors.length - 1} />
+            <SectorListRow
+              key={s.id}
+              sector={s}
+              showBorder={i < sectors.length - 1}
+              onNavigate={
+                linkSectors ? () => router.push(setIndustrySectorHref(s.id)) : undefined
+              }
+            />
           ))}
         </div>
         <SectorHeatmap sectors={sectors} layout={layout} />
@@ -1134,7 +1195,11 @@ export function StockTab({ onCrossSellViewAll }: { onCrossSellViewAll?: () => vo
       <CrossSellSection onViewAll={onCrossSellViewAll} catalog={catalog} />
       <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 24 }}>
         <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
-          <SetIndustrySectorSection sectors={catalog.sectors} layout={catalog.heatmapLayout} />
+          <SetIndustrySectorSection
+            sectors={catalog.sectors}
+            layout={catalog.heatmapLayout}
+            linkSectors={marketId === "th"}
+          />
           <EssentialServicesSection
             title={catalog.servicesTitle}
             desc={catalog.servicesDesc}

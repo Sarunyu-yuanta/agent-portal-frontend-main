@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Pagination } from "@sarunyu/system-one";
 import {
   HEADER_TEXT_CLS,
@@ -67,51 +68,74 @@ function TableRow({
   row,
   isLast,
   onRowClick,
+  href,
 }: {
   row: ThaiStructuredProduct;
   isLast: boolean;
   onRowClick?: (row: ThaiStructuredProduct) => void;
+  href?: string;
 }) {
   const border = cellBorderStyle({ bottom: !isLast });
+  const interactive = Boolean(onRowClick || href);
+  const hoverHandlers = interactive
+    ? {
+        onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+          const el = e.currentTarget;
+          el.style.backgroundColor = "#f9fafb";
+          (el.firstElementChild as HTMLElement).style.backgroundColor = "#f9fafb";
+        },
+        onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+          const el = e.currentTarget;
+          el.style.backgroundColor = "";
+          (el.firstElementChild as HTMLElement).style.backgroundColor = "";
+        },
+      }
+    : {};
+  const className = `flex items-stretch shrink-0 ${MIN_WIDTH} bg-white ${interactive ? "cursor-pointer" : ""}`;
+  const cells = COLS.map((col) => (
+    <div
+      key={col.key}
+      className={`flex ${col.width} shrink-0 items-center ${col.align} px-3 py-3.5 ${col.sticky ? STICKY_COL : ""}`}
+      style={border}
+    >
+      <span
+        className={`text-sm ${col.sticky || col.accent ? "font-bold " : ""}leading-5 ${col.accent ? "text-[#0a6ee7]" : "text-[#101828]"} whitespace-nowrap`}
+      >
+        {row[col.key]}
+      </span>
+    </div>
+  ));
+
+  if (href) {
+    return (
+      <Link href={href} className={`${className} text-inherit no-underline`} {...hoverHandlers}>
+        {cells}
+      </Link>
+    );
+  }
+
   return (
     <div
       role={onRowClick ? "button" : undefined}
       tabIndex={onRowClick ? 0 : undefined}
       onClick={() => onRowClick?.(row)}
       onKeyDown={onRowClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onRowClick(row); } } : undefined}
-      className={`flex items-stretch shrink-0 ${MIN_WIDTH} bg-white cursor-pointer`}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget;
-        el.style.backgroundColor = "#f9fafb";
-        (el.firstElementChild as HTMLElement).style.backgroundColor = "#f9fafb";
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget;
-        el.style.backgroundColor = "";
-        (el.firstElementChild as HTMLElement).style.backgroundColor = "";
-      }}
+      className={className}
+      {...hoverHandlers}
     >
-      {COLS.map((col) => (
-        <div
-          key={col.key}
-          className={`flex ${col.width} shrink-0 items-center ${col.align} px-3 py-3.5 ${col.sticky ? STICKY_COL : ""}`}
-          style={border}
-        >
-          <span
-            className={`text-sm ${col.sticky || col.accent ? "font-bold " : ""}leading-5 ${col.accent ? "text-[#0a6ee7]" : "text-[#101828]"} whitespace-nowrap`}
-          >
-            {row[col.key]}
-          </span>
-        </div>
-      ))}
+      {cells}
     </div>
   );
 }
 
 export function ThaiStructuredProductTable({
   onRowClick,
+  products = THAI_STRUCTURED_PRODUCTS,
+  getRowHref,
 }: {
   onRowClick?: (row: ThaiStructuredProduct) => void;
+  products?: ThaiStructuredProduct[];
+  getRowHref?: (row: ThaiStructuredProduct) => string;
 } = {}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -119,10 +143,10 @@ export function ThaiStructuredProductTable({
   const bodyScrollRef = useRef<HTMLDivElement>(null);
   const tableCardRef = useRef<HTMLDivElement>(null);
 
-  const total = THAI_STRUCTURED_PRODUCTS.length;
+  const total = products.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-  const paged = THAI_STRUCTURED_PRODUCTS.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = products.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <div className="flex flex-col gap-3">
@@ -159,6 +183,7 @@ export function ThaiStructuredProductTable({
                 row={row}
                 isLast={i === paged.length - 1}
                 onRowClick={onRowClick}
+                href={getRowHref?.(row)}
               />
             ))}
           </div>

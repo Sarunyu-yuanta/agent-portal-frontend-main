@@ -62,6 +62,7 @@ const CATEGORY_BY_PATH: [RegExp, string][] = [
   [/^\/product-catalog\/global-bond(\/|$)/, "global-bond"],
   [/^\/product-catalog\/thai-structured\//, "thai-structured"],
   [/^\/product-catalog\/mutual-fund\//, "mutual-fund"],
+  [/^\/product-catalog\/stock\/(?!dr|etf)[^/]+$/, "stock"],
   [/^\/product-catalog\/robo-advisory(\/|$)/, "robo-advisory"],
   [/^\/product-catalog\/definit(\/|$)/, "robo-advisory"],
 ];

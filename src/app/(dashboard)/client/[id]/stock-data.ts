@@ -9,7 +9,7 @@ export type Trend = "up" | "down" | "flat";
 
 /** Deterministic pseudo-chart so SSR and the client render the exact same
  *  sparkline — a real `Math.random()` would desync on hydration. */
-function seededSeries(seed: string, points: number, trend: Trend): number[] {
+export function seededSeries(seed: string, points: number, trend: Trend): number[] {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   const next = () => {
@@ -204,6 +204,124 @@ export const STOCK_ETF_ROWS: CrossSellRow[] = crossSellRows("ETF", [
   ["FPTV19", "DR on FPTVN #YUANTA", "135.75", "+15.30", "+0.61%", "up"],
   ["NINTENDO19", "DR on NINTENDO #YUANTA", "142.50", "+18.90", "+0.61%", "up"],
 ]);
+
+/**
+ * Figma "3.4 DR_detail" / "3.6 ETF_detail" (nodes 23228:37812 / 23228:38277) —
+ * the full asset-card grid a DR/ETF cross-sell card's arrow opens into. Both
+ * Figma frames render the exact same 10-card block, repeated twice (20 cards
+ * against a static "100 Lists" count — a paginated/lazy-loaded total, not the
+ * rendered count), the ETF frame literally reusing the DR instances,
+ * descriptions and all. `StockCrossSellDetail` renders this array twice to
+ * match, so one shared 10-row dataset backs both detail pages.
+ */
+export const STOCK_CROSS_SELL_DETAIL_ROWS: CrossSellRow[] = crossSellRows("DR", [
+  ["TAIWAN19", "DR on YT TAIWAN50 ETF #YUANTA", "125.00", "+18.00", "+0.61%", "up"],
+  ["GOLD19", "DR on SPDR GOLD TRUST(GSD) #YUANTA", "150.00", "0.00", "0.00%", "flat"],
+  ["FPTV19", "DR on FPTVN #YUANTA", "142.10", "-18.25", "-20.00%", "down"],
+  ["SIA19", "DR on SIA #YUANTA", "110.00", "+25.00", "+0.61%", "up"],
+  ["QQQM19", "DR on INVESCO NDAQ100 ETF #YUANTA", "130.00", "+22.50", "+0.61%", "up"],
+  ["TAIWAN19", "DR on YT TAIWAN50 ETF #YUANTA", "160.00", "-25.00", "-20.00%", "down"],
+  ["PFIZER19", "DR on PFIZER #YUANTA", "140.00", "-15.00", "-20.00%", "down"],
+  ["DISNEY19", "DR on DISNEY #YUANTA", "170.00", "+30.00", "+0.61%", "up"],
+  ["SIA19", "DR on SIA #YUANTA", "135.75", "0.00", "0.00%", "flat"],
+  ["GOLD19", "DR on SPDR GOLD TRUST(GSD) #YUANTA", "98.50", "+15.30", "+0.61%", "up"],
+]);
+
+/** A single selectable chip in the DR/ETF "Filter" sheet (Figma
+ *  "Modal/filer_Market", node 23051:51385 family) — an issuer/broker logo or
+ *  a country flag, plus the label shown beside it. */
+export type FilterChipOption = { id: string; label: string; icon: string };
+
+/** Broker logos exported from the Figma filter modal (node 23219:23978). */
+export const STOCK_FILTER_ISSUERS: FilterChipOption[] = [
+  { id: "yuanta", label: "Yuanta", icon: "/brand/yuanta-icon-logo.svg" },
+  { id: "ktb", label: "KTB", icon: "/products/stock/filters/broker-ktb.png" },
+  { id: "bls", label: "BLS", icon: "/products/stock/filters/broker-bls.png" },
+  { id: "pi", label: "Pi", icon: "/products/stock/filters/broker-pi.png" },
+  { id: "kgi", label: "KGI", icon: "/products/stock/filters/broker-kgi.png" },
+  { id: "kkps", label: "KKPS", icon: "/products/stock/filters/broker-kkps.png" },
+  { id: "ks", label: "KS", icon: "/products/stock/filters/broker-ks.png" },
+  { id: "scbx", label: "SCBX", icon: "/products/stock/filters/broker-scbx.png" },
+  { id: "fss", label: "FSS", icon: "/products/stock/filters/broker-fss.png" },
+  { id: "invx", label: "INVX", icon: "/products/stock/filters/broker-invx.png" },
+];
+
+/** Country/region flags — the DR filter omits Thailand (a DR is itself listed
+ *  on the SET), the ETF filter includes it, exactly as node 23228:41356 vs.
+ *  23228:38758 show. */
+const STOCK_FILTER_COUNTRIES_BASE: FilterChipOption[] = [
+  { id: "us", label: "US", icon: "/products/stock/filters/flag-us.svg" },
+  { id: "taiwan", label: "Taiwan", icon: "/products/stock/filters/flag-taiwan.svg" },
+  { id: "china", label: "China", icon: "/products/stock/filters/flag-china.svg" },
+  { id: "japan", label: "Japan", icon: "/products/stock/filters/flag-japan.svg" },
+  { id: "vietnam", label: "Vietnam", icon: "/products/stock/filters/flag-vietnam.svg" },
+  { id: "hong-kong", label: "Hong Kong", icon: "/products/stock/filters/flag-hongkong.svg" },
+  { id: "singapore", label: "Singapore", icon: "/products/stock/filters/flag-singapore.svg" },
+  { id: "india", label: "India", icon: "/products/stock/filters/flag-india.svg" },
+  { id: "europe", label: "Europe", icon: "/products/stock/filters/flag-europe.svg" },
+  { id: "denmark", label: "Denmark", icon: "/products/stock/filters/flag-denmark.svg" },
+  { id: "france", label: "France", icon: "/products/stock/filters/flag-france.svg" },
+  { id: "italy", label: "Italy", icon: "/products/stock/filters/flag-italy.svg" },
+  { id: "netherlands", label: "Netherlands", icon: "/products/stock/filters/flag-netherlands.svg" },
+];
+const STOCK_FILTER_COUNTRIES_THAILAND: FilterChipOption = {
+  id: "thailand",
+  label: "Thailand",
+  icon: "/products/stock/filters/flag-thailand.svg",
+};
+
+export type StockCrossSellKind = "dr" | "etf";
+
+export type StockCrossSellDetailConfig = {
+  title: string;
+  description: string;
+  /** Hero banner gradient — Figma "Asset detail" instance (node 23228:30095).
+   *  The 320% end-stop (vs. the ~34% Figma's own gradient-handle math implies)
+   *  is fit to the rendered frame's actual pixels — the handle length isn't
+   *  1:1 with the hero's own height, so 34% way undershoots how blue/orange
+   *  the visible banner really gets. */
+  gradient: string;
+  /** Hero decorative graphic exported straight from the Figma frame (node
+   *  23228:29193) — not the Essential Services mockup, which is a different
+   *  asset despite the shared subject. */
+  heroImage: string;
+  /** ETF's globe render sits on an opaque black backdrop in the source PNG;
+   *  screen blend (as StockTab already does for the ETF service-card mockup)
+   *  drops the black to transparent so the hero gradient shows through. */
+  heroImageBlend?: "screen";
+  showIssuerFilter: boolean;
+  countries: FilterChipOption[];
+  defaultIssuerIds: string[];
+  defaultCountryIds: string[];
+};
+
+/** Per-product copy/gradient/filter config for the DR and ETF detail pages —
+ *  both otherwise share `StockCrossSellDetail`'s layout entirely. */
+export const STOCK_CROSS_SELL_DETAIL: Record<StockCrossSellKind, StockCrossSellDetailConfig> = {
+  dr: {
+    title: "DR (Depositary Receipt)",
+    description:
+      "An investment product that is traded on the Stock Exchange of Thailand.\nIt is designed to provide Thai investors with increased opportunities.",
+    gradient: "linear-gradient(180deg, #3597de 0%, #0004ff 320%)",
+    heroImage: "/products/stock/cross-sell-hero-dr.png",
+    showIssuerFilter: true,
+    countries: STOCK_FILTER_COUNTRIES_BASE,
+    defaultIssuerIds: ["ktb", "bls"],
+    defaultCountryIds: ["china"],
+  },
+  etf: {
+    title: "ETF (Exchange Traded Fund)",
+    description:
+      "An investment policy that follows various indexes like stocks, commodities, \nand bonds, aiming to generate returns similar to the index's movements.",
+    gradient: "linear-gradient(180deg, #f6bb43 0%, #ff4d00 320%)",
+    heroImage: "/products/stock/cross-sell-hero-etf.png",
+    heroImageBlend: "screen",
+    showIssuerFilter: false,
+    countries: [STOCK_FILTER_COUNTRIES_THAILAND, ...STOCK_FILTER_COUNTRIES_BASE],
+    defaultIssuerIds: [],
+    defaultCountryIds: ["china"],
+  },
+};
 
 export type SectorRow = {
   id: string;

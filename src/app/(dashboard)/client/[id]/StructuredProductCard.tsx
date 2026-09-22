@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FireIcon, ShieldCheckIcon } from "@phosphor-icons/react";
 import type { StructuredProduct } from "./structured-product-data";
 
@@ -100,6 +101,8 @@ function StatsGrid({
   );
 }
 
+const CARD_HOVER = "cursor-pointer transition-colors hover:bg-[#f9fafb]!";
+
 export function StructuredProductCard({
   underlying,
   coupon,
@@ -110,8 +113,9 @@ export function StructuredProductCard({
   tags,
   logos,
   onClick,
+  href,
   variant = "catalog",
-}: CardProduct & { onClick?: () => void; variant?: "catalog" | "grid" }) {
+}: CardProduct & { onClick?: () => void; href?: string; variant?: "catalog" | "grid" }) {
   const stats = [
     { label: "Tenor", value: tenor },
     { label: "KO", value: ko },
@@ -120,8 +124,9 @@ export function StructuredProductCard({
   ];
 
   const isGrid = variant === "grid";
+  const clickable = Boolean(onClick || href);
 
-  const interactiveProps = onClick
+  const interactiveProps = onClick && !href
     ? {
         role: "button" as const,
         tabIndex: 0,
@@ -132,21 +137,21 @@ export function StructuredProductCard({
             onClick();
           }
         },
-        className: "cursor-pointer",
+        className: CARD_HOVER,
       }
-    : {};
+    : clickable
+      ? { className: CARD_HOVER }
+      : {};
 
   const cardStyle = {
-    backgroundColor: "white",
     border: "1px solid rgba(0,0,0,0.1)",
     boxShadow: CARD_SHADOW,
   };
 
-  if (isGrid) {
-    return (
+  const card = isGrid ? (
       <div
         {...interactiveProps}
-        className={`flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full ${interactiveProps.className ?? ""}`}
+        className={`flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         <div className="flex flex-col gap-2 items-start w-full">
@@ -155,15 +160,12 @@ export function StructuredProductCard({
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
       </div>
-    );
-  }
-
-  return (
+    ) : (
     <>
       {/* Mobile — vertical stack */}
       <div
         {...interactiveProps}
-        className={`flex md:hidden flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full ${interactiveProps.className ?? ""}`}
+        className={`flex md:hidden flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         <div className="flex flex-col gap-2 items-start w-full">
@@ -176,7 +178,7 @@ export function StructuredProductCard({
       {/* Tablet — horizontal */}
       <div
         {...interactiveProps}
-        className={`hidden md:flex lg:hidden h-[120px] box-border items-start gap-4 overflow-hidden p-5 relative rounded-[12px] w-full ${interactiveProps.className ?? ""}`}
+        className={`hidden md:flex lg:hidden h-[120px] box-border items-start gap-4 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         <div className="flex flex-1 flex-col gap-2 items-start min-w-0">
@@ -189,7 +191,7 @@ export function StructuredProductCard({
       {/* Desktop — vertical grid card */}
       <div
         {...interactiveProps}
-        className={`hidden lg:flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full ${interactiveProps.className ?? ""}`}
+        className={`hidden lg:flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         <div className="flex flex-col gap-2 items-start w-full">
@@ -199,5 +201,14 @@ export function StructuredProductCard({
         <StatsGrid stats={stats} className="w-full py-2" />
       </div>
     </>
-  );
+    );
+
+  if (href) {
+    return (
+      <Link href={href} className="block text-inherit no-underline">
+        {card}
+      </Link>
+    );
+  }
+  return card;
 }
