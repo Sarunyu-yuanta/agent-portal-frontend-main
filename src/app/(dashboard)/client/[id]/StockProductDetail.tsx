@@ -697,7 +697,7 @@ export function StockProductDetail({
   const searchParams = useSearchParams();
   const [favorited, setFavorited] = useState(false);
   const related = useMemo(() => getRelatedProducts(detail.symbol), [detail.symbol]);
-  const tabs = useMemo(
+  const tabs = useMemo<readonly StockDetailTab[]>(
     () =>
       relatedProductKinds(related).length > 0
         ? STOCK_DETAIL_TABS
