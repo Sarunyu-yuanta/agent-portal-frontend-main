@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { BottomSheet, Popover } from "@sarunyu/system-one";
 import { CoinsIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { DayPopoverContent } from "./DayPopoverContent";
+import { useVisibleRows } from "./use-visible-rows";
 import type { DayItem } from "./day-items";
 import {
   dayLabel,
@@ -77,19 +78,6 @@ const ALERT_HOVER: Record<DayRelation, string> = {
 const DONE_TONE = "bg-[var(--fill-gray-100)] text-subtle-text line-through";
 const DONE_HOVER = "hover:bg-[var(--fill-gray-200)]!";
 
-/** Rows assumed before the stack has been measured — server render and the
- * first client paint, where there is no layout to read yet. Three is what the
- * old fixed-height cell fit, so the common desktop case lands on its final
- * number immediately and nothing visibly reflows. */
-const ASSUMED_ROWS = 3;
-
-/** `gap-1` on the pill stack, in px — part of what one row costs, so this and
- * the class have to move together or the fit calculation drifts. */
-const ROW_GAP = 4;
-
-/** Only used until the first pill can be measured. */
-const FALLBACK_ROW_HEIGHT = 20;
-
 /** Sun–Sat. Columns 0–2 open their popover to the right, 3–6 to the left. */
 const COLUMNS_PER_WEEK = 7;
 
@@ -137,33 +125,9 @@ export function DayCell({
   const alertTone = ALERT_TONE[relation];
   const alertHover = ALERT_HOVER[relation];
 
-  // How many rows the stack can show is a layout question, not a constant: cells
-  // divide whatever height the viewport leaves, so a short window gets two rows
-  // where a tall one gets six. Measuring beats guessing — a fixed count either
-  // clips mid-pill on a laptop or wastes space on a monitor.
-  const stackRef = useRef<HTMLDivElement>(null);
-  const rowHeightRef = useRef(FALLBACK_ROW_HEIGHT);
-  const [rows, setRows] = useState(ASSUMED_ROWS);
-
-  useEffect(() => {
-    const el = stackRef.current;
-    if (!el) return;
-    const measure = () => {
-      // Read the real pill height rather than hard-coding one — it follows
-      // `type-caption`, so a type-scale change stays correct here for free.
-      const first = el.firstElementChild as HTMLElement | null;
-      if (first?.offsetHeight) rowHeightRef.current = first.offsetHeight;
-      const perRow = rowHeightRef.current + ROW_GAP;
-      // The last row needs no trailing gap, hence the `+ ROW_GAP` on the height.
-      setRows(Math.max(0, Math.floor((el.clientHeight + ROW_GAP) / perRow)));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-    // The stack element is stable for the cell's lifetime; resizes come from the
-    // observer, so this never needs to re-subscribe.
-  }, []);
+  // How many rows the stack can show is a layout question, not a constant — see
+  // `useVisibleRows`, which the Company Events grid on a stock shares.
+  const { stackRef, rows } = useVisibleRows();
 
   // "+N more" occupies a row of its own, so it can only be afforded by giving up
   // a pill. When even one row is too many, everything folds into the counter.

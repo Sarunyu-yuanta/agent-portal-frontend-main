@@ -2,6 +2,10 @@ import {
   MARKET_CATALOG,
   MARKET_STATUS,
   seededSeries,
+  STOCK_CROSS_SELL_DETAIL_ROWS,
+  STOCK_DR_ROWS,
+  STOCK_ETF_ROWS,
+  type CrossSellRow,
   type MarketStatusValue,
   type StockRow,
   type Trend,
@@ -399,6 +403,29 @@ function fromRow(row: StockRow, currency: string): StockProductDetail {
   };
 }
 
+/**
+ * A DR or ETF row in the shape the detail page reads.
+ *
+ * `CrossSellRow` carries a `subtitle` where a stock carries a `name` — the same
+ * slot under the symbol, so it maps straight onto it. Its own `currency` wins
+ * when it has one: a DR on a foreign underlying can be quoted off its market's
+ * default.
+ */
+function fromCrossSellRow(row: CrossSellRow, currency: string): StockProductDetail {
+  return fromRow(
+    {
+      symbol: row.symbol,
+      name: row.subtitle,
+      price: row.price,
+      changeAmount: row.changeAmount,
+      changePercent: row.changePercent,
+      trend: row.trend,
+      series: row.series,
+    },
+    row.currency ?? currency,
+  );
+}
+
 export function getStockProductDetail(id: string): StockProductDetail | null {
   const key = id.trim();
   if (!key) return null;
@@ -412,6 +439,25 @@ export function getStockProductDetail(id: string): StockProductDetail | null {
       return fromRow(match, market.currency);
     }
   }
+
+  // DR and ETF rows, which the Stock tab's cross-sell cards link into. Searched
+  // after the stock lists so a symbol carried by both resolves to its stock
+  // record, which is the richer one.
+  for (const market of Object.values(MARKET_CATALOG)) {
+    const match = [...market.etfGain, ...market.etfLoss].find(
+      (row) => row.symbol.toUpperCase() === key.toUpperCase(),
+    );
+    if (match) {
+      return fromCrossSellRow(match, market.currency);
+    }
+  }
+
+  const crossSellMatch = [
+    ...STOCK_DR_ROWS,
+    ...STOCK_ETF_ROWS,
+    ...STOCK_CROSS_SELL_DETAIL_ROWS,
+  ].find((row) => row.symbol.toUpperCase() === key.toUpperCase());
+  if (crossSellMatch) return fromCrossSellRow(crossSellMatch, "THB");
 
   const sectorMatch = knownStockRows().find(
     (row) => row.symbol.toUpperCase() === key.toUpperCase(),

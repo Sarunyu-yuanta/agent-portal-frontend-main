@@ -8,11 +8,7 @@ import {
   ArrowRightIcon,
   CaretDownIcon,
   CaretUpIcon,
-  ChatsCircleIcon,
-  ClockCountdownIcon,
-  FireSimpleIcon,
   GlobeIcon,
-  MagnifyingGlassIcon,
   MinusIcon,
   PaperPlaneTiltIcon,
   TrendDownIcon,
@@ -27,12 +23,10 @@ import {
   MARKET_WATCHLIST,
   STOCK_DR_ROWS,
   STOCK_ETF_ROWS,
-  STOCK_SCREENER_CARDS,
   type CrossSellRow,
   type MarketCatalog,
   type MarketId,
   type MarketStatusValue,
-  type ServiceCard,
   type StockRow,
   type Trend,
 } from "./stock-data";
@@ -208,7 +202,7 @@ function InstrumentRow({
   logo?: string;
   onSelect?: () => void;
 }) {
-  const className = `flex gap-4 items-center py-4 px-3 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "hover:bg-black/[0.02]" : ""}`;
+  const className = `flex gap-4 items-center py-4 px-3 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "cursor-pointer hover:bg-black/[0.02] transition-colors" : ""}`;
   const inner = (
     <>
       <div className="flex flex-col flex-1 min-w-0">
@@ -378,64 +372,6 @@ function StockRecommendationSection({
   );
 }
 
-// ── Stock Screener ───────────────────────────────────────────────────────────
-
-const SCREENER_ICONS: Record<string, ReactNode> = {
-  trending: <MagnifyingGlassIcon size={24} />,
-  highlight: <FireSimpleIcon size={24} />,
-  "talk-of-the-town": <ChatsCircleIcon size={24} />,
-  realtime: <ClockCountdownIcon size={24} />,
-};
-
-function StockScreenerSection() {
-  return (
-    <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 24 }}>
-      <div className="flex flex-col gap-4 max-w-[1280px] mx-auto px-4 lg:px-6">
-        <div className="flex gap-2 items-center">
-          <p className="font-bold text-lg" style={{ color: "#101828" }}>
-            Stock Screener
-          </p>
-          <ArrowRightIcon size={20} style={{ color: "#4a5565" }} />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
-          {STOCK_SCREENER_CARDS.map((card) => (
-            <div
-              key={card.id}
-              className={`relative flex flex-col gap-2 bg-white rounded-lg p-3 overflow-hidden h-[108px] ${CARD_SHADOW}`}
-            >
-              <div className="flex gap-1.5 items-center">
-                <span
-                  className="flex items-center justify-center rounded-full p-1 shrink-0"
-                  style={{ backgroundColor: "#fbdfcc", color: "#eb6101" }}
-                >
-                  {SCREENER_ICONS[card.id]}
-                </span>
-                <p className="font-bold text-base truncate" style={{ color: "#eb6101" }}>
-                  {card.title}
-                </p>
-              </div>
-              <p className="text-sm line-clamp-2" style={{ color: "#4a5565" }}>
-                {card.desc}
-              </p>
-              {/* Figma "Symbol_Text" watermark (asset 9bbbe.svg) — faint brand
-               *  mark peeking from the bottom-right corner, clipped by the
-               *  card's overflow-hidden. */}
-              <Image
-                src="/products/stock/screener-watermark.svg"
-                alt=""
-                width={72}
-                height={72}
-                aria-hidden
-                className="absolute -right-[19px] -bottom-[19px] pointer-events-none"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Open up opportunities (DR / ETF cross-sell) ─────────────────────────────
 
 /** Figma "Asset Card" row (node 22907:35325 family) — a roomier variant of
@@ -451,6 +387,7 @@ function CrossSellInstrumentRow({
   series,
   showBorder,
   currency = "THB",
+  onSelect,
 }: {
   symbol: string;
   subtitle: string;
@@ -461,42 +398,53 @@ function CrossSellInstrumentRow({
   series: number[];
   showBorder: boolean;
   currency?: string;
+  /** Opens the instrument's own detail page. Optional for the same reason
+   *  `InstrumentRow`'s is: a row with nothing behind it renders inert rather
+   *  than looking clickable and doing nothing. */
+  onSelect?: () => void;
 }) {
-  return (
-    <div
-      className={`flex gap-6 items-center py-6 px-6 w-full ${showBorder ? "border-b border-black/10" : ""}`}
-    >
-      <div className="flex gap-4 items-center flex-1 min-w-0">
-        <div className="flex flex-col flex-1 min-w-0 gap-0.5">
-          <p className="font-bold text-sm truncate" style={{ color: "#101828" }}>
-            {symbol}
-          </p>
-          <p className="text-sm truncate" style={{ color: "#6a7282" }}>
-            {subtitle}
-          </p>
+  const className = `flex gap-6 items-center py-6 px-6 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "cursor-pointer hover:bg-black/[0.02] transition-colors" : ""}`;
+  const inner = (
+    <div className="flex gap-4 items-center flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+        <p className="font-bold text-sm truncate" style={{ color: "#101828" }}>
+          {symbol}
+        </p>
+        <p className="text-sm truncate" style={{ color: "#6a7282" }}>
+          {subtitle}
+        </p>
+      </div>
+      <StockMiniChart series={series} trend={trend} width={96} height={42} className="shrink-0 w-24 h-[42px]" />
+      <div className="flex flex-col items-end w-[120px] shrink-0 gap-0.5">
+        <div className="flex gap-1 items-baseline font-bold text-sm" style={{ color: "#101828" }}>
+          <span>{price}</span>
+          <span>{currency}</span>
         </div>
-        <StockMiniChart series={series} trend={trend} width={96} height={42} className="shrink-0 w-24 h-[42px]" />
-        <div className="flex flex-col items-end w-[120px] shrink-0 gap-0.5">
-          <div className="flex gap-1 items-baseline font-bold text-sm" style={{ color: "#101828" }}>
-            <span>{price}</span>
-            <span>{currency}</span>
-          </div>
-          {trend === "flat" ? (
-            <span className="text-sm" style={{ color: "#6a7282" }}>
+        {trend === "flat" ? (
+          <span className="text-sm" style={{ color: "#6a7282" }}>
+            {changeAmount}
+          </span>
+        ) : (
+          <div className="flex gap-1.5 items-center">
+            <span className="text-sm" style={{ color: TREND_TEXT[trend] }}>
               {changeAmount}
             </span>
-          ) : (
-            <div className="flex gap-1.5 items-center">
-              <span className="text-sm" style={{ color: TREND_TEXT[trend] }}>
-                {changeAmount}
-              </span>
-              <PercentPill trend={trend} value={changePercent} />
-            </div>
-          )}
-        </div>
+            <PercentPill trend={trend} value={changePercent} />
+          </div>
+        )}
       </div>
     </div>
   );
+
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={className}>
+        {inner}
+      </button>
+    );
+  }
+
+  return <div className={className}>{inner}</div>;
 }
 
 function CrossSellCard({
@@ -517,6 +465,7 @@ function CrossSellCard({
    *  label. */
   onNavigate?: () => void;
 }) {
+  const router = useRouter();
   const header = (
     <div
       className="flex gap-2 items-center justify-between px-6 py-4"
@@ -534,7 +483,7 @@ function CrossSellCard({
   return (
     <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
       {onNavigate ? (
-        <button type="button" onClick={onNavigate} className="text-left w-full hover:brightness-[0.98] transition-[filter]">
+        <button type="button" onClick={onNavigate} className="text-left w-full cursor-pointer hover:brightness-[0.98] transition-[filter]">
           {header}
         </button>
       ) : (
@@ -553,6 +502,7 @@ function CrossSellCard({
             series={row.series}
             currency={row.currency ?? "THB"}
             showBorder={i < rows.length - 1}
+            onSelect={() => router.push(stockProductHref(row.symbol))}
           />
         ))}
       </div>
@@ -628,6 +578,7 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
                       series={row.series}
                       currency={row.currency ?? catalog.currency}
                       showBorder={i < catalog.etfGain.length - 1}
+                      onSelect={() => router.push(stockProductHref(row.symbol))}
                     />
                   ))}
                 </div>
@@ -652,6 +603,7 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
                       series={row.series}
                       currency={row.currency ?? catalog.currency}
                       showBorder={i < catalog.etfLoss.length - 1}
+                      onSelect={() => router.push(stockProductHref(row.symbol))}
                     />
                   ))}
                 </div>
@@ -692,87 +644,6 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
   );
 }
 
-// ── Essential Investment Services ───────────────────────────────────────────
-
-function ServiceCardTile({ service }: { service: ServiceCard }) {
-  const blob =
-    service.blob === null
-      ? null
-      : (service.blob ?? "/products/stock/services/bg-blob.svg");
-  const bottom = service.mockupBottom ?? (service.gradient ? -15 : -10);
-  const right = service.mockupRight ?? (service.gradient ? 13 : -15);
-  return (
-    <div
-      className={`relative flex flex-1 min-w-[327px] max-w-[389px] flex-col gap-1 rounded-lg px-4 py-3 overflow-hidden h-[120px] ${CARD_SHADOW}`}
-      style={{ background: service.gradient ?? "#ffffff" }}
-    >
-      {blob && (
-        <Image
-          src={blob}
-          alt=""
-          width={208}
-          height={208}
-          aria-hidden
-          className="absolute pointer-events-none"
-          style={{ bottom: -122, right: -62 }}
-        />
-      )}
-      <div className="flex gap-3 items-center w-full relative z-10">
-        <p className="flex-1 font-bold text-sm" style={{ color: "rgba(0,0,0,0.75)" }}>
-          {service.title}
-        </p>
-        <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />
-      </div>
-      <p className="text-xs w-[220px] relative z-10" style={{ color: "rgba(0,0,0,0.6)" }}>
-        {service.desc}
-      </p>
-      <Image
-        src={service.mockup}
-        alt=""
-        width={service.mockupWidth}
-        height={service.mockupHeight}
-        aria-hidden
-        unoptimized={Boolean(service.mockupMixBlend)}
-        className="absolute pointer-events-none object-cover"
-        style={{
-          bottom,
-          right,
-          mixBlendMode: service.mockupMixBlend,
-          opacity: service.mockupOpacity,
-        }}
-      />
-    </div>
-  );
-}
-
-function EssentialServicesSection({
-  title,
-  desc,
-  services,
-}: {
-  title: string;
-  desc: string;
-  services: ServiceCard[];
-}) {
-  return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="flex flex-col gap-1">
-        <p className="font-bold text-lg" style={{ color: "#101828" }}>
-          {title}
-        </p>
-        <p className="text-sm" style={{ color: "#4a5565" }}>
-          {desc}
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-4 w-full">
-        {services.map((service) => (
-          <ServiceCardTile key={service.id} service={service} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ── Root ─────────────────────────────────────────────────────────────────────
 
 /**
@@ -795,20 +666,14 @@ export function StockTab() {
         currency={catalog.currency}
         updatedAt={MARKET_LATEST_UPDATE}
       />
-      <StockScreenerSection />
       <CrossSellSection catalog={catalog} />
       <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 24 }}>
-        <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <SetIndustrySectorSection
             title={catalog.sectorsTitle}
             sectors={catalog.sectors}
             layout={catalog.heatmapLayout}
             sectorsMarket={catalog.sectorsMarket}
-          />
-          <EssentialServicesSection
-            title={catalog.servicesTitle}
-            desc={catalog.servicesDesc}
-            services={catalog.services}
           />
         </div>
       </div>

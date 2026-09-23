@@ -1,6 +1,5 @@
 "use client";
 
-import { HeartIcon } from "@phosphor-icons/react";
 import { StockMiniChart } from "./StockMiniChart";
 import type { Trend } from "./stock-data";
 
@@ -34,7 +33,6 @@ export function StockLargeAssetCard({
   series,
   /** Figma sector grid keeps gain green on the amount even when the pill is red. */
   figmaSectorAmountColors = false,
-  favoriteIcon = true,
   onSelect,
 }: {
   symbol: string;
@@ -46,7 +44,6 @@ export function StockLargeAssetCard({
   trend: Trend;
   series: number[];
   figmaSectorAmountColors?: boolean;
-  favoriteIcon?: boolean;
   onSelect?: () => void;
 }) {
   const amountColor =
@@ -56,8 +53,16 @@ export function StockLargeAssetCard({
         ? "#008236"
         : TREND_TEXT[trend];
 
+  // `group-hover:` rather than `hover:` — the hover belongs to the whole card
+  // but the button below is the element that receives it, and the fill has to
+  // land on this div because it is the one carrying `bg-white`. The `!` is this
+  // repo's standing fix for that cascade: `@sarunyu/system-one` ships a plain
+  // `.bg-white` and loads after `globals.css`, so it takes the specificity tie
+  // from a Tailwind variant (see `SELECTED_TITLE` in `NotesSidebarList`).
+  // Nothing fires when the card is not clickable — there is no `group` ancestor
+  // then.
   const card = (
-    <div className="flex min-w-[343px] w-full items-center gap-6 rounded-lg border-b border-black/10 bg-white p-6">
+    <div className="flex min-w-[343px] w-full items-center gap-6 rounded-lg border-b border-black/10 bg-white p-6 transition-[background-color,box-shadow] group-hover:bg-[#fafafa]! group-hover:shadow-[0px_2px_8px_rgba(0,0,0,0.06)]">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <p className="max-w-[119px] truncate text-sm font-bold leading-5 text-[#101828]">{symbol}</p>
@@ -81,16 +86,17 @@ export function StockLargeAssetCard({
           )}
         </div>
       </div>
-      {favoriteIcon ? (
-        <HeartIcon size={22} weight="regular" className="shrink-0 text-[#6a7282]" aria-hidden />
-      ) : null}
     </div>
   );
 
   if (!onSelect) return card;
 
   return (
-    <button type="button" onClick={onSelect} className="w-full text-left">
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group w-full cursor-pointer rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fill-p1-600)]"
+    >
       {card}
     </button>
   );

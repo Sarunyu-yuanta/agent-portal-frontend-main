@@ -1,14 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CaretDownIcon, CircleNotchIcon, TrendUpIcon } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  CircleNotchIcon,
+  SquaresFourIcon,
+  TrendDownIcon,
+  TrendUpIcon,
+} from "@phosphor-icons/react";
+import { Popover } from "@sarunyu/system-one";
 import { StockLargeAssetCard } from "./StockLargeAssetCard";
 import {
   CatalogDetailBackHeader,
   CatalogDetailTextTabs,
   CATALOG_DETAIL_WIDTH,
+  preserveTabStripScroll,
   useCatalogDetailScrollTop,
 } from "./ProductCatalogTabbedDetailLayout";
 
@@ -29,6 +37,85 @@ import { SectorGlyph, TREND_PILL_BG } from "./stock-ui";
  *  `TREND_TEXT` (#4a5565 there vs #6a7282 here), so these must not be merged.
  *  `TREND_PILL_BG` is identical, hence shared from `stock-ui`. */
 const TREND_TEXT: Record<Trend, string> = { up: "#008236", down: "#c10007", flat: "#6a7282" };
+
+/** Figma node 21182:54066 — the list's sort control. Icons double as the
+ *  trigger's leading glyph, so a closed dropdown still says how the list is
+ *  ordered without reading the label. */
+const SORT_OPTIONS = [
+  { id: "all", label: "All Lists", Icon: SquaresFourIcon },
+  { id: "gain", label: "Top Gain", Icon: TrendUpIcon },
+  { id: "loss", label: "Top Loss", Icon: TrendDownIcon },
+] as const;
+
+type SortId = (typeof SORT_OPTIONS)[number]["id"];
+
+/** `changePercent` carries its own sign ("+0.61%", "-20.00%", "0.00"), so the
+ *  string parses straight to a comparable number — `trend` is a second reading
+ *  of the same fact and sorting by it would only lose the magnitude. */
+function percentValue(changePercent: string): number {
+  const n = Number.parseFloat(changePercent.replace(/[^0-9.+-]/g, ""));
+  return Number.isNaN(n) ? 0 : n;
+}
+
+function SortDropdown({ value, onChange }: { value: SortId; onChange: (id: SortId) => void }) {
+  const [open, setOpen] = useState(false);
+  const selected = SORT_OPTIONS.find((o) => o.id === value) ?? SORT_OPTIONS[0];
+  const SelectedIcon = selected.Icon;
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+      align="end"
+      sideOffset={8}
+      // `p-2` over the bubble's own padding: Figma pads the panel by 8px and
+      // lets each row run full width, so a row's selected fill and hover reach
+      // the panel's inner edges.
+      className="p-2"
+      contentStyle={{ width: 200 }}
+      content={
+        <div className="flex flex-col">
+          {SORT_OPTIONS.map(({ id, label, Icon }) => {
+            const active = id === value;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  onChange(id);
+                  setOpen(false);
+                }}
+                className={`flex h-12 w-full shrink-0 cursor-pointer items-center gap-2 px-4 py-3 text-left transition-colors ${
+                  active ? "bg-[#eff6ff]" : "hover:bg-black/[0.02]"
+                }`}
+              >
+                <Icon size={24} className="shrink-0 text-[#4a5565]" />
+                <span className="min-w-0 flex-1 truncate text-sm leading-5 text-[#101828]">
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      }
+    >
+      <button
+        type="button"
+        aria-label={`Sort: ${selected.label}`}
+        className="flex w-[136px] shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2 transition-colors hover:bg-black/[0.02]"
+      >
+        <SelectedIcon size={20} className="shrink-0 text-[#4a5565]" />
+        <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold leading-5 text-[#4a5565]">
+          {selected.label}
+        </span>
+        <CaretDownIcon
+          size={16}
+          className={`shrink-0 text-[#4a5565] transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+    </Popover>
+  );
+}
 
 function HeroPercentPill({ trend, percentBody }: { trend: Trend; percentBody: string }) {
   if (trend === "flat") return null;
@@ -198,6 +285,17 @@ export function SetIndustrySectorDetail({
     page?.market ?? "th",
   );
 
+  const [sort, setSort] = useState<SortId>("all");
+  /** Sorted for display only — `stocks` keeps its load order, so paging in the
+   *  next batch appends where the feed put it rather than where a sort left off. */
+  const sortedStocks = useMemo(() => {
+    if (sort === "all") return stocks;
+    const direction = sort === "gain" ? -1 : 1;
+    return [...stocks].sort(
+      (a, b) => direction * (percentValue(a.changePercent) - percentValue(b.changePercent)),
+    );
+  }, [stocks, sort]);
+
   useCatalogDetailScrollTop([sectorId]);
 
   if (!page) {
@@ -222,6 +320,9 @@ export function SetIndustrySectorDetail({
           activeId={page.sector.id}
           onSelect={(id) => {
             if (id === page.sector.id) return; // already there — nothing to swap
+            // The strip is about to be torn down with the rest of the page; say
+            // so, or it comes back at the default offset mid-click.
+            preserveTabStripScroll();
             navigateWithoutFlicker(() => router.push(industrySectorHref(id, page.market)));
           }}
           fill={false}
@@ -238,21 +339,12 @@ export function SetIndustrySectorDetail({
               <p className="min-w-0 flex-1 text-base leading-5 text-[#4a5565]">
                 {page.totalCount} Lists
               </p>
-              <button
-                type="button"
-                className="flex w-[136px] shrink-0 items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2"
-              >
-                <TrendUpIcon size={20} className="shrink-0 text-[#4a5565]" />
-                <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold leading-5 text-[#4a5565]">
-                  Top Gain
-                </span>
-                <CaretDownIcon size={16} className="shrink-0 text-[#4a5565]" />
-              </button>
+              <SortDropdown value={sort} onChange={setSort} />
             </div>
             <p className="w-full px-3 text-xs leading-4 text-[#6a7282]">{page.updatedAt}</p>
           </div>
           <div className="grid w-full grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2">
-            {stocks.map((row, index) => (
+            {sortedStocks.map((row, index) => (
               <div key={`${row.symbol}-${index}`} className="min-w-0">
                 <StockLargeAssetCard
                   symbol={row.symbol}

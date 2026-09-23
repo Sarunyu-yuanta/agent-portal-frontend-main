@@ -98,6 +98,30 @@ function TabScrollButton({
  *  module scope, keyed by the tab set, is what survives that remount. */
 const tabStripScrollMemory = new Map<string, number>();
 
+/** How long after a tab switch a remount may still claim the remembered offset. */
+const TAB_STRIP_RESTORE_WINDOW_MS = 1500;
+
+/** When a tab switch last asked for the offset to outlive the remount it causes.
+ *
+ *  Module scope outlives the page, not only the remount, so the memory above on
+ *  its own also survived leaving the section entirely: coming back and opening
+ *  Resources reopened the strip scrolled to wherever some earlier visit left it,
+ *  with the first tabs cut off to the left. The offset is only ever meant to
+ *  bridge one navigation, so it expires — the remount a tab switch causes lands
+ *  within a few hundred milliseconds, and anything later is a fresh arrival.
+ *
+ *  A timestamp rather than a flag the mount consumes: React attaches the ref
+ *  twice under StrictMode in development, so the first mount would eat the flag
+ *  and the second would find nothing left to restore. */
+let tabStripScrollArmedAt = 0;
+
+/** Call immediately before a navigation that only changes which tab is active,
+ *  so the strip it remounts keeps its scroll offset instead of resetting. Any
+ *  other way of reaching the page leaves this unarmed and gets the default. */
+export function preserveTabStripScroll() {
+  tabStripScrollArmedAt = Date.now();
+}
+
 /** Tracks how far the tab strip is scrolled so the arrows can hide at each end.
  *  Both edges read `true` when the tabs fit outright, which hides both arrows. */
 function useTabStripScroll(enabled: boolean, memoryKey: string) {
@@ -121,15 +145,19 @@ function useTabStripScroll(enabled: boolean, memoryKey: string) {
     (node: HTMLDivElement | null) => {
       ref.current = node;
       if (!node || !enabled) return;
-      const remembered = tabStripScrollMemory.get(memoryKey);
+      const armed = Date.now() - tabStripScrollArmedAt < TAB_STRIP_RESTORE_WINDOW_MS;
+      const remembered = armed ? tabStripScrollMemory.get(memoryKey) : undefined;
       if (remembered) {
         node.scrollLeft = remembered;
         return;
       }
-      // First visit (deep link, or arriving from the sector list): nothing to
-      // restore, so centre whichever tab is active instead of stranding it
-      // off-screen. Set `scrollLeft` directly rather than `scrollIntoView`,
-      // which would also scroll the page vertically.
+      // Fresh arrival (deep link, the sector list, or coming back to the
+      // section): nothing to restore, so centre whichever tab is active. For the
+      // first few sectors that resolves to a negative offset and the browser
+      // clamps it to 0, which is the left edge; for one further along it scrolls
+      // only as far as it takes to show it rather than stranding it off-screen.
+      // Set `scrollLeft` directly rather than `scrollIntoView`, which would also
+      // scroll the page vertically.
       const active = node.querySelector<HTMLElement>('[data-tab-active="true"]');
       if (active) node.scrollLeft = active.offsetLeft - (node.clientWidth - active.offsetWidth) / 2;
     },

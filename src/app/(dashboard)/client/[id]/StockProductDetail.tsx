@@ -8,8 +8,6 @@ import {
   CaretDownIcon,
   CaretUpIcon,
   ClockIcon,
-  HeartIcon,
-  MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
 import {
   Area,
@@ -763,7 +761,6 @@ export function StockProductDetail({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [favorited, setFavorited] = useState(false);
   const related = useMemo(() => getRelatedProducts(detail.symbol), [detail.symbol]);
   const tabs = useMemo<readonly StockDetailTab[]>(
     () =>
@@ -776,10 +773,6 @@ export function StockProductDetail({
   const [activeTab, setActiveTab] = useState<StockDetailTab>("Market Info");
 
   useCatalogDetailScrollTop([detail.symbol]);
-
-  useEffect(() => {
-    setFavorited(false);
-  }, [detail.symbol]);
 
   useEffect(() => {
     setActiveTab(tabs.includes(requestedTab) ? requestedTab : "Market Info");
@@ -802,7 +795,7 @@ export function StockProductDetail({
           <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[30px] shrink-0 rounded-md p-[5px]">
             <ArrowLeftIcon size={18} />
           </Button>
-          <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
             <div className="flex min-w-0 flex-col gap-0.5">
               <div className="flex min-w-0 items-center gap-1">
                 <p className="shrink-0 text-lg font-bold leading-6 text-[rgba(0,0,0,0.8)]">{detail.symbol}</p>
@@ -814,43 +807,46 @@ export function StockProductDetail({
               </div>
               <MarketStatusTag status={detail.status} />
             </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <button type="button" aria-label="ค้นหา" className="flex size-6 items-center justify-center text-[#4a5565]">
-                <MagnifyingGlassIcon size={24} />
-              </button>
-              <button
-                type="button"
-                aria-label={favorited ? "นำออกจากรายการโปรด" : "เพิ่มในรายการโปรด"}
-                aria-pressed={favorited}
-                onClick={() => setFavorited((v) => !v)}
-                className="flex size-6 items-center justify-center text-[#4a5565]"
-              >
-                <HeartIcon size={24} weight={favorited ? "fill" : "regular"} className={favorited ? "text-[#cf1421]" : undefined} />
-              </button>
-            </div>
           </div>
         </div>
 
         <div className="flex w-full flex-col gap-6 rounded-2xl bg-white px-4 py-8 shadow-[0px_0px_4px_rgba(0,0,0,0.02)] md:px-8 lg:px-14">
-          <div className="flex w-full flex-col">
-            <QuoteBlock detail={detail} />
-            <div className="flex w-full overflow-x-auto border-b border-black/10" style={{ scrollbarWidth: "none" }}>
-              {tabs.map((tab) => {
-                const active = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => selectTab(tab)}
-                    className={`flex shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap lg:min-w-[80px] lg:flex-1 ${
-                      active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-black/60"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
+          <QuoteBlock detail={detail} />
+          {/* Sticky against `<main>`, which is the page's scroller (see
+              `useCatalogDetailScrollTop`). `top-0` pins it directly under the
+              app header — the header is a flex sibling above the scrollport
+              rather than an overlay, so there is no height to offset for.
+
+              A direct child of the card, not of a wrapper shared with
+              `QuoteBlock` as before: a sticky element can only travel inside its
+              own parent's box, and that wrapper ended a few pixels below the
+              tabs — the bar would have unstuck before it had moved. The card is
+              the box the tabs should stay with, so the card has to be the
+              parent, and `-mt-6` cancels the `gap-6` that promotion introduced
+              so the bar still sits flush under the quote.
+
+              `bg-white` earns its keep only once pinned: the tab row is
+              transparent in flow and the body would otherwise scroll through
+              it. */}
+          <div
+            className="sticky top-0 z-20 -mt-6 flex w-full overflow-x-auto border-b border-black/10 bg-white"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {tabs.map((tab) => {
+              const active = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => selectTab(tab)}
+                  className={`flex shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap lg:min-w-[80px] lg:flex-1 ${
+                    active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-black/60"
+                  }`}
+                >
+                  {tab}
+                </button>
+              );
+            })}
           </div>
 
           {activeTab === "Market Info" ? (
@@ -858,7 +854,7 @@ export function StockProductDetail({
           ) : activeTab === "Related Product" ? (
             <StockRelatedProductTab related={related} />
           ) : activeTab === "Company" ? (
-            <StockCompanyTab symbol={detail.symbol} />
+            <StockCompanyTab symbol={detail.symbol} companyName={detail.name} />
           ) : (
             <PlaceholderTab label={activeTab} />
           )}

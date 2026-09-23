@@ -123,7 +123,6 @@ export function StockCrossSellDetail({
                 changePercent={row.changePercent}
                 trend={row.trend}
                 series={row.series}
-                favoriteIcon={false}
               />
             ))}
           </div>

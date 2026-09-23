@@ -72,8 +72,6 @@ export const MARKET_STATUS: MarketStatusValue = "Open";
 export const MARKET_WATCHLIST = [
   { id: "th", flag: "🇹🇭", label: "Thai Market", active: true },
   { id: "us", flag: "🇺🇸", label: "US Market", active: false },
-  { id: "hk", flag: "🇭🇰", label: "Hong Kong Market", active: false },
-  { id: "vn", flag: "🇻🇳", label: "Vietnam Market", active: false },
 ];
 
 /** Placeholder circular mark used by every `MarketBoard` in the Figma file
@@ -416,7 +414,7 @@ export const ESSENTIAL_SERVICES: ServiceCard[] = [
   },
 ];
 
-export type MarketId = "th" | "us" | "hk" | "vn";
+export type MarketId = "th" | "us";
 export type HeatmapLayout = "compact-2" | "treemap-8" | "treemap-us";
 /** Sector taxonomies that have drill-in pages. `industrials` and `financials`
  *  exist in both, so US routes carry a `us-` slug prefix to disambiguate —
@@ -659,6 +657,4 @@ const US_CATALOG: MarketCatalog = {
 export const MARKET_CATALOG: Record<MarketId, MarketCatalog> = {
   th: THAI_CATALOG,
   us: US_CATALOG,
-  hk: THAI_CATALOG,
-  vn: THAI_CATALOG,
 };

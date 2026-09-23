@@ -67,7 +67,7 @@ function SectorListRow({
   const className = `flex gap-4 items-center px-6 py-4 w-full ${showBorder ? "border-b border-black/10" : ""}`;
   if (onNavigate) {
     return (
-      <button type="button" onClick={onNavigate} className={`${className} text-left w-full hover:bg-black/[0.02] transition-colors`}>
+      <button type="button" onClick={onNavigate} className={`${className} text-left w-full cursor-pointer hover:bg-black/[0.02] transition-colors`}>
         {inner}
       </button>
     );
