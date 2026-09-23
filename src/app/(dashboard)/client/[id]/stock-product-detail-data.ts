@@ -49,6 +49,28 @@ export type TimeSalesRow = {
   side: "Buy" | "Sell";
 };
 
+export type VolumeAnalysisSegmentKind = "buy" | "neutral" | "sell";
+
+export type VolumeAnalysisSegment = {
+  kind: VolumeAnalysisSegmentKind;
+  /** Volume in millions — bar width is relative to `maxVolumeM`. */
+  volumeM: number;
+};
+
+/** Figma node 24632:43803 — horizontal stacked volume-by-price chart. */
+export type VolumeAnalysisRow = {
+  price: string;
+  /** Figma only labels 51.25, 50.25, and 49.50 on the price axis. */
+  showPrice?: boolean;
+  segments: VolumeAnalysisSegment[];
+};
+
+export type VolumeAnalysisData = {
+  maxVolumeM: number;
+  axisTicks: readonly string[];
+  rows: VolumeAnalysisRow[];
+};
+
 export type AdvanceStat = { label: string; value: string };
 
 /** Figma node 23933:37281 — "Advance Data" modal opened from the quote stats pill. */
@@ -86,6 +108,7 @@ export type StockProductDetail = {
   bidLevels: OrderBookLevel[];
   offerLevels: OrderBookLevel[];
   trades: TimeSalesRow[];
+  volumeAnalysis: VolumeAnalysisData;
   advance: StockAdvanceData;
 };
 
@@ -150,6 +173,65 @@ const FIGMA_TRADES: TimeSalesRow[] = [
   { time: "03:40:53", price: "50.00", priceTone: "down", volume: "10", volumeTone: "down", side: "Sell" },
 ];
 
+/** Figma node 24632:43803 — Volume Analysis (bar widths sampled from desktop frame). */
+const FIGMA_VOLUME_ANALYSIS: VolumeAnalysisData = {
+  maxVolumeM: 10,
+  axisTicks: ["0", "2M", "4M", "6M", "8M", "10M"],
+  rows: [
+    {
+      price: "51.25",
+      showPrice: true,
+      segments: [
+        { kind: "buy", volumeM: 2.27 },
+        { kind: "sell", volumeM: 1.03 },
+      ],
+    },
+    {
+      price: "50.88",
+      segments: [
+        { kind: "buy", volumeM: 2.79 },
+        { kind: "neutral", volumeM: 0.12 },
+        { kind: "sell", volumeM: 1.94 },
+      ],
+    },
+    {
+      price: "50.25",
+      showPrice: true,
+      segments: [
+        { kind: "buy", volumeM: 5.7 },
+        { kind: "sell", volumeM: 1.94 },
+      ],
+    },
+    {
+      price: "50.13",
+      segments: [
+        { kind: "buy", volumeM: 1.12 },
+        { kind: "neutral", volumeM: 0.15 },
+        { kind: "sell", volumeM: 1.94 },
+      ],
+    },
+    {
+      price: "49.88",
+      segments: [
+        { kind: "buy", volumeM: 3.39 },
+        { kind: "sell", volumeM: 1.94 },
+      ],
+    },
+    {
+      price: "49.50",
+      showPrice: true,
+      segments: [
+        { kind: "buy", volumeM: 3.39 },
+        { kind: "sell", volumeM: 4.79 },
+      ],
+    },
+    {
+      price: "49.38",
+      segments: [{ kind: "sell", volumeM: 0.61 }],
+    },
+  ],
+};
+
 /** Figma node 21136:109579 — CPALL Market Info. */
 export const CPALL_PRODUCT_DETAIL: StockProductDetail = {
   symbol: "CPALL",
@@ -173,6 +255,7 @@ export const CPALL_PRODUCT_DETAIL: StockProductDetail = {
   bidLevels: depthLevels("bid"),
   offerLevels: depthLevels("offer"),
   trades: FIGMA_TRADES,
+  volumeAnalysis: FIGMA_VOLUME_ANALYSIS,
   advance: {
     rangeLow: "51.40",
     rangeHigh: "53.15",

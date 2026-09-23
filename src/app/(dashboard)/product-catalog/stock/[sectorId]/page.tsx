@@ -4,7 +4,7 @@ import { Suspense, use } from "react";
 import { notFound } from "next/navigation";
 import { SetIndustrySectorDetail } from "../../../client/[id]/SetIndustrySectorDetail";
 import { StockProductDetail } from "../../../client/[id]/StockProductDetail";
-import { getSetIndustrySectorPage } from "../../../client/[id]/stock-industry-sector-data";
+import { getIndustrySectorPage } from "../../../client/[id]/stock-industry-sector-data";
 import { getStockProductDetail } from "../../../client/[id]/stock-product-detail-data";
 import { useSectionBack } from "@/hooks/use-section-back";
 
@@ -23,7 +23,7 @@ export default function StockCatalogDetailPage({
     notFound();
   }
 
-  const sector = getSetIndustrySectorPage(sectorId);
+  const sector = getIndustrySectorPage(sectorId);
   if (sector) {
     return <SetIndustrySectorDetail sectorId={sectorId} onBack={goBack} />;
   }

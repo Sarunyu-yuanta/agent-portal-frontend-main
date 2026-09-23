@@ -418,6 +418,10 @@ export const ESSENTIAL_SERVICES: ServiceCard[] = [
 
 export type MarketId = "th" | "us" | "hk" | "vn";
 export type HeatmapLayout = "compact-2" | "treemap-8" | "treemap-us";
+/** Sector taxonomies that have drill-in pages. `industrials` and `financials`
+ *  exist in both, so US routes carry a `us-` slug prefix to disambiguate —
+ *  see `industrySectorHref` in `stock-industry-sector-data.ts`. */
+export type IndustrySectorMarket = "th" | "us";
 
 const US_LOGOS: Record<string, string> = {
   AAPL: "/products/stock/logos/aapl.svg",
@@ -602,6 +606,12 @@ export type MarketCatalog = {
   etfGain: CrossSellRow[];
   etfLoss: CrossSellRow[];
   sectors: SectorRow[];
+  /** Heading of the industry-sector card. Every market currently ships the SET
+   *  wording Figma specced; swap per catalog once the US/HK/VN copy lands. */
+  sectorsTitle: string;
+  /** Which sector taxonomy `sectors` belongs to — decides the drill-in route.
+   *  HK/VN alias the Thai catalog, so they resolve to the SET pages too. */
+  sectorsMarket: IndustrySectorMarket;
   heatmapLayout: HeatmapLayout;
   servicesTitle: string;
   servicesDesc: string;
@@ -619,6 +629,8 @@ const THAI_CATALOG: MarketCatalog = {
   etfGain: STOCK_ETF_ROWS,
   etfLoss: STOCK_ETF_ROWS,
   sectors: SET_INDUSTRY_SECTORS,
+  sectorsTitle: "SET Industry Sector",
+  sectorsMarket: "th",
   heatmapLayout: "compact-2",
   servicesTitle: "Essential Investment Services",
   servicesDesc: "Solutions that meet your needs. Unlock your investment potential with Yuanta.",
@@ -636,6 +648,8 @@ const US_CATALOG: MarketCatalog = {
   etfGain: US_ETF_TOP_GAIN,
   etfLoss: US_ETF_TOP_LOSS,
   sectors: US_INDUSTRY_SECTORS,
+  sectorsTitle: "SET Industry Sector",
+  sectorsMarket: "us",
   heatmapLayout: "treemap-us",
   servicesTitle: "Unlock new growth with Global stocks",
   servicesDesc: "Discover alternative ways to invest.",

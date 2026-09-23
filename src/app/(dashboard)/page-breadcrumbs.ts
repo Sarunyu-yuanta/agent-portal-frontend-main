@@ -33,7 +33,7 @@ import {
   normalizeMutualFundCategoryId,
 } from "./client/[id]/mutual-fund-data";
 import { getThaiStructuredProduct } from "./client/[id]/thai-structured-data";
-import { getSetIndustrySectorPage } from "./client/[id]/stock-industry-sector-data";
+import { getIndustrySectorPage } from "./client/[id]/stock-industry-sector-data";
 import { getStockProductDetail } from "./client/[id]/stock-product-detail-data";
 import {
   catalogCategoryForPath,
@@ -336,7 +336,7 @@ function catalogLabel(pathname: string): string | null {
   if (stockSectorId && !STOCK_SECTOR_STATIC.has(stockSectorId)) {
     const decoded = decodeURIComponent(stockSectorId);
     return (
-      getSetIndustrySectorPage(decoded)?.sector.name ??
+      getIndustrySectorPage(decoded)?.sector.name ??
       getStockProductDetail(decoded)?.symbol ??
       "SET Industry Sector"
     );

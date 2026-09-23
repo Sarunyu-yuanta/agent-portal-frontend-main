@@ -37,8 +37,12 @@ import {
   type StockDetailTab,
   type StockProductDetail,
   type TimeSalesRow,
+  type VolumeAnalysisData,
+  type VolumeAnalysisRow,
+  type VolumeAnalysisSegmentKind,
 } from "./stock-product-detail-data";
 import { CATALOG_DETAIL_WIDTH, useCatalogDetailScrollTop } from "./ProductCatalogTabbedDetailLayout";
+import { StockCompanyTab } from "./StockCompanyTab";
 import { StockRelatedProductTab } from "./StockRelatedProductTab";
 import { setQueryState, withQuery } from "@/lib/query-state";
 
@@ -47,6 +51,14 @@ const FILL = "#f5212d";
 const UP = "#2f952a";
 const DOWN = "#f5212d";
 const TONE: Record<"up" | "down", string> = { up: UP, down: DOWN };
+const VOL_BUY = "#b7eb8f";
+const VOL_SELL = "#ffa39e";
+const VOL_NEUTRAL = "#595959";
+const VOL_SEGMENT: Record<VolumeAnalysisSegmentKind, string> = {
+  buy: VOL_BUY,
+  neutral: VOL_NEUTRAL,
+  sell: VOL_SELL,
+};
 
 function tabQueryValue(tab: StockDetailTab): string | null {
   if (tab === "Market Info") return null;
@@ -386,6 +398,64 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
   );
 }
 
+function VolumeAnalysisBar({
+  segments,
+  maxVolumeM,
+}: {
+  segments: VolumeAnalysisRow["segments"];
+  maxVolumeM: number;
+}) {
+  return (
+    <div className="flex h-3.5 min-w-0 flex-1 items-center">
+      {segments.map((segment, index) => {
+        const widthPct = (segment.volumeM / maxVolumeM) * 100;
+        const isLast = index === segments.length - 1;
+        return (
+          <div
+            key={`${segment.kind}-${index}`}
+            className={`h-full shrink-0 ${isLast ? "rounded-br rounded-tr" : ""}`}
+            style={{
+              width: `${widthPct}%`,
+              backgroundColor: VOL_SEGMENT[segment.kind],
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function VolumeAnalysisChart({ data }: { data: VolumeAnalysisData }) {
+  return (
+    <div className="w-full overflow-hidden rounded-lg border border-black/10 px-4 py-6">
+      <div className="relative w-full">
+        <div className="flex flex-col gap-[11px]">
+          {data.rows.map((row, index) => (
+            <div key={`${row.price}-${index}`} className="flex h-3.5 w-full items-center gap-1">
+              <span className="w-9 shrink-0 text-xs leading-4 text-[rgba(0,0,0,0.85)]">
+                {row.showPrice ? row.price : ""}
+              </span>
+              <div className="relative min-w-0 flex-1 border-l border-black/10 pl-1">
+                <VolumeAnalysisBar segments={row.segments} maxVolumeM={data.maxVolumeM} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex w-full items-start gap-1">
+          <span className="w-9 shrink-0" aria-hidden />
+          <div className="flex min-w-0 flex-1 items-center justify-between border-t border-black/10 pt-1 pl-1">
+            {data.axisTicks.map((tick) => (
+              <span key={tick} className="text-xs leading-4 text-black/40">
+                {tick}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TimeSalesTable({ rows }: { rows: TimeSalesRow[] }) {
   return (
     <div className="flex max-h-[418px] w-full flex-col overflow-hidden rounded-xl border border-black/10">
@@ -458,9 +528,7 @@ function TimeAndSales({ detail }: { detail: StockProductDetail }) {
       {mode === "tick" ? (
         <TimeSalesTable rows={detail.trades} />
       ) : (
-        <div className="flex h-[418px] items-center justify-center rounded-xl border border-black/10 text-sm text-[#6a7282]">
-          Volume analysis will be available soon.
-        </div>
+        <VolumeAnalysisChart data={detail.volumeAnalysis} />
       )}
     </section>
   );
@@ -728,9 +796,9 @@ export function StockProductDetail({
   }
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pb-20 lg:pt-2">
+    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pb-20 pt-4 md:pt-6 lg:pt-8">
       <div className={`flex flex-col gap-2 ${CATALOG_DETAIL_WIDTH.narrow}`}>
-        <div className="flex items-center gap-2 py-2 pr-2">
+        <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
           <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[30px] shrink-0 rounded-md p-[5px]">
             <ArrowLeftIcon size={18} />
           </Button>
@@ -789,6 +857,8 @@ export function StockProductDetail({
             <MarketInfoBody detail={detail} />
           ) : activeTab === "Related Product" ? (
             <StockRelatedProductTab related={related} />
+          ) : activeTab === "Company" ? (
+            <StockCompanyTab symbol={detail.symbol} />
           ) : (
             <PlaceholderTab label={activeTab} />
           )}

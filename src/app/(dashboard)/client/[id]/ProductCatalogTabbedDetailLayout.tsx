@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@sarunyu/system-one";
-import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 
 /** Content width tokens shared by catalog drill-in pages (MF theme detail, SET sector, …). */
 export const CATALOG_DETAIL_WIDTH = {
@@ -62,15 +62,115 @@ export function CatalogDetailBackHeader({
   );
 }
 
-/** Underline tab row — text-only (mutual fund themes, SET sector). */
+/** Figma "Tabs" arrow (node 22907:35400/35410) — 32px square, 1px hairline
+ *  border, 18px caret. Kept mounted and faded out at the ends so the tab strip
+ *  never reflows as you scroll, which is what the design shows for the
+ *  at-the-start state. */
+function TabScrollButton({
+  direction,
+  hidden,
+  onClick,
+}: {
+  direction: "prev" | "next";
+  hidden: boolean;
+  onClick: () => void;
+}) {
+  const Icon = direction === "prev" ? CaretLeftIcon : CaretRightIcon;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      tabIndex={hidden ? -1 : 0}
+      aria-hidden={hidden}
+      aria-label={direction === "prev" ? "เลื่อนแท็บไปทางซ้าย" : "เลื่อนแท็บไปทางขวา"}
+      className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-black/10 bg-white text-[#4a5565] transition-opacity hover:bg-black/[0.02] ${
+        hidden ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
+    >
+      <Icon size={18} />
+    </button>
+  );
+}
+
+/** Selecting a tab on a dynamic route makes the App Router remount this whole
+ *  subtree (see `navigateWithoutFlicker` in `SetIndustrySectorDetail`), so the
+ *  strip comes back as a fresh node at `scrollLeft: 0`. Parking the offset at
+ *  module scope, keyed by the tab set, is what survives that remount. */
+const tabStripScrollMemory = new Map<string, number>();
+
+/** Tracks how far the tab strip is scrolled so the arrows can hide at each end.
+ *  Both edges read `true` when the tabs fit outright, which hides both arrows. */
+function useTabStripScroll(enabled: boolean, memoryKey: string) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(true);
+
+  const sync = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    // 1px slack: fractional scroll offsets never settle exactly on the bounds.
+    const max = el.scrollWidth - el.clientWidth;
+    setAtStart(el.scrollLeft <= 1);
+    setAtEnd(el.scrollLeft >= max - 1);
+    if (enabled) tabStripScrollMemory.set(memoryKey, el.scrollLeft);
+  }, [enabled, memoryKey]);
+
+  /** Runs in the commit phase, before paint — restoring here means the strip is
+   *  never painted at the left edge first, so switching tabs shows no jump. */
+  const attachStrip = useCallback(
+    (node: HTMLDivElement | null) => {
+      ref.current = node;
+      if (!node || !enabled) return;
+      const remembered = tabStripScrollMemory.get(memoryKey);
+      if (remembered) {
+        node.scrollLeft = remembered;
+        return;
+      }
+      // First visit (deep link, or arriving from the sector list): nothing to
+      // restore, so centre whichever tab is active instead of stranding it
+      // off-screen. Set `scrollLeft` directly rather than `scrollIntoView`,
+      // which would also scroll the page vertically.
+      const active = node.querySelector<HTMLElement>('[data-tab-active="true"]');
+      if (active) node.scrollLeft = active.offsetLeft - (node.clientWidth - active.offsetWidth) / 2;
+    },
+    [enabled, memoryKey],
+  );
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!enabled || !el) return;
+    sync();
+    el.addEventListener("scroll", sync, { passive: true });
+    // Re-measure on resize: whether the strip overflows depends on the width
+    // it was given, not just on its content.
+    const observer = new ResizeObserver(sync);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", sync);
+      observer.disconnect();
+    };
+  }, [enabled, sync]);
+
+  const scrollByPage = useCallback((dir: -1 | 1) => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(160, el.clientWidth * 0.8), behavior: "smooth" });
+  }, []);
+
+  return { attachStrip, atStart, atEnd, scrollByPage };
+}
+
+/** Underline tab row — text-only (mutual fund themes) or with a leading glyph
+ *  plus scroll arrows (SET/US industry sector, Figma node 22907:35399). */
 export function CatalogDetailTextTabs<T extends string>({
   items,
   activeId,
   onSelect,
   widthClass = CATALOG_DETAIL_WIDTH.narrow,
   fill = true,
+  scrollButtons = false,
 }: {
-  items: { id: T; label: string }[];
+  items: { id: T; label: string; icon?: ReactNode }[];
   activeId: T;
   onSelect: (id: T) => void;
   widthClass?: string;
@@ -79,28 +179,55 @@ export function CatalogDetailTextTabs<T extends string>({
    *  shrink below their own text width and overlap), so it passes `false` for
    *  natural-width tabs that scroll horizontally instead. */
   fill?: boolean;
+  /** Flank the strip with prev/next arrows. Opt-in so the mutual-fund caller,
+   *  whose tabs always fit, keeps its current chrome. */
+  scrollButtons?: boolean;
 }) {
+  // Identifies this strip across remounts. The tab set is what makes a strip
+  // distinct (SET's 8 sectors vs US's 11), and it is stable while you switch
+  // between them — exactly the lifetime the remembered offset should have.
+  const memoryKey = items.map((i) => i.id).join("|");
+  const { attachStrip, atStart, atEnd, scrollByPage } = useTabStripScroll(scrollButtons, memoryKey);
+
+  const strip = (
+    <div
+      ref={attachStrip}
+      className={`w-full overflow-x-auto hide-scrollbar ${scrollButtons ? "" : "xl:overflow-visible"}`}
+      style={{ scrollbarWidth: "none" }}
+    >
+      <div className={`flex w-full min-w-max ${fill ? "xl:min-w-0" : ""}`}>
+        {items.map(({ id, label, icon }) => {
+          const active = id === activeId;
+          return (
+            <button
+              key={id}
+              type="button"
+              data-tab-active={active}
+              onClick={() => onSelect(id)}
+              className={`flex items-center justify-center gap-1.5 border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap ${
+                fill ? "min-w-[80px] flex-1" : "shrink-0"
+              } ${active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"}`}
+            >
+              {icon && <span className="shrink-0">{icon}</span>}
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div className={widthClass}>
-      <div className="w-full overflow-x-auto hide-scrollbar xl:overflow-visible" style={{ scrollbarWidth: "none" }}>
-        <div className={`flex w-full min-w-max ${fill ? "xl:min-w-0" : ""}`}>
-          {items.map(({ id, label }) => {
-            const active = id === activeId;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => onSelect(id)}
-                className={`flex items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap ${
-                  fill ? "min-w-[80px] flex-1" : "shrink-0"
-                } ${active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"}`}
-              >
-                {label}
-              </button>
-            );
-          })}
+      {scrollButtons ? (
+        <div className="flex w-full items-center gap-4">
+          <TabScrollButton direction="prev" hidden={atStart} onClick={() => scrollByPage(-1)} />
+          <div className="min-w-0 flex-1">{strip}</div>
+          <TabScrollButton direction="next" hidden={atEnd} onClick={() => scrollByPage(1)} />
         </div>
-      </div>
+      ) : (
+        strip
+      )}
     </div>
   );
 }

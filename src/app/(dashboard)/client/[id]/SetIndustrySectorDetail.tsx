@@ -3,19 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  BellIcon,
-  BowlFoodIcon,
-  CaretDownIcon,
-  CircleNotchIcon,
-  DesktopTowerIcon,
-  FactoryIcon,
-  HouseLineIcon,
-  LightningIcon,
-  MoneyWavyIcon,
-  ShoppingBagIcon,
-  SquaresFourIcon,
-} from "@phosphor-icons/react";
+import { CaretDownIcon, CircleNotchIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { StockLargeAssetCard } from "./StockLargeAssetCard";
 import {
   CatalogDetailBackHeader,
@@ -26,37 +14,21 @@ import {
 
 const NARROW = CATALOG_DETAIL_WIDTH.narrow;
 import {
+  getIndustrySectorPage,
   getSectorStockBatch,
-  getSetIndustrySectorPage,
-  setIndustrySectorHref,
-  type SetIndustrySectorPage,
+  industrySectorHref,
+  SECTOR_STOCK_PAGE_SIZE,
+  type IndustrySectorMarket,
+  type IndustrySectorPage,
 } from "./stock-industry-sector-data";
 import { stockProductHref } from "./stock-product-detail-data";
 import type { StockRow, Trend } from "./stock-data";
+import { SectorGlyph, TREND_PILL_BG } from "./stock-ui";
 
+/** Local on purpose — the hero band's neutral is lighter than the Stock tab's
+ *  `TREND_TEXT` (#4a5565 there vs #6a7282 here), so these must not be merged.
+ *  `TREND_PILL_BG` is identical, hence shared from `stock-ui`. */
 const TREND_TEXT: Record<Trend, string> = { up: "#008236", down: "#c10007", flat: "#6a7282" };
-const TREND_PILL_BG: Record<Trend, string> = { up: "#dbfce7", down: "#fef2f2", flat: "#f3f4f6" };
-
-const SECTOR_ICON = {
-  resources: LightningIcon,
-  services: BellIcon,
-  industrials: FactoryIcon,
-  "consumer-products": ShoppingBagIcon,
-  "agro-food": BowlFoodIcon,
-  financials: MoneyWavyIcon,
-  technology: DesktopTowerIcon,
-  "property-construction": HouseLineIcon,
-} as const;
-
-function SectorGlyph({ id, size, color }: { id: string; size: number; color: string }) {
-  const Icon = SECTOR_ICON[id as keyof typeof SECTOR_ICON];
-  if (!Icon) return null;
-  return (
-    <span style={{ color }}>
-      <Icon size={size} weight="fill" />
-    </span>
-  );
-}
 
 function HeroPercentPill({ trend, percentBody }: { trend: Trend; percentBody: string }) {
   if (trend === "flat") return null;
@@ -73,7 +45,7 @@ function HeroPercentPill({ trend, percentBody }: { trend: Trend; percentBody: st
   );
 }
 
-function SectorHeroBand({ page }: { page: SetIndustrySectorPage }) {
+function SectorHeroBand({ page }: { page: IndustrySectorPage }) {
   const { sector, description } = page;
   const trend = sector.trend;
   return (
@@ -163,7 +135,11 @@ function navigateWithoutFlicker(run: () => void) {
   });
 }
 
-function useInfiniteSectorStocks(sectorId: string, initial: StockRow[]) {
+function useInfiniteSectorStocks(
+  sectorId: string,
+  initial: StockRow[],
+  market: IndustrySectorMarket,
+) {
   const [stocks, setStocks] = useState(initial);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [prevSectorId, setPrevSectorId] = useState(sectorId);
@@ -179,11 +155,14 @@ function useInfiniteSectorStocks(sectorId: string, initial: StockRow[]) {
     loadingRef.current = true;
     setIsLoadingMore(true);
     window.setTimeout(() => {
-      setStocks((current) => [...current, ...getSectorStockBatch(current.length)]);
+      setStocks((current) => [
+        ...current,
+        ...getSectorStockBatch(current.length, SECTOR_STOCK_PAGE_SIZE, market),
+      ]);
       setIsLoadingMore(false);
       loadingRef.current = false;
     }, 800);
-  }, []);
+  }, [market]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -212,8 +191,12 @@ export function SetIndustrySectorDetail({
   onBack: () => void;
 }) {
   const router = useRouter();
-  const page = getSetIndustrySectorPage(sectorId);
-  const { stocks, isLoadingMore, sentinelRef } = useInfiniteSectorStocks(sectorId, page?.stocks ?? []);
+  const page = getIndustrySectorPage(sectorId);
+  const { stocks, isLoadingMore, sentinelRef } = useInfiniteSectorStocks(
+    sectorId,
+    page?.stocks ?? [],
+    page?.market ?? "th",
+  );
 
   useCatalogDetailScrollTop([sectorId]);
 
@@ -229,15 +212,20 @@ export function SetIndustrySectorDetail({
   return (
     <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb]">
       <div className="flex flex-col gap-2 bg-white">
-        <CatalogDetailBackHeader title="SET Industry Sector" onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader title={page.title} onBack={onBack} className="!pt-8" />
         <CatalogDetailTextTabs
-          items={page.sectors.map((s) => ({ id: s.id, label: s.name }))}
+          items={page.sectors.map((s) => ({
+            id: s.id,
+            label: s.name,
+            icon: <SectorGlyph id={s.id} size={20} />,
+          }))}
           activeId={page.sector.id}
           onSelect={(id) => {
             if (id === page.sector.id) return; // already there — nothing to swap
-            navigateWithoutFlicker(() => router.push(setIndustrySectorHref(id)));
+            navigateWithoutFlicker(() => router.push(industrySectorHref(id, page.market)));
           }}
           fill={false}
+          scrollButtons
         />
       </div>
 
@@ -246,14 +234,17 @@ export function SetIndustrySectorDetail({
       <div className="w-full flex-1 pb-16">
         <div className={`flex flex-col gap-6 pt-4 ${NARROW}`}>
           <div className="flex w-full flex-col gap-3">
-            <div className="flex w-full items-center justify-end border-b border-black/10 px-3 py-3">
+            <div className="flex w-full items-center gap-2 border-b border-black/10 px-3 py-3">
+              <p className="min-w-0 flex-1 text-base leading-5 text-[#4a5565]">
+                {page.totalCount} Lists
+              </p>
               <button
                 type="button"
-                className="flex w-[136px] shrink-0 items-center gap-1 rounded-lg border border-black/10 bg-white p-2"
+                className="flex w-[136px] shrink-0 items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2"
               >
-                <SquaresFourIcon size={20} className="shrink-0 text-[#4a5565]" />
-                <span className="flex-1 truncate text-left text-sm font-semibold leading-5 text-[#4a5565]">
-                  All Lists
+                <TrendUpIcon size={20} className="shrink-0 text-[#4a5565]" />
+                <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold leading-5 text-[#4a5565]">
+                  Top Gain
                 </span>
                 <CaretDownIcon size={16} className="shrink-0 text-[#4a5565]" />
               </button>
@@ -272,7 +263,6 @@ export function SetIndustrySectorDetail({
                   trend={row.trend}
                   series={row.series}
                   figmaSectorAmountColors
-                  favoriteIcon={false}
                   onSelect={() => router.push(stockProductHref(row.symbol))}
                 />
               </div>
