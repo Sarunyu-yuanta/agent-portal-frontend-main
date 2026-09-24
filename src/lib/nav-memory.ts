@@ -15,7 +15,16 @@
 
 import { navRead, navWrite } from "./nav-session";
 
-export type NavSectionKey = "client-hub" | "product-catalog" | "insights" | "notes" | "calendar";
+export type NavSectionKey =
+  | "dashboard"
+  | "client-hub"
+  | "product-catalog"
+  | "insights"
+  | "promotions"
+  | "performance"
+  | "ic-learning"
+  | "notes"
+  | "calendar";
 
 type NavSection = {
   key: NavSectionKey;
@@ -26,10 +35,14 @@ type NavSection = {
 };
 
 const SECTIONS: NavSection[] = [
+  { key: "dashboard", root: "/dashboard", prefixes: ["/dashboard"] },
   // Full Profile (/client/:id) is Client 360's deepest level, not its own section.
   { key: "client-hub", root: "/client-hub", prefixes: ["/client-hub", "/client"] },
   { key: "product-catalog", root: "/product-catalog", prefixes: ["/product-catalog"] },
   { key: "insights", root: "/insights", prefixes: ["/insights"] },
+  { key: "promotions", root: "/promotions", prefixes: ["/promotions"] },
+  { key: "performance", root: "/performance", prefixes: ["/performance"] },
+  { key: "ic-learning", root: "/ic-learning", prefixes: ["/ic-learning"] },
   { key: "notes", root: "/notes", prefixes: ["/notes"] },
   { key: "calendar", root: "/calendar", prefixes: ["/calendar"] },
 ];
@@ -47,8 +60,30 @@ export function sectionForPath(pathname: string): NavSectionKey | null {
 
 const storageKey = (key: NavSectionKey) => `nav:last:${key}`;
 
-export function lastSectionPath(key: NavSectionKey): string | null {
+function lastSectionPath(key: NavSectionKey): string | null {
   return navRead(storageKey(key));
+}
+
+/**
+ * Query params scoped to one *visit* of a page rather than to the section — the
+ * Stock tab's `?market=`.
+ *
+ * The breadcrumb trail stores whole URLs, so these come back when the user
+ * drills into something from the page and presses back, which is the point.
+ * Walking into the section again from the sidebar is a fresh arrival, not a
+ * return: it resumes the page they left, at that page's defaults.
+ */
+const VISIT_SCOPED_PARAMS = ["market"];
+
+/** The sidebar's "resume where I left off" target for a section, if it has one. */
+export function sectionResumeUrl(key: NavSectionKey): string | null {
+  const url = lastSectionPath(key);
+  const [pathname, query] = url?.split("?") ?? [];
+  if (!url || !query) return url;
+  const params = new URLSearchParams(query);
+  for (const param of VISIT_SCOPED_PARAMS) params.delete(param);
+  const rest = params.toString();
+  return rest ? `${pathname}?${rest}` : pathname;
 }
 
 // ── Breadcrumb trail ────────────────────────────────────────────────────────

@@ -25,8 +25,13 @@ const CHECKPOINTS = [30, 15, 7, 1, 0] as const;
  * The narrowing loop matters: `find` would return 30 for everything, since an
  * expiry 5 days out has crossed 30 as well as 15 and 7, and it's the *smallest*
  * one it still satisfies that fired most recently.
+ *
+ * Exported because the Dashboard's queue rows carry the same checkpoint in
+ * their id for the same reason the bell's do — see `dashboard/dashboard-data`.
+ * Two surfaces deriving that number separately is how they start disagreeing
+ * about which crossing a row belongs to.
  */
-function lastCheckpointCrossed(daysLeft: number): number | null {
+export function lastCheckpointCrossed(daysLeft: number): number | null {
   let crossed: number | null = null;
   for (const c of CHECKPOINTS) {
     if (daysLeft <= c) crossed = c;

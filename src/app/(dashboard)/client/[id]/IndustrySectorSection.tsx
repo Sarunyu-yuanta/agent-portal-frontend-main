@@ -13,22 +13,14 @@ import {
 import { industrySectorHref } from "./stock-industry-sector-data";
 import { CARD_SHADOW, PercentPill, SectorGlyph, TREND_TEXT } from "./stock-ui";
 
-function SectorListRow({
-  sector,
-  showBorder,
-  onNavigate,
-}: {
-  sector: SectorRow;
-  showBorder: boolean;
-  onNavigate?: () => void;
-}) {
+function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?: () => void }) {
   const inner = (
     <>
       <div className="flex gap-4 items-center flex-1 min-w-0">
         {/* Figma "Sector_list" row icons render solid brand blue regardless of
          *  the sector's own trend color (node 26739:57814 family). */}
         <span style={{ color: "#0a6ee7" }}>
-          <SectorGlyph id={sector.id} size={20} />
+          <SectorGlyph id={sector.id} size={24} />
         </span>
         <p className="flex-1 text-base truncate" style={{ color: "#4a5565" }}>
           {sector.name}
@@ -64,7 +56,8 @@ function SectorListRow({
       <CaretRightIcon size={24} className="text-[#4a5565] shrink-0" />
     </>
   );
-  const className = `flex gap-4 items-center px-6 py-4 w-full ${showBorder ? "border-b border-black/10" : ""}`;
+  // Figma's "Sector_list" carries the divider on every row, last one included.
+  const className = "flex gap-4 items-center px-6 py-4 w-full border-b border-black/10";
   if (onNavigate) {
     return (
       <button type="button" onClick={onNavigate} className={`${className} text-left w-full cursor-pointer hover:bg-black/[0.02] transition-colors`}>
@@ -96,11 +89,15 @@ function HeatmapTile({
   sector,
   variant,
   palette = "soft",
+  /** Figma tints the Thai treemap's mid-size labels with text/default/secondary
+   *  while the US board keeps them at text/default/primary. */
+  labelTone = "primary",
   style,
 }: {
   sector: SectorRow;
   variant: "lg" | "md" | "sm" | "xs";
   palette?: "soft" | "mid" | "bold";
+  labelTone?: "primary" | "secondary";
   style?: CSSProperties;
 }) {
   const trend = sector.heatmapTrend ?? sector.trend;
@@ -112,14 +109,19 @@ function HeatmapTile({
   const label = sector.heatmapName ?? sector.name;
   const wrap = label.includes("\n");
   const iconColor = variant === "xs" || trend === "flat" ? "#6a7282" : HEATMAP_TEXT[trend];
-  const keepIconInline = variant === "sm" && wrap;
+  const labelColor = labelTone === "secondary" ? "#4a5565" : "#101828";
 
   return (
     <div
-      className={`flex rounded-lg p-2 min-h-0 min-w-0 w-full self-stretch ${
-        keepIconInline ? "items-start" : "flex-wrap items-center"
+      // Every tier is one flex-wrap track, like Figma: icon and label share the
+      // first line and the quote wraps onto its own full-width line beneath.
+      // Nesting the quote beside the icon instead would starve it of width and
+      // push the pill past the tile edge. `overflow-hidden` matches Figma's
+      // overflow-clip, so a long label can never bleed outside the tile.
+      className={`flex flex-wrap rounded-lg p-2 min-h-0 min-w-0 w-full self-stretch overflow-hidden ${
+        variant === "sm" ? "items-start" : "items-center"
       } ${
-        variant === "lg" ? "gap-2 content-start" : variant === "xs" ? "gap-1.5 content-center" : "gap-1.5 content-start"
+        variant === "lg" ? "gap-2 content-start" : variant === "xs" ? "gap-1 content-center" : "gap-1.5 content-start"
       }`}
       style={{
         backgroundColor: bg[trend],
@@ -132,7 +134,7 @@ function HeatmapTile({
       </span>
       {variant === "lg" && (
         <>
-          <span className={`text-sm shrink-0 ${wrap ? "whitespace-pre" : "whitespace-nowrap"}`} style={{ color: "#101828" }}>
+          <span className={`text-sm shrink-0 ${wrap ? "whitespace-pre" : "whitespace-nowrap"}`} style={{ color: labelColor }}>
             {label}
           </span>
           <span className="text-sm" style={{ color: HEATMAP_TEXT[trend] }}>
@@ -152,22 +154,12 @@ function HeatmapTile({
           {trend !== "flat" && <PercentPill trend={trend} value={changePercent} size="lg" />}
         </>
       )}
-      {variant === "sm" && wrap && (
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-xs leading-4 whitespace-pre" style={{ color: "#101828" }}>
-            {label}
-          </span>
-          <div className="flex gap-1 items-center">
-            <span className="text-xs" style={{ color: HEATMAP_TEXT[trend] }}>
-              {changeAmount}
-            </span>
-            {trend !== "flat" && <PercentPill trend={trend} value={changePercent} size="sm" />}
-          </div>
-        </div>
-      )}
-      {variant === "sm" && !wrap && (
+      {variant === "sm" && (
         <>
-          <span className="text-xs shrink-0 leading-4" style={{ color: "#101828" }}>
+          <span
+            className={`text-xs shrink-0 leading-4 ${wrap ? "whitespace-pre" : ""}`}
+            style={{ color: labelColor }}
+          >
             {label}
           </span>
           <span className="text-xs" style={{ color: HEATMAP_TEXT[trend] }}>
@@ -231,61 +223,67 @@ function UsSectorHeatmap({ byId }: { byId: Record<string, SectorRow> }) {
 /**
  * Figma ships three heatmap permutations:
  *  - "Heat map เมื่อมีแค่ 2 Sectors" (node 25177:23062) — stacked hero tiles.
- *  - The full 8-sector Thai treemap (node 22907:295581).
+ *    Chosen by the data, not a flag: a market that reports two or fewer sectors
+ *    gets it, and the list beside it renders the same two rows.
+ *  - The full 8-sector Thai treemap (node 23219:28885).
  *  - US GICS treemap (node 23219:37166) — Energy/Material heroes plus a denser
  *    right column that also packs Health Care, Communication, Utilities.
  */
 function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: HeatmapLayout }) {
-  const tiles = sectors.filter((s) => s.inHeatmap !== false);
-  if (tiles.length === 0) return null;
-  const byId = Object.fromEntries(tiles.map((s) => [s.id, s])) as Record<string, SectorRow>;
+  if (sectors.length === 0) return null;
+
+  if (sectors.length <= 2) {
+    // Two rows of list can't hold the card open on their own, so the hero tiles
+    // keep Figma's 448px content height (node 25177:23750) as a floor.
+    return (
+      <div className="hidden lg:flex flex-col gap-1.5 w-[556px] shrink-0 self-stretch min-h-[448px]">
+        <HeatmapTile sector={sectors[0]} variant="lg" palette="bold" style={{ flex: "235 1 0%" }} />
+        {sectors[1] && (
+          <HeatmapTile sector={sectors[1]} variant="lg" palette="bold" style={{ flex: "207 1 0%" }} />
+        )}
+      </div>
+    );
+  }
+
+  const byId = Object.fromEntries(sectors.map((s) => [s.id, s])) as Record<string, SectorRow>;
 
   if (layout === "treemap-us") {
     return <UsSectorHeatmap byId={byId} />;
   }
 
-  if (layout === "compact-2" || tiles.length <= 2) {
-    return (
-      <div className="hidden lg:flex gap-1.5 w-[556px] shrink-0 self-stretch">
-        <div className="flex flex-col gap-1.5 flex-1 min-w-0 h-full">
-          <HeatmapTile sector={tiles[0]} variant="lg" palette="bold" style={{ flex: "235 1 0%" }} />
-          {tiles[1] && (
-            <HeatmapTile sector={tiles[1]} variant="lg" palette="bold" style={{ flex: "207 1 0%" }} />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="hidden lg:flex gap-1.5 flex-1 min-w-0 self-stretch">
+    <div className="hidden lg:flex gap-1.5 w-[556px] shrink-0 self-stretch">
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        <HeatmapTile sector={byId.resources} variant="lg" style={{ flex: "235 1 0%" }} />
-        <HeatmapTile sector={byId.services} variant="lg" style={{ flex: "207 1 0%" }} />
+        <HeatmapTile sector={byId.resources} variant="lg" palette="bold" style={{ flex: "235 1 0%" }} />
+        <HeatmapTile sector={byId.services} variant="lg" palette="bold" style={{ flex: "207 1 0%" }} />
       </div>
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
         <div className="flex flex-col gap-1.5 flex-1 min-h-0">
-          <HeatmapTile sector={byId.industrials} variant="lg" style={{ flex: "118 1 0%" }} />
+          <HeatmapTile sector={byId.industrials} variant="lg" palette="mid" style={{ flex: "118 1 0%" }} />
+          {/* Both tiles sit directly in the flex row — a wrapper div would swallow
+           *  their `self-stretch` and leave the shorter one floating. */}
           <div className="flex gap-1.5 min-h-0" style={{ flex: "94 1 0%" }}>
-            <div className="w-[108px] shrink-0">
-              <HeatmapTile sector={byId["consumer-products"]} variant="md" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <HeatmapTile sector={byId["agro-food"]} variant="md" />
-            </div>
+            <HeatmapTile
+              sector={byId["consumer-products"]}
+              variant="sm"
+              labelTone="secondary"
+              style={{ width: 108, flex: "0 0 auto" }}
+            />
+            <HeatmapTile
+              sector={byId["agro-food"]}
+              variant="sm"
+              labelTone="secondary"
+              style={{ flex: "1 1 0%" }}
+            />
           </div>
         </div>
         <div className="flex gap-1.5 flex-1 min-h-0">
-          <div className="flex-1 min-w-0">
-            <HeatmapTile sector={byId.financials} variant="xs" />
-          </div>
-          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-            <div className="flex-1 min-h-0">
-              <HeatmapTile sector={byId.technology} variant="xs" />
-            </div>
-            <div className="flex-1 min-h-0">
-              <HeatmapTile sector={byId["property-construction"]} variant="xs" />
-            </div>
+          <HeatmapTile sector={byId.financials} variant="xs" style={{ flex: "1 1 0%" }} />
+          {/* Figma pins this stack to the width of its widest tile (123px) and
+           *  lets Financials take the slack. */}
+          <div className="flex flex-col gap-1.5 shrink-0 w-[123px]">
+            <HeatmapTile sector={byId.technology} variant="xs" style={{ flex: "1 1 0%" }} />
+            <HeatmapTile sector={byId["property-construction"]} variant="xs" style={{ flex: "1 1 0%" }} />
           </div>
         </div>
       </div>
@@ -326,11 +324,10 @@ export function SetIndustrySectorSection({
       </div>
       <div className="flex gap-10 items-stretch w-full">
         <div className="flex-1 min-w-0">
-          {sectors.map((s, i) => (
+          {sectors.map((s) => (
             <SectorListRow
               key={s.id}
               sector={s}
-              showBorder={i < sectors.length - 1}
               onNavigate={() => router.push(industrySectorHref(s.id, sectorsMarket))}
             />
           ))}

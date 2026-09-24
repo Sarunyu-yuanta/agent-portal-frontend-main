@@ -8,12 +8,12 @@
  * The tab is carried in the URL as `?category=<id>`.
  */
 export const PRODUCT_CATEGORIES = [
-  { id: "structured",      title: "Global Structured Product" },
-  { id: "thai-structured", title: "Thai Structured Product" },
-  { id: "fixed-income",    title: "Fixed Income" },
-  { id: "global-bond",     title: "Global Bond" },
-  { id: "mutual-fund",     title: "Mutual Fund" },
   { id: "stock",           title: "Stock" },
+  { id: "mutual-fund",     title: "Mutual Fund" },
+  { id: "fixed-income",    title: "Fixed Income" },
+  { id: "thai-structured", title: "Thai Structured Product" },
+  { id: "structured",      title: "Global Structured Product" },
+  { id: "global-bond",     title: "Global Bond" },
   { id: "robo-advisory",   title: "Portfolio Advisory" },
 ];
 

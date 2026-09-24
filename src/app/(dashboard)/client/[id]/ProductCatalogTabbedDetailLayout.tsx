@@ -197,6 +197,7 @@ export function CatalogDetailTextTabs<T extends string>({
   widthClass = CATALOG_DETAIL_WIDTH.narrow,
   fill = true,
   scrollButtons = false,
+  sticky = false,
 }: {
   items: { id: T; label: string; icon?: ReactNode }[];
   activeId: T;
@@ -210,6 +211,12 @@ export function CatalogDetailTextTabs<T extends string>({
   /** Flank the strip with prev/next arrows. Opt-in so the mutual-fund caller,
    *  whose tabs always fit, keeps its current chrome. */
   scrollButtons?: boolean;
+  /** Pin the row to the top of the scroll area, so switching tab never means
+   *  scrolling back up first. Opt-in because it only works where the strip is a
+   *  direct child of the page's tall root — a sticky element can't travel past
+   *  its own parent's box, so nesting it beside the back header in a short
+   *  wrapper would silently do nothing. */
+  sticky?: boolean;
 }) {
   // Identifies this strip across remounts. The tab set is what makes a strip
   // distinct (SET's 8 sectors vs US's 11), and it is stable while you switch
@@ -232,9 +239,17 @@ export function CatalogDetailTextTabs<T extends string>({
               type="button"
               data-tab-active={active}
               onClick={() => onSelect(id)}
-              className={`flex items-center justify-center gap-1.5 border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap ${
+              // Hover paint is on the inactive tabs only — the active one is
+              // already where you are, so there is nothing to invite. Trailing
+              // `!` because system-one ships its base utilities unlayered,
+              // where they outrank a `hover:` variant.
+              className={`flex cursor-pointer items-center justify-center gap-1.5 border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap transition-colors ${
                 fill ? "min-w-[80px] flex-1" : "shrink-0"
-              } ${active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"}`}
+              } ${
+                active
+                  ? "border-[#0a6ee7] text-[#0a6ee7]"
+                  : "border-black/10 text-[#6a7282] hover:bg-black/[0.03]! hover:text-[#101828]!"
+              }`}
             >
               {icon && <span className="shrink-0">{icon}</span>}
               {label}
@@ -245,7 +260,7 @@ export function CatalogDetailTextTabs<T extends string>({
     </div>
   );
 
-  return (
+  const row = (
     <div className={widthClass}>
       {scrollButtons ? (
         <div className="flex w-full items-center gap-4">
@@ -258,4 +273,10 @@ export function CatalogDetailTextTabs<T extends string>({
       )}
     </div>
   );
+
+  if (!sticky) return row;
+  // `widthClass` centres a max-width column, so the white has to come from a
+  // full-bleed wrapper — on the row itself the page would scroll through the
+  // gutters either side once pinned.
+  return <div className="sticky top-0 z-20 w-full bg-white">{row}</div>;
 }

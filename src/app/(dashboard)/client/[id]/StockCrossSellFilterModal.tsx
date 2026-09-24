@@ -15,17 +15,20 @@ function FilterChip({
   selected: boolean;
   onToggle: () => void;
 }) {
+  // Colors are classes rather than inline `style` so they can carry `hover:`
+  // variants — an inline style wins over any stylesheet rule, hover included.
+  // Trailing `!` because system-one ships its base utilities unlayered, where
+  // they outrank a plain `hover:` variant.
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-pressed={selected}
-      className="flex w-full items-center gap-2 rounded-full border py-2 pl-2 pr-3 text-sm transition-colors"
-      style={{
-        backgroundColor: selected ? "#f3f8fe" : "#ffffff",
-        borderColor: selected ? "#0a6ee7" : "rgba(0,0,0,0.1)",
-        color: selected ? "#0a6ee7" : "#4a5565",
-      }}
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-full border py-2 pl-2 pr-3 text-sm transition-colors ${
+        selected
+          ? "border-[#0a6ee7] bg-[#f3f8fe] text-[#0a6ee7] hover:bg-[#e4eefb]!"
+          : "border-black/10 bg-white text-[#4a5565] hover:border-[#0a6ee7]/40! hover:bg-[#f9fafb]!"
+      }`}
     >
       <span className="relative size-6 shrink-0 overflow-hidden rounded-full bg-[#f3f4f6]">
         <Image src={option.icon} alt="" fill sizes="24px" className="object-cover" />
@@ -90,7 +93,7 @@ export function StockCrossSellFilterModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-black/20 text-white"
+          className="absolute right-3 top-3 flex size-6 cursor-pointer items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/40!"
         >
           <XIcon size={14} weight="bold" />
         </button>

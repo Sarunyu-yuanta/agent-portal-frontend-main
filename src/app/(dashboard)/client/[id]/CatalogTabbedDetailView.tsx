@@ -79,7 +79,7 @@ export function CatalogTabbedDetailView<T extends string>({
   const body = (
     <>
       <CatalogDetailBackHeader title={title} onBack={onBack} className="!pt-8" />
-      <CatalogDetailTextTabs items={tabItems} activeId={activeTabId} onSelect={onTabSelect} />
+      <CatalogDetailTextTabs sticky items={tabItems} activeId={activeTabId} onSelect={onTabSelect} />
       {hero}
       <div
         className="relative z-10 w-full rounded-xl"

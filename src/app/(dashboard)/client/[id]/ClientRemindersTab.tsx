@@ -17,48 +17,48 @@ import {
   todayDateKey,
 } from "../../calendar/calendar-grid";
 import { groupDayItems, type DayItem } from "../../calendar/day-items";
+import {
+  bucketFor,
+  bucketSortsDescending,
+  BUCKET_TONE,
+  REMINDER_BUCKETS,
+  type ReminderBucket,
+} from "../../calendar/reminder-buckets";
 import { DONE_BADGE_TONE, SOURCE_BADGE, SourceBadgeIcon } from "../../calendar/source-badge";
 import { useDayItemModals } from "../../calendar/use-day-item-modals";
 import { formatDayOnly } from "../../notes/note-format";
 import { snippet } from "../../notes/notes-grouping";
 
 /**
- * The four buckets the desktop table's Status column reads off, in the order
- * they matter there. Not one flat chronological list: a reminder's date only
- * means something relative to today, and the thing that table opens to find
- * out is what has slipped — which a single run of dates ordered by day buries
- * in the middle. Done sits at the bottom in reverse: it is finished business,
- * kept so a ticked reminder can still be found, and the one you finished last
- * is the one you are most likely looking for.
+ * What the desktop table's Status column reads off, in the order it matters
+ * there. Not one flat chronological list: a reminder's date only means
+ * something relative to today, and the thing that table opens to find out is
+ * what has slipped — which a single run of dates ordered by day buries in the
+ * middle.
  *
- * The card lists (mobile and the Client Hub's compact dialog) don't use this
- * — see `daySections` below for why they're grouped by calendar day instead.
+ * The buckets themselves, their order and their tones are shared with the
+ * Dashboard's reminder list (`calendar/reminder-buckets`); only the English
+ * wording below belongs to this tab.
+ *
+ * The card lists (mobile and the Client Hub's compact dialog) don't use the
+ * buckets at all — see `daySections` below for why they're grouped by calendar
+ * day instead.
  */
-const SECTIONS = ["Overdue", "Today", "Upcoming", "Done"] as const;
+const BUCKET_LABEL: Record<ReminderBucket, string> = {
+  overdue: "Overdue",
+  today: "Today",
+  upcoming: "Upcoming",
+  done: "Done",
+};
 
 /** One row: an item, the day it was read off, which bucket it landed in, and
  *  that day's offset from today (negative = past) for the "in N days" line. */
-type Row = { item: DayItem; day: Date; bucket: (typeof SECTIONS)[number]; daysDiff: number };
+type Row = { item: DayItem; day: Date; bucket: ReminderBucket; daysDiff: number };
 
 /** One calendar day's worth of items, for the card lists. `isToday` is what
  *  lets the section render even when `items` is empty — every other day only
  *  exists here because `dayMap` already had something under it. */
 type DaySection = { key: string; day: Date; isToday: boolean; items: DayItem[] };
-
-/**
- * Status badge tone per bucket, matching the badges the Calendar's day popover
- * already uses for the same concept (`RELATION_BADGE` in `DayPopoverContent`) —
- * Overdue reads off the primary ramp rather than red, so it doesn't compete with
- * the KYC-style risk red used elsewhere for "urgent" concepts. Upcoming gets a
- * neutral tag the popover skips (there the date line already says it; here every
- * row needs a badge since rows from different buckets sit in the same table).
- */
-const BUCKET_TONE: Record<(typeof SECTIONS)[number], string> = {
-  Overdue: "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]",
-  Today: "bg-primary-action text-white",
-  Upcoming: "bg-[var(--fill-gray-100)] text-[var(--fill-gray-600)]",
-  Done: DONE_BADGE_TONE,
-};
 
 /**
  * A client's reminders, on their own tab.
@@ -135,21 +135,17 @@ export function ClientRemindersTab({
       const relation = dayRelation(day, today);
       const daysDiff = dayOffset(day, today);
       for (const item of items) {
-        const bucket = item.done
-          ? "Done"
-          : ({ past: "Overdue", today: "Today", future: "Upcoming" } as const)[relation];
-        all.push({ item, day, bucket, daysDiff });
+        all.push({ item, day, bucket: bucketFor(item.done, relation), daysDiff });
       }
     }
 
-    // Ascending everywhere but Done — oldest first means most overdue first,
-    // and soonest first for what's ahead. Grouped bucket by bucket rather than
-    // one global sort, so the buckets keep their order (Overdue, Today,
-    // Upcoming, Done) instead of interleaving by date.
-    return SECTIONS.flatMap((label) => {
-      const group = all.filter((row) => row.bucket === label);
+    // Grouped bucket by bucket rather than one global sort, so the buckets keep
+    // their order instead of interleaving by date. Which way each one sorts is
+    // the bucket's own property — see `bucketSortsDescending`.
+    return REMINDER_BUCKETS.flatMap((bucket) => {
+      const group = all.filter((row) => row.bucket === bucket);
       group.sort((a, b) =>
-        label === "Done"
+        bucketSortsDescending(bucket)
           ? b.day.getTime() - a.day.getTime()
           : a.day.getTime() - b.day.getTime(),
       );
@@ -319,7 +315,7 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 type-caption font-medium ${BUCKET_TONE[bucket]}`}
         >
-          {bucket}
+          {BUCKET_LABEL[bucket]}
         </span>
       </TableCell>
 

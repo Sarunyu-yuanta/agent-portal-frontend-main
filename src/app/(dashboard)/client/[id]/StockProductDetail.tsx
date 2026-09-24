@@ -73,7 +73,6 @@ function tabFromQuery(value: string | null): StockDetailTab {
 const ASSETS = {
   priceDown: "/products/stock/detail/price-down.svg",
   sparkle: "/products/stock/detail/sparkle.svg",
-  setCircle: "/products/stock/detail/set-circle.svg",
   statusOpen: "/products/stock/detail/status-open.svg",
 } as const;
 
@@ -681,7 +680,13 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
           <span className="inline-flex items-center justify-center gap-1 rounded-[80px] border border-black/10 bg-white py-0.5 pl-1.5 pr-0.5">
             <span className="text-xs leading-4 text-[rgba(0,0,0,0.75)]">{detail.market}</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ASSETS.setCircle} alt="" width={20} height={20} className="size-5 shrink-0" />
+            <img
+              src={detail.marketIcon}
+              alt=""
+              width={20}
+              height={20}
+              className="size-5 shrink-0 rounded-full"
+            />
           </span>
           <div className="flex flex-col items-end gap-0.5">
             <span className="text-sm leading-5 text-[rgba(0,0,0,0.75)]">Day&apos;s Range</span>
@@ -839,8 +844,13 @@ export function StockProductDetail({
                   key={tab}
                   type="button"
                   onClick={() => selectTab(tab)}
-                  className={`flex shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap lg:min-w-[80px] lg:flex-1 ${
-                    active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-black/60"
+                  // Matches `CatalogDetailTextTabs`: hover paint on the inactive
+                  // tabs only. Trailing `!` because system-one ships its base
+                  // utilities unlayered, where they outrank a `hover:` variant.
+                  className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-5 whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
+                    active
+                      ? "border-[#0a6ee7] text-[#0a6ee7]"
+                      : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
                   }`}
                 >
                   {tab}

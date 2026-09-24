@@ -12,13 +12,17 @@ import {
   EyeSlashIcon,
   NotePencilIcon,
   CalendarBlankIcon,
+  GaugeIcon,
+  MegaphoneIcon,
+  ChartLineUpIcon,
+  GraduationCapIcon,
 } from "@phosphor-icons/react";
 import { SidebarUserMenu } from "@/components/layout/SidebarUserMenu";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { CALENDAR_ENABLED, NOTES_ENABLED } from "@/lib/feature-flags";
 import {
   activeSectionForPath,
-  lastSectionPath,
+  sectionResumeUrl,
   markSectionEntry,
   navVisitSnapshot,
   subscribeNavVisits,
@@ -31,6 +35,13 @@ import {
  * read-mostly, and none of it authored here.
  */
 const workspaceItems: NavItem[] = [
+  {
+    href: "/dashboard",
+    section: "dashboard",
+    label: "Dashboard",
+    icon: GaugeIcon,
+    badge: null,
+  },
   {
     href: "/client-hub",
     section: "client-hub",
@@ -50,6 +61,35 @@ const workspaceItems: NavItem[] = [
     section: "insights",
     label: "Insights",
     icon: ChartBarIcon,
+    badge: null,
+  },
+  {
+    href: "/promotions",
+    section: "promotions",
+    label: "Promotion/Events",
+    icon: MegaphoneIcon,
+    badge: null,
+  },
+];
+
+/**
+ * What grows the advisor's own book, rather than serving a client in front of
+ * them right now: targets to track, skills to build. Split from Workspace for
+ * that reason, not because the surfaces differ.
+ */
+const growthItems: NavItem[] = [
+  {
+    href: "/performance",
+    section: "performance",
+    label: "Performance",
+    icon: ChartLineUpIcon,
+    badge: null,
+  },
+  {
+    href: "/ic-learning",
+    section: "ic-learning",
+    label: "IC Learning",
+    icon: GraduationCapIcon,
     badge: null,
   },
 ];
@@ -134,7 +174,7 @@ function NavSection({
     // Cmd/ctrl/shift-click is "open this href elsewhere" — leave it to the browser.
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     if (activeSection === item.section) return;
-    const last = lastSectionPath(item.section);
+    const last = sectionResumeUrl(item.section);
     // A resume target that is the page you're already on (a stale pointer
     // left behind by a cross-section guest visit) is not a navigation — fall
     // through to the plain `href` so the click still goes somewhere.
@@ -286,6 +326,12 @@ export function AppSidebar({
             onNavigate={onClose}
           />
         )}
+        <NavSection
+          label="Growth"
+          items={growthItems}
+          collapsed={collapsed}
+          onNavigate={onClose}
+        />
       </nav>
 
       {/* Privacy mode toggle */}

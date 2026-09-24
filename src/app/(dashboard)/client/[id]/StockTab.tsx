@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { type ReactNode } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button, Chip } from "@sarunyu/system-one";
 import {
@@ -31,8 +31,10 @@ import {
   type Trend,
 } from "./stock-data";
 import { stockProductHref } from "./stock-product-detail-data";
+import { marketIndexHref } from "./stock-index-data";
 import { SetIndustrySectorSection } from "./IndustrySectorSection";
 import { CARD_SHADOW, PercentPill, TREND_TEXT } from "./stock-ui";
+import { setQueryState, withQuery } from "@/lib/query-state";
 
 function TrendCaret({ trend, size = 16 }: { trend: Trend; size?: number }) {
   if (trend === "up")
@@ -89,6 +91,14 @@ function SectionHeading({ icon, title, desc }: { icon?: ReactNode; title: string
 
 // ── Market watchlist chips ──────────────────────────────────────────────────
 
+/** `?market=` — omitted from the URL while it holds its default value. */
+const MARKET_PARAM = "market";
+const DEFAULT_MARKET: MarketId = "th";
+
+function normalizeMarketId(value: string | null | undefined): MarketId {
+  return value && value in MARKET_CATALOG ? (value as MarketId) : DEFAULT_MARKET;
+}
+
 function MarketWatchlistRow({
   activeId,
   onChange,
@@ -118,9 +128,24 @@ function MarketWatchlistRow({
 
 // ── Market status + index boards ────────────────────────────────────────────
 
-function MarketBoardCard({ code, icon, price, changePercent, trend, series }: MarketCatalog["indices"][number]) {
+function MarketBoardCard({
+  code,
+  icon,
+  price,
+  changePercent,
+  trend,
+  series,
+  onSelect,
+}: MarketCatalog["indices"][number] & { onSelect: () => void }) {
   return (
-    <div className="bg-white border border-black/10 rounded-lg p-3 flex flex-col gap-3 flex-1 min-w-[140px]">
+    <button
+      type="button"
+      onClick={onSelect}
+      // Same lift as `StockLargeAssetCard`, the Stock tab's other clickable
+      // card. Trailing `!` on the paint properties because system-one ships its
+      // base utilities unlayered, where they outrank a plain `hover:` variant.
+      className="bg-white border border-black/10 rounded-lg p-3 flex flex-col gap-3 flex-1 min-w-[140px] text-left cursor-pointer transition-[background-color,border-color,box-shadow] hover:bg-[#fafafa]! hover:border-[#0a6ee7]/25! hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2"
+    >
       <div className="flex flex-col gap-2 w-full">
         <div className="flex gap-2 items-center">
           <Image src={icon} alt="" width={20} height={20} className="size-5 shrink-0 rounded-full" />
@@ -139,24 +164,36 @@ function MarketBoardCard({ code, icon, price, changePercent, trend, series }: Ma
         </div>
       </div>
       <StockMiniChart series={series} trend={trend} width={166} height={42} className="w-full h-[42px]" />
-    </div>
+    </button>
   );
 }
 
 function MarketStatusSection({
   indices,
+  market,
   updatedAt,
 }: {
   indices: MarketCatalog["indices"];
+  market: MarketId;
   updatedAt: string;
 }) {
+  const router = useRouter();
   return (
     <div className="w-full" style={{ backgroundColor: "white" }}>
       <div className="flex flex-col gap-4 max-w-[1280px] mx-auto px-4 lg:px-6" style={{ paddingBottom: 16 }}>
         <MarketStatusTag status={MARKET_STATUS} />
-        <div className="flex gap-3 items-start overflow-x-auto hide-scrollbar" style={{ scrollbarWidth: "none" }}>
+        {/* `py-1 -my-1` costs no layout but stops the scroller clipping the
+            cards' hover shadow. */}
+        <div
+          className="flex gap-3 items-start overflow-x-auto hide-scrollbar py-1 -my-1"
+          style={{ scrollbarWidth: "none" }}
+        >
           {indices.map((idx) => (
-            <MarketBoardCard key={idx.code} {...idx} />
+            <MarketBoardCard
+              key={idx.code}
+              {...idx}
+              onSelect={() => router.push(marketIndexHref(idx.code, market))}
+            />
           ))}
         </div>
         <div className="flex gap-2 items-center justify-center w-full">
@@ -653,12 +690,33 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
  * in `ProductCatalogTab` already renders.
  */
 export function StockTab() {
-  const [marketId, setMarketId] = useState<MarketId>("th");
-  const catalog = MARKET_CATALOG[marketId] ?? MARKET_CATALOG.th;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  // The market chip is view state, so it lives in the URL like the category tab
+  // above it — that's what lets the breadcrumb trail (which stores whole URLs)
+  // bring the user back to US Market after they drill into a product.
+  const marketId = normalizeMarketId(searchParams.get(MARKET_PARAM));
+  const catalog = MARKET_CATALOG[marketId];
   return (
     <div className="flex flex-col w-full">
-      <MarketWatchlistRow activeId={marketId} onChange={setMarketId} />
-      <MarketStatusSection indices={catalog.indices} updatedAt={catalog.indicesUpdatedAt} />
+      <MarketWatchlistRow
+        activeId={marketId}
+        onChange={(id) =>
+          // `push`, like the category tab: switching markets is a step the
+          // browser's back button should be able to walk out of.
+          setQueryState(
+            withQuery(pathname, searchParams, {
+              [MARKET_PARAM]: id === DEFAULT_MARKET ? null : id,
+            }),
+            "push",
+          )
+        }
+      />
+      <MarketStatusSection
+        indices={catalog.indices}
+        market={marketId}
+        updatedAt={catalog.indicesUpdatedAt}
+      />
       <StockRecommendationSection
         topGain={catalog.topGain}
         topLoss={catalog.topLoss}

@@ -10,12 +10,13 @@ import {
 import {
   advisoryDetailHref,
   catalogListHref,
+  CATALOG_PATH,
   normalizeProductCategory,
 } from "@/lib/product-catalog-routes";
 import { useSetHeaderSlot } from "../header-slot-context";
 import { useScrollThreshold } from "../client/[id]/use-scroll-threshold";
 import { rememberCatalogList } from "@/lib/nav-memory";
-import { setQueryState } from "@/lib/query-state";
+import { setQueryState, withQuery } from "@/lib/query-state";
 
 export default function ProductCatalogPage() {
   return (
@@ -40,7 +41,10 @@ function ProductCatalogPageInner() {
   // The category tab lives in the URL, so browser back/forward, a refresh and
   // sidebar re-entry all land on the tab the user actually had open.
   const category = normalizeProductCategory(searchParams.get("category"));
-  const listUrl = catalogListHref(category);
+  // Keeps the rest of the query (a tab's own view state, e.g. Stock's
+  // `?market=`) on the remembered list URL, so a detail page's back button
+  // restores the tab *as the user left it*, not just which tab it was.
+  const listUrl = withQuery(CATALOG_PATH, searchParams, { category });
 
   useEffect(() => {
     rememberCatalogList(listUrl);
@@ -108,6 +112,11 @@ function ProductCatalogPageInner() {
       searchAnchorRef={headerSearchWrapRef}
       activeCategory={category}
       onCategoryChange={(id) =>
+        // Deliberately drops the rest of the query rather than merging it: a
+        // tab's own view state (Stock's `?market=`) belongs to the visit the
+        // user set it in. It comes back when they drill into something and
+        // press back — not when they leave via the tab bar and wander in again,
+        // which starts the tab at its default.
         setQueryState(catalogListHref(id), "push")
       }
       navigation={navigation}

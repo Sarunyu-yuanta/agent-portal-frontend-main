@@ -33,6 +33,11 @@ export type PageChrome = {
   isMobileFullBleed: boolean;
   /** Page fills the viewport below the top bar and scrolls inside itself. */
   isFullHeight: boolean;
+  /**
+   * Uses the full content width (no `max-w-[1280px]`) while keeping the
+   * standard page padding — for layouts that carry their own right rail.
+   */
+  isWideContent: boolean;
   /** Page renders its own mobile breadcrumb; the layout must not add another. */
   ownsMobileBreadcrumb: boolean;
   /** Page content starts on white rather than `main`'s gray-50. */
@@ -40,13 +45,18 @@ export type PageChrome = {
 };
 
 const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Dashboard",
   "/command-center": "Command Center",
   "/client-hub": "Client 360",
   "/pipeline": "Pipeline",
   "/ai-insights": "AI Insights",
-  "/performance": "Performance & Targets",
+  "/promotions": "Promotion/Events",
+  // Was "Performance & Targets" while the built dashboard was live — restore
+  // that alongside `performance/page.tsx` when it comes back off hold.
+  "/performance": "Performance",
   "/compliance": "Compliance & Risk",
   "/insights": "Insights",
+  "/ic-learning": "IC Learning",
   "/product-catalog": "Product Catalog",
   "/notes": "Notes",
   "/calendar": "Calendar",
@@ -101,6 +111,7 @@ export function usePageChrome(): PageChrome {
     // Notes and Calendar are both master/detail-style surfaces, not documents —
     // they own the whole area below the top bar and scroll internally.
     isFullHeight: pathname === "/notes" || pathname === "/calendar",
+    isWideContent: pathname === "/dashboard",
     // Full Profile puts the breadcrumb inside its own sticky identity bar (and
     // pulls itself up over the layout's padding to do it), so a second one
     // above would overlap.

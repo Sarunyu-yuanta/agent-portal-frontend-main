@@ -34,6 +34,7 @@ import {
 } from "./client/[id]/mutual-fund-data";
 import { getThaiStructuredProduct } from "./client/[id]/thai-structured-data";
 import { getIndustrySectorPage } from "./client/[id]/stock-industry-sector-data";
+import { getMarketIndexPage } from "./client/[id]/stock-index-data";
 import { getStockProductDetail } from "./client/[id]/stock-product-detail-data";
 import {
   catalogCategoryForPath,
@@ -48,11 +49,17 @@ export type Crumb = { label: string; href?: string };
 export type BreadcrumbContext = { clients: Client[]; isPrivate: boolean };
 
 const SECTION_ROOT: Record<NavSectionKey, { path: string; label: string }> = {
+  dashboard: { path: "/dashboard", label: "Dashboard" },
   "client-hub": { path: "/client-hub", label: "Client 360" },
   "product-catalog": { path: "/product-catalog", label: "Product Catalog" },
   // Insight articles all come from the House View tab, which is what this
   // breadcrumb has always called the level above them.
   insights: { path: "/insights", label: "House View" },
+  promotions: { path: "/promotions", label: "Promotion/Events" },
+  // Matches the header title in `page-chrome.ts` — the two are allowed to
+  // differ from the sidebar's own label, but not from each other.
+  performance: { path: "/performance", label: "Performance" },
+  "ic-learning": { path: "/ic-learning", label: "IC Learning" },
   notes: { path: "/notes", label: "Notes" },
   calendar: { path: "/calendar", label: "Calendar" },
 };
@@ -128,7 +135,7 @@ function trailBreadcrumb(
     // normalize rather than treating a missing param as "tab unknown".
     if (!isCurrent && isCatalogList(urlPathname(url))) {
       rungs.push(
-        ...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url))),
+        ...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url)), url),
       );
       continue;
     }
@@ -171,14 +178,22 @@ function routeBreadcrumb(
 
 const isCatalogList = (pathname: string) => pathname === CATALOG_PATH;
 
-/** `Product Catalog`, plus the tab rung when the category is known. */
-function catalogRootCrumbs(category: string | null): Crumb[] {
+/**
+ * `Product Catalog`, plus the tab rung when the category is known.
+ *
+ * `tabUrl` is the list URL as it was actually left — pass it whenever the trail
+ * has one, so the rung carries the tab's own view state (Stock's `?market=`)
+ * and not just which tab it was. Without a trail the category is all we know.
+ */
+function catalogRootCrumbs(category: string | null, tabUrl?: string): Crumb[] {
   const root: Crumb = {
     label: SECTION_ROOT["product-catalog"].label,
     href: CATALOG_PATH,
   };
   const tab = productCategoryTitle(category);
-  return tab ? [root, { label: tab, href: catalogListHref(category) }] : [root];
+  return tab
+    ? [root, { label: tab, href: tabUrl ?? catalogListHref(category) }]
+    : [root];
 }
 
 /**
@@ -336,6 +351,7 @@ function catalogLabel(pathname: string): string | null {
   if (stockSectorId && !STOCK_SECTOR_STATIC.has(stockSectorId)) {
     const decoded = decodeURIComponent(stockSectorId);
     return (
+      getMarketIndexPage(decoded)?.index.code ??
       getIndustrySectorPage(decoded)?.sector.name ??
       getStockProductDetail(decoded)?.symbol ??
       "SET Industry Sector"

@@ -49,10 +49,12 @@ export function StockCrossSellDetail({
   const filterCount = issuerIds.length + countryIds.length;
 
   return (
-    // Figma's "Warp" column (node 23228:37813) gaps the header and the hero
-    // banner by 16px — gap-4 here, not a bigger eyeballed number.
-    <div className="flex w-full flex-col gap-4 bg-white">
-      <CatalogDetailBackHeader title={config.title} onBack={onBack} className="!pt-8" />
+    // No column `gap` here on purpose: Figma's "Warp" column (node 23228:37813)
+    // gaps the header and the hero banner by 16px, and a container gap would
+    // apply that spacing *below* the hero too — leaving a white strip between
+    // the banner and the list panel, which is meant to sit flush against it.
+    <div className="flex w-full flex-col bg-white">
+      <CatalogDetailBackHeader title={config.title} onBack={onBack} className="!pt-8 !pb-4" />
 
       <div className="relative w-full overflow-hidden" style={{ background: config.gradient }}>
         <div className={`relative flex items-center gap-6 py-10 ${NARROW}`}>
@@ -95,7 +97,11 @@ export function StockCrossSellDetail({
             <button
               type="button"
               onClick={() => setFilterOpen(true)}
-              className="relative flex shrink-0 items-center gap-1 rounded-lg border border-black/10 bg-[#f9fafb] py-2 pr-3.5 pl-2.5"
+              // Brand-light tint on hover, the same `#eff6ff` the sort
+              // dropdown marks its selected row with. Trailing `!` because
+              // system-one ships its base utilities unlayered, where they
+              // outrank a plain `hover:` variant.
+              className="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-black/10 bg-[#f9fafb] py-2 pr-3.5 pl-2.5 transition-colors hover:border-[#0a6ee7]/25! hover:bg-[#eff6ff]!"
             >
               <FunnelSimpleIcon size={20} style={{ color: "#0a6ee7" }} />
               <span className="text-sm font-semibold" style={{ color: "#0a6ee7" }}>

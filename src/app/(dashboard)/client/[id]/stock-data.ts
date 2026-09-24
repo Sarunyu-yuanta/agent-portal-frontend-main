@@ -329,13 +329,8 @@ export type SectorRow = {
   trend: Trend;
   /** Heatmap tile weight — bigger sectors get more tile area. */
   size: "lg" | "md" | "sm";
-  /**
-   * When false the sector stays in the list but is omitted from the heatmap.
-   * Figma's "Heat map เมื่อมีแค่ 2 Sectors" permutation (node 25177:23062)
-   * shows all 8 list rows but only Resources + Services as heatmap tiles.
-   */
-  inHeatmap?: boolean;
-  /** Heatmap label when it differs from the list name (US Energy → Resources). */
+  /** Heatmap label when it differs from the list name (US Energy → Resources).
+   *  Embedded `\n` forces the wrap Figma draws inside the narrow tiles. */
   heatmapName?: string;
   /** Heatmap-only quote when the list row uses a different percent/trend. */
   heatmapChangeAmount?: string;
@@ -346,14 +341,14 @@ export type SectorRow = {
 };
 
 export const SET_INDUSTRY_SECTORS: SectorRow[] = [
-  { id: "resources", name: "Resources", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg", inHeatmap: true },
-  { id: "services", name: "Services", changeAmount: "-20.00", changePercent: "-10.58%", trend: "down", size: "lg", inHeatmap: true },
-  { id: "industrials", name: "Industrials", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg", inHeatmap: false },
-  { id: "consumer-products", name: "Consumer Products", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "md", inHeatmap: false },
-  { id: "agro-food", name: "Agro & Food Industry", changeAmount: "-20.00", changePercent: "-1.58%", trend: "down", size: "md", inHeatmap: false },
-  { id: "financials", name: "Financials", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm", inHeatmap: false },
-  { id: "technology", name: "Technology", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm", inHeatmap: false },
-  { id: "property-construction", name: "Property & Construction", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm", inHeatmap: false },
+  { id: "resources", name: "Resources", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
+  { id: "services", name: "Services", changeAmount: "-20.00", changePercent: "-10.58%", trend: "down", size: "lg" },
+  { id: "industrials", name: "Industrials", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
+  { id: "consumer-products", name: "Consumer Products", heatmapName: "Consumer \nProducts", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "md" },
+  { id: "agro-food", name: "Agro & Food Industry", heatmapName: "Agro & \nFood \nIndustry", changeAmount: "-20.00", changePercent: "-1.58%", trend: "down", size: "md" },
+  { id: "financials", name: "Financials", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
+  { id: "technology", name: "Technology", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
+  { id: "property-construction", name: "Property & Construction", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
 ];
 
 export type ServiceCard = {
@@ -415,7 +410,10 @@ export const ESSENTIAL_SERVICES: ServiceCard[] = [
 ];
 
 export type MarketId = "th" | "us";
-export type HeatmapLayout = "compact-2" | "treemap-8" | "treemap-us";
+/** Treemap packing for the industry-sector card. A market that reports two or
+ *  fewer sectors ignores this and falls back to Figma's "Heat map เมื่อมีแค่ 2
+ *  Sectors" permutation (node 25177:23062) — see `SectorHeatmap`. */
+export type HeatmapLayout = "treemap-8" | "treemap-us";
 /** Sector taxonomies that have drill-in pages. `industrials` and `financials`
  *  exist in both, so US routes carry a `us-` slug prefix to disambiguate —
  *  see `industrySectorHref` in `stock-industry-sector-data.ts`. */
@@ -603,6 +601,10 @@ export type MarketCatalog = {
   crossSell: "dr-etf" | "etf-gain-loss";
   etfGain: CrossSellRow[];
   etfLoss: CrossSellRow[];
+  /** Exchange a quote from this board is listed on, and its mark — the badge
+   *  beside the price on a stock's detail page. */
+  exchange: string;
+  exchangeIcon: string;
   sectors: SectorRow[];
   /** Heading of the industry-sector card. Every market currently ships the SET
    *  wording Figma specced; swap per catalog once the US/HK/VN copy lands. */
@@ -626,10 +628,12 @@ const THAI_CATALOG: MarketCatalog = {
   crossSell: "dr-etf",
   etfGain: STOCK_ETF_ROWS,
   etfLoss: STOCK_ETF_ROWS,
+  exchange: "SET",
+  exchangeIcon: "/products/stock/detail/set-circle.svg",
   sectors: SET_INDUSTRY_SECTORS,
   sectorsTitle: "SET Industry Sector",
   sectorsMarket: "th",
-  heatmapLayout: "compact-2",
+  heatmapLayout: "treemap-8",
   servicesTitle: "Essential Investment Services",
   servicesDesc: "Solutions that meet your needs. Unlock your investment potential with Yuanta.",
   services: ESSENTIAL_SERVICES,
@@ -645,6 +649,11 @@ const US_CATALOG: MarketCatalog = {
   crossSell: "etf-gain-loss",
   etfGain: US_ETF_TOP_GAIN,
   etfLoss: US_ETF_TOP_LOSS,
+  // Every US name this catalog ships (AAPL/TSLA/MSFT/GOOGL/AMZN) is Nasdaq-
+  // listed, so the board can name one exchange. Move this onto the row once
+  // the catalog carries NYSE-listed names too.
+  exchange: "NASDAQ",
+  exchangeIcon: "/products/stock/logos/indices/ndx.svg",
   sectors: US_INDUSTRY_SECTORS,
   sectorsTitle: "SET Industry Sector",
   sectorsMarket: "us",

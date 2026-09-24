@@ -6,6 +6,7 @@ import {
   STOCK_DR_ROWS,
   STOCK_ETF_ROWS,
   type CrossSellRow,
+  type MarketCatalog,
   type MarketStatusValue,
   type StockRow,
   type Trend,
@@ -106,7 +107,10 @@ export type StockProductDetail = {
   marketCap: string;
   dayLow: string;
   dayHigh: string;
+  /** Exchange the quote is listed on, and its mark — never assume SET here, a
+   *  US name carries its own (see `MarketCatalog.exchange`). */
   market: string;
+  marketIcon: string;
   bestBid: { price: string; volume: string };
   bestOffer: { price: string; volume: string };
   bidLevels: OrderBookLevel[];
@@ -253,7 +257,8 @@ export const CPALL_PRODUCT_DETAIL: StockProductDetail = {
   marketCap: "458.13B",
   dayLow: "50.25",
   dayHigh: "51.25",
-  market: "SET",
+  market: MARKET_CATALOG.th.exchange,
+  marketIcon: MARKET_CATALOG.th.exchangeIcon,
   bestBid: { price: "67.00", volume: "1,882,900" },
   bestOffer: { price: "60.00", volume: "11,100" },
   bidLevels: depthLevels("bid"),
@@ -384,7 +389,12 @@ function knownStockRows(): StockRow[] {
   return rows;
 }
 
-function fromRow(row: StockRow, currency: string): StockProductDetail {
+/** The board a synthesized quote belongs to — decides its currency and the
+ *  exchange badge. Defaults to the Thai catalog, which is what the standalone
+ *  DR / ETF rows below are listed on. */
+type QuoteSource = Pick<MarketCatalog, "currency" | "exchange" | "exchangeIcon">;
+
+function fromRow(row: StockRow, source: QuoteSource): StockProductDetail {
   const last = parsePrice(row.price);
   const dayPad = Math.max(0.25, last * 0.01);
   return {
@@ -394,7 +404,9 @@ function fromRow(row: StockRow, currency: string): StockProductDetail {
     featured: Boolean(row.featured),
     status: MARKET_STATUS,
     price: row.price,
-    currency,
+    currency: source.currency,
+    market: source.exchange,
+    marketIcon: source.exchangeIcon,
     changeAmount: row.changeAmount,
     changePercent: row.changePercent.replace(/^[+-]/, ""),
     trend: row.trend,
@@ -411,7 +423,7 @@ function fromRow(row: StockRow, currency: string): StockProductDetail {
  * when it has one: a DR on a foreign underlying can be quoted off its market's
  * default.
  */
-function fromCrossSellRow(row: CrossSellRow, currency: string): StockProductDetail {
+function fromCrossSellRow(row: CrossSellRow, source: QuoteSource): StockProductDetail {
   return fromRow(
     {
       symbol: row.symbol,
@@ -422,7 +434,7 @@ function fromCrossSellRow(row: CrossSellRow, currency: string): StockProductDeta
       trend: row.trend,
       series: row.series,
     },
-    row.currency ?? currency,
+    row.currency ? { ...source, currency: row.currency } : source,
   );
 }
 
@@ -436,7 +448,7 @@ export function getStockProductDetail(id: string): StockProductDetail | null {
       (row) => row.symbol.toUpperCase() === key.toUpperCase(),
     );
     if (match) {
-      return fromRow(match, market.currency);
+      return fromRow(match, market);
     }
   }
 
@@ -448,7 +460,7 @@ export function getStockProductDetail(id: string): StockProductDetail | null {
       (row) => row.symbol.toUpperCase() === key.toUpperCase(),
     );
     if (match) {
-      return fromCrossSellRow(match, market.currency);
+      return fromCrossSellRow(match, market);
     }
   }
 
@@ -457,12 +469,12 @@ export function getStockProductDetail(id: string): StockProductDetail | null {
     ...STOCK_ETF_ROWS,
     ...STOCK_CROSS_SELL_DETAIL_ROWS,
   ].find((row) => row.symbol.toUpperCase() === key.toUpperCase());
-  if (crossSellMatch) return fromCrossSellRow(crossSellMatch, "THB");
+  if (crossSellMatch) return fromCrossSellRow(crossSellMatch, MARKET_CATALOG.th);
 
   const sectorMatch = knownStockRows().find(
     (row) => row.symbol.toUpperCase() === key.toUpperCase(),
   );
-  return sectorMatch ? fromRow(sectorMatch, "THB") : null;
+  return sectorMatch ? fromRow(sectorMatch, MARKET_CATALOG.th) : null;
 }
 
 export function stockProductHref(symbol: string): string {

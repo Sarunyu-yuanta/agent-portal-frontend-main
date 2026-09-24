@@ -1,47 +1,20 @@
 "use client";
 
-import { KpiRow } from "./KpiRow";
-import {
-  IncomeTracker,
-  PipelineCoverage,
-  CrossSellDiagnostics,
-  ClientEngagement,
-  OutcomeSimulator,
-} from "./MainColumn";
-import { DarkSidebar } from "./DarkSidebar";
+import { ChartLineUpIcon } from "@phosphor-icons/react";
+import { ComingSoonPage } from "../coming-soon-page";
 
+/**
+ * The full dashboard (`KpiRow`, `MainColumn`, `DarkSidebar`) is built and still
+ * on disk — held back rather than deleted, the same way `lib/feature-flags.ts`
+ * gates a finished feature for a later phase. Swap this back to render those
+ * once Performance is ready to ship.
+ */
 export default function PerformancePage() {
   return (
-    <div className="flex flex-col gap-5">
-
-      {/* KPI row */}
-      <KpiRow />
-
-      {/* Body: main 2-col + dark sidebar */}
-      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[1fr_300px] items-start">
-
-        {/* Main content */}
-        <div className="flex flex-col gap-5">
-          {/* Row 1: Income + Pipeline */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <IncomeTracker />
-            <PipelineCoverage />
-          </div>
-
-          {/* Row 2: Cross-sell + Engagement */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-            <CrossSellDiagnostics />
-            <ClientEngagement />
-          </div>
-
-          {/* Row 3: Outcome Simulator full-width */}
-          <OutcomeSimulator />
-        </div>
-
-        {/* Dark navy sidebar — stretches full height */}
-        <DarkSidebar />
-
-      </div>
-    </div>
+    <ComingSoonPage
+      icon={<ChartLineUpIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+      title="Performance"
+      body="Income, pipeline coverage, and target tracking will live here. Not built yet — check back soon."
+    />
   );
 }
