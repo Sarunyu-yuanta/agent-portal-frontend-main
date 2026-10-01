@@ -76,6 +76,27 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts`.
 - **Records**: 7 — **client `110008` has no KYC record at all**
 - **Used in**: consumed directly (no hook) — Compliance page, Client Hub
 
+### 1.7a Order Requirements (per-client)
+- **What**: The two stored halves of the booking gate — whether a client has declared their wealth, and whether they have acknowledged the product class.
+- **Lives in**: `src/data/order-requirements.json` + `src/lib/order-mock-data.ts` (`mockClientRequirements`)
+- **Shape**: `{ clientId: string, wealth: RequirementStatus, acknowledge: RequirementStatus }` where status is `"passed"|"pending"|"expired"|"missing"|"failed"`
+- **Records**: 8 (one per client), spread across every status so each state is demonstrable
+- **Note**: the booking form checks **four** things; the other two (`kyc`, `risk-profile`) are **deliberately absent here** — both are derived from the KYC record and the client's risk rating, and storing them would be how the two start disagreeing.
+- **Used in**: `clientReadiness()` in `app/(dashboard)/orders/order-requirements.ts`
+
+### 1.7b Order Books (bookings, submissions, requirement requests)
+- **What**: Future orders an IC has booked for clients against one product, the orders sent downstream, and the requests sent to clients to go and complete their forms.
+- **Lives in**: `src/data/order-books.json` + `src/lib/order-mock-data.ts` (`seedBookings`, `seedSubmissions`, `seedRequirementRequests`) — then held and mutated in `src/contexts/orders-context.tsx`
+- **Shape**:
+  ```
+  books: [{ productId, bookings: [{ id, clientId, amount: number, daysAgo: number, status? }],
+            submissions: [{ id, bookingIds: string[], daysAgo, status: "processing"|"completed"|"rejected", backendRef }] }]
+  requirementRequests: [{ id, clientId, productId, keys: RequirementKey[], daysAgo, status: "sent"|"completed" }]
+  ```
+- **Records**: 6 books (13 bookings, 3 submissions), 2 outstanding requests — 4 on the Global Structured desk, 2 on the Thai desk (`thai-` prefixed ids)
+- **Note**: every date is a `daysAgo` offset stamped from today at import, like `mockKYCData`. Currency, notional target and minimum ticket are **not** here — they are read off the product itself. The activity log is derived, not stored.
+- **Used in**: `useOrderBooks()` / `useOrderBook()` in `app/(dashboard)/orders/use-order-books.ts` — `/orders`, `/orders/[productId]`, the booking modal, the header bell. See [`order-booking.md`](order-booking.md).
+
 ### 1.8 House View Strategies
 - **What**: A CIO research/strategy pitch — hot issue, buy-list entry, asset-performance recap — with conviction level and matched-client count.
 - **Lives in**: `src/data/house-view-strategies.json` + `mock-data.ts` (`mockHouseViewStrategies`)

@@ -1,4 +1,13 @@
 export type ClientProfile = {
+  /**
+   * The trading account the client books orders under.
+   *
+   * Not the client id: one client can hold more than one account, and the
+   * booking modal prints the account the order is actually placed on. Mocked
+   * here as the client id plus a two-digit account suffix, which is the shape
+   * the real numbers take.
+   */
+  accountNo: string;
   phone: string;
   email: string;
   lineId?: string;
@@ -16,6 +25,7 @@ export type ClientProfile = {
 
 const PROFILES: Record<string, ClientProfile> = {
   "110001": {
+    accountNo: "11000122",
     phone: "+66 81 234 5678",
     email: "sarunyu.s@gmail.com",
     lineId: "sarunyu.s",
@@ -34,6 +44,7 @@ const PROFILES: Record<string, ClientProfile> = {
     ],
   },
   "110002": {
+    accountNo: "11000222",
     phone: "+66 89 345 6789",
     email: "malee.p@pongpipat.co.th",
     birthday: "5 Jul 1968",
@@ -49,6 +60,7 @@ const PROFILES: Record<string, ClientProfile> = {
     ],
   },
   "110003": {
+    accountNo: "11000322",
     phone: "+66 92 456 7890",
     email: "pravit.s@outlook.com",
     lineId: "pravit_s",
@@ -62,6 +74,7 @@ const PROFILES: Record<string, ClientProfile> = {
     relationshipSince: "Jun 2020",
   },
   "110004": {
+    accountNo: "11000422",
     phone: "+66 84 567 8901",
     email: "nattaporn.c@chaiwong.com",
     lineId: "nattaporn_c",
@@ -80,6 +93,7 @@ const PROFILES: Record<string, ClientProfile> = {
     ],
   },
   "110005": {
+    accountNo: "11000522",
     phone: "+66 95 678 9012",
     email: "wichai.t@thongkam.co.th",
     birthday: "3 Sep 1965",
@@ -92,6 +106,7 @@ const PROFILES: Record<string, ClientProfile> = {
     relationshipSince: "Nov 2012",
   },
   "110006": {
+    accountNo: "11000622",
     phone: "+66 86 789 0123",
     email: "siriporn.l@gmail.com",
     lineId: "siriporn_lad",
@@ -105,6 +120,7 @@ const PROFILES: Record<string, ClientProfile> = {
     relationshipSince: "Apr 2019",
   },
   "110007": {
+    accountNo: "11000722",
     phone: "+66 81 890 1234",
     email: "thanawat.b@boonmee.co.th",
     lineId: "thanawat_b",
@@ -122,6 +138,7 @@ const PROFILES: Record<string, ClientProfile> = {
     ],
   },
   "110008": {
+    accountNo: "11000822",
     phone: "+66 98 901 2345",
     email: "kannika.s@kannikasri.com",
     birthday: "8 Oct 1978",
@@ -136,6 +153,7 @@ const PROFILES: Record<string, ClientProfile> = {
 };
 
 const DEFAULT_PROFILE: ClientProfile = {
+  accountNo: "—",
   phone: "+66 80 000 0000",
   email: "client@example.com",
   birthday: "1 Jan 1980",

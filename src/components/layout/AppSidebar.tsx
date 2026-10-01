@@ -15,13 +15,19 @@ import {
   GaugeIcon,
   MegaphoneIcon,
   ChartLineUpIcon,
+  ClipboardTextIcon,
   GraduationCapIcon,
   UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { SidebarUserMenu } from "@/components/layout/SidebarUserMenu";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { NOTE_AUTHOR } from "@/app/(dashboard)/notes/note-constants";
-import { CALENDAR_ENABLED, NOTES_ENABLED } from "@/lib/feature-flags";
+import { IC_ROLE } from "@/lib/current-ic";
+import {
+  CALENDAR_ENABLED,
+  NOTES_ENABLED,
+  ORDER_BOOKING_ENABLED,
+} from "@/lib/feature-flags";
 import {
   activeSectionForPath,
   forgetSection,
@@ -71,6 +77,21 @@ const workspaceItems: NavItem[] = [
     icon: MegaphoneIcon,
     badge: null,
   },
+  // Sits under Product Catalog's neighbours rather than in Planner: a book is
+  // the firm's deal being filled, not something the advisor wrote down. Gated
+  // because the whole flow is (see `lib/feature-flags`); with the flag off the
+  // entry goes and `/orders` redirects to the catalogue.
+  ...(ORDER_BOOKING_ENABLED
+    ? [
+        {
+          href: "/orders",
+          section: "orders" as const,
+          label: "Order Management",
+          icon: ClipboardTextIcon,
+          badge: null,
+        },
+      ]
+    : []),
 ];
 
 /**
@@ -363,7 +384,7 @@ export function AppSidebar({
       <div className="shrink-0 border-t border-slate-700/60">
         <SidebarUserMenu
           name={NOTE_AUTHOR}
-          role="Senior RM"
+          role={IC_ROLE}
           initials="JD"
           collapsed={collapsed}
         />

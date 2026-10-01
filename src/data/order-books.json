@@ -1,0 +1,96 @@
+{
+  "books": [
+    {
+      "productId": "ko-wmt",
+      "bookings": [
+        { "id": "bk-0101", "clientId": "110001", "amount": 40000, "daysAgo": 5 },
+        { "id": "bk-0102", "clientId": "110007", "amount": 35000, "daysAgo": 5 },
+        { "id": "bk-0103", "clientId": "110004", "amount": 25000, "daysAgo": 4 }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0101",
+          "bookingIds": ["bk-0101", "bk-0102", "bk-0103"],
+          "daysAgo": 3,
+          "status": "completed",
+          "backendRef": "ORD-2026-000871"
+        }
+      ]
+    },
+    {
+      "productId": "sawad-ptt",
+      "bookings": [
+        { "id": "bk-0201", "clientId": "110001", "amount": 50000, "daysAgo": 3 },
+        { "id": "bk-0202", "clientId": "110004", "amount": 30000, "daysAgo": 3 },
+        { "id": "bk-0203", "clientId": "110007", "amount": 20000, "daysAgo": 2 }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0201",
+          "bookingIds": ["bk-0201", "bk-0202", "bk-0203"],
+          "daysAgo": 1,
+          "status": "processing",
+          "backendRef": "ORD-2026-000912"
+        }
+      ]
+    },
+    {
+      "productId": "aapl-amzn-nflx",
+      "bookings": [
+        { "id": "bk-0301", "clientId": "110001", "amount": 60000, "daysAgo": 2 },
+        { "id": "bk-0302", "clientId": "110007", "amount": 40000, "daysAgo": 1 }
+      ],
+      "submissions": []
+    },
+    {
+      "productId": "sp-nvda-amzn-axp",
+      "bookings": [
+        { "id": "bk-0401", "clientId": "110007", "amount": 30000, "daysAgo": 1 },
+        { "id": "bk-0402", "clientId": "110002", "amount": 15000, "daysAgo": 1, "status": "cancelled" }
+      ],
+      "submissions": []
+    },
+    {
+      "productId": "thai-chips",
+      "bookings": [
+        { "id": "bk-0501", "clientId": "110001", "amount": 40000, "daysAgo": 2 },
+        { "id": "bk-0502", "clientId": "110007", "amount": 20000, "daysAgo": 1 }
+      ],
+      "submissions": []
+    },
+    {
+      "productId": "thai-magnificent-7",
+      "bookings": [
+        { "id": "bk-0601", "clientId": "110004", "amount": 30000, "daysAgo": 4 },
+        { "id": "bk-0602", "clientId": "110001", "amount": 70000, "daysAgo": 4 }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0601",
+          "bookingIds": ["bk-0601", "bk-0602"],
+          "daysAgo": 3,
+          "status": "rejected",
+          "backendRef": "ORD-2026-000845"
+        }
+      ]
+    }
+  ],
+  "requirementRequests": [
+    {
+      "id": "rq-0101",
+      "clientId": "110002",
+      "productId": "sp-nvda-amzn-axp",
+      "keys": ["acknowledge"],
+      "daysAgo": 1,
+      "status": "sent"
+    },
+    {
+      "id": "rq-0102",
+      "clientId": "110004",
+      "productId": "aapl-amzn-nflx",
+      "keys": ["acknowledge"],
+      "daysAgo": 2,
+      "status": "sent"
+    }
+  ]
+}

@@ -33,6 +33,7 @@ import {
   normalizeMutualFundCategoryId,
 } from "./client/[id]/mutual-fund-data";
 import { getThaiStructuredProduct } from "./client/[id]/thai-structured-data";
+import { findBookableProduct } from "./orders/bookable-products";
 import { getIndustrySectorPage } from "./client/[id]/stock-industry-sector-data";
 import { getMarketIndexPage } from "./client/[id]/stock-index-data";
 import { getStockProductDetail } from "./client/[id]/stock-product-detail-data";
@@ -56,6 +57,7 @@ const SECTION_ROOT: Record<NavSectionKey, { path: string; label: string }> = {
   // breadcrumb has always called the level above them.
   insights: { path: "/insights", label: "House View" },
   promotions: { path: "/promotions", label: "Promotion/Events" },
+  orders: { path: "/orders", label: "Order Management" },
   // Matches the header title in `page-chrome.ts` — the two are allowed to
   // differ from the sidebar's own label, but not from each other.
   performance: { path: "/performance", label: "Performance" },
@@ -284,6 +286,16 @@ function labelFor(pathname: string, ctx: BreadcrumbContext): string | null {
   if (client) {
     const found = ctx.clients.find((c) => c.id === client[1]);
     return maskName(found?.name ?? "Client", ctx.isPrivate);
+  }
+
+  // A book is named by the product it is filling — the id in the URL is the
+  // product's, and resolving it here is what keeps the rung reading
+  // "Order Management / KO - WMT" instead of "Order Management / ko-wmt".
+  // `findBookableProduct`, not `findProductById`: books span both structured
+  // desks, and the Thai ones are not in the global registry.
+  const book = /^\/orders\/([^/]+)/.exec(pathname);
+  if (book) {
+    return findBookableProduct(decodeURIComponent(book[1]))?.underlying ?? "รายการจอง";
   }
 
   const insight = /^\/insights\/([^/]+)/.exec(pathname);

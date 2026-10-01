@@ -21,6 +21,7 @@ export type NavSectionKey =
   | "product-catalog"
   | "insights"
   | "promotions"
+  | "orders"
   | "performance"
   | "ic-learning"
   | "yaa-team-head"
@@ -42,6 +43,9 @@ const SECTIONS: NavSection[] = [
   { key: "product-catalog", root: "/product-catalog", prefixes: ["/product-catalog"] },
   { key: "insights", root: "/insights", prefixes: ["/insights"] },
   { key: "promotions", root: "/promotions", prefixes: ["/promotions"] },
+  // A book (/orders/:productId) is Order Management's deepest level, not its
+  // own section — the same shape as Full Profile under Client 360.
+  { key: "orders", root: "/orders", prefixes: ["/orders"] },
   { key: "performance", root: "/performance", prefixes: ["/performance"] },
   { key: "ic-learning", root: "/ic-learning", prefixes: ["/ic-learning"] },
   { key: "yaa-team-head", root: "/yaa-team-head", prefixes: ["/yaa-team-head"] },

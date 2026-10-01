@@ -1,3 +1,5 @@
+import type { StructuredProduct } from "./structured-product-data";
+
 export type ThaiStructuredProduct = {
   theme: string;
   product: string;
@@ -36,4 +38,72 @@ export function getThaiStructuredProduct(
   theme: string,
 ): ThaiStructuredProduct | null {
   return THAI_STRUCTURED_PRODUCTS.find((p) => p.theme === theme) ?? null;
+}
+
+// ── Booking ──────────────────────────────────────────────────────────────────
+
+/**
+ * The ticket terms the Thai desk writes these notes at.
+ *
+ * The two numbers a booking gate needs that the rows above genuinely do not
+ * carry: a minimum per client, and the notional a book has to fill before the
+ * order goes out. The global desk's products carry both as fields
+ * (`minInvestment`, `requestNotionalSize`); these rows carry neither, and every
+ * one of them is the same USD FCN structure written at the same size.
+ *
+ * One constant rather than a column repeated fifteen times — and here, next to
+ * the rows it describes, rather than in the order module, so that whoever adds
+ * a sixteenth theme finds it.
+ */
+const THAI_MIN_TICKET = "10,000 USD";
+const THAI_NOTIONAL = "100,000";
+
+/**
+ * The id a Thai theme is booked and routed under.
+ *
+ * Prefixed because `/orders/:id` is one namespace shared with the global desk,
+ * and a theme that slugged to the same string as a global product's id would
+ * resolve to the wrong book. The prefix is also what
+ * {@link findBookableProduct} splits on, so it is load-bearing rather than
+ * decorative.
+ */
+export function thaiBookableId(theme: string): string {
+  return `thai-${theme.toLowerCase().replace(/\s+/g, "-")}`;
+}
+
+/**
+ * A Thai row in the shape the rest of the app reads a structured product in.
+ *
+ * This conversion already existed inside `ThaiStructuredProductDetail`, where
+ * it fed the two document modals. It lives here now because the booking flow
+ * needs the same conversion and two of them would be two answers to "what is
+ * this product's currency".
+ */
+export function toBookableProduct(p: ThaiStructuredProduct): StructuredProduct {
+  const underlying = [p.bbg1, p.bbg2, p.bbg3].filter(Boolean).join(" - ");
+  return {
+    id: thaiBookableId(p.theme),
+    underlying,
+    coupon: p.couponPa,
+    tenor: `${p.tenor} เดือน`,
+    ko: p.koBarrier,
+    strike: p.strike,
+    ki: p.kiBarrier,
+    tags: [],
+    logos: [],
+    offerDate: "-",
+    couponPeriod: "-",
+    detailTenor: `${p.tenor} เดือน`,
+    // The theme, not the underlying. This is what names the book in Order
+    // Management, and "Big Data" is how the Thai desk refers to the deal —
+    // the tickers are already the row above it.
+    productName: `${p.product} · ${p.theme}`,
+    productType: p.product,
+    currency: p.ccy,
+    minInvestment: THAI_MIN_TICKET,
+    // Only the denominator is read (see `orderTargetFor`); the numerator is
+    // this book's own live total, which the order store owns.
+    requestNotionalSize: `0 / ${THAI_NOTIONAL}`,
+    updatedAt: "-",
+  };
 }

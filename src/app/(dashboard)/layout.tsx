@@ -17,9 +17,11 @@ import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
 import { HeaderSlotProvider, useHeaderSlot } from "./header-slot-context";
 import { PrivacyProvider } from "@/contexts/privacy-context";
 import { NotesProvider, useNotes } from "@/contexts/notes-context";
+import { OrdersProvider } from "@/contexts/orders-context";
 import {
   KYC_ALERTS_ENABLED,
   NOTES_ENABLED,
+  ORDER_BOOKING_ENABLED,
   REMINDERS_ENABLED,
 } from "@/lib/feature-flags";
 import { useClients } from "@/hooks/use-api";
@@ -28,6 +30,7 @@ import { FloatingNoteButton } from "./notes/FloatingNoteButton";
 import { usePageChrome } from "./page-chrome";
 import { useNotificationFeed } from "./calendar/use-notification-feed";
 import { useKycNotificationFeed } from "./use-kyc-notification-feed";
+import { useOrderNotificationFeed } from "./orders/use-order-notification-feed";
 import { useDayItemModals } from "./calendar/use-day-item-modals";
 
 function MarketOpenBadge() {
@@ -75,9 +78,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     useNotificationFeed(notes, clients);
   const { kycNotificationRows, kycNotificationTargets } =
     useKycNotificationFeed(clients);
+  const { orderNotificationRows, orderNotificationTargets } =
+    useOrderNotificationFeed();
 
   /**
-   * The two feeds merged into one list and grouped once, rather than
+   * The three feeds merged into one list and grouped once, rather than
    * concatenated.
    *
    * Both run unconditionally — they're memoised derivations, and gating the
@@ -95,15 +100,24 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     const rows = [
       ...(REMINDERS_ENABLED ? notificationRows : []),
       ...(KYC_ALERTS_ENABLED ? kycNotificationRows : []),
+      ...(ORDER_BOOKING_ENABLED ? orderNotificationRows : []),
     ].filter((r) => r.daysLeft <= 0);
     const days = [...new Set(rows.map((r) => r.daysLeft))].sort((a, b) => b - a);
     return days.map((daysLeft) => ({
       label: daysAgoLabelTh(-daysLeft),
       items: rows.filter((r) => r.daysLeft === daysLeft).map((r) => r.item),
     }));
-  }, [notificationRows, kycNotificationRows]);
+  }, [notificationRows, kycNotificationRows, orderNotificationRows]);
 
   const handleNotificationClick = (notifItem: NotificationItem) => {
+    // An order row carries its own destination, since one of them (a book that
+    // has filled up) is about a product rather than a client and has no
+    // client-shaped landing page to derive.
+    const orderHref = orderNotificationTargets.get(notifItem.id);
+    if (orderHref) {
+      router.push(orderHref);
+      return;
+    }
     // A KYC row's only useful destination is that client's own KYC tab, which
     // is where the record and its forms are — there's no modal for it the way
     // a reminder has one.
@@ -297,9 +311,15 @@ export default function DashboardLayout({
   return (
     <PrivacyProvider>
       <NotesProvider>
-        <HeaderSlotProvider>
-          <DashboardLayoutInner>{children}</DashboardLayoutInner>
-        </HeaderSlotProvider>
+        {/* Mounted unconditionally, like `NotesProvider` — the gate decides
+            what reaches the screen, not whether the store exists. A provider
+            behind a flag would mean every `useOrders` call site needing a
+            branch for the case where it throws. */}
+        <OrdersProvider>
+          <HeaderSlotProvider>
+            <DashboardLayoutInner>{children}</DashboardLayoutInner>
+          </HeaderSlotProvider>
+        </OrdersProvider>
       </NotesProvider>
     </PrivacyProvider>
   );

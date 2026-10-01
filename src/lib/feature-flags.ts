@@ -55,6 +55,19 @@
 /** `/notes`, the floating note composer, and every per-client Notes surface. */
 export const NOTES_ENABLED: boolean = true;
 
+/**
+ * Order booking: the "จองซื้อให้ลูกค้า" flow on a product, the `/orders` hub,
+ * and the order rows in the header bell.
+ *
+ * Its own gate rather than riding on anything above it — it stands on the
+ * product catalogue and the client KYC records, both of which have been in
+ * phase since Phase 1, and it is the first feature here that *writes*. Turning
+ * it off leaves the catalogue exactly as it was: the product detail page falls
+ * back to the external "สร้างคำสั่งซื้อ" link it carried before, and `/orders`
+ * redirects to the catalogue the way `/notes` used to redirect to the hub.
+ */
+export const ORDER_BOOKING_ENABLED: boolean = true;
+
 /** The `/calendar` month view. */
 export const CALENDAR_ENABLED: boolean = true;
 

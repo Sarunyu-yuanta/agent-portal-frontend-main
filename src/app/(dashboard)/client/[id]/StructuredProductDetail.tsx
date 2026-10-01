@@ -1,16 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@sarunyu/system-one";
+import Link from "next/link";
+import { Button, LinearProgress, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
   ArrowSquareOutIcon,
   CaretDownIcon,
+  CaretRightIcon,
   EyeIcon,
   FilePdfIcon,
   PackageIcon,
   ShieldCheckIcon,
+  UserPlusIcon,
 } from "@phosphor-icons/react";
+import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
+import { useToasts } from "@/hooks/use-toasts";
+import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
+import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
+import {
+  bookProgressPct,
+  formatOrderAmount,
+} from "@/app/(dashboard)/orders/order-book";
 import type { StructuredProduct } from "./structured-product-data";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
@@ -98,6 +109,15 @@ export function StructuredProductDetail({
   const [fcnModalOpen, setFcnModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+
+  // The page owns the toast stack rather than the modal: a booking confirms by
+  // *closing* the modal, and a toast rendered inside it would leave with it.
+  const { toasts, addToast, removeToast } = useToasts();
+  const notice = (message: string, status: ToastStatus) => addToast({ message, status });
+
+  // Called unconditionally — the flag picks what renders, not which hooks run.
+  const { data: book } = useOrderBook(product.id);
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -265,16 +285,56 @@ export function StructuredProductDetail({
               </>
             )}
           </div>
-          <a
-            href="https://placeholder.example.com/create-order"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
-            style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-          >
-            <span>สร้างคำสั่งซื้อ</span>
-            <ArrowSquareOutIcon size={16} />
-          </a>
+          {/* Booking replaces the external hand-off the page used to make.
+              With the flag off it goes back to that link, so the catalogue is
+              exactly what it was before this feature existed. */}
+          {ORDER_BOOKING_ENABLED ? (
+            <button
+              type="button"
+              onClick={() => setBookingOpen(true)}
+              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+            >
+              <UserPlusIcon size={16} />
+              <span>จองซื้อให้ลูกค้า</span>
+            </button>
+          ) : (
+            <a
+              href="https://placeholder.example.com/create-order"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
+              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+            >
+              <span>สร้างคำสั่งซื้อ</span>
+              <ArrowSquareOutIcon size={16} />
+            </a>
+          )}
+
+          {/* The book, once there is one. Hidden until the first booking
+              rather than shown empty: a 0% bar under the button that creates
+              the first booking says nothing the button doesn't. */}
+          {ORDER_BOOKING_ENABLED && book && book.openBookings.length > 0 && (
+            <Link
+              href={`/orders/${encodeURIComponent(product.id)}`}
+              className="group flex w-full max-w-[343px] flex-col gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-3 transition-colors hover:border-[#0a6ee7]"
+            >
+              <div className="flex items-center gap-2">
+                <span className="flex-1 text-xs font-bold leading-4 text-[#6a7282]">
+                  ยอดจองของดีลนี้
+                </span>
+                <span className="text-xs leading-4 text-[#4a5565]">
+                  {formatOrderAmount(book.bookedAmount, book.currency)} /{" "}
+                  {formatOrderAmount(book.targetAmount, book.currency)}
+                </span>
+                <CaretRightIcon
+                  size={14}
+                  className="shrink-0 text-[#6a7282] transition-colors group-hover:text-[#0a6ee7]"
+                />
+              </div>
+              <LinearProgress value={bookProgressPct(book)} />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -288,6 +348,15 @@ export function StructuredProductDetail({
         open={packageModalOpen}
         onClose={() => setPackageModalOpen(false)}
       />
+      {ORDER_BOOKING_ENABLED && (
+        <OrderBookingModal
+          open={bookingOpen}
+          product={product}
+          onClose={() => setBookingOpen(false)}
+          onNotice={notice}
+        />
+      )}
+      <Toaster items={toasts} onRemove={removeToast} />
     </div>
   );
 }

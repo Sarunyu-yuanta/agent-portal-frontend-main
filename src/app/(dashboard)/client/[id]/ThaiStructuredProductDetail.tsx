@@ -1,38 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@sarunyu/system-one";
-import { ArrowLeftIcon, ArrowSquareOutIcon, CaretDownIcon, EyeIcon, FilePdfIcon, PackageIcon } from "@phosphor-icons/react";
-import type { ThaiStructuredProduct } from "./thai-structured-data";
-import type { StructuredProduct } from "./structured-product-data";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Button, LinearProgress, Toaster, type ToastStatus } from "@sarunyu/system-one";
+import {
+  ArrowLeftIcon,
+  ArrowSquareOutIcon,
+  CaretDownIcon,
+  CaretRightIcon,
+  EyeIcon,
+  FilePdfIcon,
+  PackageIcon,
+  UserPlusIcon,
+} from "@phosphor-icons/react";
+import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
+import { useToasts } from "@/hooks/use-toasts";
+import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
+import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
+import { bookProgressPct, formatOrderAmount } from "@/app/(dashboard)/orders/order-book";
+import { toBookableProduct, type ThaiStructuredProduct } from "./thai-structured-data";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 const INVEST_URL = "https://placeholder.example.com/create-order";
-
-function toStructuredProduct(p: ThaiStructuredProduct): StructuredProduct {
-  const underlying = [p.bbg1, p.bbg2, p.bbg3].filter(Boolean).join(" - ");
-  return {
-    id: p.theme.toLowerCase().replace(/\s+/g, "-"),
-    underlying,
-    coupon: p.couponPa,
-    tenor: `${p.tenor} เดือน`,
-    ko: p.koBarrier,
-    strike: p.strike,
-    ki: p.kiBarrier,
-    tags: [],
-    logos: [],
-    offerDate: "-",
-    couponPeriod: "-",
-    detailTenor: `${p.tenor} เดือน`,
-    productName: underlying,
-    productType: p.product,
-    currency: p.ccy,
-    minInvestment: "-",
-    updatedAt: "-",
-  };
-}
 
 function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
   return (
@@ -64,6 +55,12 @@ export function ThaiStructuredProductDetail({
   const [fcnModalOpen, setFcnModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+
+  // The page owns the toast stack, not the modal: a booking confirms by
+  // *closing* the modal, and a toast rendered inside it would leave with it.
+  const { toasts, addToast, removeToast } = useToasts();
+  const notice = (message: string, status: ToastStatus) => addToast({ message, status });
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -72,7 +69,13 @@ export function ThaiStructuredProductDetail({
   }, [product.theme]);
 
   const underlying = [product.bbg1, product.bbg2, product.bbg3].filter(Boolean).join(" - ");
-  const adapted = toStructuredProduct(product);
+  // Memoised because it is a fresh object every call and feeds a hook's
+  // dependency list — recomputing it each render would re-run the readiness
+  // derivation behind the booking modal on every keystroke in its search box.
+  const adapted = useMemo(() => toBookableProduct(product), [product]);
+
+  // Called unconditionally — the flag picks what renders, not which hooks run.
+  const { data: book } = useOrderBook(adapted.id);
 
   const rows = [
     { label: "Investment Theme", value: product.theme },
@@ -190,21 +193,68 @@ export function ThaiStructuredProductDetail({
             )}
           </div>
 
-          <a
-            href={INVEST_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
-            style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-          >
-            <span>สร้างคำสั่งซื้อ</span>
-            <ArrowSquareOutIcon size={16} />
-          </a>
+          {/* Same swap as the global desk's detail page: booking replaces the
+              external hand-off, and the flag puts the old link back. */}
+          {ORDER_BOOKING_ENABLED ? (
+            <button
+              type="button"
+              onClick={() => setBookingOpen(true)}
+              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+            >
+              <UserPlusIcon size={16} />
+              <span>จองซื้อให้ลูกค้า</span>
+            </button>
+          ) : (
+            <a
+              href={INVEST_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
+              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+            >
+              <span>สร้างคำสั่งซื้อ</span>
+              <ArrowSquareOutIcon size={16} />
+            </a>
+          )}
+
+          {/* Hidden until the first booking — a 0% bar under the button that
+              creates the first booking says nothing the button doesn't. */}
+          {ORDER_BOOKING_ENABLED && book && book.openBookings.length > 0 && (
+            <Link
+              href={`/orders/${encodeURIComponent(adapted.id)}`}
+              className="group flex w-full max-w-[343px] flex-col gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-3 transition-colors hover:border-[#0a6ee7]"
+            >
+              <div className="flex items-center gap-2">
+                <span className="flex-1 text-xs font-bold leading-4 text-[#6a7282]">
+                  ยอดจองของดีลนี้
+                </span>
+                <span className="text-xs leading-4 text-[#4a5565]">
+                  {formatOrderAmount(book.bookedAmount, book.currency)} /{" "}
+                  {formatOrderAmount(book.targetAmount, book.currency)}
+                </span>
+                <CaretRightIcon
+                  size={14}
+                  className="shrink-0 text-[#6a7282] transition-colors group-hover:text-[#0a6ee7]"
+                />
+              </div>
+              <LinearProgress value={bookProgressPct(book)} />
+            </Link>
+          )}
         </div>
       </div>
 
       <FCNPresentationModal product={adapted} open={fcnModalOpen} onClose={() => setFcnModalOpen(false)} />
       <PackageFilesModal product={adapted} open={packageModalOpen} onClose={() => setPackageModalOpen(false)} />
+      {ORDER_BOOKING_ENABLED && (
+        <OrderBookingModal
+          open={bookingOpen}
+          product={adapted}
+          onClose={() => setBookingOpen(false)}
+          onNotice={notice}
+        />
+      )}
+      <Toaster items={toasts} onRemove={removeToast} />
     </div>
   );
 }

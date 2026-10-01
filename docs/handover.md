@@ -77,15 +77,24 @@ UI ที่แสดงมันไม่อยู่ในเฟสนี้ �
 
 `src/lib/feature-flags.ts` — โค้ดยังอยู่ครบ เปลี่ยน `false` เป็น `true` ได้เลย
 
-| Flag                 | สถานะ    |
-| -------------------- | -------- |
-| `NOTES_ENABLED`      | ปิด      |
-| `CALENDAR_ENABLED`   | ปิด      |
-| `REMINDERS_ENABLED`  | ปิด      |
-| `CALL_LOG_ENABLED`   | ปิด      |
-| `KYC_ALERTS_ENABLED` | **เปิด** |
+| Flag                    | สถานะ    |
+| ----------------------- | -------- |
+| `NOTES_ENABLED`         | ปิด      |
+| `CALENDAR_ENABLED`      | ปิด      |
+| `REMINDERS_ENABLED`     | ปิด      |
+| `CALL_LOG_ENABLED`      | ปิด      |
+| `KYC_ALERTS_ENABLED`    | **เปิด** |
+| `ORDER_BOOKING_ENABLED` | **เปิด** |
 
 Notes / Calendar / Reminders พึ่งพากัน ควรเปิดพร้อมกันทั้งชุด
+
+## ⚠️ Order booking เป็นฟีเจอร์เดียวที่ "เขียน"
+
+ที่เหลือในแอปอ่านอย่างเดียว แต่การจองคำสั่งซื้อสร้างข้อมูลใหม่ — เก็บใน React state
+(`src/contexts/orders-context.tsx`) แบบเดียวกับ Notes และมี **สอง `setTimeout` ที่จำลอง
+ระบบภายนอก** ต้องถอดออกตอนต่อ backend จริง
+
+รายละเอียดทั้งหมดอยู่ที่ [`order-booking.md`](order-booking.md)
 
 ## ข้อตกลงในโปรเจกต์
 
@@ -109,5 +118,6 @@ filter อื่นรีเซ็ตทุก refresh โดยตั้งใ�
 | ไฟล์                                               | เนื้อหา                                          |
 | -------------------------------------------------- | ------------------------------------------------ |
 | [`mock-data-inventory.md`](mock-data-inventory.md) | รายการข้อมูลทุกชุด — **ใช้อ้างอิงตอนออกแบบ API** |
+| [`order-booking.md`](order-booking.md)             | ฟีเจอร์จองคำสั่งซื้อ และจุดที่ต้องต่อ backend    |
 | [`phase-scope.md`](phase-scope.md)                 | ขอบเขตแต่ละเฟส และอะไรถูกตัดออก                  |
 | [`mock-json/`](mock-json/)                         | ข้อมูล mock แบบ JSON ล้วน                        |

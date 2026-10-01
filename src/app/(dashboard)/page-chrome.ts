@@ -54,6 +54,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/ic-learning": "IC Learning",
   "/yaa-team-head": "YAA/Team Head",
   "/product-catalog": "Product Catalog",
+  "/orders": "Order Management",
   "/notes": "Notes",
   "/calendar": "Calendar",
 };
