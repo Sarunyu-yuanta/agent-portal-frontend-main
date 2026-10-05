@@ -202,7 +202,7 @@ caret เปิดเมนู 3 ช่องทาง (SMS / LINE / นัด�
 | `src/lib/current-ic.ts` | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม |
 | `orders/order-book.ts` | ประกอบสินค้า + การจอง เป็น `OrderBook` + log |
 | `orders/use-order-books.ts` | hooks ฝั่งอ่าน คืน `Resource<T>` |
-| `orders/OrderBookingModal.tsx` | flow 3 ขั้น |
+| `orders/OrderBookingModal.tsx` | flow 2 ขั้น (เลือกลูกค้า → สถานะ + จำนวนเงินในหน้าเดียว) |
 | `orders/page.tsx` · `orders/[productId]/page.tsx` | Order Management + หน้ารวมการจอง |
 | `orders/use-order-notification-feed.tsx` | แถวแจ้งเตือนในกระดิ่ง |
 

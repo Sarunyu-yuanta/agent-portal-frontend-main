@@ -4,28 +4,18 @@
  * The booking form: pick the customer, read their four statuses back, enter the
  * notional, book.
  *
- * ## Why the amount is a second step
+ * ## One screen, with the amount gated in place
  *
- * The checks and the amount shared one screen at first, so that an IC on the
- * phone had everything in front of them. Splitting them buys something that
- * reading order could not. On one screen, a client short a document could still
- * be typed an amount for — the form only objected at the very end, with a
- * disabled button under work already done. As a step, the amount is not
- * rejected; it is **unreachable**. The gate stops being a dead button and
- * becomes the shape of the flow.
+ * The amount used to be a second step behind `ถัดไป`. It is back on the same
+ * screen as the checks, so the IC sees the whole order at once — but it is
+ * **disabled until all four pass**, faded rather than hidden, so the reader can
+ * see what comes next and that it is not yet open to them. That keeps what the
+ * step bought (no typing an amount for a client who cannot buy) without the
+ * extra click.
  *
- * The header (customer, account, IC) rides along on both steps. It is the one
- * thing worth seeing while typing a number, and it is what "ย้อนกลับ" has to
- * leave untouched.
- *
- * There is no step indicator. Two steps, both named by the button that reaches
- * them, is not a journey anyone needs a map of — a rail across the top of a
- * modal this short spends more room on saying where you are than the step
- * itself does.
- *
- * The gate has teeth at both ends: `ถัดไป` is dead until all four pass, and
- * `จองซื้อ` re-checks rather than trusting that it did. A client who is missing
- * something is fixed in the system that owns the record, which is where
+ * `จองซื้อ` still re-checks readiness rather than trusting the faded section: a
+ * check can expire while the form is open. A client who is missing something is
+ * fixed in the system that owns the record, which is where
  * "ส่งให้ลูกค้าดำเนินการ" sends them — the form has no override.
  */
 
@@ -36,9 +26,11 @@ import {
   Button,
   Input,
   SearchInput,
+  useIsMobile,
   type ToastStatus,
 } from "@sarunyu/system-one";
 import {
+  ArrowLeftIcon,
   CaretRightIcon,
   CheckCircleIcon,
   PaperPlaneTiltIcon,
@@ -83,6 +75,20 @@ export function OrderBookingModal({
   /** The host owns the toast stack — a booking closes this, taking its DOM. */
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
+  /**
+   * The chosen customer lives here rather than in the form, because the back
+   * button that clears it sits in the modal's own title row.
+   */
+  const [clientId, setClientId] = useState("");
+  // Reset on every open, during render rather than in an effect — the same
+  // reason the form below remounts: a reopened form must not still hold the
+  // last client.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setClientId("");
+  }
+
   return (
     <ResponsiveBottomSheetModal
       open={open}
@@ -93,6 +99,11 @@ export function OrderBookingModal({
       // grid stops being two columns of a form and becomes two columns of a
       // page, with the eye travelling further than any of the values are long.
       desktopMaxWidth="max-w-[614px]"
+      // Beside the title, where a back arrow is looked for — only once a
+      // customer is chosen, since the list itself has nowhere to go back to.
+      desktopTitleIcon={
+        clientId ? <BackButton onClick={() => setClientId("")} /> : undefined
+      }
     >
       {/* Remounting per open resets the customer and the amount — a form
           reopened still holding the last client's number is a mis-booking
@@ -100,6 +111,8 @@ export function OrderBookingModal({
       <BookingForm
         key={open ? "open" : "closed"}
         product={product}
+        clientId={clientId}
+        onClientChange={setClientId}
         onClose={onClose}
         onNotice={onNotice}
       />
@@ -107,12 +120,31 @@ export function OrderBookingModal({
   );
 }
 
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      variant="plain-black"
+      size="icon-sm"
+      onClick={onClick}
+      aria-label="ย้อนกลับไปเลือกลูกค้า"
+      title="ย้อนกลับไปเลือกลูกค้า"
+      className="-ml-1 shrink-0"
+    >
+      <ArrowLeftIcon size={20} />
+    </Button>
+  );
+}
+
 function BookingForm({
   product,
+  clientId,
+  onClientChange: setClientId,
   onClose,
   onNotice,
 }: {
   product: BookableProduct;
+  clientId: string;
+  onClientChange: (id: string) => void;
   onClose: () => void;
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
@@ -120,14 +152,13 @@ function BookingForm({
   const { isPrivate } = usePrivacy();
   const { bookOrder } = useOrders();
 
-  const [clientId, setClientId] = useState<string>("");
+  const isMobile = useIsMobile();
   const [raw, setRaw] = useState("");
   const [booking, setBooking] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
 
   const client = clients.find((c) => c.id === clientId) ?? null;
   const readiness = useClientReadiness(client ?? PLACEHOLDER_CLIENT, product);
-  /** The gate between the two steps — and the one on the booking itself. */
+  /** The gate on the amount section — and the one on the booking itself. */
   const ready = Boolean(client) && readiness.status === "ready";
 
   /** The modal's scroller — the customer list needs it to reset on search. */
@@ -153,13 +184,21 @@ function BookingForm({
             scrollerRef={bodyRef}
             onSelect={(id) => {
               setClientId(id);
-              // A different customer is a different check — never land them on
-              // step 2 holding the last one's verdict.
-              setStep(1);
+              // A different customer is a different order — never carry the
+              // last one's amount over to them.
+              setRaw("");
             }}
           />
         ) : (
           <div className="px-4 md:px-6">
+            {/* The bottom sheet's header is its own and takes no icon, so on a
+                phone the back arrow opens the body instead of sharing the
+                title row. */}
+            {isMobile && (
+              <div className="mb-2">
+                <BackButton onClick={() => setClientId("")} />
+              </div>
+            )}
             {/* A wider row gap than column gap: the columns are already far
                 apart across the modal, where the rows are two lines of text
                 that would otherwise run together. */}
@@ -194,27 +233,22 @@ function BookingForm({
               <ReadOnlyField label="IC Team" value={IC_TEAM} />
             </div>
 
-            {/* The header above stays on both steps — knowing whose order this
-                is matters most while typing the amount, which is the one number
-                that cannot be undone by going back. */}
-            {step === 1 ? (
-              <StatusGrid product={product} client={client} onNotice={onNotice} />
-            ) : (
-              <AmountSection
-                product={product}
-                client={client}
-                raw={raw}
-                onRawChange={setRaw}
-              />
-            )}
+            <StatusGrid product={product} client={client} onNotice={onNotice} />
+            <AmountSection
+              product={product}
+              client={client}
+              raw={raw}
+              onRawChange={setRaw}
+              disabled={!ready}
+              passed={readiness.items.filter((i) => i.status === "passed").length}
+              total={readiness.items.length}
+            />
           </div>
         )}
       </div>
 
       <Footer
-        step={step}
         ready={ready}
-        onStep={setStep}
         product={product}
         client={client}
         raw={raw}
@@ -228,6 +262,7 @@ function BookingForm({
             clientId: client.id,
             clientName: client.name,
             amount,
+            checks: readiness.items,
           });
           setBooking(false);
           onClose();
@@ -611,7 +646,7 @@ const STATUS_CHIP: Record<
  * one it is close enough to the modal's white that the cards stop reading as
  * separate surfaces at all.
  */
-function FieldCard({
+export function FieldCard({
   label,
   trailing,
   variant = "fact",
@@ -698,7 +733,7 @@ function FieldCard({
  * far edge of the card, so a grid of four can be checked down its right-hand
  * column without reading a word.
  */
-function StatusField({ item }: { item: RequirementItem }) {
+export function StatusField({ item }: { item: RequirementItem }) {
   const chip = STATUS_CHIP[item.status];
   const Icon = chip.icon;
 
@@ -758,7 +793,7 @@ function ActionLink({
  * would spend attention on rows that never need it, and the four that do carry
  * a verdict would stop standing out for carrying one.
  */
-function ReadOnlyField({ label, value }: { label: string; value: string }) {
+export function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
     <FieldCard label={label}>
       <span className="type-body-2 truncate !font-semibold text-foreground">{value}</span>
@@ -785,11 +820,22 @@ function AmountSection({
   client,
   raw,
   onRawChange,
+  disabled,
+  passed,
+  total,
 }: {
   product: BookableProduct;
   client: Client;
   raw: string;
   onRawChange: (next: string) => void;
+  /**
+   * The checks have not all passed. The section stays on screen, faded, so the
+   * IC can see the amount is the next thing and that it is not open yet.
+   */
+  disabled: boolean;
+  /** The same `passed / total` the status heading shows. */
+  passed: number;
+  total: number;
 }) {
   const { data: book } = useOrderBook(product.id);
   const currency = product.currency;
@@ -805,7 +851,7 @@ function AmountSection({
   // not the settlement account balance, and a client who intends to wire funds
   // for a ticket is an ordinary case — blocking it would be the portal
   // overruling the IC on a fact it doesn't have.
-  const overCash = amount > 0 && amount > cashHere;
+  const overCash = !disabled && amount > 0 && amount > cashHere;
 
   const setAmount = (next: string) => {
     const digits = next.replace(/[^0-9]/g, "");
@@ -813,55 +859,78 @@ function AmountSection({
   };
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border pt-4">
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <Input
-          label={`Notional Amount (${currency})`}
-          required
-          value={raw}
-          onChange={setAmount}
-          placeholder="Enter Amount"
-          inputMode="numeric"
-          forceState={tooSmall || tooBig ? "error" : "default"}
-          errorMessage={
-            tooSmall
-              ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
-              : `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
-          }
-          // The deal's total is deliberately left off: the sentence under this
-          // section already names it, and repeating it here is what pushed the
-          // helper onto a second line.
-          helperText={`ขั้นต่ำ ${formatOrderAmount(minTicket, currency)} · ยังจองได้ ${formatOrderAmount(remaining, currency)}`}
-        />
-        {/* The number the IC checks the amount against, so it sits beside the
-            input — and on a grey card, because it is the system talking back
-            rather than somewhere to type. */}
-        <FieldCard label="เงินสดคงเหลือของลูกค้า" className="self-start">
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            <span className="type-body-2 !font-semibold text-foreground">
-              ฿ {formatThbAmount(cashThb)}
-            </span>
-            {currency !== "THB" && (
-              <span className="type-caption text-muted-foreground">
-                ≈ {formatOrderAmount(Math.floor(cashHere), currency)} @ {USD_THB}
-              </span>
-            )}
-          </div>
-        </FieldCard>
-      </div>
-
-      {overCash && (
+    <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4">
+      {/* On top of the faded block it explains, and outside it so it stays at
+          full strength — the one thing in this section that is not disabled. */}
+      {disabled && (
         <Alert
           status="warning"
-          message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — ยืนยันแหล่งเงินกับลูกค้าก่อนส่งคำสั่งซื้อ"
-          multiline
+          message={`ข้อมูลที่ต้องมีก่อนจองซื้อยังไม่ครบ (${passed}/${total}) จึงยังกรอกจำนวนเงินและจองซื้อไม่ได้`}
         />
       )}
+      {/* Faded and inert, not removed — `inert` takes it out of the tab order
+          and the accessibility tree as well as the pointer's reach. */}
+      <div
+        inert={disabled}
+        aria-disabled={disabled}
+        className={`flex flex-col gap-3 transition-opacity ${
+          disabled ? "pointer-events-none select-none opacity-40" : ""
+        }`}
+      >
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <Input
+            label={`Notional Amount (${currency})`}
+            required
+            value={raw}
+            onChange={setAmount}
+            placeholder="Enter Amount"
+            inputMode="numeric"
+            disabled={disabled}
+            forceState={
+              disabled ? "disabled" : tooSmall || tooBig ? "error" : "default"
+            }
+            errorMessage={
+              tooSmall
+                ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
+                : `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
+            }
+            // The deal's total is deliberately left off: the sentence under this
+            // section already names it, and repeating it here is what pushed the
+            // helper onto a second line.
+            helperText={`ขั้นต่ำ ${formatOrderAmount(minTicket, currency)} · ยังจองได้ ${formatOrderAmount(remaining, currency)}`}
+          />
+          {/* The number the IC checks the amount against, so it sits beside the
+            input — and on a grey card, because it is the system talking back
+            rather than somewhere to type. */}
+          <FieldCard label="เงินสดคงเหลือของลูกค้า" className="self-start">
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <span className="type-body-2 !font-semibold text-foreground">
+                ฿ {formatThbAmount(cashThb)}
+              </span>
+              {currency !== "THB" && (
+                <span className="type-caption text-muted-foreground">
+                  ≈ {formatOrderAmount(Math.floor(cashHere), currency)} @{" "}
+                  {USD_THB}
+                </span>
+              )}
+            </div>
+          </FieldCard>
+        </div>
 
-      <p className="type-caption leading-snug text-muted-foreground">
-        การจองนี้เป็นคำสั่งซื้อล่วงหน้า ยังไม่ส่งเข้าระบบหลังบ้านจนกว่ายอดรวมของดีลจะครบ{" "}
-        {formatOrderAmount(target, currency)}
-      </p>
+        {overCash && (
+          <Alert
+            status="warning"
+            message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — ยืนยันแหล่งเงินกับลูกค้าก่อนส่งคำสั่งซื้อ"
+            multiline
+          />
+        )}
+
+        <p className="type-caption leading-snug text-muted-foreground">
+          การจองนี้เป็นคำสั่งซื้อล่วงหน้า
+          ยังไม่ส่งเข้าระบบหลังบ้านจนกว่ายอดรวมของดีลจะครบ{" "}
+          {formatOrderAmount(target, currency)}
+        </p>
+      </div>
     </div>
   );
 }
@@ -869,9 +938,7 @@ function AmountSection({
 // ── Footer ───────────────────────────────────────────────────────────────────
 
 function Footer({
-  step,
   ready,
-  onStep,
   product,
   client,
   raw,
@@ -879,10 +946,8 @@ function Footer({
   onCancel,
   onBooked,
 }: {
-  step: 1 | 2;
-  /** Whether all four checks pass — the gate on reaching step 2 at all. */
+  /** Whether all four checks pass — the gate on the amount and the booking. */
   ready: boolean;
-  onStep: (next: 1 | 2) => void;
   product: BookableProduct;
   client: Client | null;
   raw: string;
@@ -891,58 +956,32 @@ function Footer({
   onBooked: (amount: number) => void;
 }) {
   const { data: book } = useOrderBook(product.id);
-  const remaining = Math.max(0, (book?.targetAmount ?? 0) - (book?.bookedAmount ?? 0));
+  const remaining = Math.max(
+    0,
+    (book?.targetAmount ?? 0) - (book?.bookedAmount ?? 0),
+  );
   const { amount, ok } = amountCheck(product, remaining, raw);
 
-  if (step === 1) {
-    return (
-      <FooterBar>
-        <Button variant="outline" size="md" onClick={onCancel}>
-          Cancel
-        </Button>
-        {/* The step gate. A client who is missing something cannot reach the
-            amount at all — which is stricter than the old single screen, where
-            an IC could type a number and only then find the submit dead. The
-            disabled label says what is in the way rather than repeating the
-            action; a greyed "ถัดไป" is a button that will not say why. */}
-        <Button
-          variant={ready ? "primary" : "disabled"}
-          size="md"
-          disabled={!ready}
-          onClick={() => onStep(2)}
-        >
-          {ready ? "ถัดไป" : "ข้อมูลยังไม่ครบ"}
-        </Button>
-      </FooterBar>
-    );
-  }
-
-  // `ready` is checked again here, not just on the way in: a request can come
-  // back from the store while the IC is on step 2, and an expiry can land
-  // between the two steps. The gate has to hold at the moment of booking.
+  // `ready` is checked here as well as on the amount section: a check can
+  // expire while the form is open, and the gate has to hold at the moment of
+  // booking.
   const canBook = Boolean(client) && ready && ok && !booking;
 
   return (
-    <FooterBar>
-      <Button variant="outline" size="md" onClick={() => onStep(1)}>
-        ย้อนกลับ
-      </Button>
-      <Button
-        variant={canBook ? "primary" : "disabled"}
-        size="md"
-        disabled={!canBook}
-        onClick={() => onBooked(amount)}
-      >
-        {booking ? "กำลังจอง…" : "จองซื้อ"}
-      </Button>
-    </FooterBar>
-  );
-}
-
-function FooterBar({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3 md:px-6">
-      {children}
+    <div className="flex shrink-0 flex-col gap-2 border-t border-border px-4 py-3 md:px-6">
+      <div className="flex items-center justify-end gap-2">
+        <Button variant="outline" size="md" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          variant={canBook ? "primary" : "disabled"}
+          size="md"
+          disabled={!canBook}
+          onClick={() => onBooked(amount)}
+        >
+          {booking ? "กำลังจอง…" : "จองซื้อ"}
+        </Button>
+      </div>
     </div>
   );
 }

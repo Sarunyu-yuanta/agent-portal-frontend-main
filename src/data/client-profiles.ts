@@ -8,6 +8,8 @@ export type ClientProfile = {
    * the real numbers take.
    */
   accountNo: string;
+  /** The client's name in Thai — what Order Management prints as "Full Name (TH)". */
+  nameTh: string;
   phone: string;
   email: string;
   lineId?: string;
@@ -26,6 +28,7 @@ export type ClientProfile = {
 const PROFILES: Record<string, ClientProfile> = {
   "110001": {
     accountNo: "11000122",
+    nameTh: "ศรัณยู ศิริพัฒน์",
     phone: "+66 81 234 5678",
     email: "sarunyu.s@gmail.com",
     lineId: "sarunyu.s",
@@ -45,6 +48,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110002": {
     accountNo: "11000222",
+    nameTh: "มาลี พงษ์พิพัฒน์",
     phone: "+66 89 345 6789",
     email: "malee.p@pongpipat.co.th",
     birthday: "5 Jul 1968",
@@ -61,6 +65,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110003": {
     accountNo: "11000322",
+    nameTh: "ประวิทย์ สุวรรณรัตน์",
     phone: "+66 92 456 7890",
     email: "pravit.s@outlook.com",
     lineId: "pravit_s",
@@ -75,6 +80,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110004": {
     accountNo: "11000422",
+    nameTh: "ณัฐพร ชัยวงศ์",
     phone: "+66 84 567 8901",
     email: "nattaporn.c@chaiwong.com",
     lineId: "nattaporn_c",
@@ -94,6 +100,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110005": {
     accountNo: "11000522",
+    nameTh: "วิชัย ทองคำ",
     phone: "+66 95 678 9012",
     email: "wichai.t@thongkam.co.th",
     birthday: "3 Sep 1965",
@@ -107,6 +114,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110006": {
     accountNo: "11000622",
+    nameTh: "ศิริพร ลดาวัลย์",
     phone: "+66 86 789 0123",
     email: "siriporn.l@gmail.com",
     lineId: "siriporn_lad",
@@ -121,6 +129,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110007": {
     accountNo: "11000722",
+    nameTh: "ธนวัฒน์ บุญมี",
     phone: "+66 81 890 1234",
     email: "thanawat.b@boonmee.co.th",
     lineId: "thanawat_b",
@@ -139,6 +148,7 @@ const PROFILES: Record<string, ClientProfile> = {
   },
   "110008": {
     accountNo: "11000822",
+    nameTh: "กรรณิการ์ ศรีสุพรรณ",
     phone: "+66 98 901 2345",
     email: "kannika.s@kannikasri.com",
     birthday: "8 Oct 1978",
@@ -154,6 +164,7 @@ const PROFILES: Record<string, ClientProfile> = {
 
 const DEFAULT_PROFILE: ClientProfile = {
   accountNo: "—",
+  nameTh: "—",
   phone: "+66 80 000 0000",
   email: "client@example.com",
   birthday: "1 Jan 1980",

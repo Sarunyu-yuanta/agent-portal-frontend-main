@@ -5,10 +5,19 @@
  * downstream, and everything that has happened to it.
  *
  * The page is built around a single rule — **an order cannot be sent until the
- * book is full**. That is why the target sits in the hero rather than in a
- * detail row, why the submit button carries the shortfall in its own label when
- * it is disabled, and why "จองเพิ่ม" is the primary action right up until the
- * moment it stops being the thing standing in the way.
+ * book is full**. That is why the summary leads with the shortfall rather than
+ * the total, why the submit button carries it in its own label when disabled,
+ * and why "จองเพิ่ม" is the primary action right up until the moment it stops
+ * being the thing standing in the way.
+ *
+ * ## Layout
+ *
+ * Two columns from `lg`: the lists on the left, the summary pinned on the
+ * right. The summary is what every decision on this page is made against, so
+ * it stays in view while the booking list scrolls — and a list capped at the
+ * left column's width keeps a name and its amount within one glance, where a
+ * full-width row on a wide screen put them a metre apart. Below `lg` the
+ * summary comes first, because it is the answer to "where is this deal".
  */
 
 import { useState } from "react";
@@ -16,11 +25,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeftIcon,
+  CaretRightIcon,
+  CheckCircleIcon,
   ClockCounterClockwiseIcon,
   PaperPlaneTiltIcon,
   PlusIcon,
   ReceiptIcon,
-  TrashIcon,
   UsersThreeIcon,
 } from "@phosphor-icons/react";
 import {
@@ -37,27 +47,34 @@ import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetMo
 import { EmptyState } from "@/components/ui/empty-state";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
+import { getClientProfile } from "@/data/client-profiles";
+import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { OrderBook, OrderLogEntry, OrderSubmission } from "@/types/domain";
+import type { Booking, OrderBook, OrderLogEntry, OrderSubmission } from "@/types/domain";
 import { catalogHrefFor, type BookableProduct } from "./bookable-products";
+import {
+  CLOSED_TAG,
+  checksAtBooking,
+  dealStatus,
+  emailStatus,
+  paymentStatus,
+} from "./booking-status";
+import { BookingDetailModal } from "./BookingDetailModal";
 import {
   BOOK_STATUS_LABEL_TH,
   BOOK_STATUS_VARIANT,
   formatLogTime,
+  bookRounds,
   formatOrderAmount,
   headlineRound,
+  type BookRound,
 } from "./order-book";
 import { OrderBookingModal } from "./OrderBookingModal";
+import { useRosterReadiness } from "./use-order-books";
 
 type View = "bookings" | "orders" | "log";
-
-const VIEWS: { id: View; title: string }[] = [
-  { id: "bookings", title: "รายการจอง" },
-  { id: "orders", title: "คำสั่งซื้อ" },
-  { id: "log", title: "ประวัติ" },
-];
 
 export function OrderBookDetail({
   book,
@@ -67,23 +84,35 @@ export function OrderBookDetail({
   product: BookableProduct;
 }) {
   const router = useRouter();
-  const { submitOrder, cancelBooking } = useOrders();
+  const { submitOrder } = useOrders();
   const { toasts, addToast, removeToast } = useToasts();
+  const clients = useClients();
+  const readiness = useRosterReadiness(clients, product);
   const [view, setView] = useState<View>("bookings");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sending, setSending] = useState(false);
+  // By id, so a cancel from inside the modal shows in it straight away.
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const notice = (message: string, status: ToastStatus) => addToast({ message, status });
 
-  // Which round the hero figures describe — see `headlineRound`. A book whose
-  // order has been sent has no open round to show until someone books into it
-  // again, and an empty one under a "สำเร็จ" tag reads as a contradiction.
+  // Which round the figures describe — see `headlineRound`. A book whose order
+  // has been sent has no open round to show until someone books into it again,
+  // and an empty one under a "สำเร็จ" tag reads as a contradiction.
   const round = headlineRound(book);
   const shortfall = Math.max(0, book.targetAmount - book.bookedAmount);
   const holders = new Set(round.bookings.map((b) => b.clientId)).size;
   const hasOpen = book.openBookings.length > 0;
   const canSubmit = book.status === "ready";
+  const opened = book.allBookings.find((b) => b.id === openId) ?? null;
+  // The tab counts the round in front of the IC, the same one the summary does.
+  const liveBookings = book.openBookings.length;
+  const rounds = bookRounds(book);
+  // Every sent round, except one the summary is already showing.
+  const pastRounds = rounds.filter(
+    (r) => r.submission && r.submission.backendRef !== round.previousRef,
+  );
 
   const send = async () => {
     setSending(true);
@@ -116,12 +145,15 @@ export function OrderBookDetail({
           {/* Which desk, and a way back to the product the deal is written on —
               a book is a view of someone else's instrument, and the terms
               (coupon, KO, KI) live on the catalogue page, not here. */}
-          <Link
-            href={catalogHrefFor(product)}
-            className="type-caption truncate text-muted-foreground transition-colors hover:text-[#0a6ee7]"
-          >
-            {book.desk} · {book.productType} · ดูรายละเอียดสินค้า
-          </Link>
+          <p className="type-caption truncate text-muted-foreground">
+            {book.desk} · {book.productType} ·{" "}
+            <Link
+              href={catalogHrefFor(product)}
+              className="text-[#0a6ee7] transition-colors hover:underline"
+            >
+              ดูรายละเอียดสินค้า
+            </Link>
+          </p>
         </div>
         <Tag
           text={BOOK_STATUS_LABEL_TH[book.status]}
@@ -130,114 +162,177 @@ export function OrderBookDetail({
         />
       </div>
 
-      {/* ── Hero: how full, and what that unlocks ── */}
-      <section className="flex flex-col gap-4 rounded-[8px] border border-border bg-card p-5 shadow-sm">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="type-h5 font-bold text-foreground">
+      {/* No `grid-cols-1`: the library's unlayered stylesheet carries that class
+          too and would beat the `lg:` template below, pinning the page to one
+          column at every width. A grid with no template is one column already. */}
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        {/* ── Summary: how full, and what that unlocks ── */}
+        <div className="flex flex-col gap-3 lg:sticky lg:top-4 lg:order-2">
+        {/* The current round only. A book is filled and sent again and again,
+            and every figure and button here acts on the round in front of the
+            IC — mixing in a sent round's numbers made "ยืนยันแล้ว 100,000"
+            sit over a round nobody had sent yet. Past rounds are listed
+            underneath instead. */}
+        <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <span className="type-caption text-muted-foreground">
+              รอบที่ {round.number} ·{" "}
+              {round.previousRef ? `ส่งแล้ว (${round.previousRef})` : "ยังไม่ส่งคำสั่งซื้อ"}
+            </span>
+            <p className="type-h5 font-bold tabular-nums text-foreground">
               {formatOrderAmount(round.amount, book.currency)}
             </p>
-            <p className="type-body-2 text-muted-foreground">
-              เป้าหมาย {formatOrderAmount(book.targetAmount, book.currency)} ·{" "}
-              {Math.round(round.pct)}%
-            </p>
           </div>
-          <LinearProgress value={round.pct} />
+          {/* The bar's own numbers sit on it — booked over target, and the
+              percentage — so it can be read without the headline above. */}
+          <div className="flex flex-col gap-1.5">
+            <LinearProgress value={round.pct} />
+            <div className="type-caption flex items-baseline justify-between gap-2 tabular-nums text-muted-foreground">
+              <span>
+                {/* Primary once the target is met — the same rule the
+                    product page's "Request / Notional Size" follows. */}
+                <span
+                  className={`font-semibold ${
+                    round.amount >= book.targetAmount ? "text-[#0a6ee7]" : "text-foreground"
+                  }`}
+                >
+                  {round.amount.toLocaleString("en-US")}
+                </span>{" "}
+                / {book.targetAmount.toLocaleString("en-US")} {book.currency}
+              </span>
+              <span>{Math.round(round.pct)}%</span>
+            </div>
+          </div>
+
+          {/* The one sentence the page exists to answer, in the colour of
+              whether the IC can act on it yet. */}
+          {!round.previousRef && book.status === "collecting" && (
+            <div className="flex items-baseline justify-between gap-2 rounded-lg bg-[var(--fill-yellow-100)] px-3 py-2.5">
+              <span className="type-body-2 text-[var(--fill-yellow-700)]">ยังขาดอีก</span>
+              <span className="type-body-2 !font-bold tabular-nums text-[var(--fill-yellow-700)]">
+                {formatOrderAmount(shortfall, book.currency)}
+              </span>
+            </div>
+          )}
+          {canSubmit && (
+            <div className="flex items-center gap-2 rounded-lg bg-[var(--fill-green-100)] px-3 py-2.5">
+              <CheckCircleIcon size={18} weight="fill" className="shrink-0 text-[var(--fill-green-600)]" />
+              <span className="type-body-2 text-[var(--fill-green-700)]">
+                ครบยอดแล้ว พร้อมส่งคำสั่งซื้อ
+              </span>
+            </div>
+          )}
           {round.previousRef && (
-            // Says which round the bar above belongs to. Without it the figures
-            // describe the order that was sent while the buttons below describe
-            // the next one, and nothing on the page admits they are different.
             <p className="type-caption text-muted-foreground">
-              ยอดของคำสั่งซื้อล่าสุด ({round.previousRef}) · จองเพิ่มเพื่อเริ่มรอบใหม่
+              จองเพิ่มเพื่อเริ่มรอบใหม่ — ยอดด้านบนเป็นของคำสั่งซื้อที่ส่งไปแล้ว
             </p>
           )}
-        </div>
 
-        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-4">
-          <Figure label="ลูกค้าที่จอง" value={`${holders} ราย`} />
-          <Figure
-            label={round.previousRef ? "รอบใหม่" : "ยังขาดอีก"}
-            value={
-              round.previousRef
-                ? "ยังไม่มีการจอง"
-                : shortfall > 0
-                  ? formatOrderAmount(shortfall, book.currency)
-                  : "ครบแล้ว"
-            }
-          />
-          <Figure
-            label="ยืนยันแล้ว"
-            value={formatOrderAmount(book.confirmedAmount, book.currency)}
-          />
-          <Figure label="ขั้นต่ำต่อราย" value={formatOrderAmount(book.minTicket, book.currency)} />
-        </dl>
+          <dl className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-[#f3f4f6]">
+            <Figure label="ลูกค้าที่จอง" value={`${holders} ราย`} />
+            <Figure label="ขั้นต่ำต่อราย" value={formatOrderAmount(book.minTicket, book.currency)} />
+          </dl>
 
-        {book.status === "processing" && (
-          <Alert
-            status="information"
-            title="ส่งคำสั่งซื้อแล้ว"
-            message={`อยู่ระหว่างดำเนินการที่ระบบหลังบ้าน (${book.submissions[0]?.backendRef ?? "—"}) — จะแจ้งเตือนเมื่อเสร็จ`}
-            multiline
+          {book.status === "processing" && (
+            <Alert
+              status="information"
+              title="ส่งคำสั่งซื้อแล้ว"
+              message={`อยู่ระหว่างดำเนินการที่ระบบหลังบ้าน (${book.submissions[0]?.backendRef ?? "—"}) — จะแจ้งเตือนเมื่อเสร็จ`}
+              multiline
+            />
+          )}
+          {book.status === "rejected" && (
+            <Alert
+              status="critical"
+              title="คำสั่งซื้อถูกปฏิเสธ"
+              message="ตรวจสอบรายละเอียดในแท็บคำสั่งซื้อ แล้วจองใหม่หากต้องการส่งอีกครั้ง"
+              multiline
+            />
+          )}
+
+          <div className="flex flex-col gap-2">
+            <Button
+              variant={canSubmit ? "primary" : "disabled"}
+              size="lg"
+              disabled={!canSubmit || sending}
+              onClick={() => setConfirmOpen(true)}
+              leftIcon={<PaperPlaneTiltIcon size={18} />}
+              className="w-full"
+            >
+              {/* The disabled label says what is missing rather than repeating
+                  the action — the shortfall is the only version of "you can't"
+                  the IC can act on. */}
+              {canSubmit
+                ? "ส่งคำสั่งซื้อ"
+                : !hasOpen
+                  ? "ยังไม่มีรายการจองใหม่"
+                  : `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`}
+            </Button>
+            <Button
+              variant={canSubmit ? "outline" : "primary"}
+              size="lg"
+              onClick={() => setBookingOpen(true)}
+              leftIcon={<PlusIcon size={18} />}
+              className="w-full"
+            >
+              จองเพิ่มให้ลูกค้า
+            </Button>
+          </div>
+        </section>
+
+        {pastRounds.length > 0 && (
+          <PastRounds
+            rounds={pastRounds}
+            currency={book.currency}
+            onOpen={() => setView("orders")}
           />
         )}
-        {book.status === "rejected" && (
-          <Alert
-            status="critical"
-            title="คำสั่งซื้อถูกปฏิเสธ"
-            message="ตรวจสอบรายละเอียดในแท็บคำสั่งซื้อ แล้วจองใหม่หากต้องการส่งอีกครั้ง"
-            multiline
-          />
-        )}
-
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant={canSubmit ? "outline" : "primary"}
-            size="lg"
-            onClick={() => setBookingOpen(true)}
-            leftIcon={<PlusIcon size={18} />}
-            className="w-full sm:flex-1"
-          >
-            จองเพิ่มให้ลูกค้า
-          </Button>
-          <Button
-            variant={canSubmit ? "primary" : "disabled"}
-            size="lg"
-            disabled={!canSubmit || sending}
-            onClick={() => setConfirmOpen(true)}
-            leftIcon={<PaperPlaneTiltIcon size={18} />}
-            className="w-full sm:flex-1"
-          >
-            {/* The disabled label says what is missing rather than repeating the
-                action. A greyed-out "ส่งคำสั่งซื้อ" tells the IC they can't;
-                the shortfall tells them why, which is the only version they
-                can act on. */}
-            {canSubmit
-              ? "ส่งคำสั่งซื้อ"
-              : !hasOpen
-                ? "ยังไม่มีรายการจองใหม่"
-                : `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`}
-          </Button>
         </div>
-      </section>
 
-      <TabGroup
-        items={VIEWS.map((v) => ({ id: v.id, title: v.title }))}
-        activeId={view}
-        onChange={(id) => setView(id as View)}
+        {/* ── Lists ── */}
+        <div className="flex min-w-0 flex-col gap-3 lg:order-1">
+          <div className="transparent-tabs count-tabs scrollable-tabs">
+            <TabGroup
+              items={[
+                { id: "bookings", title: "รายการจอง", notification: liveBookings || undefined },
+                {
+                  id: "orders",
+                  title: "คำสั่งซื้อ",
+                  notification: book.submissions.length || undefined,
+                },
+                { id: "log", title: "ประวัติ" },
+              ]}
+              activeId={view}
+              onChange={(id) => setView(id as View)}
+            />
+          </div>
+
+          {view === "bookings" && (
+            <BookingsPanel
+              book={book}
+              onOpen={setOpenId}
+              onBook={() => setBookingOpen(true)}
+              onViewOrders={() => setView("orders")}
+            />
+          )}
+          {view === "orders" && <SubmissionsPanel book={book} />}
+          {view === "log" && <LogPanel logs={book.logs} />}
+        </div>
+      </div>
+
+      <BookingDetailModal
+        booking={opened}
+        book={book}
+        product={product}
+        checks={
+          opened ? checksAtBooking(opened, readiness.get(opened.clientId)?.items ?? []) : []
+        }
+        deal={opened ? dealStatus(opened, book) : CLOSED_TAG}
+        payment={opened ? paymentStatus(opened, book) : CLOSED_TAG}
+        email={opened ? emailStatus(opened, book) : CLOSED_TAG}
+        onClose={() => setOpenId(null)}
+        onNotice={notice}
       />
-
-      {view === "bookings" && (
-        <BookingsPanel
-          book={book}
-          onCancel={async (id, name) => {
-            await cancelBooking(id);
-            addToast({ message: `ยกเลิกการจองของ ${name} แล้ว`, status: "information" });
-          }}
-          onBook={() => setBookingOpen(true)}
-        />
-      )}
-      {view === "orders" && <SubmissionsPanel book={book} />}
-      {view === "log" && <LogPanel logs={book.logs} />}
 
       <OrderBookingModal
         open={bookingOpen}
@@ -257,9 +352,11 @@ export function OrderBookDetail({
             ส่งการจองทั้งหมด {book.openBookings.length} รายการของ {book.productName}{" "}
             เข้าระบบหลังบ้านเป็นคำสั่งซื้อเดียว หลังส่งแล้วจะแก้ไขรายการจองเหล่านี้ไม่ได้
           </p>
-          <ul className="flex max-h-[40dvh] min-h-0 flex-col divide-y divide-border overflow-y-auto rounded-md border border-border">
+          {/* Grey panel, divided inside — the same frame as the booking form's
+              customer list, so a list of people reads the same everywhere. */}
+          <ul className="flex max-h-[40dvh] min-h-0 flex-col divide-y divide-border overflow-y-auto rounded-xl bg-[#f3f4f6]">
             {book.openBookings.map((b) => (
-              <li key={b.id} className="flex items-center gap-3 px-3 py-2">
+              <li key={b.id} className="flex items-center gap-3 px-4 py-3">
                 <span className="type-body-2 min-w-0 flex-1 truncate text-foreground">
                   {b.clientName}
                 </span>
@@ -294,26 +391,114 @@ export function OrderBookDetail({
 
 function Figure({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5 bg-card px-4 py-3">
-      <dt className="type-caption font-bold text-muted-foreground">{label}</dt>
-      <dd className="type-body-2 !font-semibold text-foreground">{value}</dd>
+    <div className="flex items-baseline justify-between gap-3 px-4 py-3">
+      <dt className="type-body-2 text-muted-foreground">{label}</dt>
+      <dd className="type-body-2 !font-semibold tabular-nums text-foreground">{value}</dd>
     </div>
+  );
+}
+
+/**
+ * The rounds already sent, newest first — so a book on round 2 still says it
+ * has sent before, and how that went. Each opens the orders tab, where the
+ * order's own bookings are listed.
+ */
+function PastRounds({
+  rounds,
+  currency,
+  onOpen,
+}: {
+  rounds: BookRound[];
+  currency: string;
+  onOpen: () => void;
+}) {
+  return (
+    <section className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm">
+      <span className="type-caption font-semibold text-muted-foreground">รอบก่อนหน้า</span>
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-[#f3f4f6]">
+        {rounds.map((r) => {
+          const tag = SUBMISSION_TAG[r.submission!.status];
+          return (
+            <li key={r.number}>
+              <button
+                type="button"
+                onClick={onOpen}
+                className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--fill-gray-200)]"
+              >
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="type-body-2 font-semibold text-foreground">
+                    รอบที่ {r.number}
+                  </span>
+                  <span className="type-caption truncate text-muted-foreground">
+                    {r.submission!.backendRef} · {formatOrderAmount(r.amount, currency)}
+                  </span>
+                </span>
+                <Tag text={tag.text} variant={tag.variant} size="small" />
+                <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
 // ── Panels ───────────────────────────────────────────────────────────────────
 
+/**
+ * The open round's bookings, newest first, each row opening that booking's
+ * detail.
+ *
+ * Only the open round. A sent round's bookings can no longer be changed, and
+ * they are already listed under their order in the "คำสั่งซื้อ" tab — here they
+ * only made the round being filled harder to find. This keeps the list to the
+ * same round the summary and the tab count describe.
+ *
+ * Cancelling moved into the detail modal. A bin icon on every row put an
+ * irreversible action one stray click from a list people scan quickly; in the
+ * modal it sits next to everything the IC should look at before using it.
+ */
 function BookingsPanel({
   book,
-  onCancel,
+  onOpen,
   onBook,
+  onViewOrders,
 }: {
   book: OrderBook;
-  onCancel: (bookingId: string, clientName: string) => Promise<void>;
+  onOpen: (bookingId: string) => void;
   onBook: () => void;
+  onViewOrders: () => void;
 }) {
-  const { isPrivate } = usePrivacy();
-  const sentIds = new Set(book.submissions.flatMap((s) => s.bookingIds));
+  const current = bookRounds(book).find((r) => !r.submission);
+  const sentCount = book.submissions.length;
+
+  // Just sent, nothing booked since: say so, rather than an empty list that
+  // reads as though the bookings were lost.
+  if (!current && sentCount > 0) {
+    return (
+      <EmptyState
+        icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+        title={`รอบที่ ${sentCount} ส่งคำสั่งซื้อแล้ว`}
+        body={`ยังไม่มีการจองรอบที่ ${sentCount + 1} — จองให้ลูกค้าเพื่อเริ่มรอบใหม่`}
+        actionSlot={
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={onBook}
+              leftIcon={<PlusIcon size={16} />}
+            >
+              จองเพิ่มให้ลูกค้า
+            </Button>
+            <Button variant="outline" size="md" onClick={onViewOrders}>
+              ดูรายการของรอบที่ {sentCount}
+            </Button>
+          </div>
+        }
+      />
+    );
+  }
 
   if (book.allBookings.length === 0) {
     return (
@@ -330,59 +515,81 @@ function BookingsPanel({
     );
   }
 
+  // Reached only with bookings on file and none sent-and-closed, so the open
+  // round exists; the guard is for the type checker.
+  if (!current) return null;
+
   return (
-    <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-[8px] border border-border bg-card shadow-sm">
-      {book.allBookings.map((b) => {
-        const name = maskName(b.clientName, isPrivate);
-        const sent = sentIds.has(b.id);
-        const cancelled = b.status === "cancelled";
-        return (
-          <li key={b.id} className="flex items-center gap-3 px-4 py-3">
-            <Avatar type="text" initials={getInitial(name)} size="m" />
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <p
-                className={`type-body-2 truncate font-semibold ${
-                  cancelled ? "text-muted-foreground line-through" : "text-foreground"
-                }`}
-              >
-                {name}
-              </p>
-              <p className="type-caption truncate text-muted-foreground">
-                {formatLogTime(b.createdAt)} · {b.createdBy}
-              </p>
-            </div>
-            <span
-              className={`type-body-2 !font-semibold shrink-0 ${
-                cancelled ? "text-muted-foreground line-through" : "text-foreground"
-              }`}
-            >
-              {formatOrderAmount(b.amount, book.currency)}
-            </span>
-            {/* Only a booking that is still on the open round can be pulled.
-                Once it has gone downstream the portal is no longer the system
-                of record for it, and a button here would promise a reversal it
-                can't perform. */}
-            {!cancelled && !sent ? (
-              <Button
-                variant="plain"
-                size="icon-sm"
-                aria-label={`ยกเลิกการจองของ ${name}`}
-                onClick={() => onCancel(b.id, name)}
-                className="shrink-0"
-              >
-                <TrashIcon size={18} className="text-[var(--fill-red-600)]" />
-              </Button>
-            ) : (
-              <Tag
-                text={cancelled ? "ยกเลิกแล้ว" : "ส่งแล้ว"}
-                variant={cancelled ? "gray" : "blue"}
-                size="small"
-              />
-            )}
-          </li>
-        );
-      })}
-    </ul>
+    <section className="flex flex-col gap-2">
+      <div className="flex items-baseline justify-between gap-2 px-1">
+        <span className="type-body-2 !font-semibold text-foreground">
+          รอบที่ {current.number}
+          <span className="type-caption ml-2 font-normal text-muted-foreground">
+            ยังไม่ส่งคำสั่งซื้อ
+          </span>
+        </span>
+        <span className="type-caption tabular-nums text-muted-foreground">
+          {formatOrderAmount(current.amount, book.currency)}
+        </span>
+      </div>
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        {[...current.bookings]
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+          .map((b) => (
+            <BookingRow key={b.id} booking={b} book={book} onOpen={() => onOpen(b.id)} />
+          ))}
+      </ul>
+    </section>
+  );
+}
+
+function BookingRow({
+  booking,
+  book,
+  onOpen,
+}: {
+  booking: Booking;
+  book: OrderBook;
+  onOpen: () => void;
+}) {
+  const { isPrivate } = usePrivacy();
+  const name = maskName(booking.clientName, isPrivate);
+  const profile = getClientProfile(booking.clientId);
+  const cancelled = booking.status === "cancelled";
+  const status = dealStatus(booking, book);
+  const struck = cancelled ? "text-muted-foreground line-through" : "text-foreground";
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`ดูรายละเอียดการจองของ ${name}`}
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7]"
+      >
+        <Avatar type="text" initials={getInitial(name)} size="m" />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <p className={`type-body-2 truncate font-semibold ${struck}`}>
+            {booking.clientId} - {name}
+          </p>
+          <p className="type-caption truncate text-muted-foreground">
+            {maskName(profile.nameTh, isPrivate)} · Account No {profile.accountNo}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <span className={`type-body-2 !font-semibold tabular-nums ${struck}`}>
+            {formatOrderAmount(booking.amount, book.currency)}
+          </span>
+          <span className="type-caption text-muted-foreground">
+            {formatLogTime(booking.createdAt)}
+          </span>
+        </div>
+        <div className="hidden w-[120px] shrink-0 justify-center sm:flex">
+          <Tag text={status.text} variant={status.variant} size="small" />
+        </div>
+        <CaretRightIcon size={16} className="shrink-0 text-muted-foreground" />
+      </button>
+    </li>
   );
 }
 
@@ -440,9 +647,10 @@ function SubmissionRow({
         </div>
         <Tag text={tag.text} variant={tag.variant} size="small" />
       </div>
-      <ul className="flex flex-col divide-y divide-border rounded-md border border-border">
+      {/* Same grey, divided panel as the submit confirmation's list. */}
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-[#f3f4f6]">
         {rows.map((b) => (
-          <li key={b.id} className="flex items-center gap-3 px-3 py-2">
+          <li key={b.id} className="flex items-center gap-3 px-4 py-3">
             <span className="type-body-2 min-w-0 flex-1 truncate text-foreground">
               {maskName(b.clientName, isPrivate)}
             </span>

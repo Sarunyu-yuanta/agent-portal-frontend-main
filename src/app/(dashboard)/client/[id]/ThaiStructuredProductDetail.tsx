@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { Button, LinearProgress, Toaster, type ToastStatus } from "@sarunyu/system-one";
+import { Button, TabGroup, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
   ArrowSquareOutIcon,
   CaretDownIcon,
-  CaretRightIcon,
   EyeIcon,
   FilePdfIcon,
   PackageIcon,
@@ -16,8 +14,7 @@ import {
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
 import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
-import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
-import { bookProgressPct, formatOrderAmount } from "@/app/(dashboard)/orders/order-book";
+import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
 import { toBookableProduct, type ThaiStructuredProduct } from "./thai-structured-data";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
@@ -56,6 +53,7 @@ export function ThaiStructuredProductDetail({
   const [packageModalOpen, setPackageModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [tab, setTab] = useState<"detail" | "orders">("detail");
 
   // The page owns the toast stack, not the modal: a booking confirms by
   // *closing* the modal, and a toast rendered inside it would leave with it.
@@ -74,8 +72,6 @@ export function ThaiStructuredProductDetail({
   // derivation behind the booking modal on every keystroke in its search box.
   const adapted = useMemo(() => toBookableProduct(product), [product]);
 
-  // Called unconditionally — the flag picks what renders, not which hooks run.
-  const { data: book } = useOrderBook(adapted.id);
 
   const rows = [
     { label: "Investment Theme", value: product.theme },
@@ -127,11 +123,31 @@ export function ThaiStructuredProductDetail({
             </div>
           </div>
 
-          {/* Detail table */}
-          <DetailTable rows={rows} />
+          {/* Same two views as the global desk's detail page. */}
+          {ORDER_BOOKING_ENABLED && (
+            <TabGroup
+              items={[
+                { id: "detail", title: "Detail" },
+                { id: "orders", title: "Order Management" },
+              ]}
+              activeId={tab}
+              onChange={(id) => setTab(id as "detail" | "orders")}
+            />
+          )}
+
+          {tab === "detail" ? (
+            <DetailTable rows={rows} />
+          ) : (
+            <ProductOrderSection
+              product={adapted}
+              onBook={() => setBookingOpen(true)}
+              onNotice={notice}
+            />
+          )}
         </div>
 
-        {/* CTA */}
+        {/* CTA — only under Detail; Order Management carries its own จองซื้อ. */}
+        {tab === "detail" && (
         <div className="flex flex-col gap-3 items-center w-full">
           <div className="relative w-full max-w-[343px]">
             <button
@@ -218,30 +234,8 @@ export function ThaiStructuredProductDetail({
             </a>
           )}
 
-          {/* Hidden until the first booking — a 0% bar under the button that
-              creates the first booking says nothing the button doesn't. */}
-          {ORDER_BOOKING_ENABLED && book && book.openBookings.length > 0 && (
-            <Link
-              href={`/orders/${encodeURIComponent(adapted.id)}`}
-              className="group flex w-full max-w-[343px] flex-col gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-3 transition-colors hover:border-[#0a6ee7]"
-            >
-              <div className="flex items-center gap-2">
-                <span className="flex-1 text-xs font-bold leading-4 text-[#6a7282]">
-                  ยอดจองของดีลนี้
-                </span>
-                <span className="text-xs leading-4 text-[#4a5565]">
-                  {formatOrderAmount(book.bookedAmount, book.currency)} /{" "}
-                  {formatOrderAmount(book.targetAmount, book.currency)}
-                </span>
-                <CaretRightIcon
-                  size={14}
-                  className="shrink-0 text-[#6a7282] transition-colors group-hover:text-[#0a6ee7]"
-                />
-              </div>
-              <LinearProgress value={bookProgressPct(book)} />
-            </Link>
-          )}
         </div>
+        )}
       </div>
 
       <FCNPresentationModal product={adapted} open={fcnModalOpen} onClose={() => setFcnModalOpen(false)} />

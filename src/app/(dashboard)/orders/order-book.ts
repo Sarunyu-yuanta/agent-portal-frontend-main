@@ -295,6 +295,10 @@ export function headlineRound(book: OrderBook): {
   pct: number;
   /** The submitted order these figures belong to, or `null` for the open round. */
   previousRef: string | null;
+  /** 1-based: round 1 is the first order the book sent, or would send. */
+  number: number;
+  /** Of `amount`, how much the back office has confirmed — only a sent round has any. */
+  confirmed: number;
 } {
   const latest = book.submissions[0];
   const pctOf = (amount: number) =>
@@ -303,7 +307,14 @@ export function headlineRound(book: OrderBook): {
   if (book.openBookings.length === 0 && latest) {
     const rows = book.allBookings.filter((b) => latest.bookingIds.includes(b.id));
     const amount = sum(rows);
-    return { bookings: rows, amount, pct: pctOf(amount), previousRef: latest.backendRef };
+    return {
+      bookings: rows,
+      amount,
+      pct: pctOf(amount),
+      previousRef: latest.backendRef,
+      number: book.submissions.length,
+      confirmed: latest.status === "completed" ? amount : 0,
+    };
   }
 
   return {
@@ -311,7 +322,60 @@ export function headlineRound(book: OrderBook): {
     amount: book.bookedAmount,
     pct: pctOf(book.bookedAmount),
     previousRef: null,
+    number: book.submissions.length + 1,
+    confirmed: 0,
   };
+}
+
+/** One fill-and-send cycle of a book. */
+export type BookRound = {
+  /** 1-based, oldest first. */
+  number: number;
+  /** The order this round went out as; `null` for the round still open. */
+  submission: OrderSubmission | null;
+  /** Every booking placed in this round, cancelled ones included. */
+  bookings: Booking[];
+  /** Sum of the live bookings. */
+  amount: number;
+};
+
+/**
+ * A book split into its rounds, **newest first**.
+ *
+ * A book can be filled and sent more than once — each send is a new order on
+ * the same product — so a round is one submission and the bookings it carried,
+ * plus the open round: every booking no submission has carried yet. Cancelled
+ * bookings are never sent, so they always sit in the open round; that is where
+ * they were cancelled from.
+ *
+ * The open round is listed only when something is in it — a book whose last
+ * order has just gone out has no round 2 until someone books into one.
+ */
+export function bookRounds(book: OrderBook): BookRound[] {
+  const sent = [...book.submissions].reverse(); // oldest first
+  const carried = new Set(sent.flatMap((s) => s.bookingIds));
+  const rounds: BookRound[] = sent.map((submission, i) => {
+    const rows = book.allBookings.filter((b) => submission.bookingIds.includes(b.id));
+    return { number: i + 1, submission, bookings: rows, amount: sum(rows) };
+  });
+
+  const open = book.allBookings.filter((b) => !carried.has(b.id));
+  if (open.length > 0) {
+    rounds.push({
+      number: sent.length + 1,
+      submission: null,
+      bookings: open,
+      amount: sum(open.filter((b) => b.status !== "cancelled")),
+    });
+  }
+  return rounds.reverse();
+}
+
+/** Which round a booking belongs to — see {@link bookRounds}. */
+export function roundNumberOf(book: OrderBook, bookingId: string): number {
+  const index = book.submissions.findIndex((s) => s.bookingIds.includes(bookingId));
+  // `submissions` is newest first, so index 0 is the latest round.
+  return index === -1 ? book.submissions.length + 1 : book.submissions.length - index;
 }
 
 /**

@@ -2,10 +2,42 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Docs quote class names as prose (e.g. `--fill-*` placeholders); never scan them. */
+@source not "../../docs";
+
 @custom-variant dark (&:is(.dark *));
 
 .transparent-tabs [role="tab"] {
   background-color: transparent !important;
+}
+
+/* Tab counts as a pill rather than the library's always-red badge.
+
+   - Selected tab: solid primary — the tab the IC is looking at, so nothing on
+     it is unseen.
+   - A tab with something new since it was last opened: red, the library's own
+     badge colours, as a nudge to go and look. Which tabs those are comes from
+     the page, as 1-based indices in `data-new` (see `orders/page.tsx`).
+   - Every other tab: quiet grey.
+
+   `system-one` gives the tab no prop for this, so it is matched on the badge's
+   own class. Outside every @layer and `!important`, for the reason
+   `.transparent-tabs` above is: the library's unlayered stylesheet would win. */
+.count-tabs [role="tab"] > span.bg-visual-red-default {
+  background-color: var(--fill-gray-100) !important;
+  color: #6a7282 !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+}
+.count-tabs[data-new~="1"] [role="tab"]:nth-child(1) > span.bg-visual-red-default,
+.count-tabs[data-new~="2"] [role="tab"]:nth-child(2) > span.bg-visual-red-default,
+.count-tabs[data-new~="3"] [role="tab"]:nth-child(3) > span.bg-visual-red-default {
+  background-color: var(--visual-red-default) !important;
+  color: var(--on-visual-red) !important;
+}
+.count-tabs [role="tab"][aria-selected="true"] > span.bg-visual-red-default {
+  background-color: #0a6ee7 !important;
+  color: var(--fill-blue-50) !important;
 }
 
 .scrollable-tabs {

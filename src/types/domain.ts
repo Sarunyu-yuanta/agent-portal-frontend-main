@@ -141,6 +141,16 @@ export type Booking = {
   createdAt: string;
   createdBy: string;
   status: "booked" | "cancelled";
+  /**
+   * The four checks as they stood when the booking was placed.
+   *
+   * A booking can only be placed with all four passed, so this is the record
+   * that it was — the client's live status can move on afterwards (a KYC
+   * expiring, a new acknowledgement waiting on review) without rewriting what
+   * the order was booked against. Absent on seeded bookings; see
+   * `checksAtBooking`.
+   */
+  checks?: RequirementItem[];
 };
 
 export type OrderSubmissionStatus = "processing" | "completed" | "rejected";

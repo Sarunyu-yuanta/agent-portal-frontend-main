@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Button, LinearProgress, Toaster, type ToastStatus } from "@sarunyu/system-one";
+import { Button, TabGroup, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
   ArrowSquareOutIcon,
   CaretDownIcon,
-  CaretRightIcon,
   EyeIcon,
   FilePdfIcon,
   PackageIcon,
@@ -17,16 +15,22 @@ import {
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
 import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
+import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
 import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
-import {
-  bookProgressPct,
-  formatOrderAmount,
-} from "@/app/(dashboard)/orders/order-book";
+import { headlineRound } from "@/app/(dashboard)/orders/order-book";
 import type { StructuredProduct } from "./structured-product-data";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
+
+/** The product card's two views — the terms, and who has been booked into them. */
+type ProductTab = "detail" | "orders";
+
+const PRODUCT_TABS: { id: ProductTab; title: string }[] = [
+  { id: "detail", title: "Detail" },
+  { id: "orders", title: "Order Management" },
+];
 
 type DetailRow = {
   label: string;
@@ -110,14 +114,21 @@ export function StructuredProductDetail({
   const [packageModalOpen, setPackageModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [tab, setTab] = useState<ProductTab>("detail");
+
+  // Called unconditionally — the flag picks what renders, not which hooks run.
+  const { data: book } = useOrderBook(product.id);
+  // With booking on, the allocation box reads the live book, round by round,
+  // instead of the figures frozen into the product's JSON — those never moved
+  // when someone booked, so the box and the Order Management tab disagreed.
+  const round = ORDER_BOOKING_ENABLED && book ? headlineRound(book) : null;
+  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
   // The page owns the toast stack rather than the modal: a booking confirms by
   // *closing* the modal, and a toast rendered inside it would leave with it.
   const { toasts, addToast, removeToast } = useToasts();
   const notice = (message: string, status: ToastStatus) => addToast({ message, status });
 
-  // Called unconditionally — the flag picks what renders, not which hooks run.
-  const { data: book } = useOrderBook(product.id);
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -210,132 +221,136 @@ export function StructuredProductDetail({
             </div>
           </div>
 
+          {/* Tabs under the symbol and coupon, which stay put: both views are
+              about this one deal, and the header is what says which. */}
+          {ORDER_BOOKING_ENABLED && (
+            <TabGroup
+              items={PRODUCT_TABS}
+              activeId={tab}
+              onChange={(id) => setTab(id as ProductTab)}
+            />
+          )}
+
+          {tab === "detail" ? (
           <div className="flex flex-col gap-3 items-center w-full">
             <DetailTable rows={detailRows} />
-            {product.requestNotionalSize != null && product.confirmedRequest != null && (
+            {round && book ? (
+              <AllocationSummary
+                requestNotionalSize={`${money(round.amount)} / ${money(book.targetAmount)}`}
+                confirmedRequest={`${money(round.confirmed)} / ${money(round.amount)}`}
+              />
+            ) : product.requestNotionalSize != null && product.confirmedRequest != null && (
               <AllocationSummary
                 requestNotionalSize={product.requestNotionalSize}
                 confirmedRequest={product.confirmedRequest}
               />
             )}
             <p className="text-xs leading-4 text-[#6a7282] text-center whitespace-nowrap">
-              อัปเดตล่าสุด {product.updatedAt}
+              {round
+                ? `รอบที่ ${round.number} · ${round.previousRef ? `ส่งแล้ว (${round.previousRef})` : "ยังไม่ส่งคำสั่งซื้อ"}`
+                : `อัปเดตล่าสุด ${product.updatedAt}`}
             </p>
           </div>
-        </div>
-
-        {/* CTA */}
-        <div className="flex flex-col gap-3 items-center w-full">
-          <div className="relative w-full max-w-[343px]">
-            <button
-              type="button"
-              onClick={() => setDropdownOpen((v) => !v)}
-              className="flex w-full items-center h-12 px-4 font-medium text-sm text-white rounded-xl cursor-pointer transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#0a6ee7" }}
-            >
-              <span className="flex-1 text-center">ดาวน์โหลดเอกสาร</span>
-              <CaretDownIcon
-                size={14}
-                color="white"
-                style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-              />
-            </button>
-
-            {dropdownOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} role="presentation" />
-                <div
-                  className="absolute bottom-full mb-2 right-0 w-full rounded-xl overflow-hidden z-20 shadow-lg"
-                  style={{ border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "white" }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => { setFcnModalOpen(true); setDropdownOpen(false); }}
-                    className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                    style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                  >
-                    <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#fee2e2] group-hover:bg-transparent transition-colors">
-                      <FilePdfIcon size={16} color="#dc2626" className="transition-opacity group-hover:opacity-0" />
-                      <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm text-[#101828]">Presentation PDF</p>
-                      <p className="text-xs text-[#6a7282] mt-0.5">สำหรับนำเสนอลูกค้า</p>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setPackageModalOpen(true); setDropdownOpen(false); }}
-                    className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                  >
-                    <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#eff6ff] group-hover:bg-transparent transition-colors">
-                      <PackageIcon size={16} color="#0a6ee7" className="transition-opacity group-hover:opacity-0" />
-                      <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm text-[#101828]">ชุดเอกสารครบชุด</p>
-                      <p className="text-xs text-[#6a7282] mt-0.5">สำหรับปิดการขาย (.zip)</p>
-                    </div>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-          {/* Booking replaces the external hand-off the page used to make.
-              With the flag off it goes back to that link, so the catalogue is
-              exactly what it was before this feature existed. */}
-          {ORDER_BOOKING_ENABLED ? (
-            <button
-              type="button"
-              onClick={() => setBookingOpen(true)}
-              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
-              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-            >
-              <UserPlusIcon size={16} />
-              <span>จองซื้อให้ลูกค้า</span>
-            </button>
           ) : (
-            <a
-              href="https://placeholder.example.com/create-order"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
-              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-            >
-              <span>สร้างคำสั่งซื้อ</span>
-              <ArrowSquareOutIcon size={16} />
-            </a>
-          )}
-
-          {/* The book, once there is one. Hidden until the first booking
-              rather than shown empty: a 0% bar under the button that creates
-              the first booking says nothing the button doesn't. */}
-          {ORDER_BOOKING_ENABLED && book && book.openBookings.length > 0 && (
-            <Link
-              href={`/orders/${encodeURIComponent(product.id)}`}
-              className="group flex w-full max-w-[343px] flex-col gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-3 transition-colors hover:border-[#0a6ee7]"
-            >
-              <div className="flex items-center gap-2">
-                <span className="flex-1 text-xs font-bold leading-4 text-[#6a7282]">
-                  ยอดจองของดีลนี้
-                </span>
-                <span className="text-xs leading-4 text-[#4a5565]">
-                  {formatOrderAmount(book.bookedAmount, book.currency)} /{" "}
-                  {formatOrderAmount(book.targetAmount, book.currency)}
-                </span>
-                <CaretRightIcon
-                  size={14}
-                  className="shrink-0 text-[#6a7282] transition-colors group-hover:text-[#0a6ee7]"
-                />
-              </div>
-              <LinearProgress value={bookProgressPct(book)} />
-            </Link>
+            <ProductOrderSection
+              product={product}
+              onBook={() => setBookingOpen(true)}
+              onNotice={notice}
+            />
           )}
         </div>
+
+        {/* CTA — the product's own actions, so only under Detail; the Order
+            Management tab carries its own จองซื้อ. */}
+        {tab === "detail" && (
+          <div className="flex flex-col gap-3 items-center w-full">
+            <div className="relative w-full max-w-[343px]">
+              <button
+                type="button"
+                onClick={() => setDropdownOpen((v) => !v)}
+                className="flex w-full items-center h-12 px-4 font-medium text-sm text-white rounded-xl cursor-pointer transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#0a6ee7" }}
+              >
+                <span className="flex-1 text-center">ดาวน์โหลดเอกสาร</span>
+                <CaretDownIcon
+                  size={14}
+                  color="white"
+                  style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
+              </button>
+  
+              {dropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} role="presentation" />
+                  <div
+                    className="absolute bottom-full mb-2 right-0 w-full rounded-xl overflow-hidden z-20 shadow-lg"
+                    style={{ border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "white" }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { setFcnModalOpen(true); setDropdownOpen(false); }}
+                      className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
+                      style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+                    >
+                      <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#fee2e2] group-hover:bg-transparent transition-colors">
+                        <FilePdfIcon size={16} color="#dc2626" className="transition-opacity group-hover:opacity-0" />
+                        <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-[#101828]">Presentation PDF</p>
+                        <p className="text-xs text-[#6a7282] mt-0.5">สำหรับนำเสนอลูกค้า</p>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setPackageModalOpen(true); setDropdownOpen(false); }}
+                      className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+                    >
+                      <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#eff6ff] group-hover:bg-transparent transition-colors">
+                        <PackageIcon size={16} color="#0a6ee7" className="transition-opacity group-hover:opacity-0" />
+                        <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-[#101828]">ชุดเอกสารครบชุด</p>
+                        <p className="text-xs text-[#6a7282] mt-0.5">สำหรับปิดการขาย (.zip)</p>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Booking replaces the external hand-off the page used to make.
+                With the flag off it goes back to that link, so the catalogue is
+                exactly what it was before this feature existed. */}
+            {ORDER_BOOKING_ENABLED ? (
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+                style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+              >
+                <UserPlusIcon size={16} />
+                <span>จองซื้อให้ลูกค้า</span>
+              </button>
+            ) : (
+              <a
+                href="https://placeholder.example.com/create-order"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
+                style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+              >
+                <span>สร้างคำสั่งซื้อ</span>
+                <ArrowSquareOutIcon size={16} />
+              </a>
+            )}
+  
+          </div>
+        )}
       </div>
 
       <FCNPresentationModal

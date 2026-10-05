@@ -44,6 +44,7 @@ import {
 import type {
   Booking,
   OrderSubmission,
+  RequirementItem,
   RequirementKey,
   RequirementRequest,
 } from "@/types/domain";
@@ -65,6 +66,8 @@ type BookingDraft = {
   clientId: string;
   clientName: string;
   amount: number;
+  /** The checks the booking passed — stored on it, see `Booking.checks`. */
+  checks: RequirementItem[];
 };
 
 type OrdersContextValue = {
@@ -128,6 +131,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       clientId: draft.clientId,
       clientName: draft.clientName,
       amount: draft.amount,
+      checks: draft.checks,
       createdAt: new Date().toISOString(),
       createdBy: ORDER_ACTOR,
       status: "booked",
