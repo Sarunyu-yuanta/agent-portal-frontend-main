@@ -238,6 +238,14 @@ export type OrderBook = {
    * the reader having to recognise an id prefix.
    */
   desk: string;
+  /**
+   * The underlyings' logos, copied from the product.
+   *
+   * Carried on the book for the same reason `currency` and `productType` are:
+   * every surface that lists a book would otherwise look the product up again
+   * just to draw it. Empty for the Thai desk, which has no imagery.
+   */
+  logos: string[];
   currency: string;
   /** Notional that has to be filled before the order can go downstream. */
   targetAmount: number;
@@ -259,7 +267,22 @@ export type OrderBook = {
   bookedAmount: number;
   /** Sum of the bookings carried by submissions that came back `completed`. */
   confirmedAmount: number;
+  /**
+   * The open round's state whenever there is one — see `bookStatus`.
+   *
+   * A sent order never shows up here, however recently it went: rounds are
+   * independent, and the one being filled now is what the IC can act on. Orders
+   * still waiting on the back office are in {@link OrderBook.pendingOrders}.
+   */
   status: OrderBookStatus;
+  /**
+   * Orders already sent that the back office has not answered, newest first.
+   *
+   * Shown beside {@link OrderBook.status} rather than folded into it. More than
+   * one can be in flight: a round can be filled and sent while an earlier order
+   * is still out, and neither waits for the other.
+   */
+  pendingOrders: OrderSubmission[];
   /** Newest first. */
   submissions: OrderSubmission[];
   /** Newest first. */

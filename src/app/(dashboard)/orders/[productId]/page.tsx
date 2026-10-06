@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { Suspense, use } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { CatalogNotFound } from "../../product-catalog/CatalogNotFound";
@@ -26,6 +26,20 @@ export default function OrderBookPage({
   // when the flag is off. Above every hook, so flipping the flag can't change
   // the hook order.
   if (!ORDER_BOOKING_ENABLED) redirect("/product-catalog");
+  return (
+    // The open list lives in `?view=` so an order row on `/orders` can link
+    // straight to it, and `useSearchParams` suspends.
+    <Suspense fallback={<OrderBookDetailSkeleton />}>
+      <OrderBookPageInner params={params} />
+    </Suspense>
+  );
+}
+
+function OrderBookPageInner({
+  params,
+}: {
+  params: Promise<{ productId: string }>;
+}) {
   const { productId } = use(params);
   const id = decodeURIComponent(productId);
   const { data: book, isLoading } = useOrderBook(id);

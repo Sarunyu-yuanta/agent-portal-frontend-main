@@ -8,9 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
  * (`isLoading` is permanently `false` behind the store), and is wired up so
  * that giving orders an endpoint lights it up without touching the page.
  */
-export function OrderBooksSkeleton({ rows = 4 }: { rows?: number }) {
+export function OrderBooksSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+    // Same template as the real cards — see `CARD_GRID` in the page.
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex flex-col gap-3 rounded-[8px] border border-border bg-card p-4">
           <div className="flex items-start gap-3">

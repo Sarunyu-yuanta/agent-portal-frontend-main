@@ -95,21 +95,40 @@ export const seedBookings: Booking[] = orderBooksRaw.books.flatMap((book) =>
   })),
 );
 
+/**
+ * How long the back office took, counted forward from when the order was sent.
+ *
+ * Derived from the id for the same reason the hour of day is — stable across a
+ * render and identical on the server and in the browser — but added to the
+ * submission's own timestamp rather than stamped independently. Stamping it
+ * independently derived its hour from a *different* id, so an order sent at
+ * 17:35 could carry an answer at 09:57 the same day. Nothing displayed both at
+ * once until the order detail modal did, and then it read as an order answered
+ * before it was placed.
+ */
+function settledAfter(submittedAt: string, id: string): string {
+  const seed = [...id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const hours = 2 + (seed % 7); // 2–8 hours, so it always lands after the send
+  return new Date(new Date(submittedAt).getTime() + hours * 3_600_000).toISOString();
+}
+
 export const seedSubmissions: OrderSubmission[] = orderBooksRaw.books.flatMap(
   (book) =>
-    (book.submissions as SubmissionSeed[]).map((s) => ({
-      id: s.id,
-      productId: book.productId,
-      bookingIds: s.bookingIds,
-      submittedAt: stampFromDaysAgo(s.daysAgo, s.id),
-      submittedBy: ORDER_ACTOR,
-      status: s.status as OrderSubmission["status"],
-      backendRef: s.backendRef,
-      // A submission that has answered settled the day it was sent; one still
-      // processing has no settlement date to show, which is what the "กำลัง
-      // ดำเนินการ" row on the book reads off.
-      settledAt: s.status === "processing" ? null : stampFromDaysAgo(s.daysAgo, `${s.id}-settled`),
-    })),
+    (book.submissions as SubmissionSeed[]).map((s) => {
+      const submittedAt = stampFromDaysAgo(s.daysAgo, s.id);
+      return {
+        id: s.id,
+        productId: book.productId,
+        bookingIds: s.bookingIds,
+        submittedAt,
+        submittedBy: ORDER_ACTOR,
+        status: s.status as OrderSubmission["status"],
+        backendRef: s.backendRef,
+        // One still processing has no settlement date to show, which is what
+        // the "กำลังดำเนินการ" row on the book reads off.
+        settledAt: s.status === "processing" ? null : settledAfter(submittedAt, s.id),
+      };
+    }),
 );
 
 export const seedRequirementRequests: RequirementRequest[] =

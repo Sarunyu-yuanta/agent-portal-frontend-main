@@ -11,16 +11,19 @@
  */
 
 import Link from "next/link";
-import { CaretRightIcon, UsersThreeIcon } from "@phosphor-icons/react";
+import { HourglassMediumIcon, UsersThreeIcon } from "@phosphor-icons/react";
 import { LinearProgress, Tag } from "@sarunyu/system-one";
 import type { OrderBook } from "@/types/domain";
 import {
   BOOK_STATUS_LABEL_TH,
   BOOK_STATUS_VARIANT,
   formatLogTime,
-  formatOrderAmount,
   headlineRound,
+  roundOfSubmission,
 } from "./order-book";
+import { ProductLogos } from "./ProductLogos";
+import { AmountOfTarget } from "./AmountOfTarget";
+import { CARD_CLASS } from "./card-class";
 
 export function OrderBookCard({ book }: { book: OrderBook }) {
   // The round the figures describe — the open one, or the last one sent when
@@ -28,57 +31,97 @@ export function OrderBookCard({ book }: { book: OrderBook }) {
   const round = headlineRound(book);
   const holders = new Set(round.bookings.map((b) => b.clientId)).size;
   const latest = book.logs[0];
+  // Orders still out, except one the headline above is already describing —
+  // a book with nothing open leads with the round it just sent, and repeating
+  // it underneath would read as two orders in flight.
+  const pending = book.pendingOrders.filter((s) => s.backendRef !== round.previousRef);
 
   return (
     <Link
       href={`/orders/${encodeURIComponent(book.productId)}`}
-      className="group flex flex-col gap-3 rounded-[8px] border border-border bg-card p-4 shadow-sm transition-colors hover:border-[#0a6ee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7]"
+      className={CARD_CLASS}
     >
+      {/* The logo strip gets the row the catalogue card gives it, with the
+          status tag where the catalogue puts its own tags. The row is rendered
+          whether or not there are logos, so a Thai book — which has none — has
+          the same shape as a global one instead of pulling its tag up a line. */}
       <div className="flex items-start gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="type-body-1 truncate font-bold text-foreground">{book.productName}</p>
-          <p className="type-caption truncate text-muted-foreground">
-            {book.desk} · {book.productType} · {book.currency}
-          </p>
+        {/* The spacer is the div, not the strip: `ProductLogos` renders nothing
+            for a Thai book, and `flex-1` on it went with it — pulling the tag
+            and caret to the left edge on half the cards. */}
+        <div className="min-w-0 flex-1">
+          <ProductLogos logos={book.logos} />
         </div>
+        {/* `large` — the only size up from `small` the library offers. It is
+            the one thing on the card that changes colour, and at `small` it
+            read as a footnote next to the logo strip it shares a row with. */}
         <Tag
           text={BOOK_STATUS_LABEL_TH[book.status]}
           variant={BOOK_STATUS_VARIANT[book.status]}
-          size="small"
+          size="large"
         />
-        <CaretRightIcon
-          size={18}
-          className="mt-0.5 shrink-0 text-muted-foreground transition-colors group-hover:text-[#0a6ee7]"
-        />
+      </div>
+
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <p className="type-body-1 truncate font-bold text-foreground">{book.productName}</p>
+        <p className="type-caption truncate text-muted-foreground">
+          {book.desk} · {book.productType} · {book.currency}
+        </p>
+        {/* Which round the amounts below belong to. Without it a card showing
+            a fresh round's 30% beside a tag about the round already sent read
+            as one order that had somehow gone backwards. */}
+        <p className="type-caption truncate text-muted-foreground">
+          รอบที่ {round.number} ·{" "}
+          {round.previousRef ? `ส่งแล้ว (${round.previousRef})` : "ยังไม่ส่งคำสั่งซื้อ"}
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="type-body-2 !font-semibold text-foreground">
-            {formatOrderAmount(round.amount, book.currency)}
-          </p>
-          <p className="type-caption text-muted-foreground">
-            จาก {formatOrderAmount(book.targetAmount, book.currency)} ·{" "}
-            {Math.round(round.pct)}%
-          </p>
-        </div>
+        <AmountOfTarget
+          amount={round.amount}
+          target={book.targetAmount}
+          currency={book.currency}
+          pct={round.pct}
+        />
         <LinearProgress value={round.pct} />
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {/* Who is in the round, and when it last moved — the two facts that
+          qualify the figures above, at opposite ends of one line. The log
+          line's own sentence used to sit here ("จองให้ … 20,000 USD · 5 Oct …"),
+          which named one client out of several and repeated an amount the
+          figures already carry; the book's history tab is where what happened
+          belongs. */}
+      <div className="flex items-baseline justify-between gap-2">
         <span className="type-caption inline-flex items-center gap-1 text-muted-foreground">
           <UsersThreeIcon size={14} weight="fill" />
           {holders} ราย
         </span>
         {latest && (
-          // The newest log line doubles as the card's "last activity" — one
-          // sentence that says what happened and when, instead of a bare
-          // timestamp the IC has to open the book to interpret.
-          <span className="type-caption min-w-0 flex-1 truncate text-muted-foreground/70">
-            {latest.summary} · {formatLogTime(latest.at)}
+          <span className="type-caption shrink-0 tabular-nums text-muted-foreground/70">
+            {formatLogTime(latest.at)}
           </span>
         )}
       </div>
+
+      {/* An order still with the back office, named rather than folded into the
+          tag above. The tag is the open round's — these two are different
+          rounds and can say different things on the same card. */}
+      {pending.length > 0 && (
+        // The same yellow the book page uses for "ยังขาดอีก": a wait that is
+        // somebody else's to end. It is a filled block rather than a rule and a
+        // grey line because it is the one thing on the card that is not about
+        // the round the rest of it describes — the colour is what keeps a
+        // reader from folding it into the figures above.
+        <p className="type-caption flex items-center gap-1.5 rounded-lg bg-[var(--fill-yellow-100)] px-3 py-2 text-[var(--fill-yellow-700)]">
+          <HourglassMediumIcon size={14} weight="fill" className="shrink-0" />
+          <span className="truncate">
+            รอบที่ {roundOfSubmission(book, pending[0].id)} · {pending[0].backendRef} ·
+            รอผลจากระบบหลังบ้าน
+            {pending.length > 1 && ` (+${pending.length - 1})`}
+          </span>
+        </p>
+      )}
     </Link>
   );
 }

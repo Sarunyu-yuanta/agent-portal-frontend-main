@@ -79,23 +79,38 @@ export function cashInCurrency(cashThb: number, currency: string): number {
 const sum = (rows: Booking[]) => rows.reduce((total, b) => total + b.amount, 0);
 
 /**
- * Which state the book is in, decided from the *unsent* bookings rather than
- * from every booking ever placed.
+ * Which state the book is in — **the open round's state, whenever there is
+ * one**.
  *
- * That distinction is the whole reason a book can be used twice: once an order
- * has gone downstream its bookings stop counting towards the target, so the
- * next booking starts a fresh round at zero instead of finding the bar already
- * cleared by an order that has already been placed.
+ * Rounds are independent: an order already with the back office carries its own
+ * bookings, its own reference and its own answer, and nothing about it changes
+ * what the round being filled now needs. So an order in flight must not speak
+ * for the book. It used to: `processing` was tested first, which meant a round
+ * collected to 100% while the previous order was out showed a blue
+ * "กำลังดำเนินการ" tag, a disabled send button reading "ยังขาด 0 USD", and
+ * bookings tagged "รอครบยอด" on a round that was full. The book was describing
+ * two rounds at once with one word.
+ *
+ * The order in flight is still on the book — as {@link OrderBook.pendingOrders}
+ * — so every surface can show it *beside* this status rather than instead of
+ * it.
+ *
+ * With no open round there is nothing to collect, and the last order is the
+ * only thing left to report.
  */
 function bookStatus(
+  open: Booking[],
   openAmount: number,
   target: number,
   latest: OrderSubmission | undefined,
 ): OrderBookStatus {
+  if (open.length > 0) return openAmount >= target ? "ready" : "collecting";
   if (latest?.status === "processing") return "processing";
-  if (openAmount === 0 && latest?.status === "completed") return "completed";
-  if (openAmount === 0 && latest?.status === "rejected") return "rejected";
-  return openAmount >= target ? "ready" : "collecting";
+  if (latest?.status === "completed") return "completed";
+  if (latest?.status === "rejected") return "rejected";
+  // No bookings and nothing sent — a book that exists only because a
+  // requirement request was sent against the product.
+  return "collecting";
 }
 
 /**
@@ -226,6 +241,7 @@ export function assembleOrderBook(
     productName: product.underlying,
     productType: product.productName,
     desk: deskLabelFor(product),
+    logos: product.logos,
     currency: product.currency,
     targetAmount: target,
     minTicket: minTicketFor(product),
@@ -234,7 +250,8 @@ export function assembleOrderBook(
     allBookings: bookings,
     bookedAmount: sum(open),
     confirmedAmount: sum(live.filter((b) => completedIds.has(b.id))),
-    status: bookStatus(sum(open), target, ordered[0]),
+    status: bookStatus(open, sum(open), target, ordered[0]),
+    pendingOrders: ordered.filter((s) => s.status === "processing"),
     submissions: ordered,
     logs: buildLogs(product, bookings, submissions, requests),
   };
@@ -266,6 +283,22 @@ export const BOOK_STATUS_VARIANT: Record<
   processing: "blue",
   completed: "green",
   rejected: "red",
+};
+
+/**
+ * How one sent order reads, wherever it is listed.
+ *
+ * Deliberately shorter than {@link BOOK_STATUS_LABEL_TH}: a book's tag has to
+ * name the whole state ("ครบยอด รอส่งคำสั่งซื้อ"), while an order sits beside
+ * its own reference and round, so "สำเร็จ" is unambiguous.
+ */
+export const SUBMISSION_TAG: Record<
+  OrderSubmission["status"],
+  { text: string; variant: "blue" | "green" | "red" }
+> = {
+  processing: { text: "กำลังดำเนินการ", variant: "blue" },
+  completed: { text: "สำเร็จ", variant: "green" },
+  rejected: { text: "ถูกปฏิเสธ", variant: "red" },
 };
 
 /** How full the book is, capped at 100 so an over-subscribed bar stays a bar. */
@@ -376,6 +409,25 @@ export function roundNumberOf(book: OrderBook, bookingId: string): number {
   const index = book.submissions.findIndex((s) => s.bookingIds.includes(bookingId));
   // `submissions` is newest first, so index 0 is the latest round.
   return index === -1 ? book.submissions.length + 1 : book.submissions.length - index;
+}
+
+/** Which round an order was: 1 is the first order the book sent. */
+export function roundOfSubmission(book: OrderBook, submissionId: string): number {
+  const index = book.submissions.findIndex((s) => s.id === submissionId);
+  return index === -1 ? book.submissions.length : book.submissions.length - index;
+}
+
+/** The bookings an order carried, cancelled ones included, and their total. */
+export function submissionRows(
+  book: OrderBook,
+  submission: OrderSubmission,
+): { rows: Booking[]; amount: number; holders: number } {
+  const rows = book.allBookings.filter((b) => submission.bookingIds.includes(b.id));
+  return {
+    rows,
+    amount: sum(rows),
+    holders: new Set(rows.map((b) => b.clientId)).size,
+  };
 }
 
 /**

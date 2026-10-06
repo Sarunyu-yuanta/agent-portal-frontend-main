@@ -58,6 +58,7 @@ import {
   clientCashThb,
   formatOrderAmount,
   minTicketFor,
+  roundOfSubmission,
   USD_THB,
 } from "./order-book";
 import { requestableKeys } from "./order-requirements";
@@ -803,16 +804,26 @@ export function ReadOnlyField({ label, value }: { label: string; value: string }
 
 // ── Amount ───────────────────────────────────────────────────────────────────
 
-/** The amount's own validity, shared by the field and the submit button. */
+/**
+ * The amount's own validity, shared by the field and the submit button.
+ *
+ * `full` — the round has already reached the target — is its own answer rather
+ * than a very large `tooBig`. The over-limit test used to read
+ * `remaining > 0 && amount > remaining`, which switched itself off at exactly
+ * the moment it was needed most: with nothing left to book, every amount
+ * passed, and a 100,000 book took another 500,000 under a helper line still
+ * reading "ยังจองได้ 0 USD".
+ */
 function amountCheck(
   product: BookableProduct,
   remaining: number,
   raw: string,
-): { amount: number; tooSmall: boolean; tooBig: boolean; ok: boolean } {
+): { amount: number; full: boolean; tooSmall: boolean; tooBig: boolean; ok: boolean } {
   const amount = parseAmount(raw);
+  const full = remaining <= 0;
   const tooSmall = amount > 0 && amount < minTicketFor(product);
-  const tooBig = remaining > 0 && amount > remaining;
-  return { amount, tooSmall, tooBig, ok: amount > 0 && !tooSmall && !tooBig };
+  const tooBig = !full && amount > remaining;
+  return { amount, full, tooSmall, tooBig, ok: amount > 0 && !full && !tooSmall && !tooBig };
 }
 
 function AmountSection({
@@ -845,7 +856,13 @@ function AmountSection({
 
   const cashThb = clientCashThb(client);
   const cashHere = cashInCurrency(cashThb, currency);
-  const { amount, tooSmall, tooBig } = amountCheck(product, remaining, raw);
+  const { amount, full, tooSmall, tooBig } = amountCheck(product, remaining, raw);
+  /**
+   * Two different reasons the amount is closed, and they do not stack: a client
+   * who is short a document cannot book whatever the round's state, so that
+   * message wins and the round's is not also shown.
+   */
+  const blocked = disabled || full;
 
   // Cash is a warning, not a gate. `cashIdlePct` is idle cash in the portfolio,
   // not the settlement account balance, and a client who intends to wire funds
@@ -860,6 +877,24 @@ function AmountSection({
 
   return (
     <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4">
+      {/* Which round this booking lands in, and whether an earlier one is still
+          out. A book is filled and sent over and over, and "ยังจองได้ 100,000"
+          means two different things depending on whether this is the first
+          round or the third — on its own it let an IC book into a new round
+          believing they were topping up the one they had just sent. */}
+      {book && (
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <span className="type-body-2 !font-semibold text-foreground">
+            จองเข้ารอบที่ {book.submissions.length + 1}
+          </span>
+          {book.pendingOrders.length > 0 && (
+            <span className="type-caption text-muted-foreground">
+              รอบที่ {roundOfSubmission(book, book.pendingOrders[0].id)} ·{" "}
+              {book.pendingOrders[0].backendRef} · รอผลจากระบบหลังบ้าน
+            </span>
+          )}
+        </div>
+      )}
       {/* On top of the faded block it explains, and outside it so it stays at
           full strength — the one thing in this section that is not disabled. */}
       {disabled && (
@@ -868,13 +903,23 @@ function AmountSection({
           message={`ข้อมูลที่ต้องมีก่อนจองซื้อยังไม่ครบ (${passed}/${total}) จึงยังกรอกจำนวนเงินและจองซื้อไม่ได้`}
         />
       )}
+      {/* The round is full. Not an error on the amount — there is no amount
+          that would be right — so it closes the field the same way a missing
+          document does, and says what unlocks it. */}
+      {!disabled && full && (
+        <Alert
+          status="information"
+          message={`รอบที่ ${(book?.submissions.length ?? 0) + 1} ครบยอด ${formatOrderAmount(target, currency)} แล้ว — ส่งคำสั่งซื้อรอบนี้ก่อน จึงจะเปิดรอบถัดไปให้จองได้`}
+          multiline
+        />
+      )}
       {/* Faded and inert, not removed — `inert` takes it out of the tab order
           and the accessibility tree as well as the pointer's reach. */}
       <div
-        inert={disabled}
-        aria-disabled={disabled}
+        inert={blocked}
+        aria-disabled={blocked}
         className={`flex flex-col gap-3 transition-opacity ${
-          disabled ? "pointer-events-none select-none opacity-40" : ""
+          blocked ? "pointer-events-none select-none opacity-40" : ""
         }`}
       >
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -885,9 +930,9 @@ function AmountSection({
             onChange={setAmount}
             placeholder="Enter Amount"
             inputMode="numeric"
-            disabled={disabled}
+            disabled={blocked}
             forceState={
-              disabled ? "disabled" : tooSmall || tooBig ? "error" : "default"
+              blocked ? "disabled" : tooSmall || tooBig ? "error" : "default"
             }
             errorMessage={
               tooSmall

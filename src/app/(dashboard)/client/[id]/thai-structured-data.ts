@@ -72,6 +72,30 @@ export function thaiBookableId(theme: string): string {
 }
 
 /**
+ * Each underlying's own mock photograph, in `public/underlying-logos`.
+ *
+ * A Thai row is theme, tickers and terms — it has never carried artwork, so
+ * every surface that draws one next to a global product (Order Management's
+ * cards and tables) had half its rows blank. These are the same kind of
+ * stand-in the global desk's fixtures use, in the same size and format: 80×80
+ * Unsplash photographs, one per ticker rather than ten shared among
+ * forty-two, so no two unrelated underlyings wear the same picture.
+ *
+ * Derived from the ticker rather than listed per theme, because tickers repeat
+ * across themes — QCOM US is in both "Chips" and "Semiconductor", and one
+ * mapping is what keeps them the same picture in both.
+ *
+ * The files are committed; `npm run logos` re-downloads them after a theme is
+ * added. Nothing here reaches the network at runtime.
+ */
+function underlyingLogo(ticker: string): string {
+  // "NVDA US" → "nvda" — the ticker without its exchange suffix, which is what
+  // `scripts/generate-underlying-logos.mjs` names the files after.
+  const slug = ticker.split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return `/underlying-logos/${slug}.jpg`;
+}
+
+/**
  * A Thai row in the shape the rest of the app reads a structured product in.
  *
  * This conversion already existed inside `ThaiStructuredProductDetail`, where
@@ -80,7 +104,8 @@ export function thaiBookableId(theme: string): string {
  * this product's currency".
  */
 export function toBookableProduct(p: ThaiStructuredProduct): StructuredProduct {
-  const underlying = [p.bbg1, p.bbg2, p.bbg3].filter(Boolean).join(" - ");
+  const tickers = [p.bbg1, p.bbg2, p.bbg3].filter(Boolean);
+  const underlying = tickers.join(" - ");
   return {
     id: thaiBookableId(p.theme),
     underlying,
@@ -90,7 +115,8 @@ export function toBookableProduct(p: ThaiStructuredProduct): StructuredProduct {
     strike: p.strike,
     ki: p.kiBarrier,
     tags: [],
-    logos: [],
+    // One per underlying, the same rule the global fixtures follow.
+    logos: tickers.map(underlyingLogo),
     offerDate: "-",
     couponPeriod: "-",
     detailTenor: `${p.tenor} เดือน`,

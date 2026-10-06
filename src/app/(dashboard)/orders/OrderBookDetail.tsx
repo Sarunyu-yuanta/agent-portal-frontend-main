@@ -22,12 +22,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   ArrowLeftIcon,
   CaretRightIcon,
   CheckCircleIcon,
-  ClockCounterClockwiseIcon,
   PaperPlaneTiltIcon,
   PlusIcon,
   ReceiptIcon,
@@ -49,10 +48,13 @@ import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
 import { getClientProfile } from "@/data/client-profiles";
 import { useClients } from "@/hooks/use-api";
+import { usePopover } from "@/hooks/use-popover";
+import { useSectionBack } from "@/hooks/use-section-back";
 import { useToasts } from "@/hooks/use-toasts";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { Booking, OrderBook, OrderLogEntry, OrderSubmission } from "@/types/domain";
+import { setQueryState, withQuery } from "@/lib/query-state";
+import type { Booking, OrderBook, OrderSubmission } from "@/types/domain";
 import { catalogHrefFor, type BookableProduct } from "./bookable-products";
 import {
   CLOSED_TAG,
@@ -65,6 +67,7 @@ import { BookingDetailModal } from "./BookingDetailModal";
 import {
   BOOK_STATUS_LABEL_TH,
   BOOK_STATUS_VARIANT,
+  SUBMISSION_TAG,
   formatLogTime,
   bookRounds,
   formatOrderAmount,
@@ -72,9 +75,49 @@ import {
   type BookRound,
 } from "./order-book";
 import { OrderBookingModal } from "./OrderBookingModal";
+import { ProductLogos } from "./ProductLogos";
+import { SubmissionDetailModal } from "./SubmissionDetailModal";
 import { useRosterReadiness } from "./use-order-books";
 
-type View = "bookings" | "orders" | "log";
+/**
+ * Two lists, because a book holds two kinds of thing: the bookings of the round
+ * being filled, and the orders already sent.
+ *
+ * There used to be a third, "ประวัติ" — the book's log as a timeline. It was
+ * dropped because every line in it was already on one of these two, in more
+ * detail: a booking with its four checks, an order with its reference and
+ * answer. The one thing it alone carried was the trail of requirement requests
+ * sent to clients, which the header bell announces and the booking form shows
+ * the current state of. `buildLogs` stays — the list pages still read the
+ * newest entry as a book's "last activity".
+ */
+type View = "bookings" | "orders";
+
+const VIEWS: View[] = ["bookings", "orders"];
+
+/**
+ * Which list is open, in the URL rather than in state.
+ *
+ * Same rule as every other tab in this app (see `lib/query-state`), and it is
+ * what lets a row on the "คำสั่งซื้อรอผล" tab link straight to the order it
+ * names instead of landing on the booking list and asking the reader to find
+ * it. `replace`, because a sub-tab is a refinement — the back button should
+ * leave the book, not step back through every tab looked at inside it.
+ */
+function useBookView(): [View, (next: View) => void] {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const requested = searchParams.get("view") as View | null;
+  const view = requested && VIEWS.includes(requested) ? requested : "bookings";
+  return [
+    view,
+    (next) =>
+      setQueryState(
+        withQuery(pathname, searchParams, { view: next === "bookings" ? null : next }),
+        "replace",
+      ),
+  ];
+}
 
 export function OrderBookDetail({
   book,
@@ -83,17 +126,19 @@ export function OrderBookDetail({
   book: OrderBook;
   product: BookableProduct;
 }) {
-  const router = useRouter();
+  const back = useSectionBack(() => "/orders");
   const { submitOrder } = useOrders();
   const { toasts, addToast, removeToast } = useToasts();
   const clients = useClients();
   const readiness = useRosterReadiness(clients, product);
-  const [view, setView] = useState<View>("bookings");
+  const [view, setView] = useBookView();
   const [bookingOpen, setBookingOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sending, setSending] = useState(false);
   // By id, so a cancel from inside the modal shows in it straight away.
   const [openId, setOpenId] = useState<string | null>(null);
+  // The sent order opened from "รอบก่อนหน้า", by id for the same reason.
+  const [openSubmissionId, setOpenSubmissionId] = useState<string | null>(null);
 
   const notice = (message: string, status: ToastStatus) => addToast({ message, status });
 
@@ -102,7 +147,6 @@ export function OrderBookDetail({
   // and an empty one under a "สำเร็จ" tag reads as a contradiction.
   const round = headlineRound(book);
   const shortfall = Math.max(0, book.targetAmount - book.bookedAmount);
-  const holders = new Set(round.bookings.map((b) => b.clientId)).size;
   const hasOpen = book.openBookings.length > 0;
   const canSubmit = book.status === "ready";
   const opened = book.allBookings.find((b) => b.id === openId) ?? null;
@@ -134,12 +178,20 @@ export function OrderBookDetail({
         <Button
           variant="plain"
           size="icon-sm"
-          onClick={() => router.push("/orders")}
+          // Back to the list *as it was* — tab, product chip and layout. A book
+          // is now reached from three different tabs, and a hardcoded "/orders"
+          // dropped an IC who opened an order from "คำสั่งซื้อรอผล" back onto
+          // the booking tab. Same trail the breadcrumb is built from.
+          onClick={back}
           aria-label="กลับไป Order Management"
           className="shrink-0"
         >
           <ArrowLeftIcon size={20} />
         </Button>
+        {/* Beside the title rather than above it: the header is one line on a
+            phone, and the strip is how the deal is recognised in the catalogue
+            and on the list this page was opened from. */}
+        <ProductLogos logos={book.logos} className="hidden sm:flex" />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <h1 className="type-h6 truncate font-bold text-foreground">{book.productName}</h1>
           {/* Which desk, and a way back to the product the deal is written on —
@@ -228,8 +280,16 @@ export function OrderBookDetail({
             </p>
           )}
 
-          <dl className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-[#f3f4f6]">
-            <Figure label="ลูกค้าที่จอง" value={`${holders} ราย`} />
+          {/* No `overflow-hidden`: the holders row hangs a popover out of this
+              panel, and clipping it to the panel's rounded corners cut the
+              names off. The rows carry no background of their own, so there is
+              nothing left for it to clip. */}
+          <dl className="flex flex-col divide-y divide-border rounded-xl bg-[#f3f4f6]">
+            <HoldersFigure
+              bookings={round.bookings}
+              currency={book.currency}
+              round={round.number}
+            />
             <Figure label="ขั้นต่ำต่อราย" value={formatOrderAmount(book.minTicket, book.currency)} />
           </dl>
 
@@ -261,12 +321,17 @@ export function OrderBookDetail({
             >
               {/* The disabled label says what is missing rather than repeating
                   the action — the shortfall is the only version of "you can't"
-                  the IC can act on. */}
+                  the IC can act on. It is only ever shown when there *is* one:
+                  while an in-flight order could mask a full open round, this
+                  branch was reached with nothing missing and read
+                  "ยังขาด 0 USD". */}
               {canSubmit
                 ? "ส่งคำสั่งซื้อ"
                 : !hasOpen
                   ? "ยังไม่มีรายการจองใหม่"
-                  : `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`}
+                  : shortfall > 0
+                    ? `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`
+                    : "ส่งคำสั่งซื้อ"}
             </Button>
             <Button
               variant={canSubmit ? "outline" : "primary"}
@@ -284,7 +349,7 @@ export function OrderBookDetail({
           <PastRounds
             rounds={pastRounds}
             currency={book.currency}
-            onOpen={() => setView("orders")}
+            onOpen={setOpenSubmissionId}
           />
         )}
         </div>
@@ -300,7 +365,6 @@ export function OrderBookDetail({
                   title: "คำสั่งซื้อ",
                   notification: book.submissions.length || undefined,
                 },
-                { id: "log", title: "ประวัติ" },
               ]}
               activeId={view}
               onChange={(id) => setView(id as View)}
@@ -316,7 +380,6 @@ export function OrderBookDetail({
             />
           )}
           {view === "orders" && <SubmissionsPanel book={book} />}
-          {view === "log" && <LogPanel logs={book.logs} />}
         </div>
       </div>
 
@@ -339,6 +402,12 @@ export function OrderBookDetail({
         product={product}
         onClose={() => setBookingOpen(false)}
         onNotice={notice}
+      />
+
+      <SubmissionDetailModal
+        submission={book.submissions.find((s) => s.id === openSubmissionId) ?? null}
+        book={book}
+        onClose={() => setOpenSubmissionId(null)}
       />
 
       <ResponsiveBottomSheetModal
@@ -399,9 +468,93 @@ function Figure({ label, value }: { label: string; value: string }) {
 }
 
 /**
+ * "ลูกค้าที่จอง · N ราย", with the names behind a hover.
+ *
+ * The count is the figure the summary needs; the names are the question it
+ * raises, and they are already a click away in the booking list — so they
+ * belong in a hover rather than in a row of their own, which would push the
+ * send button below the fold on a laptop.
+ *
+ * Hover *and* click, via the project's own `usePopover`: a hover-only panel is
+ * unreachable on a touch screen, and the hook's short close delay is what lets
+ * the pointer travel from the row into the panel without it vanishing.
+ *
+ * Grouped by client, because one client can book twice into the same round —
+ * listing them as two rows would disagree with the "N ราย" the trigger shows.
+ */
+function HoldersFigure({
+  bookings,
+  currency,
+  round,
+}: {
+  bookings: Booking[];
+  currency: string;
+  /** Which round the list belongs to — the panel says so, the row cannot. */
+  round: number;
+}) {
+  const { isPrivate } = usePrivacy();
+  const { open, setOpen, ref, hoverProps } = usePopover();
+
+  const holders = Array.from(
+    bookings
+      .reduce((byClient, b) => {
+        const seen = byClient.get(b.clientId);
+        byClient.set(b.clientId, {
+          clientId: b.clientId,
+          clientName: b.clientName,
+          amount: (seen?.amount ?? 0) + b.amount,
+        });
+        return byClient;
+      }, new Map<string, { clientId: string; clientName: string; amount: number }>())
+      .values(),
+  ).sort((a, b) => b.amount - a.amount);
+
+  return (
+    <div
+      ref={ref}
+      {...hoverProps}
+      className="relative flex items-baseline justify-between gap-3 px-4 py-3"
+    >
+      <dt className="type-body-2 text-muted-foreground">ลูกค้าที่จอง</dt>
+      <dd>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((prev) => !prev)}
+          className="type-body-2 cursor-pointer tabular-nums !font-semibold text-foreground underline decoration-dotted decoration-from-font underline-offset-4"
+        >
+          {holders.length} ราย
+        </button>
+      </dd>
+
+      {open && holders.length > 0 && (
+        // Anchored to this row's right edge: the summary column sits against
+        // the viewport's, and a left-anchored panel ran off it.
+        <div className="absolute right-4 top-full z-50 mt-1 w-[260px] overflow-hidden rounded-xl border border-border bg-white shadow-xl">
+          <p className="px-4 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            ลูกค้าในรอบที่ {round}
+          </p>
+          <ul className="flex max-h-[220px] flex-col divide-y divide-border overflow-y-auto">
+            {holders.map((h) => (
+              <li key={h.clientId} className="flex items-baseline gap-2 px-4 py-2">
+                <span className="type-caption min-w-0 flex-1 truncate text-foreground">
+                  {h.clientId} - {maskName(h.clientName, isPrivate)}
+                </span>
+                <span className="type-caption shrink-0 !font-semibold tabular-nums text-foreground">
+                  {formatOrderAmount(h.amount, currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
  * The rounds already sent, newest first — so a book on round 2 still says it
- * has sent before, and how that went. Each opens the orders tab, where the
- * order's own bookings are listed.
+ * has sent before, and how that went. Each opens that order on its own.
  */
 function PastRounds({
   rounds,
@@ -410,7 +563,7 @@ function PastRounds({
 }: {
   rounds: BookRound[];
   currency: string;
-  onOpen: () => void;
+  onOpen: (submissionId: string) => void;
 }) {
   return (
     <section className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm">
@@ -422,7 +575,8 @@ function PastRounds({
             <li key={r.number}>
               <button
                 type="button"
-                onClick={onOpen}
+                onClick={() => onOpen(r.submission!.id)}
+                aria-label={`ดูรายละเอียดคำสั่งซื้อรอบที่ ${r.number}`}
                 className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--fill-gray-200)]"
               >
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -613,15 +767,6 @@ function SubmissionsPanel({ book }: { book: OrderBook }) {
   );
 }
 
-const SUBMISSION_TAG: Record<
-  OrderSubmission["status"],
-  { text: string; variant: "blue" | "green" | "red" }
-> = {
-  processing: { text: "กำลังดำเนินการ", variant: "blue" },
-  completed: { text: "สำเร็จ", variant: "green" },
-  rejected: { text: "ถูกปฏิเสธ", variant: "red" },
-};
-
 function SubmissionRow({
   submission,
   book,
@@ -671,60 +816,5 @@ function SubmissionRow({
         </span>
       </div>
     </li>
-  );
-}
-
-const LOG_DOT: Record<OrderLogEntry["action"], string> = {
-  "booking-created": "bg-[var(--fill-blue-500)]",
-  "booking-cancelled": "bg-[var(--fill-gray-400)]",
-  "requirement-sent": "bg-[var(--fill-yellow-500)]",
-  "requirement-completed": "bg-[var(--fill-green-500)]",
-  "order-submitted": "bg-[var(--fill-blue-600)]",
-  "order-completed": "bg-[var(--fill-green-600)]",
-  "order-rejected": "bg-[var(--fill-red-600)]",
-};
-
-/**
- * The book's history as a timeline, newest first.
- *
- * Every line is derived (see `buildLogs`), so this is a view of the same
- * bookings and submissions the other two tabs show rather than a second record
- * that could drift from them.
- */
-function LogPanel({ logs }: { logs: OrderLogEntry[] }) {
-  if (logs.length === 0) {
-    return (
-      <EmptyState
-        icon={
-          <ClockCounterClockwiseIcon size={40} className="text-[var(--text-default-placeholder)]" />
-        }
-        title="ยังไม่มีประวัติ"
-        body="ทุกการจอง การส่งคำขอข้อมูล และคำสั่งซื้อของสินค้านี้จะถูกบันทึกไว้ที่นี่"
-      />
-    );
-  }
-
-  return (
-    <ol className="flex flex-col overflow-hidden rounded-[8px] border border-border bg-card shadow-sm">
-      {logs.map((entry, i) => (
-        <li key={entry.id} className="flex gap-3 px-4 py-3">
-          <div className="flex flex-col items-center gap-1 pt-1.5">
-            <span className={`size-2 shrink-0 rounded-full ${LOG_DOT[entry.action]}`} />
-            {/* The connector stops at the last row rather than trailing into
-                nothing — a timeline that ends in a line reads as truncated. */}
-            {i < logs.length - 1 && <span className="w-px flex-1 bg-border" />}
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
-            <p className="type-body-2 leading-snug text-foreground">{entry.summary}</p>
-            {entry.detail && (
-              <p className="type-caption leading-snug text-muted-foreground">{entry.detail}</p>
-            )}
-            <p className="type-caption text-muted-foreground/70">
-              {formatLogTime(entry.at)} · {entry.actor}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ol>
   );
 }
