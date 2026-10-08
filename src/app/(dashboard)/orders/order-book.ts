@@ -9,6 +9,7 @@
 
 import type {
   Booking,
+  CreditStatus,
   OrderBook,
   OrderBookStatus,
   OrderLogEntry,
@@ -78,25 +79,19 @@ export function cashInCurrency(cashThb: number, currency: string): number {
 
 const sum = (rows: Booking[]) => rows.reduce((total, b) => total + b.amount, 0);
 
+/** A booking's funds check; seeded bookings predate it and read as funded. */
+export const creditOf = (booking: Booking): CreditStatus => booking.credit ?? "sufficient";
+
 /**
- * Which state the book is in — **the open round's state, whenever there is
- * one**.
+ * Which step the product is at — see {@link OrderBookStatus} for the steps.
  *
- * Rounds are independent: an order already with the back office carries its own
- * bookings, its own reference and its own answer, and nothing about it changes
- * what the round being filled now needs. So an order in flight must not speak
- * for the book. It used to: `processing` was tested first, which meant a round
- * collected to 100% while the previous order was out showed a blue
- * "กำลังดำเนินการ" tag, a disabled send button reading "ยังขาด 0 USD", and
- * bookings tagged "รอครบยอด" on a round that was full. The book was describing
- * two rounds at once with one word.
+ * Before anything is sent the step is read off the bookings: short of the
+ * target is still booking; at the target, it waits until every booking's funds
+ * check has come back sufficient, and only then can the IC send. One
+ * insufficient booking holds the whole product at the check until the IC
+ * cancels it and books someone else in its place.
  *
- * The order in flight is still on the book — as {@link OrderBook.pendingOrders}
- * — so every surface can show it *beside* this status rather than instead of
- * it.
- *
- * With no open round there is nothing to collect, and the last order is the
- * only thing left to report.
+ * Once sent, the order's own state is the step.
  */
 function bookStatus(
   open: Booking[],
@@ -104,13 +99,11 @@ function bookStatus(
   target: number,
   latest: OrderSubmission | undefined,
 ): OrderBookStatus {
-  if (open.length > 0) return openAmount >= target ? "ready" : "collecting";
   if (latest?.status === "processing") return "processing";
   if (latest?.status === "completed") return "completed";
   if (latest?.status === "rejected") return "rejected";
-  // No bookings and nothing sent — a book that exists only because a
-  // requirement request was sent against the product.
-  return "collecting";
+  if (openAmount < target) return "collecting";
+  return open.every((b) => creditOf(b) === "sufficient") ? "ready" : "checking";
 }
 
 /**
@@ -259,12 +252,23 @@ export function assembleOrderBook(
 
 // ── Presentation ─────────────────────────────────────────────────────────────
 
+/** The steps, in the order a product moves through them — the page's filter chips. */
+export const BOOK_STEPS: OrderBookStatus[] = [
+  "collecting",
+  "checking",
+  "ready",
+  "processing",
+  "completed",
+  "rejected",
+];
+
 export const BOOK_STATUS_LABEL_TH: Record<OrderBookStatus, string> = {
-  collecting: "กำลังรวบรวมยอด",
-  ready: "ครบยอด รอส่งคำสั่งซื้อ",
-  processing: "กำลังดำเนินการ",
-  completed: "คำสั่งซื้อสำเร็จ",
-  rejected: "คำสั่งซื้อถูกปฏิเสธ",
+  collecting: "ยืนยันการจองซื้อ",
+  checking: "รอตรวจสอบวงเงิน",
+  ready: "มีวงเงินเพียงพอ",
+  processing: "ยืนยันรับคำสั่งซื้อ",
+  completed: "รับคำสั่งซื้อสำเร็จ",
+  rejected: "ยกเลิก",
 };
 
 /**
@@ -279,6 +283,7 @@ export const BOOK_STATUS_VARIANT: Record<
   "blue" | "green" | "yellow" | "red" | "gray"
 > = {
   collecting: "gray",
+  checking: "yellow",
   ready: "green",
   processing: "blue",
   completed: "green",
@@ -300,6 +305,31 @@ export const SUBMISSION_TAG: Record<
   completed: { text: "สำเร็จ", variant: "green" },
   rejected: { text: "ถูกปฏิเสธ", variant: "red" },
 };
+
+/**
+ * Whether the product still takes bookings.
+ *
+ * A product is booked once: filled and sent as one order. From the moment that
+ * order goes downstream nothing more can be booked — while the back office is
+ * still working on it the product reads "กำลังดำเนินการ", and once it answers
+ * the book is {@link isBookClosed closed}.
+ */
+export function isBookingOpen(book: Pick<OrderBook, "submissions">): boolean {
+  return book.submissions.length === 0;
+}
+
+/**
+ * Whether the back office has answered the product's order — the point at which
+ * the product leaves the catalogue (see `useClosedProductIds`).
+ *
+ * Not at sending: an order still in flight keeps its product listed, just no
+ * longer bookable. Rejected counts as answered — a rejection is the outcome of
+ * this deal, and re-opening it would bring back the repeat booking this rule
+ * replaced.
+ */
+export function isBookClosed(book: Pick<OrderBook, "submissions">): boolean {
+  return book.submissions.some((s) => s.status !== "processing");
+}
 
 /** How full the book is, capped at 100 so an over-subscribed bar stays a bar. */
 export function bookProgressPct(book: OrderBook): number {
@@ -357,76 +387,6 @@ export function headlineRound(book: OrderBook): {
     previousRef: null,
     number: book.submissions.length + 1,
     confirmed: 0,
-  };
-}
-
-/** One fill-and-send cycle of a book. */
-export type BookRound = {
-  /** 1-based, oldest first. */
-  number: number;
-  /** The order this round went out as; `null` for the round still open. */
-  submission: OrderSubmission | null;
-  /** Every booking placed in this round, cancelled ones included. */
-  bookings: Booking[];
-  /** Sum of the live bookings. */
-  amount: number;
-};
-
-/**
- * A book split into its rounds, **newest first**.
- *
- * A book can be filled and sent more than once — each send is a new order on
- * the same product — so a round is one submission and the bookings it carried,
- * plus the open round: every booking no submission has carried yet. Cancelled
- * bookings are never sent, so they always sit in the open round; that is where
- * they were cancelled from.
- *
- * The open round is listed only when something is in it — a book whose last
- * order has just gone out has no round 2 until someone books into one.
- */
-export function bookRounds(book: OrderBook): BookRound[] {
-  const sent = [...book.submissions].reverse(); // oldest first
-  const carried = new Set(sent.flatMap((s) => s.bookingIds));
-  const rounds: BookRound[] = sent.map((submission, i) => {
-    const rows = book.allBookings.filter((b) => submission.bookingIds.includes(b.id));
-    return { number: i + 1, submission, bookings: rows, amount: sum(rows) };
-  });
-
-  const open = book.allBookings.filter((b) => !carried.has(b.id));
-  if (open.length > 0) {
-    rounds.push({
-      number: sent.length + 1,
-      submission: null,
-      bookings: open,
-      amount: sum(open.filter((b) => b.status !== "cancelled")),
-    });
-  }
-  return rounds.reverse();
-}
-
-/** Which round a booking belongs to — see {@link bookRounds}. */
-export function roundNumberOf(book: OrderBook, bookingId: string): number {
-  const index = book.submissions.findIndex((s) => s.bookingIds.includes(bookingId));
-  // `submissions` is newest first, so index 0 is the latest round.
-  return index === -1 ? book.submissions.length + 1 : book.submissions.length - index;
-}
-
-/** Which round an order was: 1 is the first order the book sent. */
-export function roundOfSubmission(book: OrderBook, submissionId: string): number {
-  const index = book.submissions.findIndex((s) => s.id === submissionId);
-  return index === -1 ? book.submissions.length : book.submissions.length - index;
-}
-
-/** The bookings an order carried, cancelled ones included, and their total. */
-export function submissionRows(
-  book: OrderBook,
-  submission: OrderSubmission,
-): { rows: Booking[]; amount: number; holders: number } {
-  const rows = book.allBookings.filter((b) => submission.bookingIds.includes(b.id));
-  return {
-    rows,
-    amount: sum(rows),
-    holders: new Set(rows.map((b) => b.clientId)).size,
   };
 }
 

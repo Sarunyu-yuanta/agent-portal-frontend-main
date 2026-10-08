@@ -38,7 +38,7 @@ import {
 } from "@/lib/nav-memory";
 
 /**
- * What the firm puts in front of you: clients, products, research. Shared,
+ * What the firm puts in front of you: clients and research. Shared,
  * read-mostly, and none of it authored here.
  */
 const workspaceItems: NavItem[] = [
@@ -57,13 +57,6 @@ const workspaceItems: NavItem[] = [
     badge: null,
   },
   {
-    href: "/product-catalog",
-    section: "product-catalog",
-    label: "Product Catalog",
-    icon: SquaresFourIcon,
-    badge: null,
-  },
-  {
     href: "/insights",
     section: "insights",
     label: "Insights",
@@ -77,10 +70,25 @@ const workspaceItems: NavItem[] = [
     icon: MegaphoneIcon,
     badge: null,
   },
-  // Sits under Product Catalog's neighbours rather than in Planner: a book is
-  // the firm's deal being filled, not something the advisor wrote down. Gated
-  // because the whole flow is (see `lib/feature-flags`); with the flag off the
-  // entry goes and `/orders` redirects to the catalogue.
+];
+
+/**
+ * Selling: finding the product, then booking clients into it and following the
+ * order through. One flow in two places, so they sit together rather than
+ * among Workspace's read-only surfaces.
+ *
+ * Order Management is gated because the whole booking flow is (see
+ * `lib/feature-flags`); with the flag off the entry goes, `/orders` redirects
+ * to the catalogue, and the section is the catalogue alone.
+ */
+const salesItems: NavItem[] = [
+  {
+    href: "/product-catalog",
+    section: "product-catalog",
+    label: "Product Catalog",
+    icon: SquaresFourIcon,
+    badge: null,
+  },
   ...(ORDER_BOOKING_ENABLED
     ? [
         {
@@ -329,6 +337,12 @@ export function AppSidebar({
         <NavSection
           label="Workspace"
           items={workspaceItems}
+          collapsed={collapsed}
+          onNavigate={onClose}
+        />
+        <NavSection
+          label="Sales"
+          items={salesItems}
           collapsed={collapsed}
           onNavigate={onClose}
         />

@@ -11,7 +11,12 @@ import {
   cellBorderStyle,
   headerBorderStyle,
 } from "./fixed-income-shared";
-import { THAI_STRUCTURED_PRODUCTS } from "./thai-structured-data";
+import { THAI_STRUCTURED_PRODUCTS, thaiBookableId } from "./thai-structured-data";
+import { HourglassMediumIcon } from "@phosphor-icons/react";
+import {
+  useOpenProducts,
+  useProcessingProductIds,
+} from "@/app/(dashboard)/orders/use-order-books";
 import type { ThaiStructuredProduct } from "./thai-structured-data";
 
 const MIN_WIDTH = "min-w-[1290px]";
@@ -76,6 +81,7 @@ function TableRow({
   href?: string;
 }) {
   const border = cellBorderStyle({ bottom: !isLast });
+  const processing = useProcessingProductIds().has(thaiBookableId(row.theme));
   const interactive = Boolean(onRowClick || href);
   const hoverHandlers = interactive
     ? {
@@ -102,6 +108,14 @@ function TableRow({
         className={`text-sm ${col.sticky || col.accent ? "font-bold " : ""}leading-5 ${col.accent ? "text-[#0a6ee7]" : "text-[#101828]"} whitespace-nowrap`}
       >
         {row[col.key]}
+        {/* Same tag the global desk's cards carry — under the theme, the one
+            column always on screen. */}
+        {col.key === "theme" && processing && (
+          <span className="mt-0.5 flex w-fit items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5 text-[9px] font-normal leading-[14px] text-[#101828]">
+            <HourglassMediumIcon size={12} weight="fill" color="#2b7fff" />
+            กำลังดำเนินการสั่งซื้อ
+          </span>
+        )}
       </span>
     </div>
   ));
@@ -130,13 +144,16 @@ function TableRow({
 
 export function ThaiStructuredProductTable({
   onRowClick,
-  products = THAI_STRUCTURED_PRODUCTS,
+  products: allProducts = THAI_STRUCTURED_PRODUCTS,
   getRowHref,
 }: {
   onRowClick?: (row: ThaiStructuredProduct) => void;
   products?: ThaiStructuredProduct[];
   getRowHref?: (row: ThaiStructuredProduct) => string;
 } = {}) {
+  // A theme whose order has gone out is no longer offered; the rows behind it
+  // move up, and the page count follows.
+  const products = useOpenProducts(allProducts, (p) => thaiBookableId(p.theme));
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const headerScrollRef = useRef<HTMLDivElement>(null);

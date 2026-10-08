@@ -14,6 +14,7 @@ import {
   INVESTMENT_SOLUTION_DETAIL_PRODUCTS,
   type StructuredProduct,
 } from "./structured-product-data";
+import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
 
 function HeroImageContent({
   src,
@@ -348,7 +349,7 @@ export function InvestmentSolutionDetail({
   onBack: () => void;
   onProductSelect: (product: StructuredProduct) => void;
 }) {
-  const products = INVESTMENT_SOLUTION_DETAIL_PRODUCTS;
+  const products = useOpenProducts(INVESTMENT_SOLUTION_DETAIL_PRODUCTS, (p) => p.id);
 
   useEffect(() => {
     const main = document.querySelector("main");

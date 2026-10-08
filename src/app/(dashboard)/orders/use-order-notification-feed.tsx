@@ -141,8 +141,8 @@ export function useOrderNotificationFeed() {
         0,
         `/orders/${encodeURIComponent(book.productId)}`,
         {
-          title: `${book.productName} ครบยอดแล้ว`,
-          description: `จองครบ ${formatOrderAmount(book.bookedAmount, book.currency)} — ส่งคำสั่งซื้อได้`,
+          title: `${book.productName} มีวงเงินเพียงพอ`,
+          description: `จองครบ ${formatOrderAmount(book.bookedAmount, book.currency)} และวงเงินผ่านครบทุกราย — ส่งคำสั่งซื้อได้`,
           time: "",
           icon: iconFor("blue", <PaperPlaneTiltIcon size={15} weight="fill" />),
         },

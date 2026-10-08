@@ -27,8 +27,7 @@ export default function OrderBookPage({
   // the hook order.
   if (!ORDER_BOOKING_ENABLED) redirect("/product-catalog");
   return (
-    // The open list lives in `?view=` so an order row on `/orders` can link
-    // straight to it, and `useSearchParams` suspends.
+    // The skeleton doubles as the loading state while the route resolves.
     <Suspense fallback={<OrderBookDetailSkeleton />}>
       <OrderBookPageInner params={params} />
     </Suspense>

@@ -47,6 +47,7 @@ import { IC_NAME, IC_TEAM } from "@/lib/current-ic";
 import { formatThbAmount, getInitial, parseAmount } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import type {
+  Booking,
   Client,
   ClientReadiness,
   RequirementItem,
@@ -57,8 +58,9 @@ import {
   cashInCurrency,
   clientCashThb,
   formatOrderAmount,
+  isBookClosed,
+  isBookingOpen,
   minTicketFor,
-  roundOfSubmission,
   USD_THB,
 } from "./order-book";
 import { requestableKeys } from "./order-requirements";
@@ -69,12 +71,15 @@ export function OrderBookingModal({
   product,
   onClose,
   onNotice,
+  onBooked,
 }: {
   open: boolean;
   product: BookableProduct;
   onClose: () => void;
   /** The host owns the toast stack — a booking closes this, taking its DOM. */
   onNotice: (message: string, status: ToastStatus) => void;
+  /** After a booking lands — the product page uses it to show the new row. */
+  onBooked?: (booking: Booking) => void;
 }) {
   /**
    * The chosen customer lives here rather than in the form, because the back
@@ -116,6 +121,7 @@ export function OrderBookingModal({
         onClientChange={setClientId}
         onClose={onClose}
         onNotice={onNotice}
+        onBooked={onBooked}
       />
     </ResponsiveBottomSheetModal>
   );
@@ -142,12 +148,14 @@ function BookingForm({
   onClientChange: setClientId,
   onClose,
   onNotice,
+  onBooked: onBookedProp,
 }: {
   product: BookableProduct;
   clientId: string;
   onClientChange: (id: string) => void;
   onClose: () => void;
   onNotice: (message: string, status: ToastStatus) => void;
+  onBooked?: (booking: Booking) => void;
 }) {
   const clients = useClients();
   const { isPrivate } = usePrivacy();
@@ -258,15 +266,17 @@ function BookingForm({
         onBooked={async (amount) => {
           if (!client) return;
           setBooking(true);
-          await bookOrder({
+          const placed = await bookOrder({
             productId: product.id,
             clientId: client.id,
             clientName: client.name,
             amount,
             checks: readiness.items,
+            fundsAvailable: cashInCurrency(clientCashThb(client), product.currency),
           });
           setBooking(false);
           onClose();
+          onBookedProp?.(placed);
           onNotice(
             `จอง ${formatOrderAmount(amount, product.currency)} ให้ ${maskName(client.name, isPrivate)} แล้ว`,
             "success",
@@ -814,16 +824,36 @@ export function ReadOnlyField({ label, value }: { label: string; value: string }
  * passed, and a 100,000 book took another 500,000 under a helper line still
  * reading "ยังจองได้ 0 USD".
  */
+/** Anything in the field besides digits and the commas it groups them with. */
+const hasNonDigit = (raw: string) => /[^0-9,]/.test(raw);
+
 function amountCheck(
   product: BookableProduct,
   remaining: number,
   raw: string,
-): { amount: number; full: boolean; tooSmall: boolean; tooBig: boolean; ok: boolean } {
-  const amount = parseAmount(raw);
+): {
+  amount: number;
+  full: boolean;
+  invalid: boolean;
+  tooSmall: boolean;
+  tooBig: boolean;
+  ok: boolean;
+} {
+  // Not a number at all: the size checks would be measuring whatever digits
+  // happened to be in it, so they stand down and this is the one error shown.
+  const invalid = hasNonDigit(raw);
+  const amount = invalid ? 0 : parseAmount(raw);
   const full = remaining <= 0;
   const tooSmall = amount > 0 && amount < minTicketFor(product);
   const tooBig = !full && amount > remaining;
-  return { amount, full, tooSmall, tooBig, ok: amount > 0 && !full && !tooSmall && !tooBig };
+  return {
+    amount,
+    full,
+    invalid,
+    tooSmall,
+    tooBig,
+    ok: !invalid && amount > 0 && !full && !tooSmall && !tooBig,
+  };
 }
 
 function AmountSection({
@@ -852,11 +882,12 @@ function AmountSection({
   const currency = product.currency;
   const minTicket = minTicketFor(product);
   const target = book?.targetAmount ?? 0;
-  const remaining = Math.max(0, target - (book?.bookedAmount ?? 0));
+  const sent = book ? !isBookingOpen(book) : false;
+  const remaining = sent ? 0 : Math.max(0, target - (book?.bookedAmount ?? 0));
 
   const cashThb = clientCashThb(client);
   const cashHere = cashInCurrency(cashThb, currency);
-  const { amount, full, tooSmall, tooBig } = amountCheck(product, remaining, raw);
+  const { amount, full, invalid, tooSmall, tooBig } = amountCheck(product, remaining, raw);
   /**
    * Two different reasons the amount is closed, and they do not stack: a client
    * who is short a document cannot book whatever the round's state, so that
@@ -864,37 +895,29 @@ function AmountSection({
    */
   const blocked = disabled || full;
 
-  // Cash is a warning, not a gate. `cashIdlePct` is idle cash in the portfolio,
-  // not the settlement account balance, and a client who intends to wire funds
-  // for a ticket is an ordinary case — blocking it would be the portal
-  // overruling the IC on a fact it doesn't have.
+  // Cash is a warning here, not a gate: the gate is the funds check every
+  // booking goes through afterwards (see `Booking.credit`), which holds the
+  // product before sending. Warning now saves the IC finding out from that.
   const overCash = !disabled && amount > 0 && amount > cashHere;
 
+  /**
+   * Digits are grouped with commas as they are typed. Anything else is kept
+   * exactly as typed rather than dropped — a key that silently did nothing read
+   * as a broken field — and the field flags it (see `amountCheck`) until it is
+   * fixed. Regrouping a value that is not a number would rewrite what the IC
+   * is looking at, so it is left alone.
+   */
   const setAmount = (next: string) => {
-    const digits = next.replace(/[^0-9]/g, "");
+    if (hasNonDigit(next)) {
+      onRawChange(next);
+      return;
+    }
+    const digits = next.replace(/,/g, "");
     onRawChange(digits ? Number(digits).toLocaleString("en-US") : "");
   };
 
   return (
     <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4">
-      {/* Which round this booking lands in, and whether an earlier one is still
-          out. A book is filled and sent over and over, and "ยังจองได้ 100,000"
-          means two different things depending on whether this is the first
-          round or the third — on its own it let an IC book into a new round
-          believing they were topping up the one they had just sent. */}
-      {book && (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-          <span className="type-body-2 !font-semibold text-foreground">
-            จองเข้ารอบที่ {book.submissions.length + 1}
-          </span>
-          {book.pendingOrders.length > 0 && (
-            <span className="type-caption text-muted-foreground">
-              รอบที่ {roundOfSubmission(book, book.pendingOrders[0].id)} ·{" "}
-              {book.pendingOrders[0].backendRef} · รอผลจากระบบหลังบ้าน
-            </span>
-          )}
-        </div>
-      )}
       {/* On top of the faded block it explains, and outside it so it stays at
           full strength — the one thing in this section that is not disabled. */}
       {disabled && (
@@ -903,13 +926,19 @@ function AmountSection({
           message={`ข้อมูลที่ต้องมีก่อนจองซื้อยังไม่ครบ (${passed}/${total}) จึงยังกรอกจำนวนเงินและจองซื้อไม่ได้`}
         />
       )}
-      {/* The round is full. Not an error on the amount — there is no amount
-          that would be right — so it closes the field the same way a missing
-          document does, and says what unlocks it. */}
+      {/* The deal is full, or already sent. Not an error on the amount — there
+          is no amount that would be right — so it closes the field the same way
+          a missing document does. A product is booked once: nothing reopens it. */}
       {!disabled && full && (
         <Alert
           status="information"
-          message={`รอบที่ ${(book?.submissions.length ?? 0) + 1} ครบยอด ${formatOrderAmount(target, currency)} แล้ว — ส่งคำสั่งซื้อรอบนี้ก่อน จึงจะเปิดรอบถัดไปให้จองได้`}
+          message={
+            !sent
+              ? `ครบยอด ${formatOrderAmount(target, currency)} แล้ว — ไม่สามารถจองเพิ่มได้`
+              : book && isBookClosed(book)
+                ? `ส่งคำสั่งซื้อของ ${product.underlying} แล้ว — สินค้านี้ปิดรับจอง`
+                : `คำสั่งซื้อของ ${product.underlying} กำลังดำเนินการที่ระบบหลังบ้าน — ไม่สามารถจองเพิ่มได้`
+          }
           multiline
         />
       )}
@@ -932,12 +961,14 @@ function AmountSection({
             inputMode="numeric"
             disabled={blocked}
             forceState={
-              blocked ? "disabled" : tooSmall || tooBig ? "error" : "default"
+              blocked ? "disabled" : invalid || tooSmall || tooBig ? "error" : "default"
             }
             errorMessage={
-              tooSmall
-                ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
-                : `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
+              invalid
+                ? "กรอกได้เฉพาะตัวเลข 0–9 เท่านั้น"
+                : tooSmall
+                  ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
+                  : `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
             }
             // The deal's total is deliberately left off: the sentence under this
             // section already names it, and repeating it here is what pushed the
@@ -965,7 +996,7 @@ function AmountSection({
         {overCash && (
           <Alert
             status="warning"
-            message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — ยืนยันแหล่งเงินกับลูกค้าก่อนส่งคำสั่งซื้อ"
+            message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — การจองนี้จะไม่ผ่านการตรวจสอบวงเงิน และต้องยกเลิกก่อนส่งคำสั่งซื้อ"
             multiline
           />
         )}
@@ -1001,10 +1032,10 @@ function Footer({
   onBooked: (amount: number) => void;
 }) {
   const { data: book } = useOrderBook(product.id);
-  const remaining = Math.max(
-    0,
-    (book?.targetAmount ?? 0) - (book?.bookedAmount ?? 0),
-  );
+  const remaining =
+    book && !isBookingOpen(book)
+      ? 0
+      : Math.max(0, (book?.targetAmount ?? 0) - (book?.bookedAmount ?? 0));
   const { amount, ok } = amountCheck(product, remaining, raw);
 
   // `ready` is checked here as well as on the amount section: a check can

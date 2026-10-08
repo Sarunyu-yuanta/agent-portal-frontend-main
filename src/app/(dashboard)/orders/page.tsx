@@ -10,78 +10,41 @@
  * the catalogue is empty.
  */
 
-import { Suspense, useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { ClipboardTextIcon, RowsIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { Button, Chip, TabGroup } from "@sarunyu/system-one";
+import { Button, Chip, Dropdown, SearchInput } from "@sarunyu/system-one";
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/empty-state";
-import { useStoredIds } from "@/hooks/use-stored-ids";
+import { usePrivacy } from "@/contexts/privacy-context";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
+import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
+import type { OrderBookStatus } from "@/types/domain";
 import { OrderBookCard } from "./OrderBookCard";
 import { OrderBookTable } from "./OrderBookTable";
-import { OrderSubmissionCard } from "./OrderSubmissionCard";
-import { OrderSubmissionTable } from "./OrderSubmissionTable";
 import { OrderBooksSkeleton } from "./OrderSkeletons";
-import { booksOf, entriesFor, orderRowsOf } from "./order-entries";
+import { BOOK_STATUS_LABEL_TH, BOOK_STEPS } from "./order-book";
 import { ViewToggle, type ViewOption } from "./ViewToggle";
 import { useOrderBooks } from "./use-order-books";
 
 /**
- * The three things an IC does here — and they are not three states of one
- * object.
+ * The steps a product moves through, as filter chips — see `OrderBookStatus`
+ * for what each means. One row per product throughout: a product is booked
+ * once and sent as one order, so there is never more than one thing about it to
+ * list.
  *
- * The first tab lists **products**: one row per book with a round still being
- * filled, because there is one open round on a book and one decision to make
- * about it. The other two list **orders**, one row each. A book that has sent
- * three rounds has three orders with three references and three answers, and
- * folding them into one row per product meant two of them were invisible here
- * and the third wore figures the reader could not attribute. See
- * `order-entries`.
- *
- * `collecting` and `ready` share the first tab because both are the IC's move —
- * one needs more clients, the other needs sending — and splitting them would
- * put the single most actionable state behind a tab that is empty most of the
- * time. The status tag on each card still tells them apart at a glance.
- *
- * ── Wording ──────────────────────────────────────────────────────────────────
- * The last two name the thing they list, because that is what they list: both
- * read "คำสั่งซื้อ …", the same word the book page's own tab uses for the same
- * object. They used to read "ส่งคำสั่งซื้อแล้ว" and "เสร็จสิ้น" — a past-tense
- * action beside a bare state, neither saying what was finished — which was left
- * over from when both tabs listed products rather than orders.
- *
- * The first keeps "จอง" rather than joining them: it lists books being filled,
- * not orders, and "รายการจอง" inside a book is the same word for the same
- * thing.
+ * A fixed list rather than one built from the books on screen, so a chip does
+ * not vanish the moment its last product moves on.
  */
-const TABS: { id: string; title: string; empty: { title: string; body: string } }[] = [
-  {
-    id: "open",
-    title: "กำลังดำเนินการจอง",
-    empty: {
-      title: "ยังไม่มีรายการที่กำลังจอง",
-      body: "เริ่มจองให้ลูกค้าได้จากหน้าสินค้าใน Product Catalog — การจองจะมารวมกันที่นี่",
-    },
-  },
-  {
-    id: "sent",
-    title: "คำสั่งซื้อรอผล",
-    empty: {
-      title: "ยังไม่มีคำสั่งซื้อที่รอผล",
-      body: "เมื่อรอบไหนครบยอดและส่งเข้าระบบหลังบ้านแล้ว คำสั่งซื้อใบนั้นจะมารออยู่ที่นี่",
-    },
-  },
-  {
-    id: "done",
-    title: "คำสั่งซื้อเสร็จสิ้น",
-    empty: {
-      title: "ยังไม่มีคำสั่งซื้อที่เสร็จสิ้น",
-      body: "คำสั่งซื้อที่ระบบหลังบ้านตอบกลับแล้ว ทั้งที่สำเร็จและถูกปฏิเสธ จะอยู่ที่นี่",
-    },
-  },
+const STEPS: { id: OrderBookStatus | "all"; label: string; empty: string }[] = [
+  { id: "all", label: "All", empty: "ยังไม่มีรายการจองซื้อ" },
+  ...BOOK_STEPS.map((id) => ({
+    id,
+    label: BOOK_STATUS_LABEL_TH[id],
+    empty: `ไม่มีรายการที่อยู่ในขั้น "${BOOK_STATUS_LABEL_TH[id]}"`,
+  })),
 ];
 
 /**
@@ -107,11 +70,15 @@ const TABS: { id: string; title: string; empty: { title: string; body: string } 
 const CARD_GRID = "grid grid-cols-1 items-start gap-3 md:grid-cols-2 xl:grid-cols-3";
 
 /**
- * Which desk's books to show. A fixed list rather than one built from the books
- * on screen, so a chip does not vanish the moment its last book moves tabs.
+ * Which kind of product to show — a dropdown in front of the search, because it
+ * sets the scope the search then runs in.
+ *
+ * A dropdown rather than chips or tabs: the steps are the page's filter, and a
+ * second row of chips competed with them. Matches `OrderBook.desk`, which is
+ * what `bookable-products` labels each desk; a new desk is one more line here.
  */
-const PRODUCTS: { id: string; label: string; desk: string | null }[] = [
-  { id: "all", label: "ทั้งหมด", desk: null },
+const PRODUCT_TYPES: { id: string; label: string; desk: string | null }[] = [
+  { id: "all", label: "ทุกประเภทสินค้า", desk: null },
   { id: "global", label: "Global Structured", desk: "Global Structured" },
   { id: "thai", label: "Thai Structured", desk: "Thai Structured" },
 ];
@@ -127,15 +94,6 @@ const VIEWS: ViewOption[] = [
   { id: "card", label: "มุมมองการ์ด", Icon: SquaresFourIcon },
   { id: "table", label: "มุมมองตาราง", Icon: RowsIcon },
 ];
-
-/** `false` during the hydration render, `true` from the render after it. */
-const subscribeNever = () => () => {};
-const useHydrated = () =>
-  useSyncExternalStore(
-    subscribeNever,
-    () => true,
-    () => false,
-  );
 
 export default function OrdersPage() {
   // Gated like `/notes` and `/calendar` are: the route keeps existing and
@@ -156,111 +114,92 @@ function OrdersPageInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { data: books, isLoading } = useOrderBooks();
-
-  // The tab is a destination, not a refinement — it goes in the URL, and
-  // `push` so the back button walks out of it. Same rule as Insights.
-  const requested = searchParams.get("tab");
-  const activeId = TABS.some((t) => t.id === requested) ? requested! : "open";
-  const active = TABS.find((t) => t.id === activeId)!;
-  /** The two tabs whose rows are orders rather than books. */
-  const isOrderTab = activeId !== "open";
+  const { isPrivate } = usePrivacy();
+  const [search, setSearch] = useState("");
 
   // A refinement rather than a destination, so `replace` — the back button
-  // should leave the page, not step back through every chip clicked on it.
-  const requestedProduct = searchParams.get("product");
-  const product = PRODUCTS.find((p) => p.id === requestedProduct) ?? PRODUCTS[0];
-  // Same reasoning as the product chip — a layout preference is a refinement of
-  // the page, not a place on it, so `replace`. It still lives in the URL so a
-  // book's "back to Order Management" returns to the view it was opened from.
+  // should leave the page, not step back through every chip clicked on it. In
+  // the URL all the same, so a book's "back to Order Management" lands on the
+  // step it was opened from.
+  const requestedStep = searchParams.get("step");
+  const step = STEPS.find((s) => s.id === requestedStep) ?? STEPS[0];
+  const requestedType = searchParams.get("product");
+  const productType = PRODUCT_TYPES.find((t) => t.id === requestedType) ?? PRODUCT_TYPES[0];
+  // Same reasoning — a layout preference is a refinement, not a place.
   const requestedView = searchParams.get("view");
   const view = VIEWS.find((v) => v.id === requestedView) ?? VIEWS[0];
 
-  const ofProduct = useMemo(
-    () => (product.desk ? books.filter((b) => b.desk === product.desk) : books),
-    [books, product],
+  // "Search All" — anything a product is recognised by: its name and type,
+  // the desk, the order reference, and the clients booked into it.
+  const matching = useMemo(() => {
+    const ofType = productType.desk
+      ? books.filter((book) => book.desk === productType.desk)
+      : books;
+    const query = search.trim().toLowerCase();
+    if (!query) return ofType;
+    return ofType.filter((book) =>
+      [
+        book.productName,
+        book.productType,
+        book.desk,
+        ...book.submissions.map((s) => s.backendRef),
+        ...book.allBookings.flatMap((b) => [b.clientId, maskName(b.clientName, isPrivate)]),
+      ].some((text) => text.toLowerCase().includes(query)),
+    );
+  }, [books, productType, search, isPrivate]);
+
+  const visible = useMemo(
+    () => (step.id === "all" ? matching : matching.filter((b) => b.status === step.id)),
+    [matching, step],
   );
-
-  // Tab badges count within the chosen product, so the number on a tab is
-  // what clicking it would actually show — books on the first tab, orders on
-  // the other two.
-  const counts = useMemo(
-    () =>
-      Object.fromEntries(
-        TABS.map((t) => [t.id, entriesFor(t.id, ofProduct).length]),
-      ) as Record<string, number>,
-    [ofProduct],
-  );
-
-  const visible = useMemo(() => entriesFor(activeId, ofProduct), [activeId, ofProduct]);
-
-  // ── What is new on each tab ────────────────────────────────────────────────
-  // Same mechanism as the header bell's unread badge: ids in localStorage,
-  // pruned to the ones still live so the entry cannot grow without bound.
-  const liveKeys = useMemo(
-    () => new Set(TABS.flatMap((t) => entriesFor(t.id, books).map((e) => e.key))),
-    [books],
-  );
-  const isKnown = useCallback((id: string) => liveKeys.has(id), [liveKeys]);
-  const [seen, setSeen] = useStoredIds("orders:seen-tabs", isKnown);
-
-  const keysOn = useCallback(
-    (tabId: string) => entriesFor(tabId, ofProduct).map((e) => e.key),
-    [ofProduct],
-  );
-
-  // Opening a tab is looking at it — everything on it stops being new. This
-  // also covers a booking landing while the tab is open.
-  //
-  // Not until hydration is done: until then `seen` is the server's empty
-  // snapshot, and writing "empty + this tab" would wipe every other tab's
-  // seen ids — a reload turned tabs already looked at red again.
-  const hydrated = useHydrated();
-  useEffect(() => {
-    if (!hydrated) return;
-    const unseen = keysOn(activeId).filter((k) => !seen.has(k));
-    if (unseen.length > 0) setSeen(new Set([...seen, ...unseen]));
-  }, [hydrated, activeId, keysOn, seen, setSeen]);
-
-  /** 1-based, for the `nth-child` rules behind `.count-tabs` in globals.css. */
-  const newTabs = TABS.flatMap((t, i) =>
-    t.id !== activeId && keysOn(t.id).some((k) => !seen.has(k)) ? [String(i + 1)] : [],
-  ).join(" ");
 
   return (
     <div className="flex flex-col gap-4">
-      {/* `transparent-tabs` lets the page's grey show through — the library
-          paints each tab white, which read as a white box on this page.
-          `count-tabs` restyles the count badges — red only where `data-new`
-          says the tab has something unseen. */}
-      <div className="transparent-tabs count-tabs scrollable-tabs" data-new={newTabs}>
-      <TabGroup
-        items={TABS.map((t) => ({
-          id: t.id,
-          title: t.title,
-          // Zero is left off rather than shown: a badge reading "0" is the
-          // only number on a tab that tells you not to click it, which the
-          // empty state below says better once you have.
-          notification: counts[t.id] || undefined,
-        }))}
-        activeId={activeId}
-        onChange={(id) =>
-          setQueryState(withQuery(pathname, searchParams, { tab: id }), "push")
-        }
-      />
+      <h1 className="type-h5 font-bold text-foreground">รายการจองซื้อ</h1>
+
+      {/* Scope first, then the query within it — read left to right. */}
+      {/* Each control in a wrapper that owns its width. No `w-full` on the
+          dropdown's wrapper: the component library's unlayered stylesheet also
+          defines `.w-full`, which outranks Tailwind's `sm:w-[240px]` — the
+          wrapper stayed 100% wide and, unshrinkable, pushed the search off the
+          screen. On a phone the column's default stretch makes it full width. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="sm:w-[240px] sm:shrink-0">
+          <Dropdown
+            value={productType.id}
+            onChange={(id) =>
+              setQueryState(
+                withQuery(pathname, searchParams, { product: id === "all" ? null : id }),
+                "replace",
+              )
+            }
+            options={PRODUCT_TYPES.map((t) => ({ label: t.label, value: t.id }))}
+            placeholder="ประเภทสินค้า"
+            className="w-full"
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            onClear={() => setSearch("")}
+            placeholder="Search All"
+            className="w-full"
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="scrollable-tabs flex min-w-0 flex-1 items-center gap-2">
-          {PRODUCTS.map((p) => (
+          {STEPS.map((s) => (
             <Chip
-              key={p.id}
-              label={p.label}
+              key={s.id}
+              label={s.label}
               type="single"
-              size="small"
-              selected={p.id === product.id}
+              selected={s.id === step.id}
               onClick={() =>
                 setQueryState(
-                  withQuery(pathname, searchParams, { product: p.id === "all" ? null : p.id }),
+                  withQuery(pathname, searchParams, { step: s.id === "all" ? null : s.id }),
                   "replace",
                 )
               }
@@ -287,51 +226,38 @@ function OrdersPageInner() {
           lands. The project-wide rule, see `docs/handover.md`. */}
       {isLoading ? (
         view.id === "table" ? (
-          isOrderTab ? (
-            <OrderSubmissionTable rows={[]} isLoading />
-          ) : (
-            <OrderBookTable books={[]} isLoading />
-          )
+          <OrderBookTable books={[]} isLoading />
         ) : (
           <OrderBooksSkeleton />
         )
       ) : visible.length === 0 ? (
         <EmptyState
           icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-          title={active.empty.title}
-          body={active.empty.body}
+          title={search ? "ไม่พบรายการที่ค้นหา" : step.empty}
+          body={
+            search
+              ? "ลองค้นหาด้วยชื่อสินค้า เลขคำสั่งซื้อ หรือชื่อลูกค้า"
+              : "เริ่มจองให้ลูกค้าได้จากหน้าสินค้าใน Product Catalog — การจองจะมารวมกันที่นี่"
+          }
           actionSlot={
-            // Only the first tab has somewhere to send them: an order appears
-            // here by being sent, not by being started, so "go and book
-            // something" is not the next step on the other two.
-            activeId === "open" ? (
+            search ? undefined : (
               <Link href="/product-catalog/product">
                 <Button variant="outline" size="md">
                   ไปที่ Product Catalog
                 </Button>
               </Link>
-            ) : undefined
+            )
           }
         />
       ) : (
-        // Keyed on both, so switching either the tab or the layout replays the
+        // Keyed on both, so switching either the step or the layout replays the
         // fade — the rows change completely in both cases.
-        <FadeIn key={`${activeId}|${view.id}`}>
-          {isOrderTab ? (
-            view.id === "table" ? (
-              <OrderSubmissionTable rows={orderRowsOf(visible)} />
-            ) : (
-              <div className={CARD_GRID}>
-                {orderRowsOf(visible).map((row) => (
-                  <OrderSubmissionCard key={row.submission.id} row={row} />
-                ))}
-              </div>
-            )
-          ) : view.id === "table" ? (
-            <OrderBookTable books={booksOf(visible)} />
+        <FadeIn key={`${step.id}|${view.id}`}>
+          {view.id === "table" ? (
+            <OrderBookTable books={visible} />
           ) : (
             <div className={CARD_GRID}>
-              {booksOf(visible).map((book) => (
+              {visible.map((book) => (
                 <OrderBookCard key={book.productId} book={book} />
               ))}
             </div>

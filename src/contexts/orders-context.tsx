@@ -18,6 +18,8 @@
  *    another system. Really a webhook, or a poll of that system.
  * 2. **{@link SUBMISSION_TURNAROUND_MS}** — the back office accepting an order.
  *    Really a status on the order record, arriving the same way.
+ * 3. **{@link CREDIT_CHECK_MS}** — the back office checking a client can fund
+ *    a booking. Really a status on the booking record.
  *
  * Every mutator is `async` and every call site awaits it, so pointing them at
  * real endpoints is a change in this file alone. `isLoading` is in the contract
@@ -43,6 +45,7 @@ import {
 } from "@/lib/order-mock-data";
 import type {
   Booking,
+  CreditStatus,
   OrderSubmission,
   RequirementItem,
   RequirementKey,
@@ -61,6 +64,9 @@ const REQUIREMENT_TURNAROUND_MS = 15_000;
 /** The same stand-in, for the back office accepting a submitted order. */
 const SUBMISSION_TURNAROUND_MS = 12_000;
 
+/** The same stand-in, for the funds check every new booking goes through. */
+const CREDIT_CHECK_MS = 8_000;
+
 type BookingDraft = {
   productId: string;
   clientId: string;
@@ -68,6 +74,12 @@ type BookingDraft = {
   amount: number;
   /** The checks the booking passed — stored on it, see `Booking.checks`. */
   checks: RequirementItem[];
+  /**
+   * The client's cash in the product's currency — what the mock funds check
+   * measures the amount against. The real check reads the settlement account
+   * itself, and this field goes.
+   */
+  fundsAvailable: number;
 };
 
 type OrdersContextValue = {
@@ -124,7 +136,33 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     timers.current.push(setTimeout(fn, ms));
   }, []);
 
+  /** Resolves one booking's funds check — see {@link CREDIT_CHECK_MS}. */
+  const settleCredit = useCallback(
+    (bookingId: string, result: CreditStatus) =>
+      later(() => {
+        setBookings((prev) =>
+          prev.map((b) => (b.id === bookingId ? { ...b, credit: result } : b)),
+        );
+      }, CREDIT_CHECK_MS),
+    [later],
+  );
+
+  // Seeded bookings still at the check get their answer too, so a demo that
+  // opens on one does not sit there forever. Seeds have no cash figure to
+  // test, so they pass.
+  useEffect(() => {
+    for (const b of seedBookings) {
+      if (b.credit === "pending") settleCredit(b.id, "sufficient");
+    }
+  }, [settleCredit]);
+
   const bookOrder = useCallback(async (draft: BookingDraft) => {
+    // One order per product: once it has been sent the product is closed, and
+    // every surface already hides its จองซื้อ. Held here as well because this is
+    // where the endpoint will enforce it.
+    if (submissions.some((s) => s.productId === draft.productId)) {
+      throw new Error("This product's order has already been sent; it takes no more bookings.");
+    }
     const booking: Booking = {
       id: localId("bk"),
       productId: draft.productId,
@@ -132,13 +170,21 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       clientName: draft.clientName,
       amount: draft.amount,
       checks: draft.checks,
+      credit: "pending",
       createdAt: new Date().toISOString(),
       createdBy: ORDER_ACTOR,
       status: "booked",
     };
     setBookings((prev) => [...prev, booking]);
+
+    // ── Stand-in for the back office's funds check ─────────────────────────
+    settleCredit(
+      booking.id,
+      draft.amount <= draft.fundsAvailable ? "sufficient" : "insufficient",
+    );
+
     return booking;
-  }, []);
+  }, [submissions, settleCredit]);
 
   const cancelBooking = useCallback(async (bookingId: string) => {
     // Marked rather than removed: the log is rebuilt from the bookings

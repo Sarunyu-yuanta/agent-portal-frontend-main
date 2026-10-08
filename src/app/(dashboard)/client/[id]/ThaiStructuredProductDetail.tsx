@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, TabGroup, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
   ArrowSquareOutIcon,
-  CaretDownIcon,
-  EyeIcon,
-  FilePdfIcon,
-  PackageIcon,
   UserPlusIcon,
 } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
 import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
+import { ProductOrderNotice } from "@/app/(dashboard)/orders/ProductOrderNotice";
 import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
+import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
+import { isBookingOpen } from "@/app/(dashboard)/orders/order-book";
 import { toBookableProduct, type ThaiStructuredProduct } from "./thai-structured-data";
+import { DocumentDownloadMenu } from "./DocumentDownloadMenu";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
 
@@ -42,6 +42,24 @@ function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
   );
 }
 
+/** The theme's terms as the Detail tab lists them — shared with Order Management's modal. */
+export function thaiProductRows(product: ThaiStructuredProduct): { label: string; value: string }[] {
+  return [
+    { label: "Investment Theme", value: product.theme },
+    { label: "Product", value: product.product },
+    { label: "Currency", value: product.ccy },
+    { label: "BBG Code 1", value: product.bbg1 },
+    { label: "BBG Code 2", value: product.bbg2 },
+    { label: "BBG Code 3", value: product.bbg3 },
+    { label: "Coupon p.a. (%)", value: product.couponPa },
+    { label: "KO Type", value: product.koType },
+    { label: "KO Barrier (%)", value: product.koBarrier },
+    { label: "Strike (%)", value: product.strike },
+    { label: "KI Barrier", value: product.kiBarrier },
+    { label: "Tenor (months)", value: String(product.tenor) },
+  ];
+}
+
 export function ThaiStructuredProductDetail({
   product,
   onBack,
@@ -51,9 +69,11 @@ export function ThaiStructuredProductDetail({
 }) {
   const [fcnModalOpen, setFcnModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [tab, setTab] = useState<"detail" | "orders">("detail");
+  // The booking just placed here — marked on the Order tab. See `ProductOrderSection`.
+  const [newBookingId, setNewBookingId] = useState<string | null>(null);
+  const clearNewBooking = useCallback(() => setNewBookingId(null), []);
 
   // The page owns the toast stack, not the modal: a booking confirms by
   // *closing* the modal, and a toast rendered inside it would leave with it.
@@ -71,22 +91,11 @@ export function ThaiStructuredProductDetail({
   // dependency list — recomputing it each render would re-run the readiness
   // derivation behind the booking modal on every keystroke in its search box.
   const adapted = useMemo(() => toBookableProduct(product), [product]);
+  const { data: book } = useOrderBook(adapted.id);
+  const canBook = !book || isBookingOpen(book);
 
 
-  const rows = [
-    { label: "Investment Theme", value: product.theme },
-    { label: "Product", value: product.product },
-    { label: "Currency", value: product.ccy },
-    { label: "BBG Code 1", value: product.bbg1 },
-    { label: "BBG Code 2", value: product.bbg2 },
-    { label: "BBG Code 3", value: product.bbg3 },
-    { label: "Coupon p.a. (%)", value: product.couponPa },
-    { label: "KO Type", value: product.koType },
-    { label: "KO Barrier (%)", value: product.koBarrier },
-    { label: "Strike (%)", value: product.strike },
-    { label: "KI Barrier", value: product.kiBarrier },
-    { label: "Tenor (months)", value: String(product.tenor) },
-  ];
+  const rows = thaiProductRows(product);
 
   return (
     <div
@@ -110,6 +119,9 @@ export function ThaiStructuredProductDetail({
       >
         {/* Summary */}
         <div className="flex flex-col gap-4">
+          {/* First thing in the card, so the order's state is read before the
+              terms of a product that can no longer be booked. */}
+          {ORDER_BOOKING_ENABLED && <ProductOrderNotice book={book} />}
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-0.5">
               <p className="text-base font-bold leading-6 text-[#101828]">{underlying}</p>
@@ -128,7 +140,7 @@ export function ThaiStructuredProductDetail({
             <TabGroup
               items={[
                 { id: "detail", title: "Detail" },
-                { id: "orders", title: "Order Management" },
+                { id: "orders", title: "Order" },
               ]}
               activeId={tab}
               onChange={(id) => setTab(id as "detail" | "orders")}
@@ -139,6 +151,8 @@ export function ThaiStructuredProductDetail({
             <DetailTable rows={rows} />
           ) : (
             <ProductOrderSection
+              newBookingId={newBookingId}
+              onNewBookingSeen={clearNewBooking}
               product={adapted}
               onBook={() => setBookingOpen(true)}
               onNotice={notice}
@@ -146,81 +160,30 @@ export function ThaiStructuredProductDetail({
           )}
         </div>
 
-        {/* CTA — only under Detail; Order Management carries its own จองซื้อ. */}
+        {/* CTA — only under Detail; the Order tab carries its own จองซื้อ. */}
         {tab === "detail" && (
         <div className="flex flex-col gap-3 items-center w-full">
-          <div className="relative w-full max-w-[343px]">
-            <button
-              type="button"
-              onClick={() => setDropdownOpen((v) => !v)}
-              className="flex w-full items-center h-12 px-4 font-medium text-sm text-white rounded-xl cursor-pointer transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#0a6ee7" }}
-            >
-              <span className="flex-1 text-center">ดาวน์โหลดเอกสาร</span>
-              <CaretDownIcon
-                size={14}
-                color="white"
-                style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-              />
-            </button>
-
-            {dropdownOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} role="presentation" />
-                <div
-                  className="absolute bottom-full mb-2 right-0 w-full rounded-xl overflow-hidden z-20 shadow-lg"
-                  style={{ border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "white" }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => { setFcnModalOpen(true); setDropdownOpen(false); }}
-                    className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                    style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                  >
-                    <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#fee2e2] group-hover:bg-transparent transition-colors">
-                      <FilePdfIcon size={16} color="#dc2626" className="transition-opacity group-hover:opacity-0" />
-                      <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm text-[#101828]">Presentation PDF</p>
-                      <p className="text-xs text-[#6a7282] mt-0.5">สำหรับนำเสนอลูกค้า</p>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setPackageModalOpen(true); setDropdownOpen(false); }}
-                    className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                  >
-                    <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#eff6ff] group-hover:bg-transparent transition-colors">
-                      <PackageIcon size={16} color="#0a6ee7" className="transition-opacity group-hover:opacity-0" />
-                      <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm text-[#101828]">ชุดเอกสารครบชุด</p>
-                      <p className="text-xs text-[#6a7282] mt-0.5">สำหรับปิดการขาย (.zip)</p>
-                    </div>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <DocumentDownloadMenu
+            onPresentation={() => setFcnModalOpen(true)}
+            onPackage={() => setPackageModalOpen(true)}
+            className="max-w-[343px]"
+          />
 
           {/* Same swap as the global desk's detail page: booking replaces the
               external hand-off, and the flag puts the old link back. */}
           {ORDER_BOOKING_ENABLED ? (
-            <button
-              type="button"
-              onClick={() => setBookingOpen(true)}
-              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
-              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-            >
-              <UserPlusIcon size={16} />
-              <span>จองซื้อให้ลูกค้า</span>
-            </button>
+            // Gone once the order is sent — the notice above the tabs says why.
+            canBook ? (
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+                style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+              >
+                <UserPlusIcon size={16} />
+                <span>จองซื้อให้ลูกค้า</span>
+              </button>
+            ) : null
           ) : (
             <a
               href={INVEST_URL}
@@ -246,6 +209,12 @@ export function ThaiStructuredProductDetail({
           product={adapted}
           onClose={() => setBookingOpen(false)}
           onNotice={notice}
+          // Straight to the Order tab with the new row marked, so the IC sees
+          // where the booking went rather than staying on Detail.
+          onBooked={(booking) => {
+            setNewBookingId(booking.id);
+            setTab("orders");
+          }}
         />
       )}
       <Toaster items={toasts} onRemove={removeToast} />

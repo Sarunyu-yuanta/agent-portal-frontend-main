@@ -1,16 +1,29 @@
 import Link from "next/link";
-import { FireIcon, ShieldCheckIcon } from "@phosphor-icons/react";
+import { FireIcon, HourglassMediumIcon, ShieldCheckIcon } from "@phosphor-icons/react";
+import { useProcessingProductIds } from "@/app/(dashboard)/orders/use-order-books";
 import type { StructuredProduct } from "./structured-product-data";
 
 type CardProduct = Pick<
   StructuredProduct,
   "underlying" | "coupon" | "tenor" | "ko" | "strike" | "ki" | "tags" | "logos"
->;
+> & {
+  /** Read for the order's state — most call sites spread the product, so it comes along. */
+  id?: string;
+};
 
 const CARD_SHADOW =
   "0px 1px 3px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1)";
 
-function LogoRow({ logos, tags }: { logos: string[]; tags: string[] }) {
+function LogoRow({
+  logos,
+  tags,
+  processing,
+}: {
+  logos: string[];
+  tags: string[];
+  /** The product's order is with the back office — see `useProcessingProductIds`. */
+  processing: boolean;
+}) {
   return (
     <div className="flex gap-2 items-center w-full shrink-0">
       <div className="flex gap-1 items-center flex-1 min-w-0">
@@ -26,7 +39,9 @@ function LogoRow({ logos, tags }: { logos: string[]; tags: string[] }) {
         ))}
       </div>
       <div className="flex gap-1 items-center shrink-0">
-        {tags.includes("ใกล้เต็ม") && (
+        {/* "ใกล้เต็ม" stops being true once the order has gone out — the
+            card's status band says what replaced it. */}
+        {!processing && tags.includes("ใกล้เต็ม") && (
           <div
             className="flex gap-0.5 items-center overflow-hidden px-1 py-0.5 rounded shrink-0"
             style={{ backgroundColor: "#fdefe6" }}
@@ -45,6 +60,24 @@ function LogoRow({ logos, tags }: { logos: string[]; tags: string[] }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * "กำลังดำเนินการสั่งซื้อ", as a band across the card's top edge.
+ *
+ * A band rather than another chip beside "ใกล้เต็ม" and "รับประกันเงินต้น":
+ * those describe the product, this describes the order on it, and as a chip it
+ * read as one more feature of the note. Absolutely placed so every layout —
+ * stacked or the tablet's row — takes it the same way; the card makes room for
+ * it with its top padding.
+ */
+function ProcessingBand() {
+  return (
+    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-[12px] font-medium leading-4 text-[#0a6ee7]">
+      <HourglassMediumIcon size={14} weight="fill" />
+      กำลังดำเนินการสั่งซื้อ
     </div>
   );
 }
@@ -115,7 +148,13 @@ export function StructuredProductCard({
   onClick,
   href,
   variant = "catalog",
+  id,
 }: CardProduct & { onClick?: () => void; href?: string; variant?: "catalog" | "grid" }) {
+  const processing = useProcessingProductIds().has(id ?? "");
+  // Room for the band: its 28px on top of the card's own 20px. Every card is
+  // `self-start` so only the one carrying the band grows — a grid would
+  // otherwise stretch its neighbours in the row to match.
+  const bandPad = processing ? "pt-12" : "";
   const stats = [
     { label: "Tenor", value: tenor },
     { label: "KO", value: ko },
@@ -151,11 +190,12 @@ export function StructuredProductCard({
   const card = isGrid ? (
       <div
         {...interactiveProps}
-        className={`flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
+        className={`flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
+        {processing && <ProcessingBand />}
         <div className="flex flex-col gap-2 items-start w-full">
-          <LogoRow logos={logos} tags={tags} />
+          <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
@@ -165,11 +205,12 @@ export function StructuredProductCard({
       {/* Mobile — vertical stack */}
       <div
         {...interactiveProps}
-        className={`flex md:hidden flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
+        className={`flex md:hidden flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
+        {processing && <ProcessingBand />}
         <div className="flex flex-col gap-2 items-start w-full">
-          <LogoRow logos={logos} tags={tags} />
+          <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
@@ -178,11 +219,12 @@ export function StructuredProductCard({
       {/* Tablet — horizontal */}
       <div
         {...interactiveProps}
-        className={`hidden md:flex lg:hidden h-[120px] box-border items-start gap-4 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
+        className={`hidden md:flex lg:hidden ${processing ? "h-[148px]" : "h-[120px]"} box-border items-start gap-4 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
+        {processing && <ProcessingBand />}
         <div className="flex flex-1 flex-col gap-2 items-start min-w-0">
-          <LogoRow logos={logos} tags={tags} />
+          <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="flex-1 h-full min-w-0 py-3" layout="tablet" />
@@ -191,11 +233,12 @@ export function StructuredProductCard({
       {/* Desktop — vertical grid card */}
       <div
         {...interactiveProps}
-        className={`hidden lg:flex flex-col items-center gap-3 overflow-hidden p-5 relative rounded-[12px] w-full bg-white ${interactiveProps.className ?? ""}`}
+        className={`hidden lg:flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
+        {processing && <ProcessingBand />}
         <div className="flex flex-col gap-2 items-start w-full">
-          <LogoRow logos={logos} tags={tags} />
+          <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
@@ -205,7 +248,7 @@ export function StructuredProductCard({
 
   if (href) {
     return (
-      <Link href={href} className="block text-inherit no-underline">
+      <Link href={href} className="block w-full self-start text-inherit no-underline">
         {card}
       </Link>
     );

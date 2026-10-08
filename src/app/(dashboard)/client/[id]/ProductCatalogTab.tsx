@@ -30,7 +30,8 @@ import { StructuredProductDetail } from "./StructuredProductDetail";
 import { StructuredProductAllPage } from "./StructuredProductAllPage";
 import { ThaiStructuredProductTable } from "./ThaiStructuredProductTable";
 import { ThaiStructuredProductDetail } from "./ThaiStructuredProductDetail";
-import type { ThaiStructuredProduct } from "./thai-structured-data";
+import { thaiBookableId, type ThaiStructuredProduct } from "./thai-structured-data";
+import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
 import { TopIdeaAllPage } from "./TopIdeaAllPage";
 import { TopIdeaDetail } from "./TopIdeaDetail";
 import { InvestmentSolutionDetail } from "./InvestmentSolutionDetail";
@@ -159,14 +160,23 @@ export function ProductCatalogTab({
   const [searchCategory, setSearchCategory] = useState<string | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => getRecentSearches());
 
+  // A product whose order has gone out is no longer on offer, so search stops
+  // finding it too — the same rule the shelves follow.
+  const searchIndex = useOpenProducts(PRODUCT_SEARCH_INDEX, (item) =>
+    item.kind === "structured"
+      ? item.product.id
+      : item.kind === "thai-structured"
+        ? thaiBookableId(item.product.theme)
+        : item.key,
+  );
   const searchResults = useMemo(() => {
     const byCategory = searchCategory
-      ? PRODUCT_SEARCH_INDEX.filter((item) => item.kind === searchCategory)
-      : PRODUCT_SEARCH_INDEX;
+      ? searchIndex.filter((item) => item.kind === searchCategory)
+      : searchIndex;
     const query = searchValue.trim();
     const byQuery = query ? byCategory.filter((item) => matchesProductQuery(item, query)) : byCategory;
     return byQuery.slice(0, MAX_SEARCH_RESULTS);
-  }, [searchValue, searchCategory]);
+  }, [searchIndex, searchValue, searchCategory]);
 
   /**
    * Closing counts as "having searched" whenever text was actually typed —

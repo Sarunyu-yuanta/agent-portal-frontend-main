@@ -25,7 +25,12 @@ import {
   type RelatedProducts,
 } from "./stock-product-detail-data";
 import type { ThaiStructuredProduct } from "./thai-structured-data";
-import { TOP_PICKS, type StructuredProduct } from "./structured-product-data";
+import {
+  STRUCTURED_SHELF,
+  TOP_PICK_COUNT,
+  type StructuredProduct,
+} from "./structured-product-data";
+import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
 import type { MutualFund } from "./mutual-fund-data";
 
 const ASSETS = {
@@ -450,6 +455,8 @@ function thaiStructuredHref(product: ThaiStructuredProduct) {
 }
 
 function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProduct[] }) {
+  // The catalogue's own Top pick, closed products out — see `STRUCTURED_SHELF`.
+  const topPicks = useOpenProducts(STRUCTURED_SHELF, (p) => p.id, TOP_PICK_COUNT);
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-col gap-4">
@@ -458,7 +465,7 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
           <p className="truncate text-xl font-bold leading-[30px] text-[#101828]">Top pick</p>
         </div>
         <div className="grid w-full grid-cols-1 gap-4 md:flex md:flex-col lg:grid lg:grid-cols-3">
-          {TOP_PICKS.map((product) => (
+          {topPicks.map((product) => (
             <StructuredProductCard
               key={product.id}
               {...product}

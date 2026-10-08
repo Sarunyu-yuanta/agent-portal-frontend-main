@@ -31,7 +31,6 @@ import {
   USD_THB,
   formatLogTime,
   headlineRound,
-  roundOfSubmission,
 } from "./order-book";
 import { AmountOfTarget } from "./AmountOfTarget";
 
@@ -49,10 +48,11 @@ type SortDir = "none" | "asc" | "desc";
  */
 const STATUS_RANK: Record<OrderBookStatus, number> = {
   ready: 0,
-  collecting: 1,
-  processing: 2,
-  completed: 3,
-  rejected: 4,
+  checking: 1,
+  collecting: 2,
+  processing: 3,
+  completed: 4,
+  rejected: 5,
 };
 
 /**
@@ -181,10 +181,9 @@ export function OrderBookTable({
                       <p className="type-caption truncate text-muted-foreground">
                         {book.desk} · {book.productType} · {book.currency}
                       </p>
-                      {/* Same line the card carries — which round the amount
-                          in the next column belongs to. */}
+                      {/* Same line the card carries — whether the amount in
+                          the next column has gone out yet. */}
                       <p className="type-caption truncate text-muted-foreground">
-                        รอบที่ {round.number} ·{" "}
                         {round.previousRef
                           ? `ส่งแล้ว (${round.previousRef})`
                           : "ยังไม่ส่งคำสั่งซื้อ"}
@@ -227,7 +226,7 @@ export function OrderBookTable({
                           line rather than overwriting it. */}
                       {pending.length > 0 && (
                         <span className="type-caption truncate text-muted-foreground">
-                          รอบที่ {roundOfSubmission(book, pending[0].id)} รอผล
+                          {pending[0].backendRef} รอผล
                           {pending.length > 1 && ` (+${pending.length - 1})`}
                         </span>
                       )}

@@ -1,24 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, TabGroup, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
   ArrowSquareOutIcon,
-  CaretDownIcon,
-  EyeIcon,
-  FilePdfIcon,
-  PackageIcon,
   ShieldCheckIcon,
   UserPlusIcon,
 } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
 import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
+import { ProductOrderNotice } from "@/app/(dashboard)/orders/ProductOrderNotice";
 import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
 import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
-import { headlineRound } from "@/app/(dashboard)/orders/order-book";
+import { headlineRound, isBookingOpen } from "@/app/(dashboard)/orders/order-book";
 import type { StructuredProduct } from "./structured-product-data";
+import { DocumentDownloadMenu } from "./DocumentDownloadMenu";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
 
@@ -29,10 +27,10 @@ type ProductTab = "detail" | "orders";
 
 const PRODUCT_TABS: { id: ProductTab; title: string }[] = [
   { id: "detail", title: "Detail" },
-  { id: "orders", title: "Order Management" },
+  { id: "orders", title: "Order" },
 ];
 
-type DetailRow = {
+export type DetailRow = {
   label: string;
   value: string;
   link?: boolean;
@@ -62,7 +60,7 @@ function AllocationSummary({ requestNotionalSize, confirmedRequest }: { requestN
   );
 }
 
-function DetailTable({ rows }: { rows: DetailRow[] }) {
+export function DetailTable({ rows }: { rows: DetailRow[] }) {
   return (
     <div
       className="flex flex-col w-full rounded-md overflow-hidden"
@@ -100,46 +98,12 @@ function DetailTable({ rows }: { rows: DetailRow[] }) {
   );
 }
 
-export function StructuredProductDetail({
-  product,
-  onBack,
-}: {
-  product: StructuredProduct;
-  onBack: () => void;
-}) {
-  const showPrincipalTag =
-    product.tags.includes("รับประกันเงินต้น") || product.id === "aapl-amzn-nflx";
-
-  const [fcnModalOpen, setFcnModalOpen] = useState(false);
-  const [packageModalOpen, setPackageModalOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [tab, setTab] = useState<ProductTab>("detail");
-
-  // Called unconditionally — the flag picks what renders, not which hooks run.
-  const { data: book } = useOrderBook(product.id);
-  // With booking on, the allocation box reads the live book, round by round,
-  // instead of the figures frozen into the product's JSON — those never moved
-  // when someone booked, so the box and the Order Management tab disagreed.
-  const round = ORDER_BOOKING_ENABLED && book ? headlineRound(book) : null;
-  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
-
-  // The page owns the toast stack rather than the modal: a booking confirms by
-  // *closing* the modal, and a toast rendered inside it would leave with it.
-  const { toasts, addToast, removeToast } = useToasts();
-  const notice = (message: string, status: ToastStatus) => addToast({ message, status });
-
-
-  useEffect(() => {
-    const main = document.querySelector("main");
-    if (main) {
-      main.scrollTop = 0;
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [product.id]);
-
-  const detailRows: DetailRow[] = [
+/**
+ * The product's terms as the Detail tab lists them — exported so Order
+ * Management's "ดูรายละเอียดสินค้า" modal shows the same rows, not a copy.
+ */
+export function structuredProductRows(product: StructuredProduct): DetailRow[] {
+  return [
     { label: "อัตราดอกเบี้ย (Coupon)", value: product.coupon },
     { label: "วันเสนอขาย", value: product.offerDate },
     { label: "งวดดอกเบี้ย", value: product.couponPeriod },
@@ -158,6 +122,51 @@ export function StructuredProductDetail({
       ],
     },
   ];
+}
+
+export function StructuredProductDetail({
+  product,
+  onBack,
+}: {
+  product: StructuredProduct;
+  onBack: () => void;
+}) {
+  const showPrincipalTag =
+    product.tags.includes("รับประกันเงินต้น") || product.id === "aapl-amzn-nflx";
+
+  const [fcnModalOpen, setFcnModalOpen] = useState(false);
+  const [packageModalOpen, setPackageModalOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [tab, setTab] = useState<ProductTab>("detail");
+  // The booking just placed here — marked on the Order tab. See `ProductOrderSection`.
+  const [newBookingId, setNewBookingId] = useState<string | null>(null);
+  const clearNewBooking = useCallback(() => setNewBookingId(null), []);
+
+  // Called unconditionally — the flag picks what renders, not which hooks run.
+  const { data: book } = useOrderBook(product.id);
+  const canBook = !book || isBookingOpen(book);
+  // With booking on, the allocation box reads the live book, round by round,
+  // instead of the figures frozen into the product's JSON — those never moved
+  // when someone booked, so the box and the Order tab disagreed.
+  const round = ORDER_BOOKING_ENABLED && book ? headlineRound(book) : null;
+  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+  // The page owns the toast stack rather than the modal: a booking confirms by
+  // *closing* the modal, and a toast rendered inside it would leave with it.
+  const { toasts, addToast, removeToast } = useToasts();
+  const notice = (message: string, status: ToastStatus) => addToast({ message, status });
+
+
+  useEffect(() => {
+    const main = document.querySelector("main");
+    if (main) {
+      main.scrollTop = 0;
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [product.id]);
+
+  const detailRows = structuredProductRows(product);
 
   return (
     <div
@@ -181,6 +190,9 @@ export function StructuredProductDetail({
       >
         {/* Symbol + summary */}
         <div className="flex flex-col gap-4 w-full">
+          {/* First thing in the card, so the order's state is read before the
+              terms of a product that can no longer be booked. */}
+          {ORDER_BOOKING_ENABLED && <ProductOrderNotice book={book} />}
           <div className="flex flex-col gap-2 w-full">
             <div className="flex gap-2 items-center w-full">
               <div className="flex flex-1 min-w-0 gap-1 items-center">
@@ -247,12 +259,16 @@ export function StructuredProductDetail({
             )}
             <p className="text-xs leading-4 text-[#6a7282] text-center whitespace-nowrap">
               {round
-                ? `รอบที่ ${round.number} · ${round.previousRef ? `ส่งแล้ว (${round.previousRef})` : "ยังไม่ส่งคำสั่งซื้อ"}`
+                ? round.previousRef
+                  ? `ส่งแล้ว (${round.previousRef})`
+                  : "ยังไม่ส่งคำสั่งซื้อ"
                 : `อัปเดตล่าสุด ${product.updatedAt}`}
             </p>
           </div>
           ) : (
             <ProductOrderSection
+              newBookingId={newBookingId}
+              onNewBookingSeen={clearNewBooking}
               product={product}
               onBook={() => setBookingOpen(true)}
               onNotice={notice}
@@ -264,78 +280,27 @@ export function StructuredProductDetail({
             Management tab carries its own จองซื้อ. */}
         {tab === "detail" && (
           <div className="flex flex-col gap-3 items-center w-full">
-            <div className="relative w-full max-w-[343px]">
-              <button
-                type="button"
-                onClick={() => setDropdownOpen((v) => !v)}
-                className="flex w-full items-center h-12 px-4 font-medium text-sm text-white rounded-xl cursor-pointer transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#0a6ee7" }}
-              >
-                <span className="flex-1 text-center">ดาวน์โหลดเอกสาร</span>
-                <CaretDownIcon
-                  size={14}
-                  color="white"
-                  style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-                />
-              </button>
-  
-              {dropdownOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} role="presentation" />
-                  <div
-                    className="absolute bottom-full mb-2 right-0 w-full rounded-xl overflow-hidden z-20 shadow-lg"
-                    style={{ border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "white" }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => { setFcnModalOpen(true); setDropdownOpen(false); }}
-                      className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                      style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                    >
-                      <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#fee2e2] group-hover:bg-transparent transition-colors">
-                        <FilePdfIcon size={16} color="#dc2626" className="transition-opacity group-hover:opacity-0" />
-                        <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm text-[#101828]">Presentation PDF</p>
-                        <p className="text-xs text-[#6a7282] mt-0.5">สำหรับนำเสนอลูกค้า</p>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setPackageModalOpen(true); setDropdownOpen(false); }}
-                      className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
-                    >
-                      <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#eff6ff] group-hover:bg-transparent transition-colors">
-                        <PackageIcon size={16} color="#0a6ee7" className="transition-opacity group-hover:opacity-0" />
-                        <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm text-[#101828]">ชุดเอกสารครบชุด</p>
-                        <p className="text-xs text-[#6a7282] mt-0.5">สำหรับปิดการขาย (.zip)</p>
-                      </div>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            <DocumentDownloadMenu
+              onPresentation={() => setFcnModalOpen(true)}
+              onPackage={() => setPackageModalOpen(true)}
+              className="max-w-[343px]"
+            />
             {/* Booking replaces the external hand-off the page used to make.
                 With the flag off it goes back to that link, so the catalogue is
                 exactly what it was before this feature existed. */}
             {ORDER_BOOKING_ENABLED ? (
-              <button
-                type="button"
-                onClick={() => setBookingOpen(true)}
-                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
-                style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-              >
-                <UserPlusIcon size={16} />
-                <span>จองซื้อให้ลูกค้า</span>
-              </button>
+              // Gone once the order is sent — the notice above the tabs says why.
+              canBook ? (
+                <button
+                  type="button"
+                  onClick={() => setBookingOpen(true)}
+                  className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+                  style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+                >
+                  <UserPlusIcon size={16} />
+                  <span>จองซื้อให้ลูกค้า</span>
+                </button>
+              ) : null
             ) : (
               <a
                 href="https://placeholder.example.com/create-order"
@@ -369,6 +334,12 @@ export function StructuredProductDetail({
           product={product}
           onClose={() => setBookingOpen(false)}
           onNotice={notice}
+          // Straight to the Order tab with the new row marked, so the IC sees
+          // where the booking went rather than staying on Detail.
+          onBooked={(booking) => {
+            setNewBookingId(booking.id);
+            setTab("orders");
+          }}
         />
       )}
       <Toaster items={toasts} onRemove={removeToast} />

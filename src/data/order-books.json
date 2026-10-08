@@ -54,7 +54,8 @@
       "productId": "thai-chips",
       "bookings": [
         { "id": "bk-0501", "clientId": "110001", "amount": 40000, "daysAgo": 2 },
-        { "id": "bk-0502", "clientId": "110007", "amount": 20000, "daysAgo": 1 }
+        { "id": "bk-0502", "clientId": "110007", "amount": 20000, "daysAgo": 1 },
+        { "id": "bk-0503", "clientId": "110004", "amount": 40000, "daysAgo": 0, "credit": "pending" }
       ],
       "submissions": []
     },
@@ -75,14 +76,11 @@
       ]
     },
     {
-      "_note": "Three rounds, two of them sent: round 1 answered, round 2 still out, round 3 being filled. The multi-round path had no fixture at all — every seeded book sent at most once — so a book that is collecting while an earlier order is in flight was never on screen.",
+      "_note": "A product is booked once: one round, sent as one order. This book used to carry three rounds; it now keeps only the first.",
       "productId": "thai-big-data",
       "bookings": [
         { "id": "bk-0701", "clientId": "110001", "amount": 40000, "daysAgo": 12 },
-        { "id": "bk-0702", "clientId": "110004", "amount": 60000, "daysAgo": 12 },
-        { "id": "bk-0703", "clientId": "110002", "amount": 50000, "daysAgo": 6 },
-        { "id": "bk-0704", "clientId": "110007", "amount": 50000, "daysAgo": 6 },
-        { "id": "bk-0705", "clientId": "110001", "amount": 40000, "daysAgo": 1 }
+        { "id": "bk-0702", "clientId": "110004", "amount": 60000, "daysAgo": 12 }
       ],
       "submissions": [
         {
@@ -91,23 +89,14 @@
           "daysAgo": 11,
           "status": "completed",
           "backendRef": "ORD-2026-000920"
-        },
-        {
-          "id": "sub-0702",
-          "bookingIds": ["bk-0703", "bk-0704"],
-          "daysAgo": 5,
-          "status": "processing",
-          "backendRef": "ORD-2026-000948"
         }
       ]
     },
     {
-      "_note": "Two rounds, both answered and answered differently, nothing open. The finished tab lists orders rather than products precisely so this book shows both — as one row per product it could only ever show the rejection.",
+      "_note": "A product is booked once: one round, sent as one order. This book used to carry two rounds; it now keeps only the first.",
       "productId": "thai-streaming-media",
       "bookings": [
-        { "id": "bk-0801", "clientId": "110002", "amount": 100000, "daysAgo": 14 },
-        { "id": "bk-0802", "clientId": "110007", "amount": 60000, "daysAgo": 9 },
-        { "id": "bk-0803", "clientId": "110004", "amount": 40000, "daysAgo": 9 }
+        { "id": "bk-0801", "clientId": "110002", "amount": 100000, "daysAgo": 14 }
       ],
       "submissions": [
         {
@@ -116,15 +105,18 @@
           "daysAgo": 13,
           "status": "completed",
           "backendRef": "ORD-2026-000899"
-        },
-        {
-          "id": "sub-0802",
-          "bookingIds": ["bk-0802", "bk-0803"],
-          "daysAgo": 8,
-          "status": "rejected",
-          "backendRef": "ORD-2026-000935"
         }
       ]
+    }
+,
+    {
+      "_note": "Full, but one booking failed its funds check — held at รอตรวจสอบวงเงิน until the IC cancels it and books someone else.",
+      "productId": "thai-semiconductor",
+      "bookings": [
+        { "id": "bk-0901", "clientId": "110001", "amount": 70000, "daysAgo": 2 },
+        { "id": "bk-0902", "clientId": "110002", "amount": 30000, "daysAgo": 1, "credit": "insufficient" }
+      ],
+      "submissions": []
     }
   ],
   "requirementRequests": [

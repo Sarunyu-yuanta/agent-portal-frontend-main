@@ -32,11 +32,38 @@ export const ALL_STRUCTURED_PRODUCTS_COUNT = structuredProductsRaw.meta.allCount
 export const ALL_STRUCTURED_PRODUCTS_UPDATED_AT = structuredProductsRaw.meta.updatedAt;
 export const ALL_STRUCTURED_PRODUCTS_UPDATED_AT_TABLET = structuredProductsRaw.meta.updatedAtTablet;
 
-export const ALL_STRUCTURED_PRODUCTS: StructuredProduct[] = [
+/** How many cards the "all products" page shows. */
+export const ALL_STRUCTURED_PRODUCTS_LIMIT = 12;
+
+/**
+ * Everything the "all products" page can show, in order — longer than the page,
+ * so a product closed by its order going out leaves a gap the next one fills.
+ */
+export const ALL_STRUCTURED_PRODUCTS_POOL: StructuredProduct[] = [
   ...(structuredProductsRaw.allProductsBase as StructuredProduct[]),
   ...TOP_PICKS.map((p, i) => ({ ...p, id: `asp-repeat-${i}`, updatedAt: "25 Aug 2026 - 09:00" })),
   ...STRUCTURED_PRODUCTS.map((p, i) => ({ ...p, id: `asp-repeat-sp-${i}`, updatedAt: "25 Aug 2026 - 09:00" })),
-].slice(0, 12);
+];
+
+export const ALL_STRUCTURED_PRODUCTS: StructuredProduct[] = ALL_STRUCTURED_PRODUCTS_POOL.slice(
+  0,
+  ALL_STRUCTURED_PRODUCTS_LIMIT,
+);
+
+/**
+ * The catalogue's front page in one queue: Top pick takes the first
+ * {@link TOP_PICK_COUNT}, the grid under it the next {@link STRUCTURED_GRID_COUNT}.
+ * One queue rather than two lists so that when a product closes, everything
+ * behind it moves up a place — a grid card into Top pick, a spare into the grid
+ * — and no product is ever on both.
+ */
+export const STRUCTURED_SHELF: StructuredProduct[] = [
+  ...TOP_PICKS,
+  ...STRUCTURED_PRODUCTS,
+  ...(structuredProductsRaw.allProductsBase as StructuredProduct[]),
+];
+export const TOP_PICK_COUNT = TOP_PICKS.length;
+export const STRUCTURED_GRID_COUNT = STRUCTURED_PRODUCTS.length;
 
 export const TOP_IDEA_DETAIL_PRODUCTS: StructuredProduct[] = [
   ...(structuredProductsRaw.topIdeaDetailBase as StructuredProduct[]),
@@ -72,7 +99,7 @@ const PRODUCTS_BY_ID: Map<string, StructuredProduct> = new Map();
 for (const product of [
   ...TOP_PICKS,
   ...STRUCTURED_PRODUCTS,
-  ...ALL_STRUCTURED_PRODUCTS,
+  ...ALL_STRUCTURED_PRODUCTS_POOL,
   ...TOP_IDEA_DETAIL_PRODUCTS,
   ...INVESTMENT_SOLUTION_DETAIL_PRODUCTS,
 ]) {

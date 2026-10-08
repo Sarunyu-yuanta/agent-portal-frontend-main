@@ -71,6 +71,8 @@ type BookingSeed = {
   amount: number;
   daysAgo: number;
   status?: string;
+  /** The funds check; left out means it passed. See `Booking.credit`. */
+  credit?: string;
 };
 
 type SubmissionSeed = {
@@ -92,6 +94,7 @@ export const seedBookings: Booking[] = orderBooksRaw.books.flatMap((book) =>
     createdAt: stampFromDaysAgo(b.daysAgo, b.id),
     createdBy: ORDER_ACTOR,
     status: (b.status ?? "booked") as Booking["status"],
+    credit: (b.credit ?? "sufficient") as NonNullable<Booking["credit"]>,
   })),
 );
 

@@ -6,6 +6,7 @@
 
 import type { TagVariant } from "@sarunyu/system-one";
 import type { Booking, OrderBook, RequirementItem } from "@/types/domain";
+import { creditOf } from "./order-book";
 
 export type BookingStatusTag = { text: string; variant: TagVariant };
 
@@ -15,9 +16,10 @@ export const CLOSED_TAG = { text: "", variant: "gray" } as const;
 /**
  * Where one booking is, read off the book rather than stored on the booking.
  *
- * A booking that no order has carried yet is waiting on the rest of the deal,
- * so it says which half of that wait it is in: still filling, or full and
- * waiting for the IC to send.
+ * Before the order is sent, the booking's own funds check comes first — a
+ * booking still being checked, or one that failed, is what the IC has to look
+ * at. A funded one is waiting on the rest of the deal: still filling, or full
+ * and waiting for the IC to send.
  */
 export function dealStatus(booking: Booking, book: OrderBook): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "ยกเลิกแล้ว", variant: "gray" };
@@ -25,9 +27,12 @@ export function dealStatus(booking: Booking, book: OrderBook): BookingStatusTag 
   if (submission?.status === "processing") return { text: "กำลังดำเนินการ", variant: "blue" };
   if (submission?.status === "completed") return { text: "สำเร็จ", variant: "green" };
   if (submission?.status === "rejected") return { text: "ถูกปฏิเสธ", variant: "red" };
+  const credit = creditOf(booking);
+  if (credit === "pending") return { text: "รอตรวจสอบวงเงิน", variant: "yellow" };
+  if (credit === "insufficient") return { text: "วงเงินไม่เพียงพอ", variant: "red" };
   return book.status === "ready"
     ? { text: "รอส่งคำสั่งซื้อ", variant: "lime" }
-    : { text: "รอครบยอด", variant: "yellow" };
+    : { text: "มีวงเงินเพียงพอ", variant: "green" };
 }
 
 /**

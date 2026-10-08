@@ -19,7 +19,6 @@ import {
   BOOK_STATUS_VARIANT,
   formatLogTime,
   headlineRound,
-  roundOfSubmission,
 } from "./order-book";
 import { ProductLogos } from "./ProductLogos";
 import { AmountOfTarget } from "./AmountOfTarget";
@@ -67,11 +66,8 @@ export function OrderBookCard({ book }: { book: OrderBook }) {
         <p className="type-caption truncate text-muted-foreground">
           {book.desk} · {book.productType} · {book.currency}
         </p>
-        {/* Which round the amounts below belong to. Without it a card showing
-            a fresh round's 30% beside a tag about the round already sent read
-            as one order that had somehow gone backwards. */}
+        {/* Whether the amounts below have gone out yet, and as which order. */}
         <p className="type-caption truncate text-muted-foreground">
-          รอบที่ {round.number} ·{" "}
           {round.previousRef ? `ส่งแล้ว (${round.previousRef})` : "ยังไม่ส่งคำสั่งซื้อ"}
         </p>
       </div>
@@ -116,8 +112,7 @@ export function OrderBookCard({ book }: { book: OrderBook }) {
         <p className="type-caption flex items-center gap-1.5 rounded-lg bg-[var(--fill-yellow-100)] px-3 py-2 text-[var(--fill-yellow-700)]">
           <HourglassMediumIcon size={14} weight="fill" className="shrink-0" />
           <span className="truncate">
-            รอบที่ {roundOfSubmission(book, pending[0].id)} · {pending[0].backendRef} ·
-            รอผลจากระบบหลังบ้าน
+            {pending[0].backendRef} · รอผลจากระบบหลังบ้าน
             {pending.length > 1 && ` (+${pending.length - 1})`}
           </span>
         </p>

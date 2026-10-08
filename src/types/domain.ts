@@ -151,7 +151,16 @@ export type Booking = {
    * `checksAtBooking`.
    */
   checks?: RequirementItem[];
+  /**
+   * The back office's check that the client can fund this booking. Every new
+   * booking starts `pending`; absent on seeded bookings, which read as
+   * `sufficient`.
+   */
+  credit?: CreditStatus;
 };
+
+/** Where one booking's funds check is — see `Booking.credit`. */
+export type CreditStatus = "pending" | "sufficient" | "insufficient";
 
 export type OrderSubmissionStatus = "processing" | "completed" | "rejected";
 
@@ -211,15 +220,20 @@ export type OrderLogEntry = {
 };
 
 /**
- * Where a product's book is in its life: filling up, full and waiting for the
- * IC to send it, or downstream.
+ * Which step a product is at — the steps Order Management filters by, in order:
  *
- * `completed` and `rejected` describe the *latest* submission. A book that has
- * been sent once and has fresh bookings on it since reads as `collecting`
- * again — the next order is what the IC can still act on.
+ * 1. `collecting` — ยืนยันการจองซื้อ: bookings coming in, target not met.
+ * 2. `checking` — รอตรวจสอบวงเงิน: target met, but not every booking has
+ *    cleared its funds check.
+ * 3. `ready` — มีวงเงินเพียงพอ: target met and every booking funded; the IC
+ *    can send.
+ * 4. `processing` — ยืนยันรับคำสั่งซื้อ: sent, the back office confirming.
+ * 5. `completed` — รับคำสั่งซื้อสำเร็จ.
+ * 6. `rejected` — ยกเลิก.
  */
 export type OrderBookStatus =
   | "collecting"
+  | "checking"
   | "ready"
   | "processing"
   | "completed"

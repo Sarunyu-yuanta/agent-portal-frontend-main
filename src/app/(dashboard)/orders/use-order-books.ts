@@ -85,6 +85,55 @@ export function useOrderBooks(): Resource<OrderBook[]> {
   return { data, isLoading };
 }
 
+/**
+ * The products whose order the back office has answered — gone from the
+ * catalogue. One still processing stays listed (not bookable, see
+ * `isBookingOpen`).
+ *
+ * Read off the submissions directly rather than by assembling every book: the
+ * catalogue only needs the ids, and it renders on pages that never show a book.
+ * Same rule as `isBookClosed`.
+ */
+export function useClosedProductIds(): Set<string> {
+  const { submissions } = useOrders();
+  return useMemo(
+    () => new Set(submissions.filter((s) => s.status !== "processing").map((s) => s.productId)),
+    [submissions],
+  );
+}
+
+/**
+ * The products whose order is with the back office right now — still listed in
+ * the catalogue, not bookable, and tagged "กำลังดำเนินการสั่งซื้อ" on its card
+ * so the IC can tell from the outside.
+ */
+export function useProcessingProductIds(): Set<string> {
+  const { submissions } = useOrders();
+  return useMemo(
+    () => new Set(submissions.filter((s) => s.status === "processing").map((s) => s.productId)),
+    [submissions],
+  );
+}
+
+/**
+ * `items` without the closed products, cut to `limit` afterwards — so a fixed
+ * shelf of `limit` cards stays full, the next product in line moving up into
+ * the gap a closed one left.
+ */
+export function useOpenProducts<T>(
+  items: T[],
+  idOf: (item: T) => string,
+  limit?: number,
+): T[] {
+  const closed = useClosedProductIds();
+  return useMemo(() => {
+    const open = items.filter((item) => !closed.has(idOf(item)));
+    return limit === undefined ? open : open.slice(0, limit);
+    // `idOf` is an inline accessor at every call site; it never changes what it reads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, closed, limit]);
+}
+
 /** This client's requirement requests for this product — the readiness input. */
 export function useRequestsFor(clientId: string, productId: string): RequirementRequest[] {
   const { requirementRequests } = useOrders();

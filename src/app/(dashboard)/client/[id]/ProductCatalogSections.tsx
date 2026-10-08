@@ -7,10 +7,12 @@ import { TopIdeaCard } from "./TopIdeaCard";
 import { StructuredProductCard } from "./StructuredProductCard";
 import { TOP_IDEAS, type TopIdeaSector } from "./top-idea-data";
 import {
-  TOP_PICKS,
-  STRUCTURED_PRODUCTS,
+  STRUCTURED_GRID_COUNT,
+  STRUCTURED_SHELF,
+  TOP_PICK_COUNT,
   type StructuredProduct,
 } from "./structured-product-data";
+import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
 import {
   INVESTMENT_SOLUTIONS,
   type InvestmentSolutionId,
@@ -174,12 +176,26 @@ export function InvestmentSolutionSection({
   );
 }
 
-/** Top Pick section — 3-card grid of TOP_PICKS. */
+/**
+ * The front page's structured products, closed ones taken out and the rest
+ * moved up — see {@link STRUCTURED_SHELF}. Each section reads it on its own;
+ * both get the same queue, so neither shows what the other does.
+ */
+function useStructuredShelf(): { topPicks: StructuredProduct[]; grid: StructuredProduct[] } {
+  const open = useOpenProducts(STRUCTURED_SHELF, (p) => p.id);
+  return {
+    topPicks: open.slice(0, TOP_PICK_COUNT),
+    grid: open.slice(TOP_PICK_COUNT, TOP_PICK_COUNT + STRUCTURED_GRID_COUNT),
+  };
+}
+
+/** Top Pick section — the first three open products on the shelf. */
 export function TopPickSection({
   onProductSelect,
 }: {
   onProductSelect: (product: StructuredProduct) => void;
 }) {
+  const { topPicks } = useStructuredShelf();
   return (
     <div
       className="w-full"
@@ -207,7 +223,7 @@ export function TopPickSection({
           </p>
         </div>
         <div className="grid grid-cols-1 md:flex md:flex-col lg:grid lg:grid-cols-3 gap-4 shrink-0 w-full">
-          {TOP_PICKS.map((p) => (
+          {topPicks.map((p) => (
             <StructuredProductCard
               key={p.id}
               {...p}
@@ -230,6 +246,7 @@ export function StructuredProductGridSection({
   onProductSelect: (product: StructuredProduct) => void;
   onAllProductsView: () => void;
 }) {
+  const { grid } = useStructuredShelf();
   return (
     <div
       className="flex flex-col gap-4 items-center relative shrink-0 w-full"
@@ -244,7 +261,7 @@ export function StructuredProductGridSection({
         </p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
-        {STRUCTURED_PRODUCTS.map((p) => (
+        {grid.map((p) => (
           <StructuredProductCard
             key={p.id}
             {...p}

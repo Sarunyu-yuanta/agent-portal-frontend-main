@@ -98,6 +98,31 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+/* A table row just added by the user (the product page's Order tab after a
+   booking): a few soft pulses to catch the eye, then it rests on the same
+   light highlight. Set on the cells as well as the row because the pinned
+   column paints its own background over the row's. No !important: an
+   important background would outrank the animation and the pulse would never
+   show; the `> td` selector already outranks the library's cell surface. */
+.row-just-added,
+.row-just-added > td {
+  background-color: #eff6ff;
+  animation: row-just-added-pulse 0.7s ease-in-out 3;
+}
+
+@keyframes row-just-added-pulse {
+  50% {
+    background-color: #cfe2ff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-just-added,
+  .row-just-added > td {
+    animation: none;
+  }
+}
+
 /* Same always-visible scrollbar treatment as .table-scroll, but for a
    vertical scroll container that IS the scroller (no wrapper div). */
 .visible-scrollbar {

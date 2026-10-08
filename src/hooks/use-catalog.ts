@@ -41,12 +41,14 @@
 import { useMemo } from "react";
 import { useStatic, type Resource } from "@/hooks/use-api";
 import { mockHouseViewStrategies } from "@/lib/mock-data";
+import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
 import {
   ALL_TOP_IDEAS,
   type TopIdeaSector,
 } from "@/app/(dashboard)/client/[id]/top-idea-data";
 import {
-  ALL_STRUCTURED_PRODUCTS,
+  ALL_STRUCTURED_PRODUCTS_LIMIT,
+  ALL_STRUCTURED_PRODUCTS_POOL,
   findProductById,
   TOP_IDEA_DETAIL_PRODUCTS,
   type StructuredProduct,
@@ -111,14 +113,20 @@ export function useTopIdeas(): Resource<{ sector: TopIdeaSector }[]> {
 
 /** The products shown on a single sector's top-idea detail page. */
 export function useTopIdeaProducts(_sector: TopIdeaSector): Resource<StructuredProduct[]> {
-  return useStatic(TOP_IDEA_DETAIL_PRODUCTS);
+  return useStatic(useOpenProducts(TOP_IDEA_DETAIL_PRODUCTS, (p) => p.id));
 }
 
 // ── Structured products ───────────────────────────────────────────────────────
 
-/** Every structured product — the "all products" list. */
+/**
+ * Every structured product still open to booking — the "all products" list.
+ * Drawn from the longer pool, so a product closed by its order going out is
+ * replaced rather than leaving the page a card short.
+ */
 export function useStructuredProducts(): Resource<StructuredProduct[]> {
-  return useStatic(ALL_STRUCTURED_PRODUCTS);
+  return useStatic(
+    useOpenProducts(ALL_STRUCTURED_PRODUCTS_POOL, (p) => p.id, ALL_STRUCTURED_PRODUCTS_LIMIT),
+  );
 }
 
 /** One structured product by id, or `undefined` — see {@link useInsightStrategy}. */

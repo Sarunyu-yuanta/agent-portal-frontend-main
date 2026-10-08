@@ -1,17 +1,20 @@
 "use client";
 
 /**
- * The "Order Management" tab of a product's page: everyone
- * booked into this deal, with the four checks each was booked against, and the
- * deal's totals underneath.
+ * Everyone booked into a deal, with the four checks each was booked against —
+ * the one booking table, in two places:
  *
- * It answers "what happened after I pressed จองซื้อ" without leaving the page
- * the booking was made from. Clicking a row opens that booking on its own
- * (`BookingDetailModal`); the full book — sending the order, the history —
- * stays on `/orders/[productId]`.
+ * - **`variant="product"`** — the "Order" tab of a product's page, with its own
+ *   จองซื้อ and the deal's totals underneath. It answers "what happened after I
+ *   pressed จองซื้อ" without leaving the page the booking was made from.
+ * - **`variant="book"`** — the booking list on `/orders/[productId]`. That
+ *   page's summary already carries the booking button and the totals, so the
+ *   table comes without either.
+ *
+ * Clicking a row opens that booking on its own (`BookingDetailModal`).
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
   Pagination,
@@ -44,7 +47,7 @@ import type {
 } from "@/types/domain";
 import type { BookableProduct } from "./bookable-products";
 import { useOrderBook, useRosterReadiness } from "./use-order-books";
-import { roundNumberOf } from "./order-book";
+import { isBookingOpen } from "./order-book";
 import { BookingDetailModal } from "./BookingDetailModal";
 import {
   CLOSED_TAG,
@@ -103,13 +106,39 @@ export function ProductOrderSection({
   product,
   onBook,
   onNotice,
+  newBookingId = null,
+  onNewBookingSeen,
+  variant = "product",
 }: {
   product: BookableProduct;
   /** Opens the booking modal — the page owns it, and its toasts. */
   onBook: () => void;
   /** The page's toast stack — cancelling from the detail modal reports here. */
   onNotice: (message: string, status: ToastStatus) => void;
+  /**
+   * The booking just placed from this page, highlighted so the IC landing on
+   * this tab after booking can see which row it made. Held by the page, so it
+   * is gone once they leave it.
+   */
+  newBookingId?: string | null;
+  /** Called once the IC has left this tab having seen {@link newBookingId}. */
+  onNewBookingSeen?: () => void;
+  /** Where the table sits — see the module note. */
+  variant?: "product" | "book";
 }) {
+  // Seen once is seen: leaving this tab — for Detail, or another page — clears
+  // the highlight, so coming back shows an ordinary row rather than replaying
+  // the pulse. Deferred a tick so StrictMode's simulated unmount, which
+  // remounts at once and cancels it, does not clear it before it is seen.
+  const seenTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!newBookingId) return;
+    if (seenTimer.current) clearTimeout(seenTimer.current);
+    return () => {
+      seenTimer.current = setTimeout(() => onNewBookingSeen?.(), 0);
+    };
+  }, [newBookingId, onNewBookingSeen]);
+
   const { data: book } = useOrderBook(product.id);
   const clients = useClients();
   const readiness = useRosterReadiness(clients, product);
@@ -147,32 +176,43 @@ export function ProductOrderSection({
   const sentIds = new Set(
     book.submissions.filter((s) => s.status === "completed").flatMap((s) => s.bookingIds),
   );
-  const mine = book.openBookings.filter((b) => b.createdBy === IC_NAME);
-  const notionalIc = mine.reduce((sum, b) => sum + b.amount, 0);
+  // The whole deal's live bookings, sent or not — a product is booked once, so
+  // there is no "round being filled" to narrow the notional to.
+  const notional = book.bookings.reduce((sum, b) => sum + b.amount, 0);
+  const notionalIc = book.bookings
+    .filter((b) => b.createdBy === IC_NAME)
+    .reduce((sum, b) => sum + b.amount, 0);
   const confirmedIc = book.bookings
     .filter((b) => b.createdBy === IC_NAME && sentIds.has(b.id))
     .reduce((sum, b) => sum + b.amount, 0);
 
   const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
-  const openRound = `รอบที่ ${book.submissions.length + 1}`;
+  const canBook = variant === "product" && isBookingOpen(book);
   const isEmpty = rows.length === 0;
   const opened = book.allBookings.find((b) => b.id === openId) ?? null;
 
   return (
     // No card and no heading of its own — it is a tab inside the product's
     // card, and the tab already names it.
-    <section className="flex w-full flex-col gap-4" aria-label="Order Management">
+    <section
+      className="flex w-full flex-col gap-4"
+      aria-label={variant === "product" ? "Order" : "รายการจอง"}
+    >
       <div className="flex items-center justify-end">
         <div className="flex w-full items-center gap-2 md:w-auto">
-          <Button
-            variant="primary"
-            size="md"
-            onClick={onBook}
-            leftIcon={<PlusIcon size={16} />}
-            className="shrink-0"
-          >
-            จองซื้อ
-          </Button>
+          {/* Gone once the order is sent — the notice above the page's tabs
+              says why, on this tab and on Detail alike. */}
+          {canBook && (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={onBook}
+              leftIcon={<PlusIcon size={16} />}
+              className="shrink-0"
+            >
+              จองซื้อ
+            </Button>
+          )}
           <SearchInput
             value={search}
             onChange={(next) => {
@@ -188,167 +228,163 @@ export function ProductOrderSection({
       </div>
 
       <div
-        className={`relative overflow-hidden overflow-x-auto rounded-xl border border-[var(--border-default)] ${
-          isEmpty ? "min-h-[160px]" : ""
+        // `table-scroll` re-exposes the scrollbar the library's <Table> hides on
+        // its own scroller (see globals.css) — eleven columns rarely fit, and
+        // a hidden scrollbar left the right half of the row undiscoverable.
+        // Empty, it is a plain white box with the message and no header row —
+        // column titles over nothing read as a table that failed to load.
+        className={`table-scroll relative overflow-hidden rounded-xl border border-[var(--border-default)] ${
+          isEmpty ? "flex min-h-[160px] items-center justify-center bg-white" : ""
         }`}
       >
-        {/* Columns sized to their content, with the slack going to Customer —
-            see `FIT` for why this is inline style rather than classes. */}
-        <Table style={{ width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell style={FIT} sortable={false}>Structured Note Name</TableHeaderCell>
-              {/* A book is filled and sent more than once; the round says which
-                  order a row went, or will go, out in. */}
-              <TableHeaderCell style={CENTER} sortable={false}>Round</TableHeaderCell>
-              <TableHeaderCell style={FIT} sortable={false}>IC Name</TableHeaderCell>
-              <TableHeaderCell style={FIT} sortable={false}>Account No</TableHeaderCell>
-              {/* Sticky at the left edge: the three columns before it scroll
-                  away first, then the name holds, so a row still says whose
-                  it is once the table is scrolled across to the statuses. */}
-              <TableHeaderCell
-                sortable={false}
-                style={GROW}
-                fixed="left"
-                fixedOffset={0}
-                fixedShadow="right"
-              >
-                Full Name (TH)
-              </TableHeaderCell>
-              {CHECK_COLUMNS.map((c) => (
-                <TableHeaderCell style={CENTER} key={c.key} sortable={false}>
-                  {c.title}
-                </TableHeaderCell>
-              ))}
-              <TableHeaderCell style={CENTER} sortable={false}>
-                Notional Amount
-              </TableHeaderCell>
-              <TableHeaderCell style={CENTER} sortable={false}>Currency</TableHeaderCell>
-              <TableHeaderCell style={CENTER} sortable={false}>Deal Status</TableHeaderCell>
-              <TableHeaderCell style={CENTER} sortable={false}>Payment Status</TableHeaderCell>
-              <TableHeaderCell style={CENTER} sortable={false}>Email Pre-Confirmation</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {visible.map((b) => {
-              const status = dealStatus(b, book);
-              const payment = paymentStatus(b, book);
-              const email = emailStatus(b, book);
-              const cancelled = b.status === "cancelled";
-              const checks = checksAtBooking(b, readiness.get(b.clientId)?.items ?? []);
-              const struck = cancelled ? "text-muted-foreground line-through" : "text-foreground";
-              return (
-                // The whole row opens this booking — a column of arrows only to
-                // say "this is clickable" spent width the table did not have.
-                <TableRow
-                  key={b.id}
-                  hoverable
-                  tabIndex={0}
-                  aria-label={`ดูรายละเอียดการจองของ ${maskName(b.clientName, isPrivate)}`}
-                  onClick={() => setOpenId(b.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setOpenId(b.id);
-                    }
-                  }}
-                  className="cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
-                >
-                  <TableCell style={FIT}>
-                    <span className="type-body-2 font-medium text-foreground">
-                      {book.productName}
-                    </span>
-                  </TableCell>
-                  <TableCell style={CENTER}>
-                    <span className="type-body-2 tabular-nums text-foreground">
-                      รอบที่ {roundNumberOf(book, b.id)}
-                    </span>
-                  </TableCell>
-                  <TableCell style={FIT}>
-                    <span className="type-body-2 text-foreground">{b.createdBy}</span>
-                  </TableCell>
-                  <TableCell style={FIT}>
-                    <span className="type-body-2 tabular-nums text-foreground">
-                      {getClientProfile(b.clientId).accountNo}
-                    </span>
-                  </TableCell>
-                  <TableCell style={GROW} fixed="left" fixedOffset={0} fixedShadow="right">
-                    <span className={`type-body-2 font-medium ${struck}`}>
-                      {maskName(getClientProfile(b.clientId).nameTh, isPrivate)}
-                    </span>
-                  </TableCell>
+        {!isEmpty && (
+          <>
+            {/* Columns sized to their content, with the slack going to Customer —
+                see `FIT` for why this is inline style rather than classes. */}
+            <Table style={{ width: "100%" }}>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell style={FIT} sortable={false}>Structured Note Name</TableHeaderCell>
+                  <TableHeaderCell style={FIT} sortable={false}>IC Name</TableHeaderCell>
+                  <TableHeaderCell style={FIT} sortable={false}>Account No</TableHeaderCell>
+                  {/* Sticky at the left edge: the three columns before it scroll
+                      away first, then the name holds, so a row still says whose
+                      it is once the table is scrolled across to the statuses. */}
+                  <TableHeaderCell
+                    sortable={false}
+                    style={GROW}
+                    fixed="left"
+                    fixedOffset={0}
+                    fixedShadow="right"
+                  >
+                    Full Name (TH)
+                  </TableHeaderCell>
                   {CHECK_COLUMNS.map((c) => (
-                    <TableCell style={CENTER} key={c.key}>
-                      <div className="flex justify-center">
-                        <CheckMark item={checks.find((i) => i.key === c.key)} />
-                      </div>
-                    </TableCell>
+                    <TableHeaderCell style={CENTER} key={c.key} sortable={false}>
+                      {c.title}
+                    </TableHeaderCell>
                   ))}
-                  <TableCell style={CENTER}>
-                    <span className={`type-body-2 font-semibold tabular-nums ${struck}`}>
-                      {money(b.amount)}
-                    </span>
-                  </TableCell>
-                  <TableCell style={CENTER}>
-                    <span className="type-body-2 text-foreground">{book.currency}</span>
-                  </TableCell>
-                  <TableCell style={CENTER}>
-                    <div className="flex justify-center">
-                      <Tag text={status.text} variant={status.variant} size="small" />
-                    </div>
-                  </TableCell>
-                  <TableCell style={CENTER}>
-                    <div className="flex justify-center">
-                      <Tag text={payment.text} variant={payment.variant} size="small" />
-                    </div>
-                  </TableCell>
-                  <TableCell style={CENTER}>
-                    <div className="flex justify-center">
-                      <Tag text={email.text} variant={email.variant} size="small" />
-                    </div>
-                  </TableCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>
+                    Notional Amount
+                  </TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>Currency</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>Deal Status</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>Payment Status</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>Email Pre-Confirmation</TableHeaderCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHead>
+              <TableBody>
+                {visible.map((b) => {
+                  const status = dealStatus(b, book);
+                  const payment = paymentStatus(b, book);
+                  const email = emailStatus(b, book);
+                  const cancelled = b.status === "cancelled";
+                  const checks = checksAtBooking(b, readiness.get(b.clientId)?.items ?? []);
+                  const struck = cancelled ? "text-muted-foreground line-through" : "text-foreground";
+                  return (
+                    // The whole row opens this booking — a column of arrows only to
+                    // say "this is clickable" spent width the table did not have.
+                    <TableRow
+                      key={b.id}
+                      hoverable
+                      tabIndex={0}
+                      aria-label={`ดูรายละเอียดการจองของ ${maskName(b.clientName, isPrivate)}`}
+                      onClick={() => setOpenId(b.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setOpenId(b.id);
+                        }
+                      }}
+                      // The row just booked pulses, then stays highlighted — see
+                      // `.row-just-added` in globals.css.
+                      className={`cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)] ${
+                        b.id === newBookingId ? "row-just-added" : ""
+                      }`}
+                    >
+                      <TableCell style={FIT}>
+                        <span className="type-body-2 font-medium text-foreground">
+                          {book.productName}
+                        </span>
+                      </TableCell>
+                      <TableCell style={FIT}>
+                        <span className="type-body-2 text-foreground">{b.createdBy}</span>
+                      </TableCell>
+                      <TableCell style={FIT}>
+                        <span className="type-body-2 tabular-nums text-foreground">
+                          {getClientProfile(b.clientId).accountNo}
+                        </span>
+                      </TableCell>
+                      <TableCell style={GROW} fixed="left" fixedOffset={0} fixedShadow="right">
+                        <span className={`type-body-2 font-medium ${struck}`}>
+                          {maskName(getClientProfile(b.clientId).nameTh, isPrivate)}
+                        </span>
+                      </TableCell>
+                      {CHECK_COLUMNS.map((c) => (
+                        <TableCell style={CENTER} key={c.key}>
+                          <div className="flex justify-center">
+                            <CheckMark item={checks.find((i) => i.key === c.key)} />
+                          </div>
+                        </TableCell>
+                      ))}
+                      <TableCell style={CENTER}>
+                        <span className={`type-body-2 font-semibold tabular-nums ${struck}`}>
+                          {money(b.amount)}
+                        </span>
+                      </TableCell>
+                      <TableCell style={CENTER}>
+                        <span className="type-body-2 text-foreground">{book.currency}</span>
+                      </TableCell>
+                      <TableCell style={CENTER}>
+                        <div className="flex justify-center">
+                          <Tag text={status.text} variant={status.variant} size="small" />
+                        </div>
+                      </TableCell>
+                      <TableCell style={CENTER}>
+                        <div className="flex justify-center">
+                          <Tag text={payment.text} variant={payment.variant} size="small" />
+                        </div>
+                      </TableCell>
+                      <TableCell style={CENTER}>
+                        <div className="flex justify-center">
+                          <Tag text={email.text} variant={email.variant} size="small" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </>
+        )}
         {isEmpty && (
-          <div className="absolute inset-x-0 bottom-0 top-12 flex flex-col items-center justify-center gap-1 px-4 text-center">
+          <div className="flex flex-col items-center justify-center gap-1 px-4 py-8 text-center">
             <p className="type-body-2 font-semibold text-foreground">
               {search ? "ไม่พบรายการที่ค้นหา" : "ยังไม่มีรายการจองซื้อ"}
             </p>
             {!search && (
               <p className="type-caption text-muted-foreground">
-                กด &quot;จองซื้อ&quot; เพื่อจองให้ลูกค้ารายแรก — รายการจะแสดงที่นี่
+                กด &quot;{variant === "product" ? "จองซื้อ" : "จองเพิ่มให้ลูกค้า"}&quot;
+                เพื่อจองให้ลูกค้ารายแรก — รายการจะแสดงที่นี่
               </p>
             )}
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {/* Notional is the round being filled; confirmed is every round the
-            back office has accepted. Each card says which, because side by
-            side they otherwise read as one round's two halves. */}
-        <Total label="Total Notional IC" scope={openRound} value={money(notionalIc)} />
-        <Total
-          label="Total Confirmed IC"
-          scope="ทุกรอบ"
-          value={money(confirmedIc)}
-          tone="green"
-        />
-        <Total
-          label="Total Notional"
-          scope={openRound}
-          value={`${money(book.bookedAmount)} / ${money(book.targetAmount)}`}
-        />
-        <Total
-          label="Total Confirmed"
-          scope="ทุกรอบ"
-          value={money(book.confirmedAmount)}
-          tone="green"
-        />
-      </div>
+      {variant === "product" && (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {/* Notional is everything booked; confirmed is what the back office
+              has accepted of it. */}
+          <Total label="Total Notional IC" value={money(notionalIc)} />
+          <Total label="Total Confirmed IC" value={money(confirmedIc)} tone="green" />
+          <Total
+            label="Total Notional"
+            value={`${money(notional)} / ${money(book.targetAmount)}`}
+          />
+          <Total label="Total Confirmed" value={money(book.confirmedAmount)} tone="green" />
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-3">
         <span className="type-body-2 text-muted-foreground">Total {rows.length} Records</span>
@@ -368,7 +404,12 @@ export function ProductOrderSection({
         deal={opened ? dealStatus(opened, book) : CLOSED_TAG}
         payment={opened ? paymentStatus(opened, book) : CLOSED_TAG}
         email={opened ? emailStatus(opened, book) : CLOSED_TAG}
-        onClose={() => setOpenId(null)}
+        onClose={() => {
+          // Opening the new booking is looking at it — it closes as an
+          // ordinary row, the same as leaving the tab would.
+          if (openId === newBookingId) onNewBookingSeen?.();
+          setOpenId(null);
+        }}
         onNotice={onNotice}
       />
     </section>
@@ -387,22 +428,16 @@ function CheckMark({ item }: { item: RequirementItem | undefined }) {
 
 function Total({
   label,
-  scope,
   value,
   tone,
 }: {
   label: string;
-  /** Which rounds the figure covers — "รอบที่ 2" or "ทุกรอบ". */
-  scope: string;
   value: string;
   tone?: "green";
 }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-black/10 px-4 py-3">
-      <span className="flex items-baseline justify-between gap-2">
-        <span className="text-xs uppercase leading-4 tracking-wide text-[#6a7282]">{label}</span>
-        <span className="type-caption shrink-0 text-muted-foreground">{scope}</span>
-      </span>
+      <span className="text-xs uppercase leading-4 tracking-wide text-[#6a7282]">{label}</span>
       <span
         className={`text-lg font-bold leading-6 tabular-nums ${
           tone === "green" ? "text-[var(--fill-green-600)]" : "text-[#101828]"
