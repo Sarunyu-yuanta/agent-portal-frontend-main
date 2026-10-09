@@ -64,7 +64,7 @@ const PAGE_SIZE = 10;
  * Every cell's style, inline on purpose.
  *
  * The library gives each text cell `min-w-[284px]` (and the table `w-full`)
- * from an unlayered stylesheet, so eleven columns each took at least 284px and
+ * from an unlayered stylesheet, so every column took at least 284px and
  * a row read as scattered words. Neither utilities nor a scoped rule in
  * globals.css reliably beat it; an inline style always does.
  *
@@ -229,7 +229,7 @@ export function ProductOrderSection({
 
       <div
         // `table-scroll` re-exposes the scrollbar the library's <Table> hides on
-        // its own scroller (see globals.css) — eleven columns rarely fit, and
+        // its own scroller (see globals.css) — ten columns rarely fit, and
         // a hidden scrollbar left the right half of the row undiscoverable.
         // Empty, it is a plain white box with the message and no header row —
         // column titles over nothing read as a table that failed to load.
@@ -244,10 +244,11 @@ export function ProductOrderSection({
             <Table style={{ width: "100%" }}>
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell style={FIT} sortable={false}>Structured Note Name</TableHeaderCell>
+                  {/* No product column — every row on this page is the product
+                      named in the header above. */}
                   <TableHeaderCell style={FIT} sortable={false}>IC Name</TableHeaderCell>
                   <TableHeaderCell style={FIT} sortable={false}>Account No</TableHeaderCell>
-                  {/* Sticky at the left edge: the three columns before it scroll
+                  {/* Sticky at the left edge: the two columns before it scroll
                       away first, then the name holds, so a row still says whose
                       it is once the table is scrolled across to the statuses. */}
                   <TableHeaderCell
@@ -302,11 +303,6 @@ export function ProductOrderSection({
                         b.id === newBookingId ? "row-just-added" : ""
                       }`}
                     >
-                      <TableCell style={FIT}>
-                        <span className="type-body-2 font-medium text-foreground">
-                          {book.productName}
-                        </span>
-                      </TableCell>
                       <TableCell style={FIT}>
                         <span className="type-body-2 text-foreground">{b.createdBy}</span>
                       </TableCell>

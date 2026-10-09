@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+
 import {
   Alert,
   Avatar,
@@ -42,6 +43,7 @@ import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetMo
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
 import { useClients } from "@/hooks/use-api";
+import { useIsoLayoutEffect } from "@/hooks/use-iso-layout-effect";
 import { getClientProfile } from "@/data/client-profiles";
 import { IC_NAME, IC_TEAM } from "@/lib/current-ic";
 import { formatThbAmount, getInitial, parseAmount } from "@/lib/client-utils";
@@ -63,7 +65,7 @@ import {
   minTicketFor,
   USD_THB,
 } from "./order-book";
-import { requestableKeys } from "./order-requirements";
+import { requestableKeys, shortRequirementLabel } from "./order-requirements";
 import { useClientReadiness, useOrderBook, useRosterReadiness } from "./use-order-books";
 
 export function OrderBookingModal({
@@ -142,6 +144,15 @@ function BackButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+/**
+ * How long the two panes take to slide past each other.
+ *
+ * A number here *and* `duration-200` in the markup, because only one of the two
+ * can be a Tailwind class: the timer that retires the off-screen pane has to
+ * outlast the transition, and a class cannot be read back. Keep them in step.
+ */
+const SLIDE_MS = 200;
+
 function BookingForm({
   product,
   clientId,
@@ -166,123 +177,216 @@ function BookingForm({
   const [booking, setBooking] = useState(false);
 
   const client = clients.find((c) => c.id === clientId) ?? null;
-  const readiness = useClientReadiness(client ?? PLACEHOLDER_CLIENT, product);
-  /** The gate on the amount section — and the one on the booking itself. */
-  const ready = Boolean(client) && readiness.status === "ready";
+  const atForm = client !== null;
+
+  /**
+   * Who the form pane is about, which lags `client` on the way back.
+   *
+   * Both panes stay mounted so they can slide past each other, so for the
+   * ~200ms it takes the form to leave it still needs someone to be about —
+   * clearing it with `clientId` would empty the pane while it is still on
+   * screen. Set in the same breath as the selection going forward, so the pane
+   * is never blank on the way in. Same split `KycAlertsPanel` makes, which is
+   * where this track comes from.
+   */
+  const [shownId, setShownId] = useState("");
+  const shown = clients.find((c) => c.id === shownId) ?? null;
+  useEffect(() => {
+    if (clientId) return;
+    const t = setTimeout(() => setShownId(""), SLIDE_MS);
+    return () => clearTimeout(t);
+  }, [clientId]);
+
+  const readiness = useClientReadiness(shown ?? PLACEHOLDER_CLIENT, product);
+  /** The gate on the amount section — and the one on the booking itself.
+   *  Keyed off the live selection, not `shown`: the footer outlives the slide
+   *  back to the list, and nothing on it may stay armed once Back is pressed. */
+  const ready = atForm && readiness.status === "ready";
 
   /** The modal's scroller — the customer list needs it to reset on search. */
   const bodyRef = useRef<HTMLDivElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const [trackHeight, setTrackHeight] = useState<number | undefined>(undefined);
+
+  /** The track slides; the modal resizes to whichever pane is showing. Both are
+   *  animated and both have to be — sliding alone leaves the box at the taller
+   *  pane's height with dead space under the shorter one. Measured, because
+   *  neither pane has a height anyone could write down: the list grows with the
+   *  roster and the form with how much is wrong with the client. */
+  useIsoLayoutEffect(() => {
+    const measure = () => {
+      const active = atForm ? formRef.current : pickerRef.current;
+      if (active) setTrackHeight(active.offsetHeight);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (pickerRef.current) observer.observe(pickerRef.current);
+    if (formRef.current) observer.observe(formRef.current);
+    return () => observer.disconnect();
+  }, [atForm]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      {/* No horizontal padding here — each branch pads itself.
+      {/* No padding of its own — each pane pads itself.
           The sticky header inside the picker has to bleed to the modal's edges
           to cover the rows passing under it, and doing that from inside a
           padded scroller meant cancelling the padding with a negative margin.
           That pair has to match at every breakpoint, and it did not: the block
-          ended up 8px further in than the list below it. Padding the branches
-          instead means there is no pair to keep in step. */}
-      <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto pb-4 pt-3">
+          ended up 8px further in than the list below it. Padding the panes
+          instead means there is no pair to keep in step.
+
+          `overflow-x-hidden` here rather than on the track below, which is what
+          actually clips the off-screen pane: an `overflow: hidden` box between
+          a sticky element and its scroller becomes the scrollport it sticks to,
+          and that box never scrolls — so clipping on the track would have left
+          the picker's search header scrolling away with the rows. Hidden on the
+          same element that scrolls is the one place it costs nothing. */}
+      <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         {/* The form is two screens in one modal: choose, then fill in. Until a
             customer is chosen there is nothing to show but their statuses, and
             every one of them would read "—" — so the list gets the whole body
-            instead of sitting in a dropdown above four empty cards. */}
-        {!client ? (
-          <CustomerPicker
-            product={product}
-            scrollerRef={bodyRef}
-            onSelect={(id) => {
-              setClientId(id);
-              // A different customer is a different order — never carry the
-              // last one's amount over to them.
-              setRaw("");
-            }}
-          />
-        ) : (
-          <div className="px-4 md:px-6">
-            {/* The bottom sheet's header is its own and takes no icon, so on a
-                phone the back arrow opens the body instead of sharing the
-                title row. */}
-            {isMobile && (
-              <div className="mb-2">
-                <BackButton onClick={() => setClientId("")} />
-              </div>
-            )}
-            {/* A wider row gap than column gap: the columns are already far
-                apart across the modal, where the rows are two lines of text
-                that would otherwise run together. */}
-            <div className="grid grid-cols-1 gap-x-3 gap-y-4 md:grid-cols-2">
-              <FieldCard label="Customer">
-                {/* The link trails the name, not the label. "เปลี่ยน" acts on
-                    the customer, and the customer is the line below the
-                    caption — put it up there and it reads as an action on the
-                    word "Customer" instead. `flex-wrap` lets it drop to its own
-                    line rather than squeezing a long name. */}
-                <div className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="type-body-2 min-w-0 truncate !font-semibold text-foreground">
-                    {client.id} - {maskName(client.name, isPrivate)}
-                  </span>
-                  <ActionLink
-                    label="เปลี่ยน"
-                    disabled={false}
-                    onClick={() => setClientId("")}
-                  />
-                </div>
-              </FieldCard>
-              <ReadOnlyField
-                label="Account No"
-                value={getClientProfile(client.id).accountNo}
-              />
-              {/* The IC sits with the customer, above the checks, because the
-                  four of them together are the header of the order: who it is
-                  for, on which account, placed by whom, from which desk. None
-                  of it is a decision — putting it after the checks made the
-                  reader step over a block of facts to reach the amount. */}
-              <ReadOnlyField label="IC Name" value={IC_NAME} />
-              <ReadOnlyField label="IC Team" value={IC_TEAM} />
-            </div>
+            instead of sitting in a dropdown above four empty cards.
 
-            <StatusGrid product={product} client={client} onNotice={onNotice} />
-            <AmountSection
-              product={product}
-              client={client}
-              raw={raw}
-              onRawChange={setRaw}
-              disabled={!ready}
-              passed={readiness.items.filter((i) => i.status === "passed").length}
-              total={readiness.items.length}
-            />
+            They are one strip that slides rather than two views that swap: the
+            form is a drill-in from the row the IC just pressed, and Back has to
+            land on the list exactly as it was — same scroll position, same
+            search. */}
+        <div
+          className="transition-[height] duration-200 ease-out"
+          style={{ height: trackHeight }}
+        >
+          {/* `items-start` is load-bearing: a flex row stretches its children to
+              the tallest, which here is the track — whose height comes from
+              measuring a pane. Both panes would then measure the same number and
+              the box would freeze at whatever it happened to be first. */}
+          <div
+            className="flex w-[200%] items-start transition-transform duration-200 ease-out"
+            style={{ transform: atForm ? "translateX(-50%)" : "translateX(0)" }}
+          >
+            {/* `inert` on whichever pane is off-screen — both stay mounted so
+                they can slide, and without it Tab walks into a pane nobody can
+                see and a screen reader reads out both. */}
+            <div ref={pickerRef} className="w-1/2 shrink-0" inert={atForm}>
+              <CustomerPicker
+                product={product}
+                scrollerRef={bodyRef}
+                onSelect={(id) => {
+                  // Together, and in this order: the pane has to be about
+                  // someone before it starts sliding into view.
+                  setShownId(id);
+                  setClientId(id);
+                  // A different customer is a different order — never carry the
+                  // last one's amount over to them.
+                  setRaw("");
+                }}
+              />
+            </div>
+            <div
+              ref={formRef}
+              className="w-1/2 shrink-0 px-4 pb-4 pt-3 md:px-6"
+              inert={!atForm}
+            >
+              {shown && (
+                <>
+                  {/* The bottom sheet's header is its own and takes no icon, so
+                      on a phone the back arrow opens the body instead of
+                      sharing the title row. */}
+                  {isMobile && (
+                    <div className="mb-2">
+                      <BackButton onClick={() => setClientId("")} />
+                    </div>
+                  )}
+                  {/* A wider row gap than column gap: the columns are already
+                      far apart across the modal, where the rows are two lines
+                      of text that would otherwise run together. */}
+                  <div className="grid grid-cols-1 gap-x-3 gap-y-4 md:grid-cols-2">
+                    <FieldCard label="Customer">
+                      {/* The link trails the name, not the label. "เปลี่ยน" acts
+                          on the customer, and the customer is the line below the
+                          caption — put it up there and it reads as an action on
+                          the word "Customer" instead. `flex-wrap` lets it drop to
+                          its own line rather than squeezing a long name. */}
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="type-body-2 min-w-0 truncate !font-semibold text-foreground">
+                          {shown.id} - {maskName(shown.name, isPrivate)}
+                        </span>
+                        <ActionLink
+                          label="เปลี่ยน"
+                          disabled={false}
+                          onClick={() => setClientId("")}
+                        />
+                      </div>
+                    </FieldCard>
+                    <ReadOnlyField
+                      label="Account No"
+                      value={getClientProfile(shown.id).accountNo}
+                    />
+                    {/* The IC sits with the customer, above the checks, because
+                        the four of them together are the header of the order:
+                        who it is for, on which account, placed by whom, from
+                        which desk. None of it is a decision — putting it after
+                        the checks made the reader step over a block of facts to
+                        reach the amount. */}
+                    <ReadOnlyField label="IC Name" value={IC_NAME} />
+                    <ReadOnlyField label="IC Team" value={IC_TEAM} />
+                  </div>
+
+                  <StatusGrid product={product} client={shown} onNotice={onNotice} />
+                  <AmountSection
+                    product={product}
+                    client={shown}
+                    raw={raw}
+                    onRawChange={setRaw}
+                    disabled={!ready}
+                    passed={readiness.items.filter((i) => i.status === "passed").length}
+                    total={readiness.items.length}
+                  />
+                </>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
-      <Footer
-        ready={ready}
-        product={product}
-        client={client}
-        raw={raw}
-        booking={booking}
-        onCancel={onClose}
-        onBooked={async (amount) => {
-          if (!client) return;
-          setBooking(true);
-          const placed = await bookOrder({
-            productId: product.id,
-            clientId: client.id,
-            clientName: client.name,
-            amount,
-            checks: readiness.items,
-            fundsAvailable: cashInCurrency(clientCashThb(client), product.currency),
-          });
-          setBooking(false);
-          onClose();
-          onBookedProp?.(placed);
-          onNotice(
-            `จอง ${formatOrderAmount(amount, product.currency)} ให้ ${maskName(client.name, isPrivate)} แล้ว`,
-            "success",
-          );
-        }}
-      />
+      {/* Only on the second screen. Both of its buttons are about an order that
+          does not exist yet while the list is up — "จองซื้อ" can only ever be
+          dead there, and a dead primary button under a list of people reads as
+          "one of these should have enabled it". The ✕ in the title row is the
+          way out of the picker; Cancel comes back with the form it belongs to.
+
+          Tied to `shown`, so it leaves with the pane rather than a beat before
+          it: unmounting on `client` shortened the modal in one frame while the
+          track was still animating its height, and the two read as a stumble.
+          `ready` is false the moment Back is pressed, so nothing here is live
+          during the slide out. */}
+      {shown && (
+        <Footer
+          ready={ready}
+          product={product}
+          raw={raw}
+          booking={booking}
+          onCancel={onClose}
+          onBooked={async (amount) => {
+            setBooking(true);
+            const placed = await bookOrder({
+              productId: product.id,
+              clientId: shown.id,
+              clientName: shown.name,
+              amount,
+              checks: readiness.items,
+              fundsAvailable: cashInCurrency(clientCashThb(shown), product.currency),
+            });
+            setBooking(false);
+            onClose();
+            onBookedProp?.(placed);
+            onNotice(
+              `จอง ${formatOrderAmount(amount, product.currency)} ให้ ${maskName(shown.name, isPrivate)} แล้ว`,
+              "success",
+            );
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -354,17 +458,15 @@ function CustomerPicker({
   const readyCount = results.filter((c) => readiness.get(c.id)?.status === "ready").length;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 pb-4">
       {/* Pinned to the top of the modal's scroller. With a long book the list
           scrolls for screens, and a search box that scrolls away with it means
           scrolling back to the top to narrow the list — which is the one thing
           a long list makes you want to do.
-          It carries the same `px` as the list below, so the two line up; the
-          scroller itself is unpadded precisely so this can be stated once per
-          side instead of as a margin cancelling a padding. `-mt-3 pt-3` is the
-          one cancelled pair left, and it is vertical — a single value, with no
-          breakpoint to keep in step. */}
-      <div className="sticky top-0 z-10 -mt-3 flex flex-col gap-3 bg-white px-4 pb-2 pt-3 md:px-6">
+          It carries the same padding as the list below, so the two line up: the
+          scroller and the pane around it are both unpadded precisely so this can
+          be stated once per side rather than as a margin cancelling one. */}
+      <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pb-2 pt-3 md:px-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="type-body-2 !font-semibold text-foreground">เลือกลูกค้า</span>
           <span className="type-caption text-muted-foreground tabular-nums">
@@ -409,6 +511,40 @@ function CustomerPicker({
   );
 }
 
+/**
+ * The three answers a row can give, in words rather than as a score.
+ *
+ * `ready` is the one the list exists to find, so it is the only green; the
+ * other two are both "not yet" and differ in who the next move belongs to —
+ * `in-review` is waiting on an approver (yellow, the same colour the status
+ * chips use for `pending`), `blocked` is waiting on the IC (red). The prefix is
+ * how the names that follow are read: "รอผล KYC" and "ยังขาด KYC" are the same
+ * four records in two different states.
+ */
+const READINESS_VERDICT: Record<
+  ClientReadiness["status"],
+  { icon: typeof CheckCircleIcon; chip: string; text: string; prefix: string }
+> = {
+  ready: {
+    icon: CheckCircleIcon,
+    chip: "bg-[var(--fill-green-100)] text-[var(--fill-green-600)]",
+    text: "ครบแล้ว",
+    prefix: "",
+  },
+  "in-review": {
+    icon: ClockIcon,
+    chip: "bg-[var(--fill-yellow-100)] text-[var(--fill-yellow-600)]",
+    text: "รอตรวจสอบ",
+    prefix: "รอผล",
+  },
+  blocked: {
+    icon: XCircleIcon,
+    chip: "bg-[var(--fill-red-100)] text-[var(--fill-red-600)]",
+    text: "ยังไม่ครบ",
+    prefix: "ยังขาด",
+  },
+};
+
 function CustomerRow({
   client,
   readiness,
@@ -420,9 +556,13 @@ function CustomerRow({
 }) {
   const { isPrivate } = usePrivacy();
   const displayName = maskName(client.name, isPrivate);
-  const ready = readiness?.status === "ready";
-  const passed = readiness?.items.filter((i) => i.status === "passed").length ?? 0;
-  const total = readiness?.items.length ?? 0;
+  const verdict = READINESS_VERDICT[readiness?.status ?? "blocked"];
+  // Named, not counted. "2/4" says how much is wrong without saying what, and
+  // the answer is four words away — the IC had to open the client to find out
+  // whether this was a form to send or a KYC review they cannot start.
+  const outstanding = (readiness?.outstanding ?? [])
+    .map((i) => shortRequirementLabel(i.label))
+    .join(", ");
 
   return (
     <li>
@@ -432,28 +572,49 @@ function CustomerRow({
         // No fill and no radius of its own — both belong to the frame now.
         // The hover is what the row still owns, and it reaches the frame's
         // edges because the row is the full width of it.
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--fill-gray-200)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7]"
+        // `py-4`, where the single-line pair it was built for took `py-3`: a
+        // chip sitting right on top of the line that explains it reads as one
+        // stacked object, and the row needed the height for them to be two.
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--fill-gray-200)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7]"
       >
         <Avatar type="text" initials={getInitial(displayName)} size="m" />
+        {/* Still tight. A name and the tier under it are one label in two
+            lines, and loosening them would undo that to match a gap on the
+            other side of the row that is doing a different job. */}
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="type-body-2 truncate !font-semibold text-foreground">
             {client.id} - {displayName}
           </span>
+          {/* Who the client is, and only that. What is outstanding used to be
+              appended here, dot-separated and changing colour halfway, which
+              put a second heavy line under a bold name and made the list harder
+              to read than the "2/4" it replaced. */}
           <span className="type-caption truncate text-muted-foreground">
             {client.tier} · {client.riskProfile}
           </span>
         </span>
-        {/* How far along, not how far short — and the same `passed / total`
-            the form's own counter uses once a customer is picked, so the two
-            screens are read the same way rather than one counting up and the
-            other counting down. `tabular-nums` keeps the column from shifting
-            as the digits change. */}
-        <span
-          className={`type-caption shrink-0 !font-semibold tabular-nums ${
-            ready ? "text-[var(--fill-green-600)]" : "text-muted-foreground"
-          }`}
-        >
-          {passed}/{total}
+        {/* The verdict, and under it the reason — one column, because they are
+            one answer. The row has to say "can I book this one" before anything
+            else, and a ratio made the reader derive it (4/4 only means yes if
+            you also know the total is four); what is missing is the follow-up
+            question, so it sits directly under the word that raises it.
+
+            A filled chip rather than coloured text, and the same fill the next
+            screen's status cards use: one shape to find down the column, at a
+            contrast 12px type can carry. The reason under it stays grey — the
+            chip is the only alarm in the row. */}
+        <span className="flex min-w-0 shrink flex-col items-end gap-2">
+          <span
+            className={`type-caption flex shrink-0 items-center gap-1 rounded-full py-0.5 pl-1.5 pr-2 !font-semibold ${verdict.chip}`}
+          >
+            <verdict.icon size={14} weight="fill" />
+            {verdict.text}
+          </span>
+          {outstanding && (
+            <span className="type-caption max-w-full truncate text-muted-foreground">
+              {verdict.prefix} {outstanding}
+            </span>
+          )}
         </span>
         <CaretRightIcon size={16} className="shrink-0 text-muted-foreground" />
       </button>
@@ -505,21 +666,22 @@ function StatusGrid({
     );
   };
 
-  const ready = readiness.items.filter((i) => i.status === "passed").length;
+  const verdict = READINESS_VERDICT[readiness.status];
 
   return (
     <>
-      {/* A heading over the four, with the count. The chips answer each row;
-          this answers the grid — "3 จาก 4" is what the IC repeats back on the
-          phone, and it saves re-counting colours every time the form re-renders
-          under them. */}
+      {/* A heading over the four, with the verdict. The chips answer each row;
+          this answers the grid, so the reader is not re-counting colours every
+          time the form re-renders under them. */}
       <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
         <span className="type-body-2 !font-semibold text-foreground">
           ข้อมูลที่ต้องมีก่อนจองซื้อ
         </span>
-        {/* Same `passed / total` the customer list shows per row, in the same
-            format. One ratio written two ways is a ratio the reader has to
-            translate between. */}
+        {/* The same word the customer list gave this client a moment ago — the
+            IC picked the row that said "ยังไม่ครบ" and the next screen has to
+            agree with it. The count rides along here, where the grid under it
+            says which ones; in the list it was the whole of the answer, which
+            is what made it unreadable. */}
         <span
           className={`type-caption rounded-full px-2 py-0.5 tabular-nums ${
             readiness.status === "ready"
@@ -527,7 +689,9 @@ function StatusGrid({
               : "bg-[var(--fill-gray-100)] text-muted-foreground"
           }`}
         >
-          {ready}/{readiness.items.length}
+          {readiness.status === "ready"
+            ? verdict.text
+            : `${verdict.text} (${readiness.outstanding.length} รายการ)`}
         </span>
       </div>
 
@@ -1016,7 +1180,6 @@ function AmountSection({
 function Footer({
   ready,
   product,
-  client,
   raw,
   booking,
   onCancel,
@@ -1025,7 +1188,6 @@ function Footer({
   /** Whether all four checks pass — the gate on the amount and the booking. */
   ready: boolean;
   product: BookableProduct;
-  client: Client | null;
   raw: string;
   booking: boolean;
   onCancel: () => void;
@@ -1041,7 +1203,7 @@ function Footer({
   // `ready` is checked here as well as on the amount section: a check can
   // expire while the form is open, and the gate has to hold at the moment of
   // booking.
-  const canBook = Boolean(client) && ready && ok && !booking;
+  const canBook = ready && ok && !booking;
 
   return (
     <div className="flex shrink-0 flex-col gap-2 border-t border-border px-4 py-3 md:px-6">

@@ -68,6 +68,17 @@ export const REQUIREMENT_CATALOG: Record<
   },
 };
 
+/**
+ * The same name, short enough to list several of in one line.
+ *
+ * "Wealth Status, KYC Status, Risk Profile Status" repeats a word three times
+ * to say what the sentence already said once ("ยังขาด"). Derived rather than a
+ * second column in the catalogue above, so the two names cannot drift apart.
+ */
+export function shortRequirementLabel(label: string): string {
+  return label.replace(/\s*Status$/, "");
+}
+
 /** Risk ratings in order, so two of them can be compared rather than matched. */
 const RISK_ORDER = ["Conservative", "Moderate", "Aggressive"] as const;
 

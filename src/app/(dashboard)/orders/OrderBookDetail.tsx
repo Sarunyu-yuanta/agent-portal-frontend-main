@@ -13,8 +13,8 @@
  * ## Layout
  *
  * Two columns from `lg`, 80/20: the lists on the left, the summary pinned on
- * the right. The booking list is the same eleven-column table as the product
- * page's Order tab (`ProductOrderSection`), so it gets most of the width; the
+ * the right. The booking list is the same wide table as the product page's
+ * Order tab (`ProductOrderSection`), so it gets most of the width; the
  * summary is what every decision is made against, so it stays in view while
  * the list scrolls. Below `lg` the summary comes first.
  */
@@ -35,13 +35,10 @@ import {
   type ToastStatus,
 } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
-import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
-import { usePopover } from "@/hooks/use-popover";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { useToasts } from "@/hooks/use-toasts";
-import { maskName } from "@/lib/mask-name";
-import type { Booking, OrderBook } from "@/types/domain";
+import type { OrderBook } from "@/types/domain";
 import type { BookableProduct } from "./bookable-products";
 import {
   BOOK_STATUS_LABEL_TH,
@@ -151,7 +148,7 @@ export function OrderBookDetail({
         />
       </div>
 
-      {/* 80/20: the booking table is eleven columns wide and gets the room; the
+      {/* 80/20: the booking table is ten columns wide and gets the room; the
           summary is a narrow column on the right, pinned while the list
           scrolls. No `grid-cols-1`: the library's unlayered stylesheet carries
           that class too and would beat the `lg:` template. A grid with no
@@ -218,12 +215,14 @@ export function OrderBookDetail({
             </div>
           )}
 
-          {/* No `overflow-hidden`: the holders row hangs a popover out of this
-              panel, and clipping it to the panel's rounded corners cut the
-              names off. The rows carry no background of their own, so there is
-              nothing left for it to clip. */}
           <dl className="flex flex-col divide-y divide-border rounded-xl bg-[#f3f4f6]">
-            <HoldersFigure bookings={round.bookings} currency={book.currency} />
+            {/* The count only — who they are is the booking list on this very
+                page, so a panel repeating it earned nothing. Counted by client:
+                one client can book the same product twice. */}
+            <Figure
+              label="ลูกค้าที่จอง"
+              value={`${new Set(round.bookings.map((b) => b.clientId)).size} ราย`}
+            />
             <Figure label="ขั้นต่ำต่อราย" value={formatOrderAmount(book.minTicket, book.currency)} />
           </dl>
 
@@ -371,88 +370,6 @@ function Figure({ label, value }: { label: string; value: string }) {
     <div className="flex items-baseline justify-between gap-3 px-4 py-3">
       <dt className="type-body-2 text-muted-foreground">{label}</dt>
       <dd className="type-body-2 !font-semibold tabular-nums text-foreground">{value}</dd>
-    </div>
-  );
-}
-
-/**
- * "ลูกค้าที่จอง · N ราย", with the names behind a hover.
- *
- * The count is the figure the summary needs; the names are the question it
- * raises, and they are already a click away in the booking list — so they
- * belong in a hover rather than in a row of their own, which would push the
- * send button below the fold on a laptop.
- *
- * Hover *and* click, via the project's own `usePopover`: a hover-only panel is
- * unreachable on a touch screen, and the hook's short close delay is what lets
- * the pointer travel from the row into the panel without it vanishing.
- *
- * Grouped by client, because one client can book the same product twice —
- * listing them as two rows would disagree with the "N ราย" the trigger shows.
- */
-function HoldersFigure({
-  bookings,
-  currency,
-}: {
-  bookings: Booking[];
-  currency: string;
-}) {
-  const { isPrivate } = usePrivacy();
-  const { open, setOpen, ref, hoverProps } = usePopover();
-
-  const holders = Array.from(
-    bookings
-      .reduce((byClient, b) => {
-        const seen = byClient.get(b.clientId);
-        byClient.set(b.clientId, {
-          clientId: b.clientId,
-          clientName: b.clientName,
-          amount: (seen?.amount ?? 0) + b.amount,
-        });
-        return byClient;
-      }, new Map<string, { clientId: string; clientName: string; amount: number }>())
-      .values(),
-  ).sort((a, b) => b.amount - a.amount);
-
-  return (
-    <div
-      ref={ref}
-      {...hoverProps}
-      className="relative flex items-baseline justify-between gap-3 px-4 py-3"
-    >
-      <dt className="type-body-2 text-muted-foreground">ลูกค้าที่จอง</dt>
-      <dd>
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((prev) => !prev)}
-          className="type-body-2 cursor-pointer tabular-nums !font-semibold text-foreground underline decoration-dotted decoration-from-font underline-offset-4"
-        >
-          {holders.length} ราย
-        </button>
-      </dd>
-
-      {open && holders.length > 0 && (
-        // Anchored to this row's right edge: the summary column sits against
-        // the viewport's, and a left-anchored panel ran off it.
-        <div className="absolute right-4 top-full z-50 mt-1 w-[260px] overflow-hidden rounded-xl border border-border bg-white shadow-xl">
-          <p className="px-4 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            ลูกค้าที่จอง
-          </p>
-          <ul className="flex max-h-[220px] flex-col divide-y divide-border overflow-y-auto">
-            {holders.map((h) => (
-              <li key={h.clientId} className="flex items-baseline gap-2 px-4 py-2">
-                <span className="type-caption min-w-0 flex-1 truncate text-foreground">
-                  {h.clientId} - {maskName(h.clientName, isPrivate)}
-                </span>
-                <span className="type-caption shrink-0 !font-semibold tabular-nums text-foreground">
-                  {formatOrderAmount(h.amount, currency)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
