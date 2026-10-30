@@ -9,8 +9,8 @@
 
 import type {
   Booking,
-  CreditStatus,
   OrderBook,
+  ProductOffer,
   OrderBookStatus,
   OrderLogEntry,
   OrderSubmission,
@@ -79,17 +79,13 @@ export function cashInCurrency(cashThb: number, currency: string): number {
 
 const sum = (rows: Booking[]) => rows.reduce((total, b) => total + b.amount, 0);
 
-/** A booking's funds check; seeded bookings predate it and read as funded. */
-export const creditOf = (booking: Booking): CreditStatus => booking.credit ?? "sufficient";
-
 /**
  * Which step the product is at — see {@link OrderBookStatus} for the steps.
  *
- * Before anything is sent the step is read off the bookings: short of the
- * target is still booking; at the target, it waits until every booking's funds
- * check has come back sufficient, and only then can the IC send. One
- * insufficient booking holds the whole product at the check until the IC
- * cancels it and books someone else in its place.
+ * Before anything is sent the step is read off the bookings alone: short of
+ * the target is still booking, at the target the IC can send. There is no
+ * funds step between the two — a booking the client could not fund was never
+ * placed (see `Booking`).
  *
  * Once sent, the order's own state is the step.
  */
@@ -102,8 +98,7 @@ function bookStatus(
   if (latest?.status === "processing") return "processing";
   if (latest?.status === "completed") return "completed";
   if (latest?.status === "rejected") return "rejected";
-  if (openAmount < target) return "collecting";
-  return open.every((b) => creditOf(b) === "sufficient") ? "ready" : "checking";
+  return openAmount < target ? "collecting" : "ready";
 }
 
 /**
@@ -217,6 +212,7 @@ export function assembleOrderBook(
   bookings: Booking[],
   submissions: OrderSubmission[],
   requests: RequirementRequest[],
+  offers: ProductOffer[] = [],
 ): OrderBook {
   const target = orderTargetFor(product);
   const live = bookings.filter((b) => b.status === "booked");
@@ -236,6 +232,11 @@ export function assembleOrderBook(
   );
   const quotaUsed = sum(live.filter((b) => !rejectedIds.has(b.id)));
 
+  // An offer the client answered by booking has had its answer: the booking
+  // row says everything the offer row would, and with a number on it.
+  const booked = new Set(bookings.map((b) => b.clientId));
+  const liveOffers = offers.filter((o) => o.status === "declined" || !booked.has(o.clientId));
+
   return {
     productId: product.id,
     productName: product.underlying,
@@ -249,6 +250,7 @@ export function assembleOrderBook(
     quotaRemaining: Math.max(0, target - quotaUsed),
     minTicket: minTicketFor(product),
     bookings: live,
+    offers: liveOffers,
     openBookings: open,
     allBookings: bookings,
     bookedAmount: sum(open),
@@ -263,28 +265,38 @@ export function assembleOrderBook(
 // ── Presentation ─────────────────────────────────────────────────────────────
 
 /**
- * Where one booking — one client's line in a book — stands, in the four words
- * the book page's chips filter by:
+ * Where one client stands on a product, in the four words the chips filter by.
+ * The order they happen in:
  *
- * - `offer` — the client took the offer: booked, funds cleared, waiting for
- *   the order to go in (a basket to fill, or the IC to send a quota booking).
- * - `review` — being checked: the funds check is pending or failed, or the
- *   order is with the back office.
+ * - `offer` — the IC put the product in front of them and they have not
+ *   answered. The only phase with no booking behind it (see {@link ProductOffer}).
+ * - `review` — they took it, or the IC booked for them. A booking exists, so
+ *   the money was checked when it was placed; from here it is the deal and the
+ *   back office that are being waited on.
  * - `completed` — the back office accepted the order.
- * - `cancelled` — the booking was cancelled, or its order rejected.
+ * - `cancelled` — the booking was cancelled, the order rejected, or the client
+ *   declined the offer.
  *
  * Coarser than `dealStatus`, which the table's Deal Status column still shows:
  * the chips sort a long list into a few piles, the tag says exactly which step.
  */
 export type BookingPhase = "offer" | "review" | "completed" | "cancelled";
 
+/**
+ * A booking is past the offer by definition — it is what answering one looks
+ * like — so it is never in that phase, however new it is.
+ */
 export function bookingPhase(booking: Booking, book: OrderBook): BookingPhase {
   if (booking.status === "cancelled") return "cancelled";
   const submission = book.submissions.find((s) => s.bookingIds.includes(booking.id));
   if (submission?.status === "completed") return "completed";
   if (submission?.status === "rejected") return "cancelled";
-  if (submission?.status === "processing") return "review";
-  return creditOf(booking) === "sufficient" ? "offer" : "review";
+  return "review";
+}
+
+/** An offer is the `offer` phase until the client says no. */
+export function offerPhase(offer: ProductOffer): BookingPhase {
+  return offer.status === "declined" ? "cancelled" : "offer";
 }
 
 /** In the order a booking moves through them — the chips' order. */
@@ -379,7 +391,7 @@ export const BOOK_AVAILABILITY_VARIANT: Record<BookAvailability, "green" | "gray
 
 /** The list's filter chips, shared by the basket and quota tabs. */
 export const BOOK_AVAILABILITY_STEPS: { id: BookAvailability | "all"; label: string; empty: string }[] = [
-  { id: "all", label: "All", empty: "ยังไม่มีรายการจองซื้อ" },
+  { id: "all", label: "ทั้งหมด", empty: "ยังไม่มีรายการจองซื้อ" },
   { id: "open", label: BOOK_AVAILABILITY_LABEL.open, empty: "ไม่มีสินค้าที่ยังเปิดจอง" },
   { id: "closed", label: BOOK_AVAILABILITY_LABEL.closed, empty: "ไม่มีสินค้าที่ปิดแล้ว" },
 ];
@@ -391,12 +403,11 @@ export function quotaUsedPct(book: OrderBook): number {
 }
 
 /**
- * A quota book's bookings sorted by where their order is — waiting to be sent
- * (funds cleared), waiting on the funds check, with the back office, done.
+ * A quota book's bookings sorted by where their order is — waiting to be sent,
+ * with the back office, done.
  */
 export function quotaOrderCounts(book: OrderBook): {
   toSend: number;
-  checking: number;
   processing: number;
   completed: number;
 } {
@@ -407,8 +418,7 @@ export function quotaOrderCounts(book: OrderBook): {
   const completed = bySub("completed");
   const unsent = book.bookings.filter((b) => !sentIds.has(b.id));
   return {
-    toSend: unsent.filter((b) => creditOf(b) === "sufficient").length,
-    checking: unsent.filter((b) => creditOf(b) === "pending").length,
+    toSend: unsent.length,
     processing: book.bookings.filter((b) => processing.has(b.id)).length,
     completed: book.bookings.filter((b) => completed.has(b.id)).length,
   };

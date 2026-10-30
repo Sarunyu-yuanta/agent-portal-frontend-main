@@ -152,16 +152,42 @@ export type Booking = {
    * `checksAtBooking`.
    */
   checks?: RequirementItem[];
-  /**
-   * The back office's check that the client can fund this booking. Every new
-   * booking starts `pending`; absent on seeded bookings, which read as
-   * `sufficient`.
-   */
-  credit?: CreditStatus;
 };
 
-/** Where one booking's funds check is — see `Booking.credit`. */
-export type CreditStatus = "pending" | "sufficient" | "insufficient";
+/*
+ * There is no funds check on a booking.
+ *
+ * There used to be — `credit: "pending" | "sufficient" | "insufficient"`,
+ * answered by the back office a moment after the booking was placed, which
+ * gave a full book a "รอตรวจสอบวงเงิน" step and could leave one unfundable
+ * booking holding a product the IC had no way to send. The amount is now
+ * typed into the booking form against the client's own cash (see
+ * `AmountSection` in `orders/OrderBookingModal.tsx`), and a booking that the
+ * client cannot fund is never placed. Every booking that exists is funded, so
+ * nothing downstream has to ask.
+ */
+
+/**
+ * A product put in front of a client, before any booking exists.
+ *
+ * The first step of the flow and the only one with no money in it: the IC
+ * sends the offer, and the client decides. There are exactly two ways out —
+ * they book (the booking is the answer, and the offer stops being the thing
+ * being tracked), or they say no (`declined`).
+ *
+ * Separate from `RequirementRequest`, which is also "sent to a client and
+ * waiting": that one chases documents the client is missing and says nothing
+ * about whether they want the product.
+ */
+export type ProductOffer = {
+  id: string;
+  productId: string;
+  clientId: string;
+  clientName: string;
+  sentAt: string;
+  sentBy: string;
+  status: "sent" | "declined";
+};
 
 export type OrderSubmissionStatus = "processing" | "completed" | "rejected";
 
@@ -226,17 +252,14 @@ export type OrderLogEntry = {
  * (`bookAvailability` in `orders/order-book.ts`):
  *
  * 1. `collecting` — ยืนยันการจองซื้อ: bookings coming in, target not met.
- * 2. `checking` — รอตรวจสอบวงเงิน: target met, but not every booking has
- *    cleared its funds check.
- * 3. `ready` — มีวงเงินเพียงพอ: target met and every booking funded; the IC
- *    can send.
- * 4. `processing` — ยืนยันรับคำสั่งซื้อ: sent, the back office confirming.
- * 5. `completed` — รับคำสั่งซื้อสำเร็จ.
- * 6. `rejected` — ยกเลิก.
+ * 2. `ready` — ครบยอด: target met; the IC can send. There is no funds step
+ *    between the two — every booking was funded to be placed at all.
+ * 3. `processing` — ยืนยันรับคำสั่งซื้อ: sent, the back office confirming.
+ * 4. `completed` — รับคำสั่งซื้อสำเร็จ.
+ * 5. `rejected` — ยกเลิก.
  */
 export type OrderBookStatus =
   | "collecting"
-  | "checking"
   | "ready"
   | "processing"
   | "completed"
@@ -286,6 +309,12 @@ export type OrderBook = {
   minTicket: number;
   /** Live bookings — cancelled ones are only in `allBookings`. */
   bookings: Booking[];
+  /**
+   * Offers still waiting on the client, plus the ones they declined — the step
+   * before a booking exists. An offer whose client has since booked this
+   * product is dropped: the booking is the answer to it.
+   */
+  offers: ProductOffer[];
   /**
    * Live bookings that no submission has carried yet.
    *

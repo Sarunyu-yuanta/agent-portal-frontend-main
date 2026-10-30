@@ -23,7 +23,6 @@ import { useCallback, useState } from "react";
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
-  HourglassMediumIcon,
   PaperPlaneTiltIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
@@ -44,7 +43,6 @@ import {
   BOOK_AVAILABILITY_LABEL,
   BOOK_AVAILABILITY_VARIANT,
   bookAvailability,
-  creditOf,
   SUBMISSION_TAG,
   formatLogTime,
   formatOrderAmount,
@@ -88,9 +86,9 @@ export function OrderBookDetail({
   const round = headlineRound(book);
   const shortfall = Math.max(0, book.targetAmount - book.bookedAmount);
   const hasOpen = book.openBookings.length > 0;
-  // Full *and* every booking funded — see `OrderBookStatus`.
+  // Full — see `OrderBookStatus`. Nothing else gates sending: every booking
+  // was funded to be placed.
   const canSubmit = book.status === "ready";
-  const unfunded = book.openBookings.filter((b) => creditOf(b) === "insufficient").length;
   // A product is booked once: nothing more after the order is sent, and closed
   // for good once the back office answers — see `isBookingOpen`/`isBookClosed`.
   const canBook = isBookingOpen(book);
@@ -207,21 +205,11 @@ export function OrderBookDetail({
                   </span>
                 </div>
               )}
-              {book.status === "checking" && (
-                <div className="flex items-start gap-2 rounded-lg bg-[var(--fill-yellow-100)] px-3 py-2.5">
-                  <HourglassMediumIcon size={18} weight="fill" className="mt-0.5 shrink-0 text-[var(--fill-yellow-700)]" />
-                  <span className="type-body-2 text-[var(--fill-yellow-700)]">
-                    {unfunded > 0
-                      ? `ครบยอดแล้ว แต่วงเงินไม่เพียงพอ ${unfunded} ราย — ยกเลิกรายการนั้นแล้วจองให้ลูกค้ารายอื่นแทน`
-                      : "ครบยอดแล้ว รอตรวจสอบวงเงินของลูกค้าทุกราย"}
-                  </span>
-                </div>
-              )}
               {canSubmit && (
                 <div className="flex items-center gap-2 rounded-lg bg-[var(--fill-green-100)] px-3 py-2.5">
                   <CheckCircleIcon size={18} weight="fill" className="shrink-0 text-[var(--fill-green-600)]" />
                   <span className="type-body-2 text-[var(--fill-green-700)]">
-                    ครบยอดและมีวงเงินเพียงพอ พร้อมส่งคำสั่งซื้อ
+                    ครบยอดแล้ว พร้อมส่งคำสั่งซื้อ
                   </span>
                 </div>
               )}
@@ -279,13 +267,9 @@ export function OrderBookDetail({
                         the IC can act on. */}
                     {canSubmit
                       ? "ส่งคำสั่งซื้อ"
-                      : book.status === "checking"
-                        ? "รอตรวจสอบวงเงิน"
-                        : !hasOpen
-                          ? "ยังไม่มีรายการจอง"
-                          : shortfall > 0
-                            ? `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`
-                            : "ส่งคำสั่งซื้อ"}
+                      : !hasOpen
+                        ? "ยังไม่มีรายการจอง"
+                        : `ยังขาด ${formatOrderAmount(shortfall, book.currency)}`}
                   </Button>
                   <Button
                     variant={canSubmit ? "outline" : "primary"}
@@ -446,7 +430,7 @@ function QuotaSummary({
         <div className="flex items-start gap-2 rounded-lg bg-[var(--fill-green-100)] px-3 py-2.5">
           <PaperPlaneTiltIcon size={18} weight="fill" className="mt-0.5 shrink-0 text-[var(--fill-green-600)]" />
           <span className="type-body-2 text-[var(--fill-green-700)]">
-            มีวงเงินเพียงพอ {counts.toSend} รายการ — กด &quot;ส่งคำสั่งซื้อ&quot; ที่รายการได้เลย
+            รอส่งคำสั่งซื้อ {counts.toSend} รายการ — กด &quot;ส่งคำสั่งซื้อ&quot; ที่รายการได้เลย
           </span>
         </div>
       )}
@@ -454,7 +438,6 @@ function QuotaSummary({
       <dl className="flex flex-col divide-y divide-border rounded-xl bg-[#f3f4f6]">
         <Figure label="ลูกค้าที่จอง" value={`${new Set(book.bookings.map((b) => b.clientId)).size} ราย`} />
         <Figure label="ขั้นต่ำต่อราย" value={formatOrderAmount(book.minTicket, book.currency)} />
-        <Figure label="รอตรวจวงเงิน" value={`${counts.checking} รายการ`} />
         <Figure label="รอผลหลังบ้าน" value={`${counts.processing} รายการ`} />
         <Figure label="สำเร็จ" value={`${counts.completed} รายการ`} />
       </dl>

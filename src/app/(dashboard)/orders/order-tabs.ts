@@ -32,11 +32,11 @@ export const ORDER_TABS: OrderTab[] = [
 ];
 
 /**
- * Where `/orders` lands with no `?tab=`. Global Structured rather than the
- * first tab: it is the desk this page was built for, and every older link into
- * it — the empty state, the header bell — meant that list.
+ * Where `/orders` lands with no `?tab=` — the first tab, Stock. Links that mean
+ * a specific desk carry their own `?tab=` (`ORDER_TAB_BY_DESK` in
+ * `bookable-products.ts`), so only a bare `/orders` lands here.
  */
-export const DEFAULT_ORDER_TAB = "structured";
+export const DEFAULT_ORDER_TAB = "stock";
 
 export function normalizeOrderTab(value: string | null | undefined): OrderTab {
   return (

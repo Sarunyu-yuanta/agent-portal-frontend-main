@@ -365,6 +365,7 @@ function BookingForm({
         <Footer
           ready={ready}
           product={product}
+          cashAvailable={cashInCurrency(clientCashThb(shown), product.currency)}
           raw={raw}
           booking={booking}
           onCancel={onClose}
@@ -376,7 +377,6 @@ function BookingForm({
               clientName: shown.name,
               amount,
               checks: readiness.items,
-              fundsAvailable: cashInCurrency(clientCashThb(shown), product.currency),
             });
             setBooking(false);
             onClose();
@@ -774,7 +774,7 @@ function StatusGrid({
  * person) and orange for *expired* (it was on file, which is a different
  * conversation from never having had it).
  */
-const STATUS_CHIP: Record<
+export const STATUS_CHIP: Record<
   RequirementStatus,
   { icon: typeof CheckCircleIcon; bg: string; fg: string }
 > = {
@@ -995,6 +995,8 @@ const hasNonDigit = (raw: string) => /[^0-9,]/.test(raw);
 function amountCheck(
   product: BookableProduct,
   remaining: number,
+  /** The client's own cash, in the product's currency — see `overCash`. */
+  cashAvailable: number,
   raw: string,
 ): {
   amount: number;
@@ -1002,6 +1004,7 @@ function amountCheck(
   invalid: boolean;
   tooSmall: boolean;
   tooBig: boolean;
+  overCash: boolean;
   ok: boolean;
 } {
   // Not a number at all: the size checks would be measuring whatever digits
@@ -1011,13 +1014,25 @@ function amountCheck(
   const full = remaining <= 0;
   const tooSmall = amount > 0 && amount < minTicketFor(product);
   const tooBig = !full && amount > remaining;
+  /**
+   * More than the client can fund.
+   *
+   * A gate, not a warning. It used to be the latter, on the reasoning that the
+   * back office's funds check downstream was the real gate — which meant a
+   * booking could be placed, fill a basket, and then hold the whole product at
+   * "วงเงินไม่เพียงพอ" until the IC found it and cancelled it. The check that
+   * decides belongs where the number is typed, so that state no longer exists
+   * (see `Booking` in `types/domain.ts`).
+   */
+  const overCash = amount > 0 && amount > cashAvailable;
   return {
     amount,
     full,
     invalid,
     tooSmall,
     tooBig,
-    ok: !invalid && amount > 0 && !full && !tooSmall && !tooBig,
+    overCash,
+    ok: !invalid && amount > 0 && !full && !tooSmall && !tooBig && !overCash,
   };
 }
 
@@ -1052,18 +1067,18 @@ function AmountSection({
 
   const cashThb = clientCashThb(client);
   const cashHere = cashInCurrency(cashThb, currency);
-  const { amount, full, invalid, tooSmall, tooBig } = amountCheck(product, remaining, raw);
+  const { full, invalid, tooSmall, tooBig, overCash } = amountCheck(
+    product,
+    remaining,
+    cashHere,
+    raw,
+  );
   /**
    * Two different reasons the amount is closed, and they do not stack: a client
    * who is short a document cannot book whatever the round's state, so that
    * message wins and the round's is not also shown.
    */
   const blocked = disabled || full;
-
-  // Cash is a warning here, not a gate: the gate is the funds check every
-  // booking goes through afterwards (see `Booking.credit`), which holds the
-  // product before sending. Warning now saves the IC finding out from that.
-  const overCash = !disabled && amount > 0 && amount > cashHere;
 
   /**
    * Digits are grouped with commas as they are typed. Anything else is kept
@@ -1128,14 +1143,22 @@ function AmountSection({
             inputMode="numeric"
             disabled={blocked}
             forceState={
-              blocked ? "disabled" : invalid || tooSmall || tooBig ? "error" : "default"
+              blocked
+                ? "disabled"
+                : invalid || tooSmall || tooBig || overCash
+                  ? "error"
+                  : "default"
             }
+            /* Ordered the way they are read: what was typed, then how big it
+               is against the round, then against the client. */
             errorMessage={
               invalid
                 ? "กรอกได้เฉพาะตัวเลข 0–9 เท่านั้น"
                 : tooSmall
                   ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
-                  : `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
+                  : tooBig
+                    ? `เกินยอดที่ยังจองได้ ${formatOrderAmount(remaining, currency)}`
+                    : `เกินเงินสดคงเหลือของลูกค้า ${formatOrderAmount(Math.floor(cashHere), currency)}`
             }
             // The deal's total is deliberately left off: the sentence under this
             // section already names it, and repeating it here is what pushed the
@@ -1162,8 +1185,8 @@ function AmountSection({
 
         {overCash && (
           <Alert
-            status="warning"
-            message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — การจองนี้จะไม่ผ่านการตรวจสอบวงเงิน และต้องยกเลิกก่อนส่งคำสั่งซื้อ"
+            status="critical"
+            message="จำนวนที่จองมากกว่าเงินสดคงเหลือของลูกค้า — ลดจำนวนลง หรือให้ลูกค้าเติมเงินก่อนจึงจะจองได้"
             multiline
           />
         )}
@@ -1183,6 +1206,7 @@ function AmountSection({
 function Footer({
   ready,
   product,
+  cashAvailable,
   raw,
   booking,
   onCancel,
@@ -1191,6 +1215,8 @@ function Footer({
   /** Whether all four checks pass — the gate on the amount and the booking. */
   ready: boolean;
   product: BookableProduct;
+  /** The client's cash in the product's currency — see `amountCheck`. */
+  cashAvailable: number;
   raw: string;
   booking: boolean;
   onCancel: () => void;
@@ -1198,7 +1224,7 @@ function Footer({
 }) {
   const { data: book } = useOrderBook(product.id);
   const remaining = book ? bookingRemaining(book) : 0;
-  const { amount, ok } = amountCheck(product, remaining, raw);
+  const { amount, ok } = amountCheck(product, remaining, cashAvailable, raw);
 
   // `ready` is checked here as well as on the amount section: a check can
   // expire while the form is open, and the gate has to hold at the moment of

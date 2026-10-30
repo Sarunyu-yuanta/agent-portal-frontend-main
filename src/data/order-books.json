@@ -52,10 +52,16 @@
     },
     {
       "productId": "thai-chips",
+      "_offers": "Sent to two clients who have not answered yet, and one who said no.",
+      "offers": [
+        { "id": "of-0601", "clientId": "110005", "daysAgo": 1 },
+        { "id": "of-0602", "clientId": "110006", "daysAgo": 0 },
+        { "id": "of-0603", "clientId": "110008", "daysAgo": 3, "status": "declined" }
+      ],
       "bookings": [
         { "id": "bk-0501", "clientId": "110001", "amount": 40000, "daysAgo": 2 },
         { "id": "bk-0502", "clientId": "110007", "amount": 20000, "daysAgo": 1 },
-        { "id": "bk-0503", "clientId": "110004", "amount": 40000, "daysAgo": 0, "credit": "pending" }
+        { "id": "bk-0503", "clientId": "110004", "amount": 40000, "daysAgo": 0 }
       ],
       "submissions": []
     },
@@ -110,22 +116,22 @@
     }
 ,
     {
-      "_note": "Full, but one booking failed its funds check — held at รอตรวจสอบวงเงิน until the IC cancels it and books someone else.",
+      "_note": "Full — every booking funded (they could not have been placed otherwise), so the IC can send.",
       "productId": "thai-semiconductor",
       "bookings": [
         { "id": "bk-0901", "clientId": "110001", "amount": 70000, "daysAgo": 2 },
-        { "id": "bk-0902", "clientId": "110002", "amount": 30000, "daysAgo": 1, "credit": "insufficient" }
+        { "id": "bk-0902", "clientId": "110002", "amount": 30000, "daysAgo": 1 }
       ],
       "submissions": []
     },
     {
-      "_note": "Fixed Income, quota 10,000,000 THB. Each booking is its own order: one done, one with the back office, one cleared and waiting to be sent, one still at the funds check.",
+      "_note": "Fixed Income, quota 10,000,000 THB. Each booking is its own order: one done, one with the back office, two waiting to be sent.",
       "productId": "fi-mqdc482b-0",
       "bookings": [
         { "id": "bk-1001", "clientId": "110001", "amount": 2000000, "daysAgo": 5 },
         { "id": "bk-1002", "clientId": "110004", "amount": 1500000, "daysAgo": 3 },
         { "id": "bk-1003", "clientId": "110007", "amount": 1000000, "daysAgo": 1 },
-        { "id": "bk-1004", "clientId": "110003", "amount": 500000, "daysAgo": 0, "credit": "pending" }
+        { "id": "bk-1004", "clientId": "110003", "amount": 500000, "daysAgo": 0 }
       ],
       "submissions": [
         { "id": "sub-1001", "bookingIds": ["bk-1001"], "daysAgo": 4, "status": "completed", "backendRef": "ORD-2026-001104" },

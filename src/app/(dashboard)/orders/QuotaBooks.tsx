@@ -37,7 +37,7 @@ import { AmountOfTarget } from "./AmountOfTarget";
 /** The one line that tells the IC whether a bond is waiting on them. */
 function OrderCountsLine({ book }: { book: OrderBook }) {
   const counts = quotaOrderCounts(book);
-  if (counts.toSend === 0 && counts.checking === 0 && counts.processing === 0) return null;
+  if (counts.toSend === 0 && counts.processing === 0) return null;
   return (
     <div className="flex flex-wrap gap-1.5">
       {counts.toSend > 0 && (
@@ -46,12 +46,6 @@ function OrderCountsLine({ book }: { book: OrderBook }) {
         <span className="type-caption inline-flex items-center gap-1 rounded-lg bg-[var(--fill-green-100)] px-2 py-1 text-[var(--fill-green-700)]">
           <PaperPlaneTiltIcon size={14} weight="fill" className="shrink-0" />
           รอส่งคำสั่งซื้อ {counts.toSend}
-        </span>
-      )}
-      {counts.checking > 0 && (
-        <span className="type-caption inline-flex items-center gap-1 rounded-lg bg-[var(--fill-yellow-100)] px-2 py-1 text-[var(--fill-yellow-700)]">
-          <HourglassMediumIcon size={14} weight="fill" className="shrink-0" />
-          รอตรวจวงเงิน {counts.checking}
         </span>
       )}
       {counts.processing > 0 && (

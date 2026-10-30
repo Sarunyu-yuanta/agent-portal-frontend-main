@@ -32,56 +32,23 @@ import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { TRANSACTION_CHANNELS } from "@/lib/transaction-mock-data";
-import type {
-  ClientTransaction,
-  TransactionAsset,
-  TransactionSide,
-  TransactionStatus,
-} from "@/types/domain";
+import type { ClientTransaction, TransactionAsset, TransactionSide } from "@/types/domain";
 import { PAGE_SIZE_OPTIONS } from "../client/[id]/fixed-income-shared";
 import { formatLogTime } from "./order-book";
+import { TransactionDetailModal } from "./TransactionDetailModal";
+import {
+  PRICE_LABEL,
+  QUANTITY_LABEL,
+  SIDE_CLASS,
+  SIDE_LABEL,
+  STATUS_TAG,
+  formatAmount,
+  formatPrice,
+  formatQuantity,
+} from "./transaction-display";
 import { useTransactions } from "./use-transactions";
 
-const SIDE_LABEL: Record<TransactionSide, string> = {
-  buy: "ซื้อ",
-  sell: "ขาย",
-  switch: "สับเปลี่ยน",
-};
-
-/** Green and red, as the rest of the app colours a rise and a fall. */
-const SIDE_CLASS: Record<TransactionSide, string> = {
-  buy: "text-[var(--fill-green-700)]",
-  sell: "text-[var(--fill-red-700)]",
-  switch: "text-[var(--fill-blue-700)]",
-};
-
-const STATUS_TAG: Record<
-  TransactionStatus,
-  { text: string; variant: "green" | "yellow" | "blue" | "gray" }
-> = {
-  matched: { text: "สำเร็จ", variant: "green" },
-  partial: { text: "จับคู่บางส่วน", variant: "yellow" },
-  pending: { text: "รอดำเนินการ", variant: "blue" },
-  cancelled: { text: "ยกเลิก", variant: "gray" },
-};
-
-/** What a row's quantity counts, per asset. */
-const QUANTITY_LABEL: Record<TransactionAsset, string> = {
-  stock: "จำนวน (หุ้น)",
-  tfex: "จำนวน (สัญญา)",
-  "mutual-fund": "จำนวน (หน่วย)",
-};
-
-const PRICE_LABEL: Record<TransactionAsset, string> = {
-  stock: "ราคา",
-  tfex: "ราคา",
-  "mutual-fund": "NAV",
-};
-
 const COLUMNS = 9;
-
-const number = (value: number, digits = 2) =>
-  value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
 export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
   const pathname = usePathname();
@@ -91,6 +58,10 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
+  // Which row's detail is open. Local, like the booking detail on a product's
+  // own tab — the URL carries where the IC *is*, and a trade they opened to
+  // read is not somewhere they navigated to.
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const sides: TransactionSide[] =
     asset === "mutual-fund" ? ["buy", "sell", "switch"] : ["buy", "sell"];
@@ -120,6 +91,9 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
   const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const paged = visible.slice((safePage - 1) * pageSize, safePage * pageSize);
+  // Looked up in the unfiltered rows: a chip clicked behind the open modal
+  // must not blank out the trade being read.
+  const open = rows.find((t: ClientTransaction) => t.id === openId) ?? null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -131,7 +105,7 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="scrollable-tabs flex min-w-0 items-center gap-2">
           <Chip
-            label="All"
+            label="ทั้งหมด"
             type="single"
             selected={side === null}
             onClick={() => setParam("side", null)}
@@ -148,18 +122,6 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:shrink-0">
-          <div className="min-w-0 flex-1 lg:w-[280px] lg:flex-none">
-            <SearchInput
-              value={search}
-              onChange={(v) => {
-                setSearch(v);
-                setPage(1);
-              }}
-              onClear={() => setSearch("")}
-              placeholder="ค้นหาสินค้า หรือลูกค้า"
-              className="w-full"
-            />
-          </div>
           <div className="sm:w-[200px] sm:shrink-0">
             <Dropdown
               value={channel ?? "all"}
@@ -169,6 +131,18 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
                 ...channels.map((c) => ({ label: c, value: c })),
               ]}
               placeholder="ช่องทาง"
+              className="w-full"
+            />
+          </div>
+          <div className="min-w-0 flex-1 lg:w-[280px] lg:flex-none">
+            <SearchInput
+              value={search}
+              onChange={(v) => {
+                setSearch(v);
+                setPage(1);
+              }}
+              onClear={() => setSearch("")}
+              placeholder="ค้นหาสินค้า หรือลูกค้า"
               className="w-full"
             />
           </div>
@@ -209,7 +183,23 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
                   <TableRowsSkeleton columns={COLUMNS} />
                 ) : (
                   paged.map((t) => (
-                    <TableRow key={t.id}>
+                    // The whole row opens the trade — same as a booking row on
+                    // a product's tab, and cheaper than a column of arrows in a
+                    // table already scrolling sideways.
+                    <TableRow
+                      key={t.id}
+                      hoverable
+                      tabIndex={0}
+                      aria-label={`ดูรายละเอียดรายการ ${t.symbol} ของ ${maskName(t.clientName, isPrivate)}`}
+                      onClick={() => setOpenId(t.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setOpenId(t.id);
+                        }
+                      }}
+                      className="cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
+                    >
                       <TableCell>
                         <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
                           {formatLogTime(t.at)}
@@ -238,19 +228,17 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="type-body-2 tabular-nums text-foreground">
-                          {asset === "mutual-fund"
-                            ? number(t.quantity, 4)
-                            : t.quantity.toLocaleString("en-US")}
+                          {formatQuantity(asset, t.quantity)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="type-body-2 tabular-nums text-foreground">
-                          {number(t.price, asset === "mutual-fund" ? 4 : 2)}
+                          {formatPrice(asset, t.price)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="type-body-2 tabular-nums !font-semibold text-foreground">
-                          {number(t.amount)}
+                          {formatAmount(t.amount)}
                         </span>
                         <span className="type-caption ml-1 text-muted-foreground">{t.currency}</span>
                       </TableCell>
@@ -307,6 +295,9 @@ export function TransactionsPanel({ asset }: { asset: TransactionAsset }) {
           )}
         </FadeIn>
       )}
+
+      {/* Rendered whether or not one is open, so the modal can animate out. */}
+      <TransactionDetailModal transaction={open} onClose={() => setOpenId(null)} />
     </div>
   );
 }

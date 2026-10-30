@@ -14,6 +14,7 @@ export function ResponsiveBottomSheetModal({
   desktopRoundedClassName = "rounded-xl",
   desktopTitleClassName = "leading-6",
   desktopTitleIcon,
+  desktopTitleHidden = false,
   headerAction,
   children,
 }: {
@@ -25,6 +26,16 @@ export function ResponsiveBottomSheetModal({
   desktopRoundedClassName?: string;
   desktopTitleClassName?: string;
   desktopTitleIcon?: ReactNode;
+  /**
+   * Takes the desktop heading out of the picture while keeping it in the
+   * accessibility tree — for a body that opens with its own headline and would
+   * otherwise say the same thing twice. The ✕ stays where it was.
+   *
+   * Desktop only. The mobile sheet's header row is also the only thing it has
+   * to dismiss with, and a drawer whose accessible name is blank is worse than
+   * one that repeats itself.
+   */
+  desktopTitleHidden?: boolean;
   headerAction?: ReactNode;
   children: ReactNode;
 }) {
@@ -76,12 +87,22 @@ export function ResponsiveBottomSheetModal({
         aria-modal
         aria-labelledby={titleId}
       >
-        <div className="flex gap-4 items-center px-4 pt-4 pb-0 shrink-0">
+        {/* `pt-2` when the heading is hidden: the row is then just the ✕, and
+            the full `pt-4` left it floating in a band of its own. */}
+        <div
+          className={`flex gap-4 items-center px-4 pb-0 shrink-0 ${
+            desktopTitleHidden ? "pt-2" : "pt-4"
+          }`}
+        >
           <div className="flex flex-1 gap-2 items-center min-w-0">
-            {desktopTitleIcon}
+            {!desktopTitleHidden && desktopTitleIcon}
             <p
               id={titleId}
-              className={`type-h6 font-bold text-[var(--text-default-primary)] ${desktopTitleClassName} flex-1 min-w-0`}
+              className={
+                desktopTitleHidden
+                  ? "sr-only"
+                  : `type-h6 font-bold text-[var(--text-default-primary)] ${desktopTitleClassName} flex-1 min-w-0`
+              }
             >
               {title}
             </p>

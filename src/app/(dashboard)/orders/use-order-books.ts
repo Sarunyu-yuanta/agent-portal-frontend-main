@@ -28,7 +28,7 @@ import {
 
 /** One product's book, or `null` when the id resolves to no product. */
 export function useOrderBook(productId: string): Resource<OrderBook | null> {
-  const { bookings, submissions, requirementRequests, isLoading } = useOrders();
+  const { bookings, offers, submissions, requirementRequests, isLoading } = useOrders();
 
   const data = useMemo(() => {
     const product = findBookableProduct(productId);
@@ -38,8 +38,9 @@ export function useOrderBook(productId: string): Resource<OrderBook | null> {
       bookings.filter((b) => b.productId === productId),
       submissions.filter((s) => s.productId === productId),
       requirementRequests.filter((r) => r.productId === productId),
+      offers.filter((o) => o.productId === productId),
     );
-  }, [productId, bookings, submissions, requirementRequests]);
+  }, [productId, bookings, offers, submissions, requirementRequests]);
 
   return { data, isLoading };
 }
@@ -57,11 +58,12 @@ export function useOrderBook(productId: string): Resource<OrderBook | null> {
  * row the IC can act on.
  */
 export function useOrderBooks(): Resource<OrderBook[]> {
-  const { bookings, submissions, requirementRequests, isLoading } = useOrders();
+  const { bookings, offers, submissions, requirementRequests, isLoading } = useOrders();
 
   const data = useMemo(() => {
     const ids = new Set([
       ...bookings.map((b) => b.productId),
+      ...offers.map((o) => o.productId),
       ...submissions.map((s) => s.productId),
       ...requirementRequests.map((r) => r.productId),
     ]);
@@ -76,6 +78,7 @@ export function useOrderBooks(): Resource<OrderBook[]> {
           bookings.filter((b) => b.productId === id),
           submissions.filter((s) => s.productId === id),
           requirementRequests.filter((r) => r.productId === id),
+          offers.filter((o) => o.productId === id),
         ),
       );
     }
@@ -84,7 +87,7 @@ export function useOrderBooks(): Resource<OrderBook[]> {
     // newest event is today belongs above one that has been quiet for a week,
     // whatever state either is in.
     return books.sort((a, b) => (b.logs[0]?.at ?? "").localeCompare(a.logs[0]?.at ?? ""));
-  }, [bookings, submissions, requirementRequests]);
+  }, [bookings, offers, submissions, requirementRequests]);
 
   return { data, isLoading };
 }

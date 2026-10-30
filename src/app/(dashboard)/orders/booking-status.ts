@@ -6,7 +6,6 @@
 
 import type { TagVariant } from "@sarunyu/system-one";
 import type { Booking, OrderBook, RequirementItem } from "@/types/domain";
-import { creditOf } from "./order-book";
 
 export type BookingStatusTag = { text: string; variant: TagVariant };
 
@@ -16,10 +15,9 @@ export const CLOSED_TAG = { text: "", variant: "gray" } as const;
 /**
  * Where one booking is, read off the book rather than stored on the booking.
  *
- * Before the order is sent, the booking's own funds check comes first — a
- * booking still being checked, or one that failed, is what the IC has to look
- * at. A funded one is waiting on the rest of the deal: still filling, or full
- * and waiting for the IC to send.
+ * Before the order is sent there is only the deal to wait on — the booking's
+ * own funds were settled when it was placed (see `Booking`), so a booking is
+ * either waiting for the basket to fill or waiting for the IC to send it.
  */
 export function dealStatus(booking: Booking, book: OrderBook): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "ยกเลิกแล้ว", variant: "gray" };
@@ -27,14 +25,11 @@ export function dealStatus(booking: Booking, book: OrderBook): BookingStatusTag 
   if (submission?.status === "processing") return { text: "กำลังดำเนินการ", variant: "blue" };
   if (submission?.status === "completed") return { text: "สำเร็จ", variant: "green" };
   if (submission?.status === "rejected") return { text: "ถูกปฏิเสธ", variant: "red" };
-  const credit = creditOf(booking);
-  if (credit === "pending") return { text: "รอตรวจสอบวงเงิน", variant: "yellow" };
-  if (credit === "insufficient") return { text: "วงเงินไม่เพียงพอ", variant: "red" };
-  // A quota booking is its own order, so once funded it is waiting on nobody
-  // but the IC; a basket booking waits for the rest of the deal.
+  // A quota booking is its own order, so it is waiting on nobody but the IC;
+  // a basket booking waits for the rest of the deal first.
   return book.mode === "quota" || book.status === "ready"
     ? { text: "รอส่งคำสั่งซื้อ", variant: "lime" }
-    : { text: "มีวงเงินเพียงพอ", variant: "green" };
+    : { text: "รอยอดครบ", variant: "green" };
 }
 
 /**
@@ -57,27 +52,43 @@ export function checksAtBooking(booking: Booking, live: RequirementItem[]): Requ
 //
 // Payment and the pre-confirmation email are owned by systems this portal does
 // not talk to yet, so neither is stored anywhere. Both are read off the
-// booking's own submission instead — which is the order they really happen in
-// (an email goes out once the order is placed, payment is due once it is
-// accepted) — so the columns move with the deal in the demo rather than
-// showing a fixed value. When those systems report back, replace these two.
+// booking's own submission instead, so the columns move with the deal in the
+// demo rather than showing a fixed value. When those systems report back,
+// replace these two.
+//
+// Both now have an answer from the moment the booking exists, because the
+// booking itself is the event that starts them: the amount was checked against
+// the client's cash to be placed at all (see `Booking`), and the
+// pre-confirmation goes out on the back of that. Neither says "ยังไม่…" for a
+// live booking any more — that wording came from when a booking sat waiting on
+// a funds check that no longer happens.
 
-/** Whether the client has paid — only asked once the order has gone in. */
+/**
+ * Where the money is.
+ *
+ * A placed booking already has the cash behind it — the form would not have
+ * let it through otherwise — so it reads as held, not as "ยังไม่ถึงกำหนด".
+ * Settlement proper happens when the back office accepts the order.
+ */
 export function paymentStatus(booking: Booking, book: OrderBook): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = book.submissions.find((s) => s.bookingIds.includes(booking.id));
   if (submission?.status === "completed") return { text: "ชำระแล้ว", variant: "green" };
   if (submission?.status === "processing") return { text: "รอชำระ", variant: "yellow" };
   if (submission?.status === "rejected") return { text: "ไม่ต้องชำระ", variant: "gray" };
-  return { text: "ยังไม่ถึงกำหนด", variant: "gray" };
+  return { text: "กันเงินแล้ว", variant: "lime" };
 }
 
-/** The pre-confirmation email the client receives when their order is placed. */
+/**
+ * The pre-confirmation email.
+ *
+ * Sent when the booking is placed — that is the thing being confirmed to the
+ * client — and confirmed back when the order completes.
+ */
 export function emailStatus(booking: Booking, book: OrderBook): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = book.submissions.find((s) => s.bookingIds.includes(booking.id));
   if (submission?.status === "completed") return { text: "ยืนยันแล้ว", variant: "green" };
-  if (submission?.status === "processing") return { text: "ส่งแล้ว", variant: "blue" };
   if (submission?.status === "rejected") return { text: "ยกเลิก", variant: "gray" };
-  return { text: "ยังไม่ส่ง", variant: "gray" };
+  return { text: "ส่งแล้ว", variant: "blue" };
 }

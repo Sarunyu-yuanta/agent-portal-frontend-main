@@ -23,6 +23,7 @@ import orderRequirementsRaw from "@/data/order-requirements.json";
 import type {
   Booking,
   OrderSubmission,
+  ProductOffer,
   RequirementKey,
   RequirementRequest,
   RequirementStatus,
@@ -71,8 +72,13 @@ type BookingSeed = {
   amount: number;
   daysAgo: number;
   status?: string;
-  /** The funds check; left out means it passed. See `Booking.credit`. */
-  credit?: string;
+};
+
+type OfferSeed = {
+  id: string;
+  clientId: string;
+  daysAgo: number;
+  status?: string;
 };
 
 type SubmissionSeed = {
@@ -94,7 +100,25 @@ export const seedBookings: Booking[] = orderBooksRaw.books.flatMap((book) =>
     createdAt: stampFromDaysAgo(b.daysAgo, b.id),
     createdBy: ORDER_ACTOR,
     status: (b.status ?? "booked") as Booking["status"],
-    credit: (b.credit ?? "sufficient") as NonNullable<Booking["credit"]>,
+  })),
+);
+
+/**
+ * Every seeded offer — a product put in front of a client, still waiting.
+ *
+ * A book's `offers` are the ones with no booking behind them yet; an offer the
+ * client took is represented by the booking it produced, so none is seeded for
+ * a client who also has a booking on the same product.
+ */
+export const seedOffers: ProductOffer[] = orderBooksRaw.books.flatMap((book) =>
+  ((book as { offers?: OfferSeed[] }).offers ?? []).map((o) => ({
+    id: o.id,
+    productId: book.productId,
+    clientId: o.clientId,
+    clientName: nameById[o.clientId] ?? o.clientId,
+    sentAt: stampFromDaysAgo(o.daysAgo, o.id),
+    sentBy: ORDER_ACTOR,
+    status: (o.status ?? "sent") as ProductOffer["status"],
   })),
 );
 

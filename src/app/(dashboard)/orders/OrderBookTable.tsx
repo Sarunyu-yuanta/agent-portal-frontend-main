@@ -46,11 +46,10 @@ type SortDir = "none" | "asc" | "desc";
  */
 const STATUS_RANK: Record<OrderBookStatus, number> = {
   ready: 0,
-  checking: 1,
-  collecting: 2,
-  processing: 3,
-  completed: 4,
-  rejected: 5,
+  collecting: 1,
+  processing: 2,
+  completed: 3,
+  rejected: 4,
 };
 
 /**

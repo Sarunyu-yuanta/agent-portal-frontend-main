@@ -18,8 +18,6 @@
  *    another system. Really a webhook, or a poll of that system.
  * 2. **{@link SUBMISSION_TURNAROUND_MS}** — the back office accepting an order.
  *    Really a status on the order record, arriving the same way.
- * 3. **{@link CREDIT_CHECK_MS}** — the back office checking a client can fund
- *    a booking. Really a status on the booking record.
  *
  * Every mutator is `async` and every call site awaits it, so pointing them at
  * real endpoints is a change in this file alone. `isLoading` is in the contract
@@ -40,14 +38,15 @@ import {
 import {
   ORDER_ACTOR,
   seedBookings,
+  seedOffers,
   seedRequirementRequests,
   seedSubmissions,
 } from "@/lib/order-mock-data";
 import { bookingModeForId } from "@/app/(dashboard)/orders/bookable-products";
 import type {
   Booking,
-  CreditStatus,
   OrderSubmission,
+  ProductOffer,
   RequirementItem,
   RequirementKey,
   RequirementRequest,
@@ -65,9 +64,6 @@ const REQUIREMENT_TURNAROUND_MS = 15_000;
 /** The same stand-in, for the back office accepting a submitted order. */
 const SUBMISSION_TURNAROUND_MS = 12_000;
 
-/** The same stand-in, for the funds check every new booking goes through. */
-const CREDIT_CHECK_MS = 8_000;
-
 type BookingDraft = {
   productId: string;
   clientId: string;
@@ -75,22 +71,24 @@ type BookingDraft = {
   amount: number;
   /** The checks the booking passed — stored on it, see `Booking.checks`. */
   checks: RequirementItem[];
-  /**
-   * The client's cash in the product's currency — what the mock funds check
-   * measures the amount against. The real check reads the settlement account
-   * itself, and this field goes.
-   */
-  fundsAvailable: number;
 };
 
 type OrdersContextValue = {
   bookings: Booking[];
+  offers: ProductOffer[];
   submissions: OrderSubmission[];
   requirementRequests: RequirementRequest[];
   /** Always `false` today — see the module note. */
   isLoading: boolean;
   bookOrder: (draft: BookingDraft) => Promise<Booking>;
   cancelBooking: (bookingId: string) => Promise<void>;
+  /** Puts a product in front of one or more clients — see {@link ProductOffer}. */
+  sendOffers: (
+    productId: string,
+    clients: { id: string; name: string }[],
+  ) => Promise<ProductOffer[]>;
+  /** The client said no. The offer stays on the record, as a declined one. */
+  declineOffer: (offerId: string) => Promise<void>;
   /** Nudges a client to complete `keys` in whichever system owns them. */
   sendRequirementRequest: (input: {
     clientId: string;
@@ -114,6 +112,7 @@ const localId = (prefix: string) => `${prefix}-local-${++localSeq}`;
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
   const [bookings, setBookings] = useState<Booking[]>(seedBookings);
+  const [offers, setOffers] = useState<ProductOffer[]>(seedOffers);
   const [submissions, setSubmissions] = useState<OrderSubmission[]>(seedSubmissions);
   const [requirementRequests, setRequirementRequests] =
     useState<RequirementRequest[]>(seedRequirementRequests);
@@ -137,26 +136,6 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     timers.current.push(setTimeout(fn, ms));
   }, []);
 
-  /** Resolves one booking's funds check — see {@link CREDIT_CHECK_MS}. */
-  const settleCredit = useCallback(
-    (bookingId: string, result: CreditStatus) =>
-      later(() => {
-        setBookings((prev) =>
-          prev.map((b) => (b.id === bookingId ? { ...b, credit: result } : b)),
-        );
-      }, CREDIT_CHECK_MS),
-    [later],
-  );
-
-  // Seeded bookings still at the check get their answer too, so a demo that
-  // opens on one does not sit there forever. Seeds have no cash figure to
-  // test, so they pass.
-  useEffect(() => {
-    for (const b of seedBookings) {
-      if (b.credit === "pending") settleCredit(b.id, "sufficient");
-    }
-  }, [settleCredit]);
-
   const bookOrder = useCallback(async (draft: BookingDraft) => {
     // Basket desks take one order per product: once it has been sent the
     // product is closed, and every surface already hides its จองซื้อ. Held here
@@ -176,21 +155,40 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       clientName: draft.clientName,
       amount: draft.amount,
       checks: draft.checks,
-      credit: "pending",
       createdAt: new Date().toISOString(),
       createdBy: ORDER_ACTOR,
       status: "booked",
     };
     setBookings((prev) => [...prev, booking]);
-
-    // ── Stand-in for the back office's funds check ─────────────────────────
-    settleCredit(
-      booking.id,
-      draft.amount <= draft.fundsAvailable ? "sufficient" : "insufficient",
-    );
-
     return booking;
-  }, [submissions, settleCredit]);
+  }, [submissions]);
+
+  const sendOffers = useCallback(
+    async (productId: string, clients: { id: string; name: string }[]) => {
+      const sentAt = new Date().toISOString();
+      const placed: ProductOffer[] = clients.map((c) => ({
+        id: localId("of"),
+        productId,
+        clientId: c.id,
+        clientName: c.name,
+        sentAt,
+        sentBy: ORDER_ACTOR,
+        status: "sent",
+      }));
+      setOffers((prev) => [...prev, ...placed]);
+      return placed;
+    },
+    [],
+  );
+
+  const declineOffer = useCallback(async (offerId: string) => {
+    // Marked rather than removed, like a cancelled booking: the offer is part
+    // of what happened to this product, and a "no" is the answer the IC asked
+    // for rather than the absence of one.
+    setOffers((prev) =>
+      prev.map((o) => (o.id === offerId ? { ...o, status: "declined" } : o)),
+    );
+  }, []);
 
   const cancelBooking = useCallback(async (bookingId: string) => {
     // Marked rather than removed: the log is rebuilt from the bookings
@@ -269,20 +267,26 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       bookings,
+      offers,
       submissions,
       requirementRequests,
       isLoading: false,
       bookOrder,
       cancelBooking,
+      sendOffers,
+      declineOffer,
       sendRequirementRequest,
       submitOrder,
     }),
     [
       bookings,
+      offers,
       submissions,
       requirementRequests,
       bookOrder,
       cancelBooking,
+      sendOffers,
+      declineOffer,
       sendRequirementRequest,
       submitOrder,
     ],
