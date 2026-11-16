@@ -104,3 +104,13 @@ export const KYC_ALERTS_ENABLED: boolean = true;
  * them by mistake.
  */
 export const CALL_LOG_ENABLED: boolean = true;
+
+/**
+ * Sidebar entries held back for now. Only the sidebar link is gated — the
+ * routes still exist and render if opened by URL; nothing else links to them.
+ * With all three Growth entries off, the whole Growth section stops rendering.
+ */
+export const PROMOTIONS_ENABLED: boolean = false;
+export const PERFORMANCE_ENABLED: boolean = false;
+export const IC_LEARNING_ENABLED: boolean = false;
+export const YAA_TEAM_HEAD_ENABLED: boolean = false;

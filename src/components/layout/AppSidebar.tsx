@@ -25,8 +25,12 @@ import { NOTE_AUTHOR } from "@/app/(dashboard)/notes/note-constants";
 import { IC_ROLE } from "@/lib/current-ic";
 import {
   CALENDAR_ENABLED,
+  IC_LEARNING_ENABLED,
   NOTES_ENABLED,
   ORDER_BOOKING_ENABLED,
+  PERFORMANCE_ENABLED,
+  PROMOTIONS_ENABLED,
+  YAA_TEAM_HEAD_ENABLED,
 } from "@/lib/feature-flags";
 import {
   activeSectionForPath,
@@ -63,13 +67,17 @@ const workspaceItems: NavItem[] = [
     icon: ChartBarIcon,
     badge: null,
   },
-  {
-    href: "/promotions",
-    section: "promotions",
-    label: "Promotion/Events",
-    icon: MegaphoneIcon,
-    badge: null,
-  },
+  ...(PROMOTIONS_ENABLED
+    ? [
+        {
+          href: "/promotions",
+          section: "promotions" as const,
+          label: "Promotion/Events",
+          icon: MegaphoneIcon,
+          badge: null,
+        },
+      ]
+    : []),
 ];
 
 /**
@@ -108,27 +116,39 @@ const salesItems: NavItem[] = [
  * that reason, not because the surfaces differ.
  */
 const growthItems: NavItem[] = [
-  {
-    href: "/performance",
-    section: "performance",
-    label: "Performance",
-    icon: GaugeIcon,
-    badge: null,
-  },
-  {
-    href: "/ic-learning",
-    section: "ic-learning",
-    label: "IC Learning",
-    icon: GraduationCapIcon,
-    badge: null,
-  },
-  {
-    href: "/yaa-team-head",
-    section: "yaa-team-head",
-    label: "YAA/Team Head",
-    icon: UsersThreeIcon,
-    badge: null,
-  },
+  ...(PERFORMANCE_ENABLED
+    ? [
+        {
+          href: "/performance",
+          section: "performance" as const,
+          label: "Performance",
+          icon: GaugeIcon,
+          badge: null,
+        },
+      ]
+    : []),
+  ...(IC_LEARNING_ENABLED
+    ? [
+        {
+          href: "/ic-learning",
+          section: "ic-learning" as const,
+          label: "IC Learning",
+          icon: GraduationCapIcon,
+          badge: null,
+        },
+      ]
+    : []),
+  ...(YAA_TEAM_HEAD_ENABLED
+    ? [
+        {
+          href: "/yaa-team-head",
+          section: "yaa-team-head" as const,
+          label: "YAA/Team Head",
+          icon: UsersThreeIcon,
+          badge: null,
+        },
+      ]
+    : []),
 ];
 
 /**
@@ -311,27 +331,28 @@ export function AppSidebar({
         </div>
       )}
 
-      {/* Logo — the collapsed rail shows the YA square in the same icon zone
-          the nav icons line up on; expanded, the full white lockup replaces it
-          rather than sitting beside it. `logo-ic-portal-white.svg` carries the
-          YA mark itself (the wordmark-only asset it replaced did not), so
-          keeping both on screen would draw the mark twice. */}
-      <div className="flex items-center py-4 shrink-0 px-2 h-[62px]">
-        <div
-          className={`${ICON_ZONE} transition-opacity duration-300 ease-in-out ${collapsed ? "opacity-100" : "opacity-0 w-0"}`}
-        >
+      {/* Logo — the YA mark never moves or fades: the small icon sits in the
+          same icon zone the nav icons line up on and stays fully opaque in
+          both states. Expanded, the full lockup (`logo-ic-portal-white.svg`,
+          which carries the mark itself) is laid exactly over it with its own
+          mark clipped off, so only the "Yuanta Securities / IC PORTAL" text
+          fades in and out. Cross-fading two copies of the mark instead dims it
+          mid-transition, which reads as a flicker. */}
+      <div className="relative flex items-center py-4 shrink-0 px-2 h-[62px]">
+        <div className={ICON_ZONE}>
           {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size icon, no responsive sizes needed */}
-          <img src="/brand/yuanta-icon-logo.svg" alt="Yuanta" className="w-auto h-7.5" />
+          <img src="/brand/yuanta-icon-logo.svg" alt="Yuanta" className="w-auto h-8" />
         </div>
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100"
+          aria-hidden={collapsed}
+          className={`absolute left-[9px] top-1/2 -translate-y-1/2 transition-opacity duration-300 ease-in-out ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- small fixed-size wordmark, no responsive sizes needed */}
           <img
             src="/brand/logo-ic-portal-white.svg"
             alt="Yuanta IC Portal"
-            className="w-auto h-8"
+            className="w-auto h-8 max-w-none [clip-path:inset(0_0_0_34px)]"
           />
         </div>
       </div>
@@ -358,12 +379,14 @@ export function AppSidebar({
             onNavigate={onClose}
           />
         )}
-        <NavSection
-          label="Growth"
-          items={growthItems}
-          collapsed={collapsed}
-          onNavigate={onClose}
-        />
+        {growthItems.length > 0 && (
+          <NavSection
+            label="Growth"
+            items={growthItems}
+            collapsed={collapsed}
+            onNavigate={onClose}
+          />
+        )}
       </nav>
 
       {/* Privacy mode toggle */}

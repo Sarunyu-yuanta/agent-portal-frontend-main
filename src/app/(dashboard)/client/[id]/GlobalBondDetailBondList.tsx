@@ -20,7 +20,7 @@ import {
   TopPickTag,
 } from "./fixed-income-shared";
 
-const TOP_PICK_COL_CLS = "w-[70px]";
+const TOP_PICK_COL_CLS = "w-[112px]";
 
 const headerBorder = (opts?: { right?: boolean; left?: boolean }) => ({
   borderBottom: `1px solid ${BORDER_COLOR}`,
@@ -256,7 +256,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
     >
       <div className="overflow-x-auto">
         <div className="flex items-stretch min-w-[1280px]">
-          <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex flex-col flex-1 min-w-[220px]">
             <div
               className="flex h-11 items-center px-4"
               style={headerBorder({ left: true, right: false })}

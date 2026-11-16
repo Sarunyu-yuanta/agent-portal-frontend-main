@@ -1,5 +1,6 @@
 "use client";
 
+import { NotesTabSkeleton } from "./ClientProfileSkeleton";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Toaster } from "@sarunyu/system-one";
@@ -174,7 +175,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
   const modalOpen = createOpen || editOpen;
 
   if (isLoading) {
-    return <p className="type-body-2 text-muted-foreground text-center py-10">Loading notes…</p>;
+    return <NotesTabSkeleton />;
   }
 
   return (

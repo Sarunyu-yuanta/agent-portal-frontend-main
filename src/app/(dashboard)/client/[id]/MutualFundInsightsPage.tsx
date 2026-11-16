@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { Button, Pagination } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { MutualFundInsightCard } from "./MutualFundInsightsSection";
-import { getMutualFundInsightsPage } from "./mutual-fund-data";
+import { MutualFundInsightsPageSkeleton } from "./MutualFundListPageSkeletons";
+import { useMutualFundInsights } from "@/hooks/use-catalog";
 
 /** Figma 38285:291118 — mutual fund CIO insights list. */
 export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const { items, totalPages } = getMutualFundInsightsPage(currentPage);
+  const { data: insights, isLoading } = useMutualFundInsights(currentPage);
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -19,6 +20,10 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
       window.scrollTo(0, 0);
     }
   }, [currentPage]);
+
+  if (isLoading) return <MutualFundInsightsPageSkeleton />;
+
+  const { items, totalPages } = insights;
 
   return (
     <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">

@@ -26,7 +26,6 @@ import {
   type Trend,
 } from "./stock-data";
 import {
-  getRelatedProducts,
   getStockQuoteHistory,
   relatedProductKinds,
   STOCK_CHART_RANGES,
@@ -36,6 +35,7 @@ import {
   type StockChartRange,
   type StockDetailTab,
   type StockProductDetail,
+  type StockTabNotice,
   type TimeSalesRow,
   type VolumeAnalysisData,
   type VolumeAnalysisRow,
@@ -44,7 +44,21 @@ import {
 import { CATALOG_DETAIL_WIDTH, useCatalogDetailScrollTop } from "./ProductCatalogTabbedDetailLayout";
 import { StockCompanyTab } from "./StockCompanyTab";
 import { StockRelatedProductTab } from "./StockRelatedProductTab";
+import {
+  StockDetailHeaderSkeleton,
+  StockMarketInfoBodySkeleton,
+  StockProposalButtonSkeleton,
+  StockQuoteBlockSkeleton,
+  StockTabBodySkeleton,
+} from "./StockCatalogSkeletons";
 import { setQueryState, withQuery } from "@/lib/query-state";
+import { TabsSkeleton } from "@/components/ui/skeleton";
+import {
+  useStockNews,
+  useStockRelatedProducts,
+  useStockResearch,
+  useStockTechnical,
+} from "@/hooks/use-catalog";
 
 const LINE = "#d92d3c";
 const FILL = "#f5212d";
@@ -751,27 +765,62 @@ function MarketInfoBody({ detail }: { detail: StockProductDetail }) {
   );
 }
 
-function PlaceholderTab({ label }: { label: string }) {
+function NoticeTabBody({ notice }: { notice: StockTabNotice | null }) {
+  if (!notice) return <StockTabBodySkeleton />;
   return (
     <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
-      {label} details will be available soon.
+      {notice.message}
     </div>
   );
 }
 
+/* Research / Technical / News: one component per tab so each calls only its
+ * own resource, and only once that tab is open. */
+function StockResearchTab({ symbol }: { symbol: string }) {
+  const { data, isLoading } = useStockResearch(symbol);
+  return <NoticeTabBody notice={isLoading ? null : data} />;
+}
+
+function StockTechnicalTab({ symbol }: { symbol: string }) {
+  const { data, isLoading } = useStockTechnical(symbol);
+  return <NoticeTabBody notice={isLoading ? null : data} />;
+}
+
+function StockNewsTab({ symbol }: { symbol: string }) {
+  const { data, isLoading } = useStockNews(symbol);
+  return <NoticeTabBody notice={isLoading ? null : data} />;
+}
+
+/**
+ * The ticker screen, loading included — two levels:
+ *
+ * 1. First load (`isLoading`, the page resource): the whole screen is skeleton,
+ *    tab strip included, so nothing can be pressed before there is a quote.
+ *    The body skeleton still follows `?tab=` so a deep link lands on the
+ *    right shape.
+ * 2. Once the quote is in, the real tabs are live and every tab but Market Info
+ *    reads its own resource: a tab whose data is still loading skeletons its
+ *    body only. "Related Product" is offered while its resource loads, and
+ *    dropped once it resolves with nothing in it.
+ */
 export function StockProductDetail({
-  detail,
+  detail: resolved,
+  isLoading,
   onBack,
 }: {
-  detail: StockProductDetail;
+  detail: StockProductDetail | null;
+  isLoading: boolean;
   onBack: () => void;
 }) {
+  const detail = isLoading ? null : resolved;
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const related = useMemo(() => getRelatedProducts(detail.symbol), [detail.symbol]);
+  const symbol = detail?.symbol ?? null;
+  const relatedResource = useStockRelatedProducts(symbol);
+  const related = relatedResource.isLoading ? null : relatedResource.data;
   const tabs = useMemo<readonly StockDetailTab[]>(
     () =>
-      relatedProductKinds(related).length > 0
+      !related || relatedProductKinds(related).length > 0
         ? STOCK_DETAIL_TABS
         : STOCK_DETAIL_TABS.filter((tab) => tab !== "Related Product"),
     [related],
@@ -779,7 +828,7 @@ export function StockProductDetail({
   const requestedTab = tabFromQuery(searchParams.get("tab"));
   const [activeTab, setActiveTab] = useState<StockDetailTab>("Market Info");
 
-  useCatalogDetailScrollTop([detail.symbol]);
+  useCatalogDetailScrollTop([symbol]);
 
   useEffect(() => {
     setActiveTab(tabs.includes(requestedTab) ? requestedTab : "Market Info");
@@ -798,27 +847,31 @@ export function StockProductDetail({
   return (
     <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pb-20 pt-4 md:pt-6 lg:pt-8">
       <div className={`flex flex-col gap-2 ${CATALOG_DETAIL_WIDTH.narrow}`}>
-        <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
-          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[30px] shrink-0 rounded-md p-[5px]">
-            <ArrowLeftIcon size={18} />
-          </Button>
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <div className="flex min-w-0 items-center gap-1">
-                <p className="shrink-0 text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.8)]">{detail.symbol}</p>
-                {detail.featured ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={ASSETS.sparkle} alt="" width={16} height={16} className="shrink-0" />
-                ) : null}
-                <p className="min-w-0 truncate text-base leading-[24px] text-[rgba(0,0,0,0.75)]">{detail.name}</p>
+        {!detail ? (
+          <StockDetailHeaderSkeleton />
+        ) : (
+          <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
+            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[30px] shrink-0 rounded-md p-[5px]">
+              <ArrowLeftIcon size={18} />
+            </Button>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <div className="flex min-w-0 items-center gap-1">
+                  <p className="shrink-0 text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.8)]">{detail.symbol}</p>
+                  {detail.featured ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={ASSETS.sparkle} alt="" width={16} height={16} className="shrink-0" />
+                  ) : null}
+                  <p className="min-w-0 truncate text-base leading-[24px] text-[rgba(0,0,0,0.75)]">{detail.name}</p>
+                </div>
+                <MarketStatusTag status={detail.status} />
               </div>
-              <MarketStatusTag status={detail.status} />
             </div>
           </div>
-        </div>
+        )}
 
         <div className="flex w-full flex-col gap-6 rounded-2xl bg-white px-4 py-8 shadow-[0px_0px_4px_rgba(0,0,0,0.02)] md:px-8 lg:px-14">
-          <QuoteBlock detail={detail} />
+          {detail ? <QuoteBlock detail={detail} /> : <StockQuoteBlockSkeleton />}
           {/* Sticky against `<main>`, which is the page's scroller (see
               `useCatalogDetailScrollTop`). `top-0` pins it directly under the
               app header — the header is a flex sibling above the scrollport
@@ -835,46 +888,62 @@ export function StockProductDetail({
               `bg-white` earns its keep only once pinned: the tab row is
               transparent in flow and the body would otherwise scroll through
               it. */}
-          <div
-            className="sticky top-0 z-20 -mt-6 flex w-full overflow-x-auto border-b border-black/10 bg-white"
-            style={{ scrollbarWidth: "none" }}
-          >
-            {tabs.map((tab) => {
-              const active = activeTab === tab;
-              return (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => selectTab(tab)}
-                  // Matches `CatalogDetailTextTabs`: hover paint on the inactive
-                  // tabs only. Trailing `!` because system-one ships its base
-                  // utilities unlayered, where they outrank a `hover:` variant.
-                  className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
-                    active
-                      ? "border-[#0a6ee7] text-[#0a6ee7]"
-                      : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
-                  }`}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-          </div>
+          {!detail ? (
+            <TabsSkeleton count={tabs.length} className="-mt-6 w-full border-b border-black/10" />
+          ) : (
+            <div
+              className="sticky top-0 z-20 -mt-6 flex w-full overflow-x-auto border-b border-black/10 bg-white"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {tabs.map((tab) => {
+                const active = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => selectTab(tab)}
+                    // Matches `CatalogDetailTextTabs`: hover paint on the inactive
+                    // tabs only. Trailing `!` because system-one ships its base
+                    // utilities unlayered, where they outrank a `hover:` variant.
+                    className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
+                      active
+                        ? "border-[#0a6ee7] text-[#0a6ee7]"
+                        : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-          {activeTab === "Market Info" ? (
+          {/* Level 1 gate is `!detail` (the page resource); each branch below
+              it gates on its own tab's resource. */}
+          {!detail ? (
+            activeTab === "Market Info" ? <StockMarketInfoBodySkeleton /> : <StockTabBodySkeleton />
+          ) : activeTab === "Market Info" ? (
             <MarketInfoBody detail={detail} />
           ) : activeTab === "Related Product" ? (
-            <StockRelatedProductTab related={related} />
+            related ? <StockRelatedProductTab related={related} /> : <StockTabBodySkeleton />
           ) : activeTab === "Company" ? (
             <StockCompanyTab symbol={detail.symbol} companyName={detail.name} />
+          ) : activeTab === "Research" ? (
+            <StockResearchTab symbol={detail.symbol} />
+          ) : activeTab === "Technical" ? (
+            <StockTechnicalTab symbol={detail.symbol} />
           ) : (
-            <PlaceholderTab label={activeTab} />
+            <StockNewsTab symbol={detail.symbol} />
           )}
 
           {/* Offered, never booked — see `SendProposalButton`. */}
-          <SendProposalButton
-            subject={{ id: offeredProductId("stock", detail.symbol), underlying: detail.symbol, documents: "บทวิเคราะห์หุ้น" }}
-          />
+          {detail ? (
+            <SendProposalButton
+              subject={{ id: offeredProductId("stock", detail.symbol), underlying: detail.symbol, documents: "บทวิเคราะห์หุ้น" }}
+            />
+          ) : (
+            <StockProposalButtonSkeleton />
+          )}
         </div>
       </div>
     </div>

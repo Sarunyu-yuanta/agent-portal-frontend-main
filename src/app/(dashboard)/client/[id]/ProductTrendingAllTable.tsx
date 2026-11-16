@@ -11,6 +11,7 @@ import { bookForItem, trendingRows, useTrendingBooks } from "./use-trending-book
 import { PercentPill } from "./stock-ui";
 import { TagFilterChip } from "./MutualFundCard";
 import { MF_ASSETS } from "./mutual-fund-assets";
+import { PaginationSkeleton, Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import {
   HEADER_TEXT_CLS,
   PAGE_SIZE_OPTIONS,
@@ -332,6 +333,32 @@ export function ProductTrendingAllTable({
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** The whole page while the ranking loads: title, updated line, sort chips
+ *  (as bars — nothing to re-sort yet), the table and its pagination. */
+export function ProductTrendingAllTableSkeleton() {
+  return (
+    <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }} aria-busy="true">
+      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="size-8 shrink-0 rounded-lg" />
+            <Skeleton className="h-7 w-40" />
+          </div>
+          <Skeleton className="h-5 w-80 max-w-full" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-14" />
+          <Skeleton className="h-9 w-28 rounded-full" />
+          <Skeleton className="h-9 w-36 rounded-full" />
+          <Skeleton className="h-9 w-28 rounded-full" />
+        </div>
+        <TableSkeleton columns={5} rows={10} />
+        <PaginationSkeleton />
       </div>
     </div>
   );

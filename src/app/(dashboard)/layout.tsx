@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
 import { HeaderSlotProvider, useHeaderSlot } from "./header-slot-context";
 import { PrivacyProvider } from "@/contexts/privacy-context";
 import { NotesProvider, useNotes } from "@/contexts/notes-context";
-import { OrdersProvider } from "@/contexts/orders-context";
+import { OrdersProvider, useOrders } from "@/contexts/orders-context";
 import { CampaignsProvider } from "@/contexts/campaigns-context";
 import {
   KYC_ALERTS_ENABLED,
@@ -24,7 +24,7 @@ import {
   ORDER_BOOKING_ENABLED,
   REMINDERS_ENABLED,
 } from "@/lib/feature-flags";
-import { useClients } from "@/hooks/use-api";
+import { useClientsResource } from "@/hooks/use-api";
 import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
 import { FloatingNoteButton } from "./notes/FloatingNoteButton";
 import { usePageChrome } from "./page-chrome";
@@ -56,7 +56,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const headerSlot = useHeaderSlot();
 
   const { notes } = useNotes();
-  const clients = useClients();
+  const { data: clients, isLoading: clientsLoading } = useClientsResource();
 
   // Clicking a bell row opens the reminder itself — the same two modals
   // `ClientRemindersTab` opens for the same job, just hoisted up here since
@@ -72,6 +72,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     useKycNotificationFeed(clients);
   const { orderNotificationRows, orderNotificationTargets, orderSubmissionTargets } =
     useOrderNotificationFeed();
+  // The bell's rows are derived from clients (KYC, reminder holders) and
+  // orders; until both have arrived it shows skeleton rows, not a guess.
+  const { isLoading: ordersLoading } = useOrders();
+  const notificationsLoading = clientsLoading || ordersLoading;
   const [openSubmission, setOpenSubmission] = useState<OrderSubmissionRef | null>(null);
 
   /**
@@ -218,8 +222,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   today, reminders alongside them once that flag flips. It only
                   disappears if every feed is off, rather than sitting there
                   permanently empty. */}
-              {notificationGroups.length > 0 && (
+              {(notificationsLoading || notificationGroups.length > 0) && (
                 <NotificationBell
+                  isLoading={notificationsLoading}
                   groups={notificationGroups}
                   emptyText="ไม่มีการแจ้งเตือน"
                   onItemClick={handleNotificationClick}

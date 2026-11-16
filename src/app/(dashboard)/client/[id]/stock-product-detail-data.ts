@@ -29,6 +29,20 @@ export const STOCK_DETAIL_TABS = [
 
 export type StockDetailTab = (typeof STOCK_DETAIL_TABS)[number];
 
+/** The tabs that have no feed yet and show a single line of copy instead. */
+export type StockNoticeTab = Extract<StockDetailTab, "Research" | "Technical" | "News">;
+
+/**
+ * What a not-yet-built tab (Research / Technical / News) shows today. It is
+ * only copy, but it is served per ticker like the real feed will be, so the
+ * tab already has its own resource — and its own loading state — to replace.
+ */
+export type StockTabNotice = { symbol: string; tab: StockNoticeTab; message: string };
+
+export function getStockTabNotice(symbol: string, tab: StockNoticeTab): StockTabNotice {
+  return { symbol, tab, message: `${tab} details will be available soon.` };
+}
+
 export const STOCK_CHART_RANGES = ["1D", "5D", "1M", "6M", "YTD", "1Y", "5Y"] as const;
 
 export type StockChartRange = (typeof STOCK_CHART_RANGES)[number];

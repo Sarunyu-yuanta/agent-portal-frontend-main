@@ -5,6 +5,8 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { AdvisoryClientPickerModal } from "./AdvisoryClientPickerModal";
 import type { AdvisoryService } from "./portfolio-advisory-client";
 import { ROBO_ASSETS } from "./robo-advisory-assets";
+import { useClientsResource } from "@/hooks/use-api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const HOVER_TRANSITION = "duration-500 ease-in-out";
 
@@ -229,6 +231,33 @@ function PortfolioAdvisoryCards({
   );
 }
 
+/** Header + the two service cards, same footprint as the real ones. */
+function PortfolioAdvisorySkeleton() {
+  return (
+    <div className="flex flex-col gap-3 md:gap-6" aria-busy="true">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-7 w-48 lg:h-[34px]" />
+        <Skeleton className="h-5 w-full max-w-[560px]" />
+      </div>
+      <div className="flex flex-col gap-3 md:flex-row md:gap-4 lg:gap-6">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex w-full flex-col gap-3 rounded-lg border border-black/5 p-4 h-[124px] md:flex-1 lg:h-[135px]"
+          >
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="size-6 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-full max-w-[420px]" />
+            <Skeleton className="h-4 w-2/3 max-w-[300px]" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Figma 33772:161280 mobile / 33777:122707 tablet / 33787:150658 desktop */
 export function RoboAdvisoryTab({
   onRoboAdvisorySelect,
@@ -240,6 +269,7 @@ export function RoboAdvisoryTab({
   // An IC reads these plans for one client at a time, so picking the client is
   // the first step of entering either service rather than a filter inside it.
   const [pendingService, setPendingService] = useState<AdvisoryService | null>(null);
+  const { isLoading: clientsLoading } = useClientsResource();
 
   return (
     <div className="w-full bg-white px-4 py-3 md:px-8 md:pb-10 md:pt-3 lg:bg-[#f9fafb] lg:py-10">
@@ -247,11 +277,20 @@ export function RoboAdvisoryTab({
         <div
           className="flex flex-col gap-3 md:gap-6 lg:rounded-xl lg:bg-white lg:px-14 lg:py-8 lg:shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]"
         >
-          <PortfolioAdvisoryHeader />
-          <PortfolioAdvisoryCards
-            onRoboAdvisorySelect={() => setPendingService("robo")}
-            onDefinitSelect={() => setPendingService("definit")}
-          />
+          {/* The cards' copy is static, but both open a client picker — so
+              until the client list is in, there is nothing to pick from and
+              the section stands as a skeleton rather than a dead click. */}
+          {clientsLoading ? (
+            <PortfolioAdvisorySkeleton />
+          ) : (
+            <>
+              <PortfolioAdvisoryHeader />
+              <PortfolioAdvisoryCards
+                onRoboAdvisorySelect={() => setPendingService("robo")}
+                onDefinitSelect={() => setPendingService("definit")}
+              />
+            </>
+          )}
         </div>
       </div>
 

@@ -18,6 +18,8 @@ import { useSetHeaderSlot } from "../header-slot-context";
 import { useScrollThreshold } from "../client/[id]/use-scroll-threshold";
 import { rememberCatalogList } from "@/lib/nav-memory";
 import { setQueryState, withQuery } from "@/lib/query-state";
+import { useProductCatalogLoading } from "@/hooks/use-catalog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProductCatalogPage() {
   return (
@@ -38,6 +40,7 @@ function ProductCatalogPageInner() {
   const setHeaderSlot = useSetHeaderSlot();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isLoading = useProductCatalogLoading();
 
   // The category tab lives in the URL, so browser back/forward, a refresh and
   // sidebar re-entry all land on the tab the user actually had open.
@@ -52,7 +55,10 @@ function ProductCatalogPageInner() {
   }, [listUrl]);
 
   useEffect(() => {
-    if (scrolled) {
+    if (scrolled && isLoading) {
+      // Same footprint as the `sm` search bar, nothing to type into yet.
+      setHeaderSlot(<Skeleton className="h-9 w-full rounded-lg" />);
+    } else if (scrolled) {
       setHeaderSlot(
         <div
           ref={headerSearchWrapRef}
@@ -72,7 +78,7 @@ function ProductCatalogPageInner() {
       setHeaderSlot(null);
     }
     return () => setHeaderSlot(null);
-  }, [scrolled, searchValue, setSearchValue, setHeaderSlot]);
+  }, [scrolled, isLoading, searchValue, setSearchValue, setHeaderSlot]);
 
   const navigation: CatalogNavigation = {
     onProductSelect: (p) => router.push(`/product-catalog/product/${p.id}`),

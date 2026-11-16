@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 
 import { CatalogDetailThemeHero, CatalogTabbedDetailView } from "./CatalogTabbedDetailView";
-import { useCatalogDetailScrollTop } from "./ProductCatalogTabbedDetailLayout";
+import {
+  CATALOG_DETAIL_WIDTH,
+  CatalogDetailBackHeader,
+  CatalogDetailDesktopShell,
+  useCatalogDetailScrollTop,
+} from "./ProductCatalogTabbedDetailLayout";
 import {
   MutualFundListCard,
 } from "./MutualFundCard";
@@ -12,6 +17,13 @@ import { MutualFundThemeDetailMobile } from "./MutualFundThemeDetailMobile";
 import { MutualFundLegendModal } from "./MutualFundLegendSheet";
 
 import { MutualFundTagLegend } from "./mutual-fund-ui";
+import {
+  MutualFundTabbedListControlsSkeleton,
+  MutualFundTabbedListGridSkeleton,
+  MutualFundTabbedListHeroSkeleton,
+} from "./MutualFundListPageSkeletons";
+import { useMutualFundTheme, useMutualFundUniverse } from "@/hooks/use-catalog";
+import { TabsSkeleton } from "@/components/ui/skeleton";
 import {
   filterFundsByTag,
   fundHasHighlightTag,
@@ -24,11 +36,11 @@ import {
   getThemeGridFunds,
   getThemeHeroTitle,
   type MobilePerformancePeriod,
+  type MutualFundTheme,
   type MutualFundThemeId,
 } from "./mutual-fund-data";
 
-function MutualFundThemeHero({ themeId }: { themeId: MutualFundThemeId }) {
-  const theme = getMutualFundTheme(themeId);
+function MutualFundThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme: MutualFundTheme }) {
   const Icon = THEME_ICON_COMPONENTS[theme.icon];
 
   return (
@@ -92,6 +104,9 @@ export function MutualFundThemeDetailPage({
 
   useCatalogDetailScrollTop([themeId]);
 
+  const { data: theme, isLoading: themeLoading } = useMutualFundTheme(themeId);
+  const { isLoading: universeLoading } = useMutualFundUniverse();
+
   const themeTabItems = useMemo(
     () => MUTUAL_FUND_THEME_IDS.map((id) => ({ id, label: getMutualFundTheme(id).title })),
     [],
@@ -102,55 +117,95 @@ export function MutualFundThemeDetailPage({
   const showHighlightTag = bothOrNeitherTag || highlightActive;
   const tagFunds = filterFundsByTag(funds, viewActive, highlightActive);
   const listCountLabel = `${tagFunds.length} รายการ`;
+  // Two levels. First load (the fund universe the page hangs off): the whole
+  // page is skeleton, theme tabs included. After that, switching theme only
+  // waits on that theme — the real tabs stay live and only the hero, list
+  // controls and grid below them are skeleton.
+  const isPageLoading = universeLoading;
+  const isLoading = themeLoading || universeLoading;
 
   return (
     <>
       <div className="lg:hidden">
         <MutualFundThemeDetailMobile
           themeId={themeId}
+          theme={theme}
+          isLoading={isLoading}
+          isPageLoading={isPageLoading}
           onThemeChange={setThemeId}
           onBack={onBack}
           onFundSelect={onFundSelect}
         />
       </div>
 
-      <CatalogTabbedDetailView
-        title="ธีมกองทุนเด่น"
-        onBack={onBack}
-        tabItems={themeTabItems}
-        activeTabId={themeId}
-        onTabSelect={setThemeId}
-        hero={<MutualFundThemeHero themeId={themeId} />}
-        listControls={
-          <>
-            <MutualFundTagLegend
-              viewActive={viewActive}
-              highlightActive={highlightActive}
-              onToggleView={() => setViewActive((v) => !v)}
-              onToggleHighlight={() => setHighlightActive((v) => !v)}
-              onShowLegend={() => setLegendOpen(true)}
-            />
-            <PerformancePeriodTabs active={period} onChange={setPeriod} />
-          </>
-        }
-        countLabel={listCountLabel}
-      >
-        <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
-          {tagFunds.map((fund, index) => (
-            <div key={`${fund.id}-${index}`} className="min-w-0">
-              <MutualFundListCard
-                fund={fund}
-                onSelect={onFundSelect}
-                showView={showViewTag && fundHasViewTag(fund)}
-                showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
-              />
+      {isPageLoading ? (
+        <CatalogDetailDesktopShell>
+          <CatalogDetailBackHeader title="ธีมกองทุนเด่น" onBack={onBack} className="!pt-8" />
+          <TabsSkeleton count={themeTabItems.length} className={CATALOG_DETAIL_WIDTH.narrow} />
+          <MutualFundTabbedListHeroSkeleton />
+          <div
+            className="relative z-10 w-full rounded-xl"
+            style={{ backgroundImage: `linear-gradient(to right, ${THEME_HERO_COLOR.from}, ${THEME_HERO_COLOR.to})` }}
+          >
+            <div className="w-full rounded-t-xl bg-white pt-4 pb-6">
+              <div className={`flex flex-col gap-6 ${CATALOG_DETAIL_WIDTH.narrow}`}>
+                <div className="flex w-full flex-col gap-3">
+                  <MutualFundTabbedListControlsSkeleton />
+                </div>
+                <MutualFundTabbedListGridSkeleton />
+              </div>
             </div>
-          ))}
-        </div>
-        {tagFunds.length === 0 ? (
-          <p className="px-3 text-center text-sm font-normal text-[#6a7282]">ไม่พบกองทุนในธีมนี้</p>
-        ) : null}
-      </CatalogTabbedDetailView>
+          </div>
+        </CatalogDetailDesktopShell>
+      ) : (
+        <CatalogTabbedDetailView
+          title="ธีมกองทุนเด่น"
+          onBack={onBack}
+          tabItems={themeTabItems}
+          activeTabId={themeId}
+          onTabSelect={setThemeId}
+          hero={isLoading ? <MutualFundTabbedListHeroSkeleton /> : <MutualFundThemeHero themeId={themeId} theme={theme} />}
+          listControls={
+            isLoading ? (
+              <MutualFundTabbedListControlsSkeleton />
+            ) : (
+              <>
+                <MutualFundTagLegend
+                  viewActive={viewActive}
+                  highlightActive={highlightActive}
+                  onToggleView={() => setViewActive((v) => !v)}
+                  onToggleHighlight={() => setHighlightActive((v) => !v)}
+                  onShowLegend={() => setLegendOpen(true)}
+                />
+                <PerformancePeriodTabs active={period} onChange={setPeriod} />
+              </>
+            )
+          }
+          countLabel={isLoading ? undefined : listCountLabel}
+        >
+          {isLoading ? (
+            <MutualFundTabbedListGridSkeleton />
+          ) : (
+            <>
+              <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
+                {tagFunds.map((fund, index) => (
+                  <div key={`${fund.id}-${index}`} className="min-w-0">
+                    <MutualFundListCard
+                      fund={fund}
+                      onSelect={onFundSelect}
+                      showView={showViewTag && fundHasViewTag(fund)}
+                      showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
+                    />
+                  </div>
+                ))}
+              </div>
+              {tagFunds.length === 0 ? (
+                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">ไม่พบกองทุนในธีมนี้</p>
+              ) : null}
+            </>
+          )}
+        </CatalogTabbedDetailView>
+      )}
 
       <MutualFundLegendModal open={legendOpen} onClose={() => setLegendOpen(false)} />
     </>

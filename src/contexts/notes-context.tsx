@@ -8,6 +8,10 @@ import {
   type ReactNode,
 } from "react";
 import type { Note } from "@/types/domain";
+import { useStatic } from "@/hooks/use-api";
+
+/** Nothing is seeded today; a real feed would be fetching this list. */
+const SEED_NOTES: Note[] = [];
 
 /** Everything the caller supplies for a new note; id and timestamps are set here. */
 export type NoteDraft = Omit<Note, "id" | "createdAt" | "updatedAt">;
@@ -15,11 +19,9 @@ export type NoteDraft = Omit<Note, "id" | "createdAt" | "updatedAt">;
 type NotesContextValue = {
   notes: Note[];
   /**
-   * Always `false` — notes live in memory, so there is never anything to wait
-   * for. Kept in the contract because every notes screen already renders a
-   * skeleton against it: whenever notes get a real endpoint, this is the one
-   * field that has to start going `true` and the skeletons come back on their
-   * own. Same seam as `useStatic` in `@/hooks/use-api`.
+   * The seed list hasn't arrived — from `useStatic` over the seed, the same
+   * seam every other dataset uses. Every notes screen renders a skeleton
+   * against it, so a real endpoint needs no screen changes.
    */
   isLoading: boolean;
   /**
@@ -68,7 +70,8 @@ let localIdSeq = 0;
  * single caller.
  */
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const { isLoading } = useStatic(SEED_NOTES);
+  const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
 
   const addNote = useCallback(async (draft: NoteDraft, presetLocalId?: string) => {
     const now = new Date().toISOString();
@@ -94,7 +97,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotesContext.Provider
-      value={{ notes, isLoading: false, addNote, editNote, removeNote }}
+      value={{ notes, isLoading, addNote, editNote, removeNote }}
     >
       {children}
     </NotesContext.Provider>

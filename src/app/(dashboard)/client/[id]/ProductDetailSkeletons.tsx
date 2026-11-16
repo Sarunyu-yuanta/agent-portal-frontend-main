@@ -6,12 +6,12 @@
  * section-level and card-level pieces they build on live in
  * `ProductCatalogSkeletons.tsx` and `@/components/ui/detail-skeletons`.
  */
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
+import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import {
   DetailHeaderSkeleton,
   ProductDetailPageSkeleton,
   KeyValueTableSkeleton,
-  HeroBannerSkeleton,
   AccordionListSkeleton,
   ColumnTableSkeleton,
   StatCardRowSkeleton,
@@ -103,7 +103,7 @@ function CompanyBondSectionSkeleton({ columns }: { columns: number }) {
           <Skeleton className="h-3 w-28" />
         </div>
       </div>
-      <ColumnTableSkeleton columns={columns} rows={6} rowHeightClass="h-[52px]" firstColWide minWidthClass="min-w-[1400px]" />
+      <ColumnTableSkeleton columns={columns} rows={6} rowHeightClass="h-[52px]" firstColWide />
     </div>
   );
 }
@@ -137,37 +137,56 @@ export function FixedIncomeCompanyDetailSkeleton({ hasSecondary = false }: { has
 /** Mirrors GlobalBondDetail: hero banner + filter pill rows, bond list, recommended bond cards. */
 export function GlobalBondDetailSkeleton() {
   return (
-    <div className="flex flex-col items-stretch w-full pt-4 pb-10 px-4 md:pt-6 md:pb-20 md:px-8 lg:px-20">
+    <div className="flex flex-col items-stretch w-full pt-4 pb-10 px-4 md:pt-6 md:pb-20 md:px-8 lg:px-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
       <DetailHeaderSkeleton maxWidth="max-w-[1280px]" />
 
       <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[1280px] mx-auto">
-        <div className="flex flex-col gap-4 w-full">
-          <HeroBannerSkeleton heightClass="h-56" />
-          <div className="flex flex-wrap gap-2 items-center">
-            <Skeleton className="h-7 w-24 rounded-full" />
-            <Skeleton className="h-7 w-28 rounded-full" />
-            <Skeleton className="h-7 w-20 rounded-full" />
-          </div>
-          {[0, 1].map((row) => (
-            <div key={row} className="flex flex-wrap gap-2 items-center">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-20 rounded-full" />
-              ))}
+        {/* Mirrors GlobalBondDetailHero: logo + title + tags, description, then the two filter pill groups inside the banner. */}
+        <div className="flex flex-col gap-6 px-4 py-6 md:p-8 rounded-xl overflow-hidden bg-[var(--fill-gray-100)]">
+          <div className="flex flex-col gap-2 md:gap-1.5 lg:min-h-[83px] lg:justify-between w-full">
+            <div className="flex flex-col gap-2 lg:pb-[9px] w-full">
+              <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between w-full">
+                <div className="flex gap-2 items-center min-w-0">
+                  <Skeleton className="size-7 md:size-8 rounded-lg shrink-0 bg-[var(--fill-gray-300)]" />
+                  <Skeleton className="h-[30px] md:h-10 w-48 md:w-80 bg-[var(--fill-gray-300)]" />
+                </div>
+                <div className="flex flex-wrap gap-[7px] items-center">
+                  <Skeleton className="h-7 w-24 rounded bg-[var(--fill-gray-300)]" />
+                  <Skeleton className="h-7 w-28 rounded bg-[var(--fill-gray-300)]" />
+                  <Skeleton className="h-7 w-48 lg:w-80 rounded bg-[var(--fill-gray-300)]" />
+                </div>
+              </div>
             </div>
-          ))}
+            <Skeleton className="h-5 w-full max-w-sm bg-[var(--fill-gray-300)]" />
+          </div>
+
+          <div className="flex flex-col gap-3 md:gap-2 lg:flex-row lg:gap-10 lg:items-center w-full">
+            {[5, 3].map((pills, g) => (
+              <div key={g} className="flex flex-col gap-2 min-w-0">
+                <Skeleton className="h-5 w-32 shrink-0 bg-[var(--fill-gray-300)]" />
+                <div className="flex gap-1 items-center p-1 rounded-lg bg-[var(--fill-gray-300)]/50 overflow-hidden">
+                  {Array.from({ length: pills }).map((_, i) => (
+                    <Skeleton key={i} className="h-[38px] w-14 md:w-16 rounded-lg shrink-0 bg-[var(--fill-gray-300)]" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 lg:gap-12 w-full">
+          {ORDER_BOOKING_ENABLED && <TabsSkeleton count={2} />}
+
           <div className="flex flex-col gap-4 w-full">
             <div className="flex items-center justify-between w-full">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-6 md:h-7 w-28 md:w-32" />
+              <Skeleton className="h-5 md:h-6 w-40 md:w-64" />
             </div>
             <div className="lg:hidden w-full">
               <AccordionListSkeleton rows={5} />
             </div>
             <div className="hidden lg:block w-full">
-              <ColumnTableSkeleton columns={9} rows={6} rowHeightClass="h-[52px]" firstColWide minWidthClass="min-w-[1280px]" />
+              <ColumnTableSkeleton columns={9} rows={6} rowHeightClass="h-[52px]" firstColWide />
             </div>
           </div>
 
@@ -176,7 +195,7 @@ export function GlobalBondDetailSkeleton() {
               <Skeleton className="size-5 rounded shrink-0" />
               <Skeleton className="h-5 w-40" />
             </div>
-            <StatCardRowSkeleton cards={3} className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full" />
+            <StatCardRowSkeleton cards={3} className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full" cardHeightClass="h-[240px]" />
           </div>
         </div>
       </div>
@@ -187,29 +206,37 @@ export function GlobalBondDetailSkeleton() {
 /** Mirrors GlobalBondAllPage: filter hero, bond list, pagination footer. */
 export function GlobalBondAllPageSkeleton() {
   return (
-    <div className="flex flex-col items-stretch w-full pt-4 pb-10 px-4 md:pt-6 md:pb-20 md:px-8 lg:px-20">
+    <div className="flex flex-col items-stretch w-full pt-4 pb-10 px-4 md:pt-6 md:pb-20 md:px-8 lg:px-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
       <DetailHeaderSkeleton maxWidth="max-w-[1280px]" />
 
       <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[1280px] mx-auto">
-        <div className="flex flex-col gap-4 w-full">
-          <HeroBannerSkeleton heightClass="h-56" />
-          <div className="hidden lg:flex flex-wrap gap-3 items-center">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-9 w-32 rounded-lg" />
-            ))}
+        {/* Mirrors the real hero: big title + description, then (desktop) the 4 filter dropdowns + clear button inside the banner. */}
+        <div className="flex w-full flex-col gap-4 rounded-xl px-4 py-6 md:gap-6 md:p-8 bg-[var(--fill-gray-100)]">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-9 lg:h-12 w-56 lg:w-[420px] bg-[var(--fill-gray-300)]" />
+            <Skeleton className="h-5 lg:h-6 w-64 lg:w-[540px] bg-[var(--fill-gray-300)]" />
+          </div>
+          <Skeleton className="h-[46px] w-40 rounded-lg lg:hidden bg-[var(--fill-gray-300)]" />
+          <div className="hidden lg:flex w-full flex-nowrap items-center gap-3">
+            <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-11 flex-1 min-w-0 rounded-lg bg-[var(--fill-gray-300)]" />
+              ))}
+            </div>
+            <Skeleton className="h-11 w-36 shrink-0 rounded-lg bg-[var(--fill-gray-300)]" />
           </div>
         </div>
 
         <div className="flex flex-col gap-3 lg:gap-4 w-full items-center">
           <div className="flex items-center justify-between w-full">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-6 md:h-7 w-32 md:w-36" />
+            <Skeleton className="h-5 md:h-6 w-40 md:w-64" />
           </div>
           <div className="w-full lg:hidden">
             <AccordionListSkeleton rows={6} />
           </div>
           <div className="hidden w-full lg:block">
-            <ColumnTableSkeleton columns={9} rows={8} rowHeightClass="h-[65px]" firstColWide minWidthClass="min-w-[1280px]" />
+            <ColumnTableSkeleton columns={9} rows={8} rowHeightClass="h-[65px]" firstColWide />
           </div>
           <div className="flex w-full items-center justify-end gap-3">
             <Skeleton className="h-6 w-16" />
@@ -228,10 +255,14 @@ export function GlobalBondAllPageSkeleton() {
 export function TopIdeaAllPageSkeleton() {
   return (
     <div className="flex flex-col items-center gap-8 w-full pt-6 pb-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
-      <DetailHeaderSkeleton maxWidth="max-w-[1280px]" />
+      {/* Same box as the real header (h-[46px], px-4/8/20) so the back button and title don't shift. */}
+      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
+        <Skeleton className="size-7 rounded-md shrink-0" />
+        <Skeleton className="h-6 w-28" />
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
-        {Array.from({ length: 9 }).map((_, i) => (
+        {Array.from({ length: 15 }).map((_, i) => (
           <TopIdeaCardSkeleton key={i} fullWidth />
         ))}
       </div>
@@ -244,18 +275,18 @@ export function TopIdeaDetailSkeleton() {
   return (
     <ProductGridDetailSkeleton
       hero={
-        <div className="relative flex w-full items-center min-h-[100px] lg:min-h-[155px] -mb-6" style={{ backgroundColor: "#f3f4f6" }}>
+        <div className="relative flex w-full items-center -mb-6 min-h-[100px] pt-3 pb-10 md:pt-4 md:pb-10 lg:min-h-[155px] lg:pt-8 lg:pb-14" style={{ backgroundColor: "#f3f4f6" }}>
           <div className="relative z-[1] flex flex-1 gap-2 lg:gap-4 items-center w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
             <div className="flex flex-1 gap-2 lg:gap-4 items-center min-w-0">
-              <Skeleton className="size-8 lg:size-10 rounded-full shrink-0" />
-              <div className="flex flex-1 flex-col gap-1 min-w-0">
-                <Skeleton className="h-5 w-40" />
-                <Skeleton className="h-3 w-56" />
+              <Skeleton className="size-6 md:size-8 lg:size-10 rounded-md shrink-0" />
+              <div className="flex flex-1 flex-col gap-0.5 md:gap-1 lg:gap-2 min-w-0">
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-56" />
               </div>
             </div>
-            <div className="flex flex-col gap-1 items-end shrink-0">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-3 w-12" />
+            <div className="flex flex-col gap-0.5 lg:gap-2 items-end shrink-0">
+              <Skeleton className="h-7 w-24 lg:h-[34px] lg:w-[112px] rounded-md" />
+              <Skeleton className="h-4 w-14" />
             </div>
           </div>
         </div>

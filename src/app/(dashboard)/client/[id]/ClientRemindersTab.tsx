@@ -1,5 +1,6 @@
 "use client";
 
+import { ListTabSkeleton } from "./ClientProfileSkeleton";
 import { useMemo } from "react";
 import { CalendarBlankIcon, CalendarCheckIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@sarunyu/system-one";
@@ -172,9 +173,7 @@ export function ClientRemindersTab({
   }, [dayMap, todayKey]);
 
   if (isLoading) {
-    return (
-      <p className="type-body-2 text-muted-foreground text-center py-10">Loading reminders…</p>
-    );
+    return <ListTabSkeleton />;
   }
 
   return (

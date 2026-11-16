@@ -6,8 +6,14 @@ import { Avatar, Card, TabGroup } from "@sarunyu/system-one";
 import { ClientAssetSidebarContent } from "@/components/ClientAssetSidebarContent";
 import { ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import { mockClients, mockClientDetails } from "@/lib/mock-data";
-import { useClientsResource } from "@/hooks/use-api";
-import { ClientProfileSkeleton } from "./ClientProfileSkeleton";
+import {
+  useClientAssetAccounts,
+  useClientCallLogs,
+  useClientProfile,
+  useClientsResource,
+} from "@/hooks/use-api";
+import { ClientProfileSkeleton, DetailCardsSkeleton } from "./ClientProfileSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitials, formatAumThb, formatPlYtdPct } from "@/lib/client-utils";
@@ -16,8 +22,6 @@ import { useSetHeaderSlot } from "../../header-slot-context";
 import { usePageBreadcrumb } from "../../page-breadcrumbs";
 import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
 import { TierBadge } from "@/components/ui/tier-badge";
-import { getCallLogs } from "@/data/call-log-data";
-import { getClientProfile } from "@/data/client-profiles";
 import { ContactChips } from "../../calendar/HolderContact";
 import { LiabilitiesDetailModal } from "@/components/LiabilitiesDetailModal";
 import type { LiabilitiesDetail } from "@/data/liabilities-details";
@@ -78,8 +82,11 @@ function ClientPageInner({ id }: { id: string }) {
   const [holdingsSortDir, setHoldingsSortDir] = useState<SortDir>("none");
   const [holdingsSortKey, setHoldingsSortKey] = useState<HoldingsSortKey>(null);
 
-  const callLogs = getCallLogs(client.id);
-  const profile = getClientProfile(client.id);
+  // Per-tab data: each tab that would be its own endpoint waits on its own
+  // resource, so a slow one skeletons that tab's content, not the page.
+  const { data: callLogs, isLoading: callLogsLoading } = useClientCallLogs(client.id);
+  const { data: profile, isLoading: profileLoading } = useClientProfile(client.id);
+  const { data: assetAccounts, isLoading: assetsLoading } = useClientAssetAccounts(client.id);
   const kycExpiryLabel = kycExpiryLabelTh(client.id);
   const [liabilitiesOpen, setLiabilitiesOpen] = useState(false);
   const [liabilitiesData, setLiabilitiesData] = useState<{ amount: string; detail: LiabilitiesDetail } | null>(null);
@@ -137,10 +144,21 @@ function ClientPageInner({ id }: { id: string }) {
     return () => setHeaderSlot(null);
   }, [scrolled, activeTab, setHeaderSlot]);
 
+  const tabStrip = (
+    <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
+      <TabGroup
+        items={CLIENT_TAB_ITEMS}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        size="md"
+      />
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="flex flex-col -mt-6 pt-6">
-        <ClientProfileSkeleton />
+        <ClientProfileSkeleton tab={activeTab} />
       </div>
     );
   }
@@ -252,31 +270,35 @@ function ClientPageInner({ id }: { id: string }) {
         </div>
 
         {/* ── Tab navigation ── */}
-        <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
-          <TabGroup
-            items={CLIENT_TAB_ITEMS}
-            activeId={activeTab}
-            onChange={setActiveTab}
-            size="md"
-          />
-        </div>
+        {tabStrip}
       </div>
 
       {/* ── Body content ── */}
       <FadeIn key={activeTab}>
         {activeTab === "kyc" ? (
-          <KycTab client={client} profile={profile} />
+          profileLoading ? (
+            <div className="pt-8">
+              <DetailCardsSkeleton />
+            </div>
+          ) : (
+            <KycTab client={client} profile={profile} />
+          )
         ) : activeTab === "assets" ? (
           <div className="pt-8">
+            {assetsLoading ? (
+              <DetailCardsSkeleton />
+            ) : (
             <ClientAssetSidebarContent
               clientId={client.id}
               client={client}
+              assetAccounts={assetAccounts}
               accordionCards
               onLiabilitiesOpen={(amount, detail) => {
                 setLiabilitiesData({ amount, detail });
                 setLiabilitiesOpen(true);
               }}
             />
+            )}
           </div>
         ) : activeTab === "orders" ? (
           <div className="pt-8 w-full">
@@ -292,7 +314,16 @@ function ClientPageInner({ id }: { id: string }) {
             <Card variant="default">
               <div className="flex flex-col gap-4">
                 <h6 className="type-h6 text-foreground">Call Log</h6>
-                <CallLogTable callLogs={callLogs} />
+                {callLogsLoading ? (
+                  // Already inside the Call Log card — rows only, no second card.
+                  <div className="flex flex-col gap-2" aria-busy="true">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                    ))}
+                  </div>
+                ) : (
+                  <CallLogTable callLogs={callLogs} />
+                )}
               </div>
             </Card>
           </div>

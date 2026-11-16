@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useIndustrySectorPage } from "@/hooks/use-catalog";
+import { SetIndustrySectorDetailSkeleton } from "./StockCatalogSkeletons";
 import {
   CatalogDetailBackHeader,
   CatalogDetailTextTabs,
@@ -12,7 +14,6 @@ import {
 
 const NARROW = CATALOG_DETAIL_WIDTH.narrow;
 import {
-  getIndustrySectorPage,
   getSectorStockBatch,
   industrySectorHref,
   SECTOR_STOCK_PAGE_SIZE,
@@ -73,9 +74,14 @@ export function SetIndustrySectorDetail({
   onBack: () => void;
 }) {
   const router = useRouter();
-  const page = getIndustrySectorPage(sectorId);
+  const { data: page, isLoading } = useIndustrySectorPage(sectorId);
 
   useCatalogDetailScrollTop([sectorId]);
+
+  // Above the not-found branch, or every visit flashes "ไม่พบข้อมูล" first.
+  // The whole page, tab strip included: picking another sector is a
+  // navigation to that sector's own page, so every load here is a first load.
+  if (isLoading) return <SetIndustrySectorDetailSkeleton />;
 
   if (!page) {
     return (

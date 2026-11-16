@@ -13,6 +13,10 @@ import { Suspense } from "react";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { TabGroup } from "@sarunyu/system-one";
 import { FadeIn } from "@/components/ui/fade-in";
+import { TabsSkeleton } from "@/components/ui/skeleton";
+import { useOrders } from "@/contexts/orders-context";
+import { useHasLoaded } from "@/hooks/use-api";
+import { useTransactions } from "./use-transactions";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { catalogListHref } from "@/lib/product-catalog-routes";
 import { setQueryState, withQuery } from "@/lib/query-state";
@@ -41,9 +45,22 @@ function OrdersPageInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = normalizeOrderTab(searchParams.get("tab"));
+  // First load (the order records and trades the panels read): the tab strip
+  // is bars too. After that it stays live; a panel still waiting on its own
+  // data skeletons only its content.
+  const { isLoading: ordersLoading } = useOrders();
+  const stock = useTransactions("stock");
+  const tfex = useTransactions("tfex");
+  const fund = useTransactions("mutual-fund");
+  const hasLoaded = useHasLoaded(
+    ordersLoading || stock.isLoading || tfex.isLoading || fund.isLoading,
+  );
 
   return (
     <div className="flex flex-col gap-4">
+      {!hasLoaded ? (
+        <TabsSkeleton count={ORDER_TABS.length} />
+      ) : (
       <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
         <TabGroup
           items={ORDER_TABS.map((t) => ({ id: t.id, title: t.title }))}
@@ -60,6 +77,7 @@ function OrdersPageInner() {
           size="md"
         />
       </div>
+      )}
 
       <FadeIn key={tab.id}>
         {tab.kind === "all" ? (

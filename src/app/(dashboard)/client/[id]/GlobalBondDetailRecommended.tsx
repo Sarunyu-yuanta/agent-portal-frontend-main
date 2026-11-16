@@ -42,7 +42,7 @@ function RecommendedBondCard({
 }) {
   return (
     <div
-      className={`box-border flex h-[194px] w-[320px] md:w-[416px] shrink-0 lg:w-full lg:min-w-0 flex-col items-center justify-between gap-4 rounded-xl bg-white p-4 ${
+      className={`box-border flex min-h-[194px] w-[320px] md:w-[416px] shrink-0 lg:w-full lg:min-w-0 flex-col items-center justify-between gap-4 rounded-xl bg-white p-4 ${
         highlighted ? "border-2 border-[#51a2ff]" : "border-0"
       }`}
       style={{ boxShadow: TABLE_SHADOW }}

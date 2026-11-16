@@ -17,7 +17,10 @@
  * `@/hooks/use-catalog`. This file holds the ones the dashboard shell needs.
  */
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { getCallLogs, type CallLogEntry } from "@/data/call-log-data";
+import { getClientProfile, type ClientProfile } from "@/data/client-profiles";
+import { DEFAULT_ASSET_ACCOUNTS, type AssetAccountItem } from "@/data/asset-account-details";
 import {
   mockClients,
   mockNBAActions,
@@ -142,4 +145,40 @@ export function usePipelineDeals() {
 
 export function useMiniKanban() {
   return useStatic(mockMiniKanban).data;
+}
+
+/**
+ * Whether a screen has finished its FIRST load. Starts `false` while
+ * `isLoading`, flips to `true` the first time it isn't, and stays there.
+ *
+ * The two-level loading model: until a page has loaded once, the whole page —
+ * tab strip included — is skeleton. After that, tabs stay real and clickable,
+ * and a tab whose own data is still coming shows a skeleton in its content
+ * only. Pass the loading flag of whatever the page shows first.
+ */
+export function useHasLoaded(isLoading: boolean): boolean {
+  const [loaded, setLoaded] = useState(!isLoading);
+  if (!isLoading && !loaded) setLoaded(true);
+  return loaded;
+}
+
+// ── Client 360 per-tab resources ─────────────────────────────────────────────
+// Each profile tab that would be its own endpoint reads through its own hook,
+// so switching to a tab whose data is slow shows a skeleton in that tab only.
+
+/** KYC tab: the client's KYC profile. */
+export function useClientProfile(clientId: string): Resource<ClientProfile> {
+  const profile = useMemo(() => getClientProfile(clientId), [clientId]);
+  return useStatic(profile);
+}
+
+/** Call Log tab: the client's calls. */
+export function useClientCallLogs(clientId: string): Resource<CallLogEntry[]> {
+  const logs = useMemo(() => getCallLogs(clientId), [clientId]);
+  return useStatic(logs);
+}
+
+/** Assets tab: the client's accounts (one shared mock list today). */
+export function useClientAssetAccounts(_clientId: string): Resource<AssetAccountItem[]> {
+  return useStatic(DEFAULT_ASSET_ACCOUNTS);
 }

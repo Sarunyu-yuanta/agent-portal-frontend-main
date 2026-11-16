@@ -14,6 +14,7 @@
  * row is status; ประเภท and ช่องทาง live in the filter dialog.
  */
 
+import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { FunnelSimpleIcon, ReceiptIcon } from "@phosphor-icons/react";
@@ -225,6 +226,8 @@ export function TransactionsPanel({
   // Looked up in the unfiltered rows: a chip clicked behind the open modal
   // must not blank out the trade being read.
   const open = trades.find((t: ClientTransaction) => t.id === openId) ?? null;
+
+  if (isLoading) return <OrdersPanelSkeleton />;
 
   return (
     <div className="flex flex-col gap-4">

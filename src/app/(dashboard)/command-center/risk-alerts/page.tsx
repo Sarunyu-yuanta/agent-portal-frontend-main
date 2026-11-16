@@ -114,6 +114,10 @@ function RiskAlertsPageInner() {
 
   const filtered = category !== "all" || severity !== null;
 
+  // The whole page, not just the list: the category tabs and severity strip
+  // carry counts from this feed, so they wait for it too.
+  if (isLoading) return <RiskAlertsSkeleton />;
+
   return (
     /* `xl:pb-20` clears the floating "New note" button the shell pins at
        `bottom-8 right-8` from `xl` up — see the Call Log page for the same. */

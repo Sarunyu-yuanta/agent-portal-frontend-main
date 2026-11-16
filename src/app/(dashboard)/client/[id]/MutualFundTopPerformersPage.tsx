@@ -13,6 +13,13 @@ import { MutualFundTopPerformersMobile } from "./MutualFundTopPerformersMobile";
 import { MutualFundLegendModal } from "./MutualFundLegendSheet";
 import { MutualFundTagLegend } from "./mutual-fund-ui";
 import {
+  MutualFundTabbedListControlsSkeleton,
+  MutualFundTabbedListGridSkeleton,
+  MutualFundTabbedListHeroSkeleton,
+} from "./MutualFundListPageSkeletons";
+import { useMutualFundUniverse } from "@/hooks/use-catalog";
+import { TabsSkeleton } from "@/components/ui/skeleton";
+import {
   filterFundsByTag,
   searchFunds,
   fundHasHighlightTag,
@@ -119,6 +126,11 @@ export function MutualFundTopPerformersPage({
     }
   }, [groupId]);
 
+  // The grid is a slice of the fund universe; the whole page waits on that,
+  // category tabs included (first load = full skeleton). There is no
+  // per-category resource, so once the universe is in, switching category
+  // has nothing to wait for.
+  const { isLoading } = useMutualFundUniverse();
   const funds = useMemo(
     () => getMobileGroupGridFunds(groupId, false, 16),
     [groupId],
@@ -133,7 +145,7 @@ export function MutualFundTopPerformersPage({
   return (
     <>
       <div className="lg:hidden">
-        <MutualFundTopPerformersMobile onBack={onBack} onFundSelect={onFundSelect} />
+        <MutualFundTopPerformersMobile isLoading={isLoading} onBack={onBack} onFundSelect={onFundSelect} />
       </div>
 
       <div className="hidden w-full flex-1 flex-col bg-white pb-20 lg:flex">
@@ -154,69 +166,88 @@ export function MutualFundTopPerformersPage({
         </div>
 
         <div className="mx-auto w-full max-w-[996px] px-4 md:px-8 lg:px-0">
-          <CategoryTabs activeId={groupId} onSelect={setGroupId} />
+          {isLoading ? (
+            <TabsSkeleton count={MOBILE_FUND_GROUPS.length} />
+          ) : (
+            <CategoryTabs activeId={groupId} onSelect={setGroupId} />
+          )}
         </div>
       </div>
 
       <div className="relative w-full overflow-hidden bg-[#f9fafb]">
-        <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pb-2.5 pt-2.5 md:px-8 lg:px-0">
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{heroTitle}</p>
-            <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{TOP_PERFORMERS_HERO_SUBTITLE}</p>
-            <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
-              ข้อมูล ณ วันที่ {TOP_PERFORMERS_LIST_UPDATED_AT}
-            </p>
+        {isLoading ? (
+          <MutualFundTabbedListHeroSkeleton />
+        ) : (
+          <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pb-2.5 pt-2.5 md:px-8 lg:px-0">
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{heroTitle}</p>
+              <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{TOP_PERFORMERS_HERO_SUBTITLE}</p>
+              <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
+                ข้อมูล ณ วันที่ {TOP_PERFORMERS_LIST_UPDATED_AT}
+              </p>
+            </div>
+            <MutualFundGroupHeroGraphic groupId={groupId} scale={1.15} />
           </div>
-          <MutualFundGroupHeroGraphic groupId={groupId} scale={1.15} />
-        </div>
+        )}
         <div className="relative z-20 h-3 w-full bg-gradient-to-r from-[#00a1e9] to-[#004eba]" />
       </div>
 
       <div className="relative z-10 w-full rounded-xl bg-gradient-to-r from-[#00a1e9] to-[#004eba]">
         <div className="w-full rounded-t-xl bg-white pt-4 pb-6">
           <div className="mx-auto flex w-full max-w-[996px] flex-col gap-6 px-4 md:px-8 lg:px-0">
-            <div className="flex w-full flex-col gap-3">
-              <MutualFundTagLegend
-                viewActive={viewActive}
-                highlightActive={highlightActive}
-                onToggleView={() => setViewActive((v) => !v)}
-                onToggleHighlight={() => setHighlightActive((v) => !v)}
-                onShowLegend={() => setLegendOpen(true)}
-                trailing={
-                  <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
-                    <SearchInput
-                      value={query}
-                      onChange={setQuery}
-                      onClear={() => setQuery("")}
-                      placeholder="ค้นหากองทุน"
-                      size="sm"
-                      className="w-full"
-                    />
-                  </div>
-                }
-              />
-              <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">{listCountLabel}</p>
-              <PerformancePeriodTabs active={period} onChange={setPeriod} />
-            </div>
-
-            <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
-              {tagFunds.map((fund, index) => (
-                <div key={`${fund.id}-${index}`} className="min-w-0">
-                  <MutualFundListCard
-                    fund={fund}
-                    onSelect={onFundSelect}
-                    showView={showViewTag && fundHasViewTag(fund)}
-                    showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
-                  />
+            {isLoading ? (
+              <>
+                <div className="flex w-full flex-col gap-3">
+                  <MutualFundTabbedListControlsSkeleton search />
                 </div>
-              ))}
-            </div>
+                <MutualFundTabbedListGridSkeleton count={false} />
+              </>
+            ) : (
+              <>
+                <div className="flex w-full flex-col gap-3">
+                  <MutualFundTagLegend
+                    viewActive={viewActive}
+                    highlightActive={highlightActive}
+                    onToggleView={() => setViewActive((v) => !v)}
+                    onToggleHighlight={() => setHighlightActive((v) => !v)}
+                    onShowLegend={() => setLegendOpen(true)}
+                    trailing={
+                      <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
+                        <SearchInput
+                          value={query}
+                          onChange={setQuery}
+                          onClear={() => setQuery("")}
+                          placeholder="ค้นหากองทุน"
+                          size="sm"
+                          className="w-full"
+                        />
+                      </div>
+                    }
+                  />
+                  <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">{listCountLabel}</p>
+                  <PerformancePeriodTabs active={period} onChange={setPeriod} />
+                </div>
 
-            {tagFunds.length === 0 ? (
-              <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
-                {query.trim() ? `ไม่พบกองทุนที่ตรงกับ "${query.trim()}"` : "ไม่พบกองทุนในหมวดนี้"}
-              </p>
-            ) : null}
+                <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
+                  {tagFunds.map((fund, index) => (
+                    <div key={`${fund.id}-${index}`} className="min-w-0">
+                      <MutualFundListCard
+                        fund={fund}
+                        onSelect={onFundSelect}
+                        showView={showViewTag && fundHasViewTag(fund)}
+                        showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {tagFunds.length === 0 ? (
+                  <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
+                    {query.trim() ? `ไม่พบกองทุนที่ตรงกับ "${query.trim()}"` : "ไม่พบกองทุนในหมวดนี้"}
+                  </p>
+                ) : null}
+              </>
+            )}
           </div>
         </div>
         </div>

@@ -95,9 +95,12 @@ const BOARD_TITLE: Record<MarketId, string> = {
   us: "Global Market Index",
 };
 
-/** Resolves an `index-<market>-<code>` slug, or null so the route can fall
- *  through to the sector and stock-quote lookups. */
-export function getMarketIndexPage(slug: string): MarketIndexPage | null {
+/** The part of an index page that is navigation, not data: which board, which
+ *  index, and the board's tab strip — resolved from the slug and the static
+ *  board list. */
+type MarketIndexNav = Pick<MarketIndexPage, "market" | "title" | "index" | "indices">;
+
+function getMarketIndexNav(slug: string): MarketIndexNav | null {
   if (!slug.startsWith(INDEX_SLUG_PREFIX)) return null;
   const rest = slug.slice(INDEX_SLUG_PREFIX.length);
   const separator = rest.indexOf("-");
@@ -111,11 +114,20 @@ export function getMarketIndexPage(slug: string): MarketIndexPage | null {
   const index = catalog.indices.find((i) => slugOf(i.code) === codeSlug);
   if (!index) return null;
 
+  return { market, title: BOARD_TITLE[market], index, indices: catalog.indices };
+}
+
+/** Resolves an `index-<market>-<code>` slug, or null so the route can fall
+ *  through to the sector and stock-quote lookups. */
+export function getMarketIndexPage(slug: string): MarketIndexPage | null {
+  const nav = getMarketIndexNav(slug);
+  if (!nav) return null;
+  const { market, index } = nav;
+  const catalog = MARKET_CATALOG[market];
+  const codeSlug = slugOf(index.code);
+
   return {
-    market,
-    title: BOARD_TITLE[market],
-    index,
-    indices: catalog.indices,
+    ...nav,
     description: INDEX_DESCRIPTIONS[codeSlug] ?? "",
     stocks: getIndexStockBatch(0, INDEX_STOCK_PAGE_SIZE, market),
     totalCount: 50,

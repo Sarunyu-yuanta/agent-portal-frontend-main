@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BellIcon } from "@phosphor-icons/react";
 import type { NotificationGroup, NotificationItem } from "@sarunyu/system-one";
 import { useStoredIds } from "@/hooks/use-stored-ids";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * The header bell, in place of the DS `NavHeaderNotification`.
@@ -32,11 +33,18 @@ export function NotificationBell({
   groups,
   emptyText,
   onItemClick,
+  isLoading = false,
 }: {
   /** One group per day, newest first — the panel prints them in this order. */
   groups: NotificationGroup[];
   emptyText: string;
   onItemClick?: (item: NotificationItem) => void;
+  /**
+   * The feeds behind `groups` haven't arrived. The panel shows skeleton rows,
+   * the badge stays off (there is no count yet), and nothing is marked seen or
+   * pruned — an empty feed mid-load must not read as "every alert cleared".
+   */
+  isLoading?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -60,14 +68,15 @@ export function NotificationBell({
    * back as genuinely new.
    */
   const isKnown = useCallback(
-    (id: string) => liveIds.includes(id),
-    [liveIds],
+    // Mid-load the live list is incomplete, so nothing can be judged gone.
+    (id: string) => isLoading || liveIds.includes(id),
+    [isLoading, liveIds],
   );
   const [seen, setSeen] = useStoredIds("notifications:seen", isKnown);
 
   /** The badge counts unseen rows — every row in the panel is already due. */
   const unseenCount = liveIds.filter((id) => !seen.has(id)).length;
-  const showBadge = unseenCount > 0;
+  const showBadge = !isLoading && unseenCount > 0;
 
   useEffect(() => {
     if (!open) return;
@@ -157,7 +166,7 @@ export function NotificationBell({
           // Opening is the acknowledgement — everything on screen at that
           // moment counts as seen, and only a row raised after this point
           // brings the badge back.
-          if (!open) setSeen(new Set(liveIds));
+          if (!open && !isLoading) setSeen(new Set(liveIds));
           setOpen((v) => !v);
         }}
         className="relative flex size-6 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 text-icon-brand transition-colors hover:bg-hover-bg"
@@ -185,13 +194,46 @@ export function NotificationBell({
           className="absolute right-0 top-full z-50 mt-2 w-[375px] max-w-[calc(var(--vw)*100-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div className="max-h-[480px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {!hasRows && (
-              <p className="px-4 py-8 text-center text-sm text-muted-foreground">{emptyText}</p>
+            {isLoading ? (
+              <NotificationRowsSkeleton />
+            ) : (
+              <>
+                {!hasRows && (
+                  <p className="px-4 py-8 text-center text-sm text-muted-foreground">{emptyText}</p>
+                )}
+                {renderGroups()}
+              </>
             )}
-            {renderGroups()}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Stands in for the panel's rows while the feeds load: same heading strip,
+ *  icon column and title/time/description stack as a real row. */
+function NotificationRowsSkeleton() {
+  return (
+    <div aria-busy="true">
+      <div className="border-b border-border bg-[var(--bg-default-secondary)] px-4 py-1.5">
+        <Skeleton className="h-4 w-12 my-0.5" />
+      </div>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex items-start gap-3 px-4 py-3">
+          <span className="flex w-10 shrink-0 justify-center py-0.5">
+            <Skeleton className="size-6 rounded-full" />
+          </span>
+          <div className="min-w-0 flex-1 space-y-2 py-1">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 flex-1 max-w-[160px]" />
+              <Skeleton className="ml-auto h-4 w-14" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

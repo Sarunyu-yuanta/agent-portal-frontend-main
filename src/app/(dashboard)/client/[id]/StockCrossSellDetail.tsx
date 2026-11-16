@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChartLineUpIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
+import { useStockCrossSellDetail } from "@/hooks/use-catalog";
+import { StockCrossSellDetailSkeleton } from "./StockCatalogSkeletons";
 import { StockLargeAssetCard } from "./StockLargeAssetCard";
 import { StockCrossSellFilterModal } from "./StockCrossSellFilterModal";
 import {
@@ -11,10 +13,10 @@ import {
   useCatalogDetailScrollTop,
 } from "./ProductCatalogTabbedDetailLayout";
 import {
-  STOCK_CROSS_SELL_DETAIL,
   STOCK_CROSS_SELL_DETAIL_ROWS,
   STOCK_FILTER_ISSUERS,
   MARKET_LATEST_UPDATE,
+  type StockCrossSellDetailConfig,
   type StockCrossSellKind,
 } from "./stock-data";
 
@@ -37,14 +39,29 @@ export function StockCrossSellDetail({
   kind: StockCrossSellKind;
   onBack: () => void;
 }) {
-  const config = STOCK_CROSS_SELL_DETAIL[kind];
+  const { data: config, isLoading } = useStockCrossSellDetail(kind);
+
+  useCatalogDetailScrollTop([kind]);
+
+  if (isLoading) return <StockCrossSellDetailSkeleton />;
+
+  // Keyed so the filter state below is seeded from this kind's loaded config,
+  // not from whatever was on hand before it arrived.
+  return <StockCrossSellDetailBody key={kind} config={config} onBack={onBack} />;
+}
+
+function StockCrossSellDetailBody({
+  config,
+  onBack,
+}: {
+  config: StockCrossSellDetailConfig;
+  onBack: () => void;
+}) {
   const rows = STOCK_CROSS_SELL_DETAIL_ROWS;
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [issuerIds, setIssuerIds] = useState<string[]>(config.defaultIssuerIds);
   const [countryIds, setCountryIds] = useState<string[]>(config.defaultCountryIds);
-
-  useCatalogDetailScrollTop([kind]);
 
   const filterCount = issuerIds.length + countryIds.length;
 

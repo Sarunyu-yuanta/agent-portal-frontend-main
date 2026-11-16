@@ -12,6 +12,8 @@ import { MutualFundGroupHeroGraphic } from "./MutualFundGroupHero";
 import { MutualFundLegendBottomSheet, MutualFundLegendModal } from "./MutualFundLegendSheet";
 
 import { MobilePeriodTabs, MutualFundTagLegend } from "./mutual-fund-ui";
+import { MutualFundTabbedListMobileBodySkeleton } from "./MutualFundListPageSkeletons";
+import { TabsSkeleton } from "@/components/ui/skeleton";
 import {
   filterFundsByTag,
   searchFunds,
@@ -75,9 +77,12 @@ function MobileHero({ groupId }: { groupId: MobileFundGroupId }) {
 
 /** Figma 39839:522570 — mobile "Mutual fund top performers" page. */
 export function MutualFundTopPerformersMobile({
+  isLoading = false,
   onBack,
   onFundSelect,
 }: {
+  /** While the page's fund universe loads (first load), the category tabs and everything below are skeleton; the back header stays live. */
+  isLoading?: boolean;
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
@@ -113,56 +118,66 @@ export function MutualFundTopPerformersMobile({
         </h1>
       </div>
 
-      <MobileCategoryTabs activeId={groupId} onSelect={setGroupId} />
-      <div className="relative w-full overflow-hidden">
-        <MobileHero groupId={groupId} />
-        <div className="relative z-20 h-3 w-full bg-gradient-to-r from-[#00a1e9] to-[#004eba]" />
-      </div>
+      {isLoading ? (
+        <TabsSkeleton count={MOBILE_FUND_GROUPS.length} className="px-4" />
+      ) : (
+        <MobileCategoryTabs activeId={groupId} onSelect={setGroupId} />
+      )}
+      {isLoading ? (
+        <MutualFundTabbedListMobileBodySkeleton search />
+      ) : (
+        <>
+          <div className="relative w-full overflow-hidden">
+            <MobileHero groupId={groupId} />
+            <div className="relative z-20 h-3 w-full bg-gradient-to-r from-[#00a1e9] to-[#004eba]" />
+          </div>
 
-      <div className="flex w-full flex-col gap-3 pt-4 pb-6">
-        <MutualFundTagLegend
-          viewActive={viewActive}
-          highlightActive={highlightActive}
-          onToggleView={() => setViewActive((v) => !v)}
-          onToggleHighlight={() => setHighlightActive((v) => !v)}
-          onShowLegend={() => setLegendOpen(true)}
-          trailing={
-            <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
-              <SearchInput
-                value={query}
-                onChange={setQuery}
-                onClear={() => setQuery("")}
-                placeholder="ค้นหากองทุน"
-                size="sm"
-                className="w-full"
-              />
+          <div className="flex w-full flex-col gap-3 pt-4 pb-6">
+            <MutualFundTagLegend
+              viewActive={viewActive}
+              highlightActive={highlightActive}
+              onToggleView={() => setViewActive((v) => !v)}
+              onToggleHighlight={() => setHighlightActive((v) => !v)}
+              onShowLegend={() => setLegendOpen(true)}
+              trailing={
+                <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
+                  <SearchInput
+                    value={query}
+                    onChange={setQuery}
+                    onClear={() => setQuery("")}
+                    placeholder="ค้นหากองทุน"
+                    size="sm"
+                    className="w-full"
+                  />
+                </div>
+              }
+            />
+            <MobilePeriodTabs active={period} onChange={setPeriod} />
+
+            <p className="px-3 text-sm leading-[24px] text-[#101828]">{listCountLabel}</p>
+
+            <div className="flex w-full flex-col">
+              {tagFunds.map((fund, index) => (
+                <div key={`${fund.id}-${index}`}>
+                  {index > 0 ? <div className="mx-3 h-px bg-black/10" /> : null}
+                  <MutualFundListCardMobile
+                    fund={fund}
+                    onSelect={onFundSelect}
+                    showView={showViewTag && fundHasViewTag(fund)}
+                    showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
+                  />
+                </div>
+              ))}
             </div>
-          }
-        />
-        <MobilePeriodTabs active={period} onChange={setPeriod} />
 
-        <p className="px-3 text-sm leading-[24px] text-[#101828]">{listCountLabel}</p>
-
-        <div className="flex w-full flex-col">
-          {tagFunds.map((fund, index) => (
-            <div key={`${fund.id}-${index}`}>
-              {index > 0 ? <div className="mx-3 h-px bg-black/10" /> : null}
-              <MutualFundListCardMobile
-                fund={fund}
-                onSelect={onFundSelect}
-                showView={showViewTag && fundHasViewTag(fund)}
-                showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
-              />
-            </div>
-          ))}
-        </div>
-
-        {tagFunds.length === 0 ? (
-          <p className="px-3 text-center text-sm text-[#6a7282]">
+            {tagFunds.length === 0 ? (
+              <p className="px-3 text-center text-sm text-[#6a7282]">
                 {query.trim() ? `ไม่พบกองทุนที่ตรงกับ "${query.trim()}"` : "ไม่พบกองทุนในหมวดนี้"}
               </p>
-        ) : null}
-      </div>
+            ) : null}
+          </div>
+        </>
+      )}
 
       {isPhone ? (
         <MutualFundLegendBottomSheet open={legendOpen} onOpenChange={setLegendOpen} />

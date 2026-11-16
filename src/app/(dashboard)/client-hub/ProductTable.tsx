@@ -8,7 +8,7 @@ import {
   TableHeaderCell,
   TableCell,
 } from "@sarunyu/system-one";
-import { TableRowsSkeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/ui/skeleton";
 import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
 import { useFlipRows } from "@/hooks/use-flip-rows";
 import { displayAssetLabel, formatThbAmount } from "@/lib/client-utils";
@@ -34,6 +34,8 @@ export function ProductTable({
   onClearFilters?: () => void;
 }) {
   const flipRef = useFlipRows<string>();
+  if (isLoading) return <TableSkeleton />;
+
   const isEmpty = !isLoading && rows.length === 0;
   return (
     <div className={`relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
@@ -78,9 +80,7 @@ export function ProductTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {isLoading ? (
-            <TableRowsSkeleton columns={5} />
-          ) : rows.map((row) => (
+          {rows.map((row) => (
             <TableRow
               key={row.label}
               ref={flipRef(row.label)}

@@ -7,7 +7,8 @@ import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
 import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { useClients } from "@/hooks/use-api";
+import { useClients, useClientsResource } from "@/hooks/use-api";
+import { useRoboAdvisoryPlans } from "@/hooks/use-catalog";
 import type { Client } from "@/types/domain";
 import { usePageBreadcrumb } from "../../page-breadcrumbs";
 import {
@@ -24,7 +25,8 @@ import {
   SECTION_SHADOW,
 } from "./portfolio-advisory-ui";
 import { ROBO_ASSETS } from "./robo-advisory-assets";
-import { ROBO_ADVISORY_PLANS, type RoboAdvisoryPlan } from "./robo-advisory-plan-data";
+import type { RoboAdvisoryPlan } from "./robo-advisory-plan-data";
+import { AdvisoryDetailSkeleton } from "./AdvisoryDetailSkeleton";
 import {
   EMPTY_ROBO_ADVISORY_FILTERS,
   filterRoboAdvisoryPlans,
@@ -406,7 +408,9 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
   const [detailPlan, setDetailPlan] = useState<RoboAdvisoryPlan | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<RoboAdvisoryFilters>(EMPTY_ROBO_ADVISORY_FILTERS);
-  const filteredPlans = filterRoboAdvisoryPlans(ROBO_ADVISORY_PLANS, filters);
+  const { data: plans, isLoading: plansLoading } = useRoboAdvisoryPlans();
+  const { isLoading: clientsLoading } = useClientsResource();
+  const filteredPlans = filterRoboAdvisoryPlans(plans, filters);
   const advisory = useAdvisoryClient("robo");
   const client = advisory.client;
 
@@ -418,6 +422,19 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
       window.scrollTo(0, 0);
     }
   }, []);
+
+  // Whole page stands as a skeleton until the plans and the client list are
+  // in — otherwise the picker would open over an empty list (no client yet).
+  if (plansLoading || clientsLoading) {
+    return (
+      <AdvisoryDetailSkeleton
+        cards={2}
+        stats={4}
+        cardMinHeightClass="min-h-[302px]"
+        showFilterButton={SHOW_ROBO_FILTER_BUTTON}
+      />
+    );
+  }
 
   return (
     <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pb-20 lg:pt-2">

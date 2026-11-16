@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useMarketIndexPage } from "@/hooks/use-catalog";
 import { StockMiniChart } from "./StockMiniChart";
+import { MarketIndexDetailSkeleton } from "./StockCatalogSkeletons";
 import {
   CatalogDetailBackHeader,
   CatalogDetailTextTabs,
@@ -12,7 +14,6 @@ import {
 } from "./ProductCatalogTabbedDetailLayout";
 import {
   getIndexStockBatch,
-  getMarketIndexPage,
   INDEX_STOCK_PAGE_SIZE,
   marketIndexHref,
   type MarketIndexPage,
@@ -89,9 +90,14 @@ export function MarketIndexDetail({
   onBack: () => void;
 }) {
   const router = useRouter();
-  const page = getMarketIndexPage(slug);
+  const { data: page, isLoading } = useMarketIndexPage(slug);
 
   useCatalogDetailScrollTop([slug]);
+
+  // Above the not-found branch, or every visit flashes "ไม่พบข้อมูล" first.
+  // The whole page, tab strip included: picking another index is a navigation
+  // to that index's own page, so every load here is a first load.
+  if (isLoading) return <MarketIndexDetailSkeleton />;
 
   if (!page) {
     return (

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AccordionListSkeleton, ColumnTableSkeleton, DetailHeaderSkeleton } from "@/components/ui/detail-skeletons";
+import { PaginationSkeleton, Skeleton } from "@/components/ui/skeleton";
+import { AccordionListSkeleton, ColumnTableSkeleton } from "@/components/ui/detail-skeletons";
 
 /** Mirrors TopIdeaCard's fixed size (171×98, 200px on md+). Pass `fullWidth` for the
  *  `fullWidth` card variant used in grids (TopIdeaAllPage) instead of the horizontal strip. */
@@ -138,6 +138,7 @@ function ThaiStructuredTableSkeleton() {
             </div>
           ))}
         </div>
+        <PaginationSkeleton />
       </div>
     </div>
   );
@@ -178,17 +179,25 @@ function FixedIncomeCardSkeleton() {
 function FixedIncomeTabSkeleton() {
   return (
     <div className="flex flex-col gap-6 items-center w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-6 pt-6 pb-10">
-      <div className="flex items-center justify-between w-full">
-        <Skeleton className="h-8 w-40 rounded-lg" />
-        <Skeleton className="h-3 w-32" />
+      {/* Filter bar: Primary/Secondary switcher + Filter badge, centred at
+          704px like the real one, then the "updated" line. */}
+      <div className="flex w-full justify-center">
+        <div className="flex w-full max-w-[704px] items-center gap-3 md:gap-4">
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 w-10 shrink-0 rounded-lg md:w-24" />
+        </div>
       </div>
+      <Skeleton className="h-4 w-48 self-end" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:hidden">
         {Array.from({ length: 6 }).map((_, i) => (
           <FixedIncomeCardSkeleton key={i} />
         ))}
       </div>
       <div className="hidden lg:block w-full">
-        <ColumnTableSkeleton columns={11} rows={8} rowHeightClass="h-[60px]" firstColWide minWidthClass="min-w-[1440px]" />
+        <ColumnTableSkeleton columns={11} rows={8} rowHeightClass="h-[60px]" firstColWide />
+      </div>
+      <div className="w-full">
+        <PaginationSkeleton />
       </div>
     </div>
   );
@@ -207,7 +216,7 @@ function GlobalBondTabSkeleton() {
           <AccordionListSkeleton rows={5} />
         </div>
         <div className="hidden lg:block w-full">
-          <ColumnTableSkeleton columns={9} rows={5} rowHeightClass="h-[52px]" firstColWide minWidthClass="min-w-[1305px]" />
+          <ColumnTableSkeleton columns={9} rows={5} rowHeightClass="h-[52px]" firstColWide />
         </div>
       </div>
 
@@ -230,21 +239,44 @@ function GlobalBondTabSkeleton() {
   );
 }
 
-/** Matches MutualFundTab: two-column hero + theme carousel. */
+/** Matches MutualFundTab top to bottom: quick-action tiles, the themes
+ *  carousel, then Top Performers (with its group chips) beside Insights. */
 function MutualFundTabSkeleton() {
   return (
-    <div className="flex flex-col w-full bg-white pt-6 pb-10">
-      <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+    <div className="flex w-full flex-col bg-white" aria-busy="true">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-4 pt-8 md:px-8 lg:px-6 lg:pt-10">
+        {/* Quick actions */}
+        <div className="flex w-full gap-2.5 lg:justify-center lg:gap-8">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Skeleton key={i} className="h-[68px] flex-1 rounded lg:w-[260px] lg:flex-none" />
+          ))}
+        </div>
+        {/* Themes carousel */}
+        <div className="flex w-full flex-col gap-4 pb-10 pt-3">
+          <Skeleton className="h-7 w-48" />
+          <div className="flex gap-3 overflow-hidden">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[420px] w-[308px] shrink-0 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-3 w-full max-w-[1280px] px-4 pb-10 md:px-8 lg:mt-6 lg:px-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+          {/* Top performers: heading, group chips, ranked list */}
           <div className="flex flex-col gap-4">
             <Skeleton className="h-7 w-48" />
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-hidden">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-7 w-20 rounded-full shrink-0" />
+                <Skeleton key={i} className="h-8 w-20 shrink-0 rounded-full" />
               ))}
             </div>
-            <Skeleton className="h-80 w-full rounded-xl" />
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-lg" />
+            ))}
           </div>
+          {/* Insights: heading, lead card, two smaller */}
           <div className="flex flex-col gap-4">
             <Skeleton className="h-7 w-56" />
             <Skeleton className="h-48 w-full rounded-lg" />
@@ -252,14 +284,6 @@ function MutualFundTabSkeleton() {
               <Skeleton className="h-[100px] flex-1 rounded-lg" />
               <Skeleton className="h-[100px] flex-1 rounded-lg" />
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col gap-4 mt-8">
-          <Skeleton className="h-7 w-40" />
-          <div className="flex gap-3 overflow-hidden">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-80 w-[308px] shrink-0 rounded-lg" />
-            ))}
           </div>
         </div>
       </div>
@@ -276,15 +300,19 @@ function MutualFundTabSkeleton() {
 export function ProductGridDetailSkeleton({ hero }: { hero: ReactNode }) {
   return (
     <div className="flex flex-col gap-2 w-full bg-white pt-4 md:pt-6">
-      <DetailHeaderSkeleton maxWidth="max-w-[1280px]" />
+      {/* Same box as the real detail header so the back button lines up with the content column. */}
+      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
+        <Skeleton className="size-7 rounded-md shrink-0" />
+        <Skeleton className="h-6 w-48" />
+      </div>
 
       {hero}
 
       <div className="relative z-10 w-full bg-white rounded-t-[24px] pt-4 pb-10 lg:pt-6">
         <div className="flex flex-col gap-2 items-center w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
           <div className="flex items-center justify-between w-full">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-8 rounded-lg" />
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-8 w-8 rounded-lg md:w-[88px]" />
           </div>
           <Skeleton className="h-3 w-32 self-start" />
 

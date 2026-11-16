@@ -6,7 +6,9 @@ import { TabGroup } from "@sarunyu/system-one";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { navRead, navWrite } from "@/lib/nav-session";
 import { INSIGHTS_FILTER_KEY } from "@/lib/nav-memory";
-import { useInsightStrategies } from "@/hooks/use-catalog";
+import { useInsightStrategies, useResearch } from "@/hooks/use-catalog";
+import { useHasLoaded } from "@/hooks/use-api";
+import { TabsSkeleton } from "@/components/ui/skeleton";
 import { FadeIn } from "@/components/ui/fade-in";
 import { StrategyPlaybooksSkeleton, AIRecommendCardSkeleton } from "./InsightsSkeletons";
 import {
@@ -59,7 +61,10 @@ const FILTER_KEY = INSIGHTS_FILTER_KEY;
 
 function InsightsPageInner() {
   const searchParams = useSearchParams();
-  const { isLoading } = useInsightStrategies();
+  // First load: the tab strip is bars until the open tab's data arrives.
+  // After that the tabs stay live and each tab's body skeletons on its own.
+  const { isLoading: strategiesLoading } = useInsightStrategies();
+  const { isLoading: researchLoading } = useResearch();
 
   // The tab stays in the URL — it's a destination, not a refinement.
   const activeTab =
@@ -78,6 +83,10 @@ function InsightsPageInner() {
 
   // `replace`, not `push` — refining a list shouldn't fill up history with
   // entries the user has to click through to leave the page.
+  const hasLoaded = useHasLoaded(
+    activeTab === "insights" ? strategiesLoading : researchLoading,
+  );
+
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) =>
       setQueryState(withQuery("/insights", searchParams, updates), "replace"),
@@ -86,6 +95,9 @@ function InsightsPageInner() {
 
   return (
     <div className="flex flex-col gap-6">
+      {!hasLoaded ? (
+        <TabsSkeleton count={2} />
+      ) : (
       <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
         <TabGroup
           items={[
@@ -99,9 +111,11 @@ function InsightsPageInner() {
           size="md"
         />
       </div>
+      )}
 
       <FadeIn key={activeTab}>
-        {isLoading ? (
+        {/* Research renders its own skeleton; this one is House View's. */}
+        {activeTab === "insights" && strategiesLoading ? (
           <InsightsLayout>
             <StrategyPlaybooksSkeleton />
             <SidebarColumn>

@@ -20,7 +20,10 @@ import {
 } from "@phosphor-icons/react";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { FadeIn } from "@/components/ui/fade-in";
-import { mockAnalysts, type AnalystItem } from "@/lib/mock-data";
+import { type AnalystItem } from "@/lib/mock-data";
+import { useResearch } from "@/hooks/use-catalog";
+import { useHasLoaded } from "@/hooks/use-api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -51,33 +54,6 @@ const RESEARCH_CATS = [
 const MOCK_PDF_URL = "/mock-reports/sample-report.pdf";
 const RESEARCH_HOME_OPTION = "__home__";
 
-type ResearchItem = { id: string; date: string; category: string; title: string };
-
-const MOCK_RESEARCH: ResearchItem[] = [
-  { id: "r01", date: "03/08/2569", category: "Derivative",                  title: "DERIVATIVES - AFTERNOON" },
-  { id: "r02", date: "03/08/2569", category: "Yuanta Global Wealth",        title: "Global Insights - Cancelled Attacks on Iran: Unlocking Energy Market Overhang" },
-  { id: "r03", date: "03/08/2569", category: "Chart Perspective Afternoon", title: "TECHNICAL - BDMS, LH, M" },
-  { id: "r04", date: "03/08/2569", category: "จับข่าวมาเล่าหุ้น",           title: "จับข่าวมาเล่าหุ้น - ENERGY, BANPU, TLI, TASCO" },
-  { id: "r05", date: "03/08/2569", category: "Wealth Designs Daily",        title: "Sentiment การลงทุนยังดีในช่วงสั้น แนะนำสะสม CBG, SJWD, TASCO, JMART" },
-  { id: "r06", date: "03/08/2569", category: "Wealth Signal",               title: "WEALTH SIGNAL - The Pullback Has a Purpose: Repricing Risk, Revealing the Winners - Part 2" },
-  { id: "r07", date: "03/08/2569", category: "Wealth Signal",               title: "WEALTH SIGNAL - The Pullback Has a Purpose: Repricing Risk, Revealing the Winners - Part 1" },
-  { id: "r08", date: "03/08/2569", category: "Chart Perspective Morning",   title: "TECHNICAL - STA, HMPRO, JMART, SISB, SAMART, CKP" },
-  { id: "r09", date: "03/08/2569", category: "Power Investing",             title: "POWER INVESTING - CBG, SJWD, TASCO" },
-  { id: "r10", date: "03/08/2569", category: "Top 5 DCA",                   title: "TOP 5 DCA - GULF, SJWD, TASCO, ITC, MTC" },
-  { id: "r11", date: "02/08/2569", category: "Wealth Designs Daily",        title: "Market Wrap - SET ปรับตัวขึ้น นำโดยกลุ่มพลังงานและธนาคาร" },
-  { id: "r12", date: "02/08/2569", category: "Theme Strategy",              title: "THEME STRATEGY - AI Infrastructure Play: Data Center & Power" },
-  { id: "r13", date: "02/08/2569", category: "Trading Portfolio",           title: "TRADING PORTFOLIO UPDATE - สัปดาห์ที่ 31/2569" },
-  { id: "r14", date: "02/08/2569", category: "Commodities Highlight",       title: "COMMODITIES HIGHLIGHT - Gold & Oil Outlook Q3/2026" },
-  { id: "r15", date: "01/08/2569", category: "Wealth Compass",              title: "WEALTH COMPASS - Asset Allocation Monthly: สิงหาคม 2569" },
-  { id: "r16", date: "01/08/2569", category: "ELN Pick",                    title: "ELN PICK - DELTA, AOT, PTT: Attractive Entry for Structured Products" },
-  { id: "r17", date: "01/08/2569", category: "SBL IDEA",                    title: "SBL IDEA - Short Selling Opportunity: GULF, INTUCH" },
-  { id: "r18", date: "01/08/2569", category: "Yuanta Universe",             title: "YUANTA UNIVERSE - Monthly Model Portfolio Rebalancing" },
-  { id: "r19", date: "01/08/2569", category: "ความเห็นนักวิเคราะห์",         title: "Daily Morning Note - Macro Outlook & Stock Picks" },
-  { id: "r20", date: "31/07/2569", category: "บทวิเคราะห์หุ้นรายตัว",        title: "PTTEP - Maintain BUY, TP 155 บาท: Strong Cash Flow Despite Oil Weakness" },
-  { id: "r21", date: "31/07/2569", category: "บทวิเคราะห์อุตสาหกรรม",        title: "Sector Report: Thai Banking Sector - Asset Quality Improvement Ahead" },
-  { id: "r22", date: "31/07/2569", category: "Technical Trading Portfolio", title: "TECHNICAL TRADING - Buy Signals: ADVANC, CPALL, GULF" },
-  { id: "r23", date: "30/07/2569", category: "เอกสารการสัมมนา",             title: "Wealth Seminar: Navigating Volatility in Global Markets - สไลด์ประกอบการสัมมนา" },
-];
 
 type LandingTile = { id: string; title: string; subtitle: string; icon: PhosphorIcon; color: string; span?: string };
 
@@ -173,22 +149,47 @@ export function Research() {
   const isSearching = searchQuery.trim().length > 0;
   const showList = activeCategory !== null || isSearching || searchDate !== undefined;
 
-  const filtered = MOCK_RESEARCH.filter((item) => {
+  const { data: feed, isLoading } = useResearch();
+  const hasLoaded = useHasLoaded(isLoading);
+
+  const filtered = feed.reports.filter((item) => {
     const catOk = activeCategory === null || activeCategory === "บทวิเคราะห์ทั้งหมด" || item.category === activeCategory;
     const dateOk = !searchDate || item.date === formatBuddhistDate(searchDate);
     const searchOk = !isSearching || item.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
     return catOk && dateOk && searchOk;
   });
 
+  // The sub-tab chips are navigation, so they stay live; everything that acts
+  // on the feed (search, date, categories, the reports) waits for it.
+  const subTabs = (
+    <div className="flex items-center gap-2 pb-2">
+      <Chip label="Research" type="single" selected={subTab === "research"} onClick={() => setSubTab("research")} />
+      <Chip label="Analyst Contact" type="single" selected={subTab === "analyst"} onClick={() => setSubTab("analyst")} />
+    </div>
+  );
+
+  // Chips are bars too until the feed has loaded once.
+  if (isLoading) {
+    return (
+      <ResearchSkeleton
+        subTabs={
+          hasLoaded ? subTabs : (
+            <div className="flex items-center gap-2 pb-2">
+              <Skeleton className="h-9 w-24 rounded-full" />
+              <Skeleton className="h-9 w-36 rounded-full" />
+            </div>
+          )
+        }
+      />
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col md:max-h-[calc(var(--vh)*72)]">
 
       {/* Sub-tabs + desktop search bar */}
       <div className="flex items-center justify-between gap-4 px-3 pt-2 border-b border-border shrink-0">
-        <div className="flex items-center gap-2 pb-2">
-          <Chip label="Research" type="single" selected={subTab === "research"} onClick={() => setSubTab("research")} />
-          <Chip label="Analyst Contact" type="single" selected={subTab === "analyst"} onClick={() => setSubTab("analyst")} />
-        </div>
+        {subTabs}
         <div className={`hidden md:flex items-center gap-2 pb-2 ${subTab === "research" ? "" : "invisible"}`}>
           <SearchInput
             placeholder="ค้นหาชื่อหุ้น"
@@ -250,7 +251,7 @@ export function Research() {
           {subTab === "analyst" ? (
             <div className="flex-1 overflow-y-auto hide-scrollbar p-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {mockAnalysts.map((analyst) => (
+                {feed.analysts.map((analyst) => (
                   <AnalystCard key={analyst.id} analyst={analyst} />
                 ))}
               </div>
@@ -330,6 +331,37 @@ export function Research() {
             </>
           )}
         </FadeIn>
+      </div>
+    </div>
+  );
+}
+
+/** The Research card while its feed loads: the real sub-tab chips, then
+ *  search + date, category sidebar and the landing tiles as bars. */
+function ResearchSkeleton({ subTabs }: { subTabs: React.ReactNode }) {
+  return (
+    <div
+      aria-busy="true"
+      className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col md:max-h-[calc(var(--vh)*72)]"
+    >
+      <div className="flex items-center justify-between gap-4 px-3 pt-2 border-b border-border">
+        {subTabs}
+        <div className="hidden md:flex items-center gap-2 pb-2">
+          <Skeleton className="h-12 w-80 rounded-lg" />
+          <Skeleton className="h-12 w-56 rounded-lg" />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row">
+        <div className="hidden md:flex flex-col gap-3 w-52 shrink-0 border-r border-border p-4">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <Skeleton key={i} className="h-5 w-full" />
+          ))}
+        </div>
+        <div className="flex-1 min-w-0 p-4 grid grid-cols-2 lg:grid-cols-3 auto-rows-[130px] gap-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Skeleton key={i} className="h-full w-full rounded-xl" />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useFixedIncomeBonds } from "@/hooks/use-catalog";
+import { useMemo, useRef, useState } from "react";
 import { Badge, Button, Pagination, Tag } from "@sarunyu/system-one";
 import type { TagVariant } from "@sarunyu/system-one";
 import {
   BuildingsIcon,
   HandshakeIcon,
-  CircleNotchIcon,
 } from "@phosphor-icons/react";
 import {
   BOND_LOGOS,
   EMPTY_FIXED_INCOME_FILTERS,
-  FIXED_INCOME_BONDS,
   countFixedIncomeFilters,
   filterFixedIncomeBonds,
   fixedIncomeBookableId,
@@ -467,22 +466,19 @@ export function FixedIncomeTab({
   const [appliedFilters, setAppliedFilters] = useState<FixedIncomeFilters>(
     EMPTY_FIXED_INCOME_FILTERS,
   );
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
   const tableCardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(t);
-  }, []);
-
   const booking = useQuotaBooking();
   // A bond whose quota is used up has nothing left to sell — gone from the list,
   // the same way a structured product leaves once its order is answered.
-  const openBonds = useOpenProducts(FIXED_INCOME_BONDS, fixedIncomeBookableId);
+  // Loading is the catalog's to show (`ProductCatalogTabSkeleton`, gated on
+  // `useProductCatalogLoading`, which includes this resource).
+  const { data: bonds } = useFixedIncomeBonds();
+  const openBonds = useOpenProducts(bonds, fixedIncomeBookableId);
   const filteredBonds = useMemo(
     () => filterFixedIncomeBonds(openBonds, appliedFilters),
     [openBonds, appliedFilters],
@@ -659,15 +655,6 @@ export function FixedIncomeTab({
           />
         </div>
       </div>
-
-      {isLoading && (
-        <div className="flex gap-1 items-center justify-center w-full py-2.5 px-3 pl-3 pr-4">
-          <CircleNotchIcon size={20} className="animate-spin text-[#6a7282]" />
-          <span className="text-sm font-bold leading-[24px] text-[#6a7282]">
-            กำลังโหลดข้อมูล
-          </span>
-        </div>
-      )}
 
       {booking.ui}
 

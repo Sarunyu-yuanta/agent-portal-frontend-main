@@ -11,7 +11,6 @@ import { RankBadge, TrendingFill, TrendingSortChips } from "./ProductTrendingAll
 import { bookForItem, trendingRows, useTrendingBooks } from "./use-trending-books";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import {
-  PRODUCT_TRENDING_GROUPS,
   PRODUCT_TRENDING_UPDATED_AT,
   DEFAULT_TRENDING_SORT,
   emptyTrendingMessage,
@@ -25,6 +24,8 @@ import {
   type TrendingTarget,
 } from "./product-trending-data";
 import type { CatalogNavigation } from "./ProductCatalogTab";
+import { useProductTrendingGroups } from "@/hooks/use-catalog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function TrendingRow({
   item,
@@ -201,7 +202,9 @@ export function ProductTrendingTab({
       }),
     );
   const books = useTrendingBooks();
-  const groups = PRODUCT_TRENDING_GROUPS.map((group) => ({
+  const { data: trendingGroups, isLoading } = useProductTrendingGroups();
+  if (isLoading) return <ProductTrendingTabSkeleton />;
+  const groups = trendingGroups.map((group) => ({
     group,
     items: trendingRows(group, books, sort),
   }));
@@ -244,6 +247,64 @@ export function ProductTrendingTab({
         <p className="type-caption text-muted-foreground text-center">
           {PRODUCT_TRENDING_UPDATED_AT}
         </p>
+      </div>
+    </div>
+  );
+}
+
+/** One `TrendingGroupCard`: grey header strip, then ranked rows. */
+function TrendingGroupCardSkeleton() {
+  return (
+    <div className="flex flex-col bg-white rounded-lg overflow-hidden border border-black/5">
+      <div className="flex items-center justify-between px-6 h-12" style={{ backgroundColor: "#f9f9f9" }}>
+        <Skeleton className="h-5 w-28" />
+        <Skeleton className="h-5 w-16" />
+      </div>
+      <div className="flex flex-col p-3">
+        {Array.from({ length: TRENDING_CARD_ROWS }).map((_, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-3 px-3 py-4 ${i < TRENDING_CARD_ROWS - 1 ? "border-b border-black/10" : ""}`}
+          >
+            <Skeleton className="size-7 rounded-full shrink-0" />
+            <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-4 w-full max-w-[240px]" />
+            </div>
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Stands in for the Recommended tab while its groups load: heading, the sort
+ * chips (as bars — nothing to re-sort yet) and four group cards.
+ */
+function ProductTrendingTabSkeleton() {
+  return (
+    <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }} aria-busy="true">
+      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-7 w-60" />
+          <Skeleton className="h-5 w-full max-w-[640px]" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-14" />
+          <Skeleton className="h-9 w-28 rounded-full" />
+          <Skeleton className="h-9 w-36 rounded-full" />
+          <Skeleton className="h-9 w-28 rounded-full" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <TrendingGroupCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     </div>
   );

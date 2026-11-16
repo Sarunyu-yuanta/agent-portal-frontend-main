@@ -11,6 +11,7 @@
  * Filters live in the URL (`replace`), like every other tab's.
  */
 
+import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { FunnelSimpleIcon, ReceiptIcon } from "@phosphor-icons/react";
@@ -151,6 +152,8 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
   const offerProduct =
     opened?.kind === "offer" ? findBookableProduct(opened.book.productId) : undefined;
   const readiness = useRosterReadiness(clients, bookingProduct ?? FALLBACK_PRODUCT);
+
+  if (isLoading) return <OrdersPanelSkeleton withCreate />;
 
   return (
     <div className="flex flex-col gap-4">

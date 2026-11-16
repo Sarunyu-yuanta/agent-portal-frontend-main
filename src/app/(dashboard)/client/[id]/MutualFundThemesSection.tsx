@@ -98,7 +98,7 @@ function ThemeCard({
   onThemeSeeAll?: (themeId: MutualFundTheme["id"]) => void;
 }) {
   return (
-    <div className="flex h-[380px] w-[308px] shrink-0 flex-col gap-[10px] rounded-lg bg-gradient-to-b from-[#0a6ee7] to-[#f3f4f6] to-[85.462%] px-1 pb-1 pt-2">
+    <div className="flex min-h-[380px] w-[308px] shrink-0 flex-col gap-[10px] rounded-lg bg-gradient-to-b from-[#0a6ee7] to-[#f3f4f6] to-[85.462%] px-1 pb-1 pt-2">
       <div className="flex w-full items-start gap-1 px-3">
         <ThemeIcon icon={theme.icon} />
         <div className="flex min-w-0 flex-1 flex-col">

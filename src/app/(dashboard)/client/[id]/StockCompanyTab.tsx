@@ -31,12 +31,14 @@ import {
   WEEKDAY_LABELS,
   WEEKS_SHOWN,
 } from "../../calendar/calendar-grid";
+import { useStockCompanyInfo } from "@/hooks/use-catalog";
+import { StockTabBodySkeleton } from "./StockCatalogSkeletons";
 import {
   COMPANY_SUB_TABS,
-  getStockCompanyEvents,
   type CompanySubTab,
   type CorporateActionKind,
   type CorporateCalendarMarker,
+  type StockCompanyEvents,
 } from "./stock-company-data";
 
 /**
@@ -444,13 +446,14 @@ function CompanyDayCell({
 }
 
 function CompanyEventsSection({
+  data,
   symbol,
   companyName,
 }: {
+  data: StockCompanyEvents;
   symbol: string;
   companyName: string;
 }) {
-  const data = useMemo(() => getStockCompanyEvents(symbol), [symbol]);
   /** The mock feed hangs off April 2026, so "today" is pinned there too —
    *  otherwise the grid would open on a real month with nothing in it. */
   const today = useMemo(() => new Date(2026, 3, 30), []);
@@ -632,6 +635,11 @@ export function StockCompanyTab({
   companyName: string;
 }) {
   const [subTab, setSubTab] = useState<CompanySubTab>("Company Events");
+  // The tab's own resource: while it loads, only this body is a skeleton —
+  // the ticker header, quote and detail tab strip stay up around it.
+  const { data, isLoading } = useStockCompanyInfo(symbol);
+
+  if (isLoading || !data) return <StockTabBodySkeleton />;
 
   return (
     <section className="flex w-full flex-col gap-6">
@@ -649,7 +657,7 @@ export function StockCompanyTab({
       </div>
 
       {subTab === "Company Events" ? (
-        <CompanyEventsSection symbol={symbol} companyName={companyName} />
+        <CompanyEventsSection data={data} symbol={symbol} companyName={companyName} />
       ) : (
         <CompanySubTabPlaceholder label={subTab} />
       )}

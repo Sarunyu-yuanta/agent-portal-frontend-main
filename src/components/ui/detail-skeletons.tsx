@@ -105,26 +105,28 @@ export function ColumnTableSkeleton({
   rows = 6,
   rowHeightClass = "h-[52px]",
   firstColWide = false,
-  minWidthClass = "",
 }: {
   columns?: number;
   rows?: number;
   rowHeightClass?: string;
   firstColWide?: boolean;
-  minWidthClass?: string;
 }) {
+  // A loading table never scrolls and never shows every column: at most six
+  // even columns that fit the box. The real table's width is the real
+  // table's business.
+  const shown = Math.min(columns, 6);
   const colClass = (i: number) => (firstColWide && i === 0 ? "w-[180px] shrink-0" : "flex-1");
   return (
-    <div className="w-full rounded-xl overflow-hidden border border-black/10 bg-white overflow-x-auto">
-      <div className={`flex flex-col ${minWidthClass}`}>
+    <div className="w-full rounded-xl overflow-hidden border border-black/10 bg-white">
+      <div className="flex flex-col">
         <div className="flex h-11 items-center gap-4 px-4 bg-[var(--bg-default-secondary)]">
-          {Array.from({ length: columns }).map((_, i) => (
+          {Array.from({ length: shown }).map((_, i) => (
             <Skeleton key={i} className={`h-3 w-16 ${colClass(i)}`} />
           ))}
         </div>
         {Array.from({ length: rows }).map((_, r) => (
           <div key={r} className={`flex items-center gap-4 px-4 ${rowHeightClass} border-t border-black/10`}>
-            {Array.from({ length: columns }).map((_, i) => (
+            {Array.from({ length: shown }).map((_, i) => (
               <Skeleton key={i} className={`h-4 ${colClass(i)}`} />
             ))}
           </div>
@@ -135,11 +137,19 @@ export function ColumnTableSkeleton({
 }
 
 /** Matches a horizontal-scroll or grid row of small stat/summary cards. */
-export function StatCardRowSkeleton({ cards = 3, className = "grid grid-cols-1 lg:grid-cols-3 gap-4" }: { cards?: number; className?: string }) {
+export function StatCardRowSkeleton({
+  cards = 3,
+  className = "grid grid-cols-1 lg:grid-cols-3 gap-4",
+  cardHeightClass = "h-[132px]",
+}: {
+  cards?: number;
+  className?: string;
+  cardHeightClass?: string;
+}) {
   return (
     <div className={className}>
       {Array.from({ length: cards }).map((_, i) => (
-        <Skeleton key={i} className="h-[132px] rounded-xl w-full" />
+        <Skeleton key={i} className={`${cardHeightClass} rounded-xl w-full`} />
       ))}
     </div>
   );

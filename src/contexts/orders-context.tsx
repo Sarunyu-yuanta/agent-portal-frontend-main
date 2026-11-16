@@ -25,8 +25,8 @@
  *
  * Every mutator is `async` and every call site awaits it, so pointing them at
  * real endpoints is a change in this file alone. `isLoading` is in the contract
- * and permanently `false` for the same reason `useStatic` returns one — the
- * screens already render skeletons against it.
+ * and comes from `useStatic` over the seed, the same seam every other
+ * dataset uses — the screens already render skeletons against it.
  */
 
 import {
@@ -49,6 +49,7 @@ import {
   seedRequirementRequests,
   seedSubmissions,
 } from "@/lib/order-mock-data";
+import { useStatic } from "@/hooks/use-api";
 import {
   bookingModeForId,
   findBookableProduct,
@@ -112,7 +113,7 @@ type OrdersContextValue = {
   requirementRequests: RequirementRequest[];
   /** Append-only, newest last — every offer that has gone out. */
   proposals: ProposalLog[];
-  /** Always `false` today — see the module note. */
+  /** The order records haven't arrived — sourced from `useStatic` over the seed. */
   isLoading: boolean;
   /**
    * Places one client's order on a product — the single action behind every
@@ -182,6 +183,9 @@ let localSeq = 0;
 const localId = (prefix: string) => `${prefix}-local-${++localSeq}`;
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
+  // The seed is what a real feed would be fetching; its loading state is the
+  // context's, so every order screen and the bell wait on the same thing.
+  const { isLoading } = useStatic(seedBookings);
   const [bookings, setBookings] = useState<Booking[]>(seedBookings);
   const [submissions, setSubmissions] = useState<OrderSubmission[]>(seedSubmissions);
   const [requirementRequests, setRequirementRequests] =
@@ -515,7 +519,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       submissions,
       requirementRequests,
       proposals,
-      isLoading: false,
+      isLoading,
       placeOrder,
       cancelBooking,
       sendRequirementRequest,
@@ -526,6 +530,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       submissions,
       requirementRequests,
       proposals,
+      isLoading,
       placeOrder,
       cancelBooking,
       sendRequirementRequest,

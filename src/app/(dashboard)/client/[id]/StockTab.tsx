@@ -35,6 +35,8 @@ import { marketIndexHref } from "./stock-index-data";
 import { SetIndustrySectorSection } from "./IndustrySectorSection";
 import { CARD_SHADOW, PercentPill, TREND_TEXT } from "./stock-ui";
 import { setQueryState, withQuery } from "@/lib/query-state";
+import { useMarketCatalog } from "@/hooks/use-catalog";
+import { StockTabSkeleton } from "./StockTabSkeleton";
 
 function TrendCaret({ trend, size = 16 }: { trend: Trend; size?: number }) {
   if (trend === "up")
@@ -696,7 +698,8 @@ export function StockTab() {
   // above it — that's what lets the breadcrumb trail (which stores whole URLs)
   // bring the user back to US Market after they drill into a product.
   const marketId = normalizeMarketId(searchParams.get(MARKET_PARAM));
-  const catalog = MARKET_CATALOG[marketId];
+  const { data: catalog, isLoading } = useMarketCatalog(marketId);
+  if (isLoading) return <StockTabSkeleton />;
   return (
     <div className="flex flex-col w-full">
       <MarketWatchlistRow

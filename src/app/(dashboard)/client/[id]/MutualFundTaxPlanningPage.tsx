@@ -8,6 +8,8 @@ import { ArrowLeftIcon, ArrowRightIcon, InfoIcon } from "@phosphor-icons/react";
 import { navRead, navRemove, navWrite } from "@/lib/nav-session";
 import { mutualFundDetailHref, RiskBadge } from "./MutualFundCard";
 import { MF_ASSETS } from "./mutual-fund-assets";
+import { MutualFundTaxPlanningSkeleton } from "./MutualFundListPageSkeletons";
+import { useMutualFundUniverse } from "@/hooks/use-catalog";
 import {
   TAX_SAVING_FUND_TYPES,
   getTaxSavingFunds,
@@ -221,6 +223,9 @@ export function MutualFundTaxPlanningPage({
     () => readStoredIncomeState().calculatedIncome,
   );
 
+  // The recommended funds are a slice of the fund universe; the page waits on that.
+  const { isLoading } = useMutualFundUniverse();
+
   useEffect(() => {
     navWrite(INCOME_STATE_KEY, JSON.stringify({ incomeInput, calculatedIncome }));
   }, [incomeInput, calculatedIncome]);
@@ -248,6 +253,15 @@ export function MutualFundTaxPlanningPage({
     const numeric = Number(incomeInput);
     setCalculatedIncome(Number.isFinite(numeric) && numeric > 0 ? numeric : 0);
   };
+
+  if (isLoading) {
+    return (
+      <MutualFundTaxPlanningSkeleton
+        fundTypes={TAX_SAVING_FUND_TYPES.length}
+        showResults={calculatedIncome !== null}
+      />
+    );
+  }
 
   return (
     <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">

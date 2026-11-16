@@ -7,7 +7,8 @@ import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { useClients } from "@/hooks/use-api";
+import { useClients, useClientsResource } from "@/hooks/use-api";
+import { useDefinitPlans } from "@/hooks/use-catalog";
 import type { Client } from "@/types/domain";
 import { usePageBreadcrumb } from "../../page-breadcrumbs";
 import {
@@ -23,7 +24,8 @@ import {
   PlanSuitabilityBadge,
   SECTION_SHADOW,
 } from "./portfolio-advisory-ui";
-import { DEFINIT_PLANS, type DefinitPlan } from "./definit-plan-data";
+import type { DefinitPlan } from "./definit-plan-data";
+import { AdvisoryDetailSkeleton } from "./AdvisoryDetailSkeleton";
 import { DefinitPlanDetailModal } from "./RoboAdvisoryPlanDetailModal";
 import { ROBO_ASSETS } from "./robo-advisory-assets";
 import { RoboRiskLevel } from "./RoboRiskLevel";
@@ -453,6 +455,8 @@ function DefinitHeroDesktop({
 /** Figma 34315:84889 — Definit x Yuanta detail from Portfolio Advisory tab. */
 export function DefinitDetail({ onBack }: { onBack?: () => void }) {
   const [detailPlan, setDetailPlan] = useState<DefinitPlan | null>(null);
+  const { data: plans, isLoading: plansLoading } = useDefinitPlans();
+  const { isLoading: clientsLoading } = useClientsResource();
   const advisory = useAdvisoryClient("definit");
   const client = advisory.client;
 
@@ -465,6 +469,12 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
     }
   }, []);
 
+  // Whole page stands as a skeleton until the plans and the client list are
+  // in — otherwise the picker would open over an empty list (no client yet).
+  if (plansLoading || clientsLoading) {
+    return <AdvisoryDetailSkeleton cards={2} stats={3} cardMinHeightClass="min-h-[360px]" />;
+  }
+
   return (
     <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pb-20 lg:pt-2">
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
@@ -473,7 +483,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
           <>
             <div className="md:hidden">
               <DefinitHeroMobile
-                plans={DEFINIT_PLANS}
+                plans={plans}
                 advisory={advisory}
                 client={client}
                 onPlanDetails={setDetailPlan}
@@ -481,7 +491,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
             </div>
             <div className="hidden md:block">
               <DefinitHeroTablet
-                plans={DEFINIT_PLANS}
+                plans={plans}
                 advisory={advisory}
                 client={client}
                 onPlanDetails={setDetailPlan}
@@ -497,7 +507,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
         {client ? (
           <div className="w-full overflow-clip rounded-xl" style={{ boxShadow: SECTION_SHADOW }}>
             <DefinitHeroDesktop
-              plans={DEFINIT_PLANS}
+              plans={plans}
               advisory={advisory}
               client={client}
               onPlanDetails={setDetailPlan}

@@ -15,6 +15,7 @@
  * empty.
  */
 
+import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ClipboardTextIcon } from "@phosphor-icons/react";
@@ -101,6 +102,8 @@ export function BasketBooksPanel({
   }, [books, desk, search, isPrivate, step_, proposals, clientId]);
 
 
+
+  if (isLoading) return <OrdersPanelSkeleton withCreate />;
 
   return (
     <div className="flex flex-col gap-4">

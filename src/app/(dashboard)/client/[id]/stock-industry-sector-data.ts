@@ -129,25 +129,34 @@ export type IndustrySectorPage = {
   updatedAt: string;
 };
 
+/** The navigation half of a sector page — the taxonomy's tab strip and which
+ *  sector is open — from the slug and the static sector lists. */
+type IndustrySectorNav = Pick<IndustrySectorPage, "market" | "title" | "sector" | "sectors">;
+
+function getIndustrySectorNav(slug: string): IndustrySectorNav | null {
+  const isUs = slug.startsWith(US_SLUG_PREFIX);
+  const sectorId = isUs ? slug.slice(US_SLUG_PREFIX.length) : slug;
+  const sectors = isUs ? US_INDUSTRY_SECTORS : SET_INDUSTRY_SECTORS;
+  const sector = sectors.find((s) => s.id === sectorId);
+  if (!sector) return null;
+  const market: IndustrySectorMarket = isUs ? "us" : "th";
+  return { market, title: "SET Industry Sector", sector, sectors };
+}
+
 /** Resolves a drill-in slug against whichever taxonomy it names — a bare id is
  *  a SET sector, a `us-`-prefixed one a GICS sector. Returns null for unknown
  *  slugs so the route can fall through to the stock-quote lookup. */
 export function getIndustrySectorPage(slug: string): IndustrySectorPage | null {
-  const isUs = slug.startsWith(US_SLUG_PREFIX);
-  const sectorId = isUs ? slug.slice(US_SLUG_PREFIX.length) : slug;
-  const sectors = isUs ? US_INDUSTRY_SECTORS : SET_INDUSTRY_SECTORS;
+  const nav = getIndustrySectorNav(slug);
+  if (!nav) return null;
+  const { market, sector } = nav;
+  const sectorId = sector.id;
+  const isUs = market === "us";
   const descriptions = isUs ? US_SECTOR_DESCRIPTIONS : SET_SECTOR_DESCRIPTIONS;
   const fallback = isUs ? US_SECTOR_DESCRIPTIONS.energy : SET_SECTOR_DESCRIPTIONS.resources;
 
-  const sector = sectors.find((s) => s.id === sectorId);
-  if (!sector) return null;
-
-  const market: IndustrySectorMarket = isUs ? "us" : "th";
   return {
-    market,
-    title: "SET Industry Sector",
-    sector,
-    sectors,
+    ...nav,
     description: descriptions[sectorId] ?? fallback,
     stocks: getSectorStockBatch(0, SECTOR_STOCK_PAGE_SIZE, market),
     totalCount: 260,

@@ -219,7 +219,7 @@ export function GlobalBondDetailHero({
             showFilters ? "flex" : "hidden"
           }`}
         >
-          <div className="flex flex-col gap-2 md:flex-row md:gap-4 md:items-center lg:gap-3 lg:items-center">
+          <div className="flex flex-col gap-2 min-w-0">
             <span className="text-xs leading-[22px] text-[rgba(0,0,0,0.75)] md:text-sm md:leading-[26px] whitespace-nowrap">
               ผลตอบแทนโดยประมาณ :
             </span>
@@ -230,7 +230,7 @@ export function GlobalBondDetailHero({
               onChange={onYieldChange}
             />
           </div>
-          <div className="flex flex-col gap-[9px] md:flex-row md:gap-4 md:items-center lg:gap-3 lg:items-center">
+          <div className="flex flex-col gap-2 min-w-0">
             <span className="text-sm leading-[26px] text-[rgba(0,0,0,0.75)] whitespace-nowrap">
               ระยะเวลาครบกำหนด :
             </span>

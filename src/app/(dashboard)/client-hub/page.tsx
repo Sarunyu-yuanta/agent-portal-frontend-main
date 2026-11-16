@@ -4,7 +4,8 @@ import { Suspense, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CircleNotchIcon } from "@phosphor-icons/react";
 import { TabGroup, SearchInput, Pagination } from "@sarunyu/system-one";
-import { useClientsResource } from "@/hooks/use-api";
+import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
+import { useClientsResource, useHasLoaded } from "@/hooks/use-api";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { DetailDrawer } from "@/components/ui/detail-drawer";
 import { setQueryState } from "@/lib/query-state";
@@ -101,6 +102,7 @@ function ClientHubPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: clients, isLoading } = useClientsResource();
+  const hasLoaded = useHasLoaded(isLoading);
   const { isPrivate } = usePrivacy();
 
   // Customer view
@@ -309,51 +311,72 @@ function ClientHubPageInner() {
       {/* White section — full-width background, content constrained to max-w */}
       <section className="flex-1 bg-white rounded-t-[16px] xl:rounded-t-2xl">
         <div className="max-w-[1280px] mx-auto px-4 xl:px-6 flex flex-col gap-3 pt-4 xl:pt-6 pb-6">
-          {/* Toolbar */}
+          {/* Toolbar. First load: tabs are bars too — nothing is clickable
+              yet. After that the tabs stay live; their counts and the Columns /
+              Search controls (which act on the rows) wait for data. */}
           <div className="flex flex-wrap items-center gap-3 min-h-10">
+            {!hasLoaded ? (
+              <TabsSkeleton count={2} className="h-10" />
+            ) : (
             <TabGroup
               items={[
-                { id: "customer", title: `Customer (${sorted.length})` },
-                { id: "product", title: `Product (${filteredProductRows.length})` },
+                {
+                  id: "customer",
+                  title: isLoading ? "Customer" : `Customer (${sorted.length})`,
+                },
+                {
+                  id: "product",
+                  title: isLoading ? "Product" : `Product (${filteredProductRows.length})`,
+                },
               ]}
               activeId={viewFilter}
               size="md"
               onChange={(id) => setViewFilter(id as ViewFilter)}
             />
-            {viewFilter === "customer" && (
-              <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto">
-                <ColumnVisibilityMenu
-                  columns={CUSTOMER_COLUMNS}
-                  visibleColumns={visibleColumns}
-                  onToggle={toggleColumn}
-                  onReset={() => setHiddenColumns(new Set())}
-                />
-                <DebouncedSearchField
-                  className="flex-1 lg:w-64"
-                  inputClassName="!h-10"
-                  placeholder="Search clients…"
-                  value={search}
-                  debouncedValue={debouncedSearch}
-                  onChange={(val) => {
-                    setSearch(val);
-                    setCurrentPage(1);
-                  }}
-                  onClear={() => {
-                    setSearch("");
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
             )}
-            {viewFilter === "product" && (
-              <DebouncedSearchField
-                className="w-full lg:w-56 lg:ml-auto"
-                placeholder="Search products…"
-                value={productSearch}
-                debouncedValue={debouncedProductSearch}
-                onChange={setProductSearch}
-                onClear={() => setProductSearch("")}
-              />
+            {isLoading ? (
+              <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto" aria-busy="true">
+                {viewFilter === "customer" && <Skeleton className="h-10 w-[120px] rounded-lg" />}
+                <Skeleton className="h-10 flex-1 lg:w-64 rounded-lg" />
+              </div>
+            ) : (
+              <>
+              {viewFilter === "customer" && (
+                <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto">
+                  <ColumnVisibilityMenu
+                    columns={CUSTOMER_COLUMNS}
+                    visibleColumns={visibleColumns}
+                    onToggle={toggleColumn}
+                    onReset={() => setHiddenColumns(new Set())}
+                  />
+                  <DebouncedSearchField
+                    className="flex-1 lg:w-64"
+                    inputClassName="!h-10"
+                    placeholder="Search clients…"
+                    value={search}
+                    debouncedValue={debouncedSearch}
+                    onChange={(val) => {
+                      setSearch(val);
+                      setCurrentPage(1);
+                    }}
+                    onClear={() => {
+                      setSearch("");
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
+              {viewFilter === "product" && (
+                <DebouncedSearchField
+                  className="w-full lg:w-56 lg:ml-auto"
+                  placeholder="Search products…"
+                  value={productSearch}
+                  debouncedValue={debouncedProductSearch}
+                  onChange={setProductSearch}
+                  onClear={() => setProductSearch("")}
+                />
+              )}
+              </>
             )}
           </div>
 
@@ -384,6 +407,13 @@ function ClientHubPageInner() {
                   }}
                 />
 
+                {isLoading ? (
+                  <div className="flex flex-wrap-reverse items-center justify-end gap-3" aria-hidden>
+                    <Skeleton className="h-8 w-40" />
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-10 w-[120px] rounded-lg" />
+                  </div>
+                ) : (
                 <div className="flex flex-wrap-reverse items-center justify-end gap-3">
                   <div className="flex items-center gap-2">
                     <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
@@ -423,6 +453,7 @@ function ClientHubPageInner() {
                     />
                   </div>
                 </div>
+                )}
               </>
             ) : (
               <ProductTable

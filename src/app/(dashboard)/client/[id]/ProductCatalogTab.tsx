@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
-import { Chip, SearchInput, Tab, Tag } from "@sarunyu/system-one";
-import { ArrowUpLeftIcon, ChartLineUpIcon } from "@phosphor-icons/react";
+import { Button, Chip, SearchInput, Tab, Tag } from "@sarunyu/system-one";
+import { ArrowUpLeftIcon, CaretLeftIcon, CaretRightIcon, ChartLineUpIcon } from "@phosphor-icons/react";
 import { ChipScroller } from "@/components/ui/chip-scroller";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FixedIncomeTab } from "./FixedIncomeTab";
@@ -46,6 +46,8 @@ import { useProductCatalogLoading } from "@/hooks/use-catalog";
 import { useRouter } from "next/navigation";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ProductCatalogTabSkeleton } from "./ProductCatalogSkeletons";
+import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
+import { useHasLoaded } from "@/hooks/use-api";
 import type { StructuredProduct } from "./structured-product-data";
 import {
   getInvestmentSolution,
@@ -97,10 +99,14 @@ const TRENDING_TAB_ID = "product-trending";
 function CatalogTabBar({
   activeId,
   onChange,
+  hasLoaded,
 }: {
   activeId: string;
   onChange: (id: string) => void;
+  /** False until the catalog's first load — the strip is bars until then. */
+  hasLoaded: boolean;
 }) {
+  if (!hasLoaded) return <TabsSkeleton count={PRODUCT_CATEGORIES.length} className="w-max" />;
   return (
     <div role="tablist" className="flex w-max">
       {PRODUCT_CATEGORIES.map((category) => {
@@ -119,6 +125,112 @@ function CatalogTabBar({
           />
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * The desktop tab strip outgrows the 1280px column once every category is
+ * shown, and a mouse has no horizontal axis to scroll it with — so, like
+ * `ChipScroller`, it gets caret buttons on whichever side still has tabs
+ * hidden. The fade matches the strip's own background (the bottom of the
+ * header's white→#f7f7f7 gradient) and stops above the tabs' underline.
+ */
+function TabStripScroller({
+  className = "",
+  activeKey,
+  children,
+}: {
+  className?: string;
+  /** Changes when the selected tab changes — the strip then scrolls it fully into view. */
+  activeKey?: string;
+  children: ReactNode;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // A wrapper that outlives its children: the strip swaps from skeleton bars to
+  // the real tabs, which changes its width without resizing the viewport.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    const content = contentRef.current;
+    if (!el || !content) return;
+    const update = () =>
+      setOverflow({
+        left: el.scrollLeft > 1,
+        right: el.scrollLeft < el.scrollWidth - el.clientWidth - 1,
+      });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    observer.observe(content);
+    return () => {
+      el.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, []);
+
+  // Bring the selected tab clear of the edge fades when it's clipped. Done by
+  // hand rather than `scrollIntoView`, which would also scroll the page
+  // vertically to reach it.
+  useEffect(() => {
+    const el = scrollRef.current;
+    const tab = el?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    if (!el || !tab) return;
+    const FADE = 48;
+    const view = el.getBoundingClientRect();
+    const box = tab.getBoundingClientRect();
+    let delta = 0;
+    if (box.right > view.right - FADE) delta = box.right - (view.right - FADE);
+    else if (box.left < view.left + FADE) delta = box.left - (view.left + FADE);
+    if (delta !== 0) el.scrollBy({ left: delta, behavior: "smooth" });
+  }, [activeKey]);
+
+  const step = (direction: 1 | -1) =>
+    scrollRef.current?.scrollBy({
+      left: direction * Math.round(scrollRef.current.clientWidth * 0.6),
+      behavior: "smooth",
+    });
+
+  return (
+    <div className={className}>
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto pl-4 lg:pl-6 [--bg-default-primary:transparent]"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <div ref={contentRef} className="w-max">
+            {children}
+          </div>
+        </div>
+        {(["left", "right"] as const).map((side) => {
+          if (!overflow[side]) return null;
+          const isLeft = side === "left";
+          return (
+            <div
+              key={side}
+              className={`pointer-events-none absolute top-0 bottom-[2px] flex items-center ${
+                isLeft
+                  ? "left-0 pl-1.5 pr-8 bg-gradient-to-r from-[#f7f7f7] via-[#f7f7f7] to-transparent"
+                  : "right-0 pr-1.5 pl-8 bg-gradient-to-l from-[#f7f7f7] via-[#f7f7f7] to-transparent"
+              }`}
+            >
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => step(isLeft ? -1 : 1)}
+                aria-label={isLeft ? "เลื่อนแท็บไปทางซ้าย" : "เลื่อนแท็บไปทางขวา"}
+                className="pointer-events-auto"
+              >
+                {isLeft ? <CaretLeftIcon size={16} /> : <CaretRightIcon size={16} />}
+              </Button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -297,6 +409,7 @@ export function ProductCatalogTab({
   const mobileScrolled = useScrollThreshold();
   const drag = useDragScroll();
   const isLoading = useProductCatalogLoading();
+  const hasLoaded = useHasLoaded(isLoading);
 
   // Scrolling swaps which search bar is on screen (the in-page one collapses
   // away, the host's sticky header one takes over, and back again) — so the
@@ -573,12 +686,16 @@ export function ProductCatalogTab({
       >
         <div className="px-4 pt-6 pb-4" onFocus={() => setSearchOpen(true)}>
           <div ref={mobileSearchWrapRef}>
-            <SearchInput
-              value={searchValue}
-              onChange={setSearchValue}
-              placeholder="ค้นหาสินทรัพย์"
-              className="w-full"
-            />
+            {isLoading ? (
+              <Skeleton className="h-12 w-full rounded-lg" />
+            ) : (
+              <SearchInput
+                value={searchValue}
+                onChange={setSearchValue}
+                placeholder="ค้นหาสินทรัพย์"
+                className="w-full"
+              />
+            )}
           </div>
         </div>
         <div
@@ -588,7 +705,7 @@ export function ProductCatalogTab({
             ["--bg-default-primary" as string]: "transparent",
           }}
         >
-          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} />
+          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} hasLoaded={hasLoaded} />
         </div>
       </div>
 
@@ -604,22 +721,27 @@ export function ProductCatalogTab({
               onFocus={() => setSearchOpen(true)}
             >
               <div ref={desktopSearchWrapRef} className="w-full max-w-[792px]">
-                <SearchInput
-                  value={searchValue}
-                  onChange={setSearchValue}
-                  placeholder="ค้นหาสินทรัพย์"
-                  className="w-full"
-                />
+                {/* Skeleton while loading: there is nothing to search yet. */}
+                {isLoading ? (
+                  <Skeleton className="h-12 w-full rounded-lg" />
+                ) : (
+                  <SearchInput
+                    value={searchValue}
+                    onChange={setSearchValue}
+                    placeholder="ค้นหาสินทรัพย์"
+                    className="w-full"
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
-        <div
-          className={`max-w-[1280px] mx-auto w-full px-4 lg:px-6 overflow-x-auto [--bg-default-primary:transparent] transition-[padding] duration-300 ease-out ${mobileScrolled ? "pt-6" : ""}`}
-          style={{ scrollbarWidth: "none" }}
+        <TabStripScroller
+          activeKey={hasLoaded ? activeProductTab : undefined}
+          className={`max-w-[1280px] mx-auto w-full transition-[padding] duration-300 ease-out ${mobileScrolled ? "pt-6" : ""}`}
         >
-          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} />
-        </div>
+          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} hasLoaded={hasLoaded} />
+        </TabStripScroller>
       </div>
 
       {/* ── Search overlay: focusing either search bar above pops this open as a floating modal overlapping it ── */}
@@ -742,14 +864,16 @@ export function ProductCatalogTab({
 
       {/* ── Tab content ─────────────────────────────────────────────────────── */}
       <FadeIn key={activeProductTab} className="flex flex-col w-full">
-        {/* Stock and Robo Advisory have no loading state to speak of (their
-            data is local mock content, not fetched), so both skip straight
-            past the catalog's shared loading skeleton. */}
+        {/* Stock and Robo Advisory skip the catalog's shared loading
+            skeleton: Stock reads its market through `useMarketCatalog` and
+            renders its own (`StockTabSkeleton`); Robo Advisory's data is local
+            mock content, but its cards open a client picker, so it shows its
+            own skeleton until the client list is in. */}
         {activeProductTab === "stock" ? (
           <StockTab />
         ) : activeProductTab === "product-trending" ? (
-          /* Mock sales over the other tabs' real products — nothing fetched,
-             so it skips the skeleton alongside Stock. */
+          /* Renders its own skeleton (via `useProductTrendingGroups`), so it
+             skips the catalog's shared one alongside Stock. */
           <ProductTrendingTab nav={nav} />
         ) : EMPTY_CATALOG_TABS[activeProductTab] ? (
           /* Sits in the no-skeleton branch because there is nothing to wait for. */

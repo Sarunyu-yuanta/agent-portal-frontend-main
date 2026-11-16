@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button, Chip } from "@sarunyu/system-one";
-import { ArrowLeftIcon, CircleNotchIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { StructuredProductCard } from "./StructuredProductCard";
 import {
   ALL_STRUCTURED_PRODUCTS_COUNT,
@@ -33,7 +33,6 @@ export function StructuredProductAllPage({
 }) {
   const { data: allProducts, isLoading } = useStructuredProducts();
   const [couponFilter, setCouponFilter] = useState<CouponFilter>("all");
-  const [isLoadingMore, setIsLoadingMore] = useState(true);
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -42,11 +41,6 @@ export function StructuredProductAllPage({
     } else {
       window.scrollTo(0, 0);
     }
-  }, []);
-
-  useEffect(() => {
-    const t = setTimeout(() => setIsLoadingMore(false), 800);
-    return () => clearTimeout(t);
   }, []);
 
   if (isLoading) return <StructuredProductAllPageSkeleton />;
@@ -130,12 +124,6 @@ export function StructuredProductAllPage({
             ))}
           </div>
 
-          {isLoadingMore && (
-            <div className="flex gap-1 items-center justify-center w-full py-2 pl-2.5 pr-3.5 lg:hidden">
-              <CircleNotchIcon size={22} className="animate-spin text-black/40" />
-              <span className="text-sm font-semibold leading-[26px] text-black/40">กำลังโหลดข้อมูล</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ import {
   TableCell,
   Tooltip,
 } from "@sarunyu/system-one";
-import { TableRowsSkeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/ui/skeleton";
 import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
 import { useFlipRows } from "@/hooks/use-flip-rows";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -80,6 +80,8 @@ export function CustomerTable({
     return {};
   };
 
+  if (isLoading) return <TableSkeleton />;
+
   const isEmpty = !isLoading && rows.length === 0;
 
   return (
@@ -110,9 +112,7 @@ export function CustomerTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {isLoading ? (
-            <TableRowsSkeleton columns={shown.length + 1} />
-          ) : rows.map((client) => {
+          {rows.map((client) => {
             const rowNo = originalIndexMap.get(client.id) ?? 0;
             return (
               <Tooltip

@@ -2,11 +2,14 @@
 
 import { use } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ProductTrendingAllTable } from "../../../client/[id]/ProductTrendingAllTable";
+import {
+  ProductTrendingAllTable,
+  ProductTrendingAllTableSkeleton,
+} from "../../../client/[id]/ProductTrendingAllTable";
+import { useProductTrendingGroups } from "@/hooks/use-catalog";
 import { useTrendingSelect } from "../../../client/[id]/ProductTrendingTab";
 import {
   DEFAULT_TRENDING_SORT,
-  getTrendingGroup,
   normalizeTrendingSort,
   trendingUpdatedAt,
   TRENDING_SORT_PARAM,
@@ -21,7 +24,9 @@ export default function ProductTrendingGroupPage({
   params: Promise<{ groupId: string }>;
 }) {
   const { groupId } = use(params);
-  const group = getTrendingGroup(decodeURIComponent(groupId));
+  const { data: groups, isLoading } = useProductTrendingGroups();
+  const id = decodeURIComponent(groupId);
+  const group = groups.find((g) => g.id === id);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -38,6 +43,9 @@ export default function ProductTrendingGroupPage({
     onProductSelect: (p) => router.push(`/product-catalog/product/${p.id}`),
     onGlobalBondIssuerSelect: (id) => router.push(`/product-catalog/global-bond/${id}`),
   });
+
+  // Loading above not-found, or every visit flashes "ไม่พบ…" before data lands.
+  if (isLoading) return <ProductTrendingAllTableSkeleton />;
 
   if (!group) {
     return <CatalogNotFound message="ไม่พบหมวดสินค้านี้" onBack={goBack} />;

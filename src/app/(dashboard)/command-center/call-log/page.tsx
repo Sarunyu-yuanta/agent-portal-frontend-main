@@ -107,6 +107,9 @@ export default function CallLogPage() {
     [visible, safePage, pageSize],
   );
 
+  // Whole page, client filter included: its options are this log's clients.
+  if (isLoading) return <CallLogSkeleton />;
+
   return (
     /* `xl:pb-20` clears the floating "New note" button, which the shell pins at
        `bottom-8 right-8` and renders from `xl` up (`FloatingNoteButton`). Without
@@ -334,5 +337,25 @@ function CallLogBookTable({
         </Table>
       </div>
     </>
+  );
+}
+
+/** Title row (back, title, client filter) and the list card, as bars. */
+function CallLogSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 xl:gap-5 xl:pb-20" aria-busy="true">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-40" />
+        <span className="flex-1" />
+        <Skeleton className="h-10 w-[220px] shrink-0 rounded-lg" />
+      </div>
+      <Card variant="default" className="gap-4">
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 rounded-lg" />
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 }

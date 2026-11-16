@@ -22,6 +22,8 @@ import {
 import { MutualFundLegendBottomSheet, MutualFundLegendModal } from "./MutualFundLegendSheet";
 import { MF_ASSETS } from "./mutual-fund-assets";
 import { MutualFundTagLegend } from "./mutual-fund-ui";
+import { MutualFundFilterResultsSkeleton } from "./MutualFundListPageSkeletons";
+import { useMutualFundUniverse } from "@/hooks/use-catalog";
 import {
   filterFundsByTag,
   searchFunds,
@@ -91,6 +93,9 @@ export function MutualFundFilterResultsPage({
   const [highlightActive, setHighlightActive] = useState(false);
   const [query, setQuery] = useState("");
   const isPhone = useIsMobile();
+  // `funds` is a slice of the fund universe (the whole of it, or the
+  // tax-saving subset); the page waits on that.
+  const { isLoading } = useMutualFundUniverse();
 
   const visibleFunds = useMemo(() => applyMutualFundFilter(funds, filterState), [funds, filterState]);
   const showNoMatchesState = !isEmptyFilterState(filterState) && visibleFunds.length === 0;
@@ -123,6 +128,8 @@ export function MutualFundFilterResultsPage({
       <FunnelSimpleIcon size={20} />
     </Button>
   );
+
+  if (isLoading) return <MutualFundFilterResultsSkeleton />;
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-20">
