@@ -1,0 +1,478 @@
+{
+  "_clients": "A client belongs to one IC throughout: 110001/110002/110004/110007 are the signed-in IC's, 110003/110005 are Nalinee Vorakit's, 110006/110008 are Korn Panitchpakdi's. Every basket below mixes at least two desks' worth of them — that is what a shared basket is, and it is what makes the book page's 'ของฉัน' and 'ทั้งดีล' figures differ.",
+  "books": [
+    {
+      "productId": "ko-wmt",
+      "bookings": [
+        { "id": "bk-0101", "clientId": "110001", "amount": 40000, "daysAgo": 5 },
+        { "id": "bk-0102", "clientId": "110007", "amount": 35000, "daysAgo": 5 },
+        { "id": "bk-0103", "clientId": "220101", "amount": 25000, "daysAgo": 4, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0101",
+          "bookingIds": ["bk-0101", "bk-0102", "bk-0103"],
+          "daysAgo": 3,
+          "status": "completed",
+          "backendRef": "ORD-2026-000871"
+        }
+      ]
+    },
+    {
+      "_note": "prp-0101 is a win on a deal that has since closed: the booking came three days after the proposal, and a win outranks the product no longer taking orders.",
+      "productId": "sawad-ptt",
+      "proposals": [
+        { "id": "prp-0101", "clientId": "110001", "daysAgo": 6 }
+      ],
+      "bookings": [
+        { "id": "bk-0201", "clientId": "110001", "amount": 50000, "daysAgo": 3 },
+        { "id": "bk-0202", "clientId": "110004", "amount": 30000, "daysAgo": 3 },
+        { "id": "bk-0203", "clientId": "330201", "amount": 20000, "daysAgo": 2, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0201",
+          "bookingIds": ["bk-0201", "bk-0202", "bk-0203"],
+          "daysAgo": 1,
+          "status": "processing",
+          "backendRef": "ORD-2026-000912"
+        }
+      ]
+    },
+    {
+      "productId": "aapl-amzn-nflx",
+      "bookings": [
+        { "id": "bk-0301", "clientId": "110001", "amount": 60000, "daysAgo": 2 },
+        { "id": "bk-0302", "clientId": "220101", "amount": 40000, "daysAgo": 1, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Under target on purpose, so one basket stays in 'collecting' rather than being picked up on load.",
+      "productId": "sp-nvda-amzn-axp",
+      "bookings": [
+        { "id": "bk-0401", "clientId": "110007", "amount": 30000, "daysAgo": 1 },
+        { "id": "bk-0402", "clientId": "110002", "amount": 15000, "daysAgo": 1, "status": "cancelled" },
+        { "id": "bk-0403", "clientId": "220101", "amount": 25000, "daysAgo": 2, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-0404", "clientId": "330201", "amount": 20000, "daysAgo": 0, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Half-filled, two desks in. One of the two baskets added so Global Structured has six still collecting — the desk has eight products and four of them are deliberately past booking (completed, processing, rejected, and one seeded full), which left the catalogue's shelf showing four.",
+      "productId": "sp-googl-msft-crm",
+      "bookings": [
+        { "id": "bk-0901", "clientId": "110004", "amount": 35000, "daysAgo": 3 },
+        { "id": "bk-0902", "clientId": "220102", "amount": 20000, "daysAgo": 1, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Barely opened — one ticket from one client, so the shelf has a near-empty basket as well as a nearly full one.",
+      "productId": "sp-amd-mu-avgo",
+      "bookings": [
+        { "id": "bk-1001", "clientId": "110007", "amount": 10000, "daysAgo": 0 }
+      ],
+      "submissions": []
+    },
+    {
+      "productId": "thai-chips",
+      "bookings": [
+        { "id": "bk-0501", "clientId": "110001", "amount": 40000, "daysAgo": 2 },
+        { "id": "bk-0502", "clientId": "220101", "amount": 20000, "daysAgo": 1, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-0503", "clientId": "110004", "amount": 40000, "daysAgo": 0 }
+      ],
+      "submissions": []
+    },
+    {
+      "productId": "thai-magnificent-7",
+      "bookings": [
+        { "id": "bk-0601", "clientId": "330201", "amount": 30000, "daysAgo": 4, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-0602", "clientId": "110001", "amount": 70000, "daysAgo": 4 }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0601",
+          "bookingIds": ["bk-0601", "bk-0602"],
+          "daysAgo": 3,
+          "status": "rejected",
+          "backendRef": "ORD-2026-000845"
+        }
+      ]
+    },
+    {
+      "_note": "A product is booked once: one round, sent as one order. This book used to carry three rounds; it now keeps only the first.",
+      "productId": "thai-big-data",
+      "bookings": [
+        { "id": "bk-0701", "clientId": "110001", "amount": 40000, "daysAgo": 12 },
+        { "id": "bk-0702", "clientId": "220101", "amount": 60000, "daysAgo": 12, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0701",
+          "bookingIds": ["bk-0701", "bk-0702"],
+          "daysAgo": 11,
+          "status": "completed",
+          "backendRef": "ORD-2026-000920"
+        }
+      ]
+    },
+    {
+      "_note": "A product is booked once: one round, sent as one order. This book used to carry two rounds; it now keeps only the first.",
+      "productId": "thai-streaming-media",
+      "bookings": [
+        { "id": "bk-0801", "clientId": "110002", "amount": 60000, "daysAgo": 14 },
+        { "id": "bk-0802", "clientId": "330201", "amount": 40000, "daysAgo": 14, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-0801",
+          "bookingIds": ["bk-0801", "bk-0802"],
+          "daysAgo": 13,
+          "status": "completed",
+          "backendRef": "ORD-2026-000899"
+        }
+      ]
+    }
+,
+    {
+      "_note": "Full — every booking funded (they could not have been placed otherwise), so the IC can send.",
+      "productId": "thai-semiconductor",
+      "bookings": [
+        { "id": "bk-0901", "clientId": "110001", "amount": 70000, "daysAgo": 2 },
+        { "id": "bk-0902", "clientId": "330201", "amount": 30000, "daysAgo": 1, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Opened today, one client in. The emptiest a live book gets.",
+      "productId": "sp-nasdaq-amzn-nflx",
+      "bookings": [
+        { "id": "bk-2301", "clientId": "110002", "amount": 15000, "daysAgo": 0 }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Two fifths in. Proposals: prp-0201 went out three days before 110001 booked, so it is won; prp-0202 has no booking behind it and the deal is still filling, so it is still open.",
+      "productId": "thai-metaverse",
+      "proposals": [
+        { "id": "prp-0201", "clientId": "110001", "daysAgo": 5 },
+        { "id": "prp-0202", "clientId": "110002", "daysAgo": 1 }
+      ],
+      "bookings": [
+        { "id": "bk-3001", "clientId": "110001", "amount": 25000, "daysAgo": 2 },
+        { "id": "bk-3002", "clientId": "330201", "amount": 15000, "daysAgo": 1, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "With the back office.",
+      "productId": "thai-healthcare",
+      "bookings": [
+        { "id": "bk-3101", "clientId": "110002", "amount": 40000, "daysAgo": 7 },
+        { "id": "bk-3102", "clientId": "220101", "amount": 60000, "daysAgo": 7, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-3101",
+          "bookingIds": ["bk-3101", "bk-3102"],
+          "daysAgo": 5,
+          "status": "processing",
+          "backendRef": "ORD-2026-001211"
+        }
+      ]
+    },
+    {
+      "_note": "One client, just placed.",
+      "productId": "thai-energy",
+      "bookings": [
+        { "id": "bk-3201", "clientId": "110007", "amount": 20000, "daysAgo": 0 }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Done and answered. Proposals: prp-0301 never produced a booking and the deal is closed, so it is lost; prp-0302 went to a client who had already booked 13 days earlier, and a booking that predates the send is not the send's doing — lost as well.",
+      "productId": "thai-bank",
+      "proposals": [
+        { "id": "prp-0301", "clientId": "110002", "daysAgo": 20 },
+        { "id": "prp-0302", "clientId": "110004", "daysAgo": 5 }
+      ],
+      "bookings": [
+        { "id": "bk-3301", "clientId": "110004", "amount": 55000, "daysAgo": 18 },
+        { "id": "bk-3302", "clientId": "330201", "amount": 45000, "daysAgo": 18, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-3301",
+          "bookingIds": ["bk-3301", "bk-3302"],
+          "daysAgo": 17,
+          "status": "completed",
+          "backendRef": "ORD-2026-000801"
+        }
+      ]
+    },
+    {
+      "_note": "Eighty per cent, one cancelled.",
+      "productId": "thai-payments",
+      "bookings": [
+        { "id": "bk-3401", "clientId": "110001", "amount": 50000, "daysAgo": 3 },
+        { "id": "bk-3402", "clientId": "220101", "amount": 30000, "daysAgo": 2, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-3403", "clientId": "110002", "amount": 10000, "daysAgo": 1, "status": "cancelled" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "No booking at all \u2014 this book exists only because a client was sent off to finish their forms. The emptiest state Order Management lists.",
+      "productId": "thai-investment",
+      "bookings": [],
+      "submissions": []
+    },
+    {
+      "_note": "Rejected downstream. The one outcome nobody designs for and everybody meets.",
+      "productId": "thai-enterprise-software",
+      "bookings": [
+        { "id": "bk-2501", "clientId": "110004", "amount": 50000, "daysAgo": 16 },
+        { "id": "bk-2502", "clientId": "220101", "amount": 50000, "daysAgo": 16, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-2501",
+          "bookingIds": ["bk-2501", "bk-2502"],
+          "daysAgo": 15,
+          "status": "rejected",
+          "backendRef": "ORD-2026-000812"
+        }
+      ]
+    },
+    {
+      "_note": "Ninety per cent: one more ticket and the back office takes it.",
+      "productId": "thai-sharing-economy",
+      "bookings": [
+        { "id": "bk-2701", "clientId": "110001", "amount": 40000, "daysAgo": 2 },
+        { "id": "bk-2702", "clientId": "220101", "amount": 30000, "daysAgo": 2, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-2703", "clientId": "330201", "amount": 20000, "daysAgo": 1, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Nobody of ours in it. The deal fills on other desks' clients, which is what the product page's \u0e22\u0e2d\u0e14\u0e08\u0e2d\u0e07\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19 = 0 is for \u2014 and why it is on no list in Order Management, which is the IC's own work.",
+      "productId": "thai-apparel",
+      "bookings": [
+        { "id": "bk-2801", "clientId": "220101", "amount": 35000, "daysAgo": 3, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-2802", "clientId": "330201", "amount": 15000, "daysAgo": 2, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-2803", "clientId": "330202", "amount": 10000, "daysAgo": 0, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Half full, with a booking the client pulled \u2014 a cancelled row that still has to read right.",
+      "productId": "thai-food-&-beverage",
+      "bookings": [
+        { "id": "bk-2601", "clientId": "110007", "amount": 50000, "daysAgo": 4 },
+        { "id": "bk-2602", "clientId": "110002", "amount": 20000, "daysAgo": 3, "status": "cancelled" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Mostly somebody else's clients, with a small stake of ours.",
+      "productId": "sp-msft-orcl",
+      "bookings": [
+        { "id": "bk-4001", "clientId": "110001", "amount": 10000, "daysAgo": 3 },
+        { "id": "bk-4002", "clientId": "220101", "amount": 20000, "daysAgo": 2, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Ninety per cent: one more ticket and the back office takes it.",
+      "productId": "sp-tsla-rivn-lcid",
+      "bookings": [
+        { "id": "bk-4101", "clientId": "110004", "amount": 45000, "daysAgo": 4 },
+        { "id": "bk-4102", "clientId": "330201", "amount": 30000, "daysAgo": 3, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-4103", "clientId": "110002", "amount": 15000, "daysAgo": 1 }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Rejected downstream.",
+      "productId": "sp-pttep-banpu",
+      "bookings": [
+        { "id": "bk-4201", "clientId": "110007", "amount": 60000, "daysAgo": 14 },
+        { "id": "bk-4202", "clientId": "220101", "amount": 40000, "daysAgo": 14, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-4201",
+          "bookingIds": ["bk-4201", "bk-4202"],
+          "daysAgo": 13,
+          "status": "rejected",
+          "backendRef": "ORD-2026-000776"
+        }
+      ]
+    },
+    {
+      "_note": "Done and answered.",
+      "productId": "asp-jpm-bac-gs",
+      "bookings": [
+        { "id": "bk-4301", "clientId": "110001", "amount": 55000, "daysAgo": 21 },
+        { "id": "bk-4302", "clientId": "330201", "amount": 45000, "daysAgo": 21, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-4301",
+          "bookingIds": ["bk-4301", "bk-4302"],
+          "daysAgo": 20,
+          "status": "completed",
+          "backendRef": "ORD-2026-000742"
+        }
+      ]
+    },
+    {
+      "_note": "Half full, with a booking the client pulled.",
+      "productId": "asp-cpall-bdms",
+      "bookings": [
+        { "id": "bk-4401", "clientId": "110002", "amount": 50000, "daysAgo": 5 },
+        { "id": "bk-4402", "clientId": "110004", "amount": 20000, "daysAgo": 4, "status": "cancelled" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "Nobody of ours in it. The deal fills on other desks' clients, which is what the product page's \u0e22\u0e2d\u0e14\u0e08\u0e2d\u0e07\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19 = 0 is for \u2014 and why it is on no list in Order Management, which is the IC's own work.",
+      "productId": "asp-cost-tgt",
+      "bookings": [
+        { "id": "bk-4501", "clientId": "220101", "amount": 40000, "daysAgo": 3, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-4502", "clientId": "330201", "amount": 20000, "daysAgo": 2, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-4503", "clientId": "220102", "amount": 15000, "daysAgo": 0, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": []
+    },
+    {
+      "_note": "With the back office.",
+      "productId": "asp-dis-nke-sbux",
+      "bookings": [
+        { "id": "bk-4601", "clientId": "110004", "amount": 35000, "daysAgo": 8 },
+        { "id": "bk-4602", "clientId": "220101", "amount": 65000, "daysAgo": 8, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        {
+          "id": "sub-4601",
+          "bookingIds": ["bk-4601", "bk-4602"],
+          "daysAgo": 6,
+          "status": "processing",
+          "backendRef": "ORD-2026-001188"
+        }
+      ]
+    },
+    {
+      "_note": "No booking at all \u2014 on the list only because a client was sent off to finish their forms.",
+      "productId": "asp-adbe-crm-now",
+      "bookings": [],
+      "submissions": []
+    },
+    {
+      "_note": "Fixed Income, quota 10,000,000 THB. Each booking is its own order, created and sent in one press — so every one of them carries a submission. One done, one with the back office, two just sent and still cancellable.",
+      "productId": "fi-mqdc482b-0",
+      "proposals": [
+        { "id": "prp-1001", "clientId": "110007", "daysAgo": 4 }
+      ],
+      "bookings": [
+        { "id": "bk-1001", "clientId": "110001", "amount": 2000000, "daysAgo": 5 },
+        { "id": "bk-1002", "clientId": "110004", "amount": 1500000, "daysAgo": 3 },
+        { "id": "bk-1003", "clientId": "110007", "amount": 1000000, "daysAgo": 1 },
+        { "id": "bk-1004", "clientId": "220101", "amount": 500000, "daysAgo": 0, "createdBy": "Nalinee Vorakit" }
+      ],
+      "submissions": [
+        { "id": "sub-1001", "bookingIds": ["bk-1001"], "daysAgo": 4, "status": "completed", "backendRef": "ORD-2026-001104" },
+        { "id": "sub-1002", "bookingIds": ["bk-1002"], "daysAgo": 2, "status": "processing", "backendRef": "ORD-2026-001131" },
+        { "id": "sub-1003", "bookingIds": ["bk-1003"], "daysAgo": 0, "status": "sent", "backendRef": "ORD-2026-001158" },
+        { "id": "sub-1004", "bookingIds": ["bk-1004"], "daysAgo": 0, "status": "sent", "backendRef": "ORD-2026-001162" }
+      ]
+    },
+    {
+      "_note": "Fixed Income, quota 15,000,000 THB — two orders done, plenty of quota left. bk-1103 is the cancel window used: sent, then pulled before the back office took it up, so its amount never came out of the quota.",
+      "productId": "fi-jmt127a-0",
+      "bookings": [
+        { "id": "bk-1101", "clientId": "110002", "amount": 3000000, "daysAgo": 4 },
+        { "id": "bk-1102", "clientId": "220101", "amount": 2000000, "daysAgo": 2, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-1103", "clientId": "110004", "amount": 1000000, "daysAgo": 1, "status": "cancelled" }
+      ],
+      "submissions": [
+        { "id": "sub-1101", "bookingIds": ["bk-1101"], "daysAgo": 4, "status": "completed", "backendRef": "ORD-2026-001098" },
+        { "id": "sub-1102", "bookingIds": ["bk-1102"], "daysAgo": 2, "status": "completed", "backendRef": "ORD-2026-001127" },
+        { "id": "sub-1103", "bookingIds": ["bk-1103"], "daysAgo": 1, "status": "sent", "backendRef": "ORD-2026-001145" }
+      ]
+    },
+    {
+      "_note": "Global Bond, quota 2,000,000 USD.",
+      "productId": "gb-m1",
+      "proposals": [
+        { "id": "prp-1201", "clientId": "110004", "daysAgo": 2 }
+      ],
+      "bookings": [
+        { "id": "bk-1201", "clientId": "110001", "amount": 400000, "daysAgo": 3 },
+        { "id": "bk-1202", "clientId": "330201", "amount": 600000, "daysAgo": 2, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-1203", "clientId": "330202", "amount": 200000, "daysAgo": 1, "createdBy": "Korn Panitchpakdi" },
+        { "id": "bk-1204", "clientId": "110002", "amount": 150000, "daysAgo": 0 }
+      ],
+      "submissions": [
+        { "id": "sub-1201", "bookingIds": ["bk-1201"], "daysAgo": 3, "status": "completed", "backendRef": "ORD-2026-001112" },
+        { "id": "sub-1202", "bookingIds": ["bk-1202"], "daysAgo": 1, "status": "processing", "backendRef": "ORD-2026-001140" },
+        { "id": "sub-1203", "bookingIds": ["bk-1203"], "daysAgo": 0, "status": "sent", "backendRef": "ORD-2026-001171" },
+        { "id": "sub-1204", "bookingIds": ["bk-1204"], "daysAgo": 0, "status": "sent", "backendRef": "ORD-2026-001175" }
+      ]
+    },
+    {
+      "_note": "Global Bond, quota 1,000,000 USD, fully used — and entirely by other desks, so it is on no list of ours.",
+      "productId": "gb-c1",
+      "bookings": [
+        { "id": "bk-1301", "clientId": "220101", "amount": 600000, "daysAgo": 6, "createdBy": "Nalinee Vorakit" },
+        { "id": "bk-1302", "clientId": "330201", "amount": 400000, "daysAgo": 5, "createdBy": "Korn Panitchpakdi" }
+      ],
+      "submissions": [
+        { "id": "sub-1301", "bookingIds": ["bk-1301"], "daysAgo": 6, "status": "completed", "backendRef": "ORD-2026-001071" },
+        { "id": "sub-1302", "bookingIds": ["bk-1302"], "daysAgo": 5, "status": "completed", "backendRef": "ORD-2026-001083" }
+      ]
+    }
+  ],
+  "requirementRequests": [
+    {
+      "id": "rq-0101",
+      "clientId": "110002",
+      "productId": "sp-nvda-amzn-axp",
+      "keys": ["acknowledge"],
+      "daysAgo": 1,
+      "status": "sent"
+    },
+    {
+      "id": "rq-0105",
+      "clientId": "110002",
+      "productId": "asp-adbe-crm-now",
+      "keys": ["wealth"],
+      "daysAgo": 2,
+      "status": "sent"
+    },
+    {
+      "id": "rq-0103",
+      "clientId": "110007",
+      "productId": "thai-investment",
+      "keys": ["wealth", "acknowledge"],
+      "daysAgo": 1,
+      "status": "sent"
+    },
+    {
+      "id": "rq-0104",
+      "clientId": "110001",
+      "productId": "thai-sharing-economy",
+      "keys": ["acknowledge"],
+      "daysAgo": 3,
+      "status": "sent"
+    },
+    {
+      "id": "rq-0102",
+      "clientId": "110004",
+      "productId": "aapl-amzn-nflx",
+      "keys": ["acknowledge"],
+      "daysAgo": 2,
+      "status": "sent"
+    }
+  ]
+}

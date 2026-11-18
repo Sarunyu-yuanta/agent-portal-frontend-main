@@ -1,5 +1,7 @@
 {
   "110001": {
+    "accountNo": "11000122",
+    "nameTh": "ศรัณยู ศิริพัฒน์",
     "phone": "+66 81 234 5678",
     "email": "sarunyu.s@gmail.com",
     "lineId": "sarunyu.s",
@@ -13,11 +15,19 @@
     "relationshipSince": "Jan 2018",
     "referredBy": "Thanawat Boonmee",
     "familyMembers": [
-      { "relation": "Spouse", "name": "Wanida Siripat" },
-      { "relation": "Son", "name": "Natthawut Siripat" }
+      {
+        "relation": "Spouse",
+        "name": "Wanida Siripat"
+      },
+      {
+        "relation": "Son",
+        "name": "Natthawut Siripat"
+      }
     ]
   },
   "110002": {
+    "accountNo": "11000222",
+    "nameTh": "มาลี พงษ์พิพัฒน์",
     "phone": "+66 89 345 6789",
     "email": "malee.p@pongpipat.co.th",
     "birthday": "5 Jul 1968",
@@ -29,10 +39,15 @@
     "riskProfile": "Moderate",
     "relationshipSince": "Mar 2016",
     "familyMembers": [
-      { "relation": "Spouse", "name": "Krit Pongpipat" }
+      {
+        "relation": "Spouse",
+        "name": "Krit Pongpipat"
+      }
     ]
   },
   "110003": {
+    "accountNo": "11000322",
+    "nameTh": "ประวิทย์ สุวรรณรัตน์",
     "phone": "+66 92 456 7890",
     "email": "pravit.s@outlook.com",
     "lineId": "pravit_s",
@@ -46,6 +61,8 @@
     "relationshipSince": "Jun 2020"
   },
   "110004": {
+    "accountNo": "11000422",
+    "nameTh": "ณัฐพร ชัยวงศ์",
     "phone": "+66 84 567 8901",
     "email": "nattaporn.c@chaiwong.com",
     "lineId": "nattaporn_c",
@@ -59,11 +76,19 @@
     "relationshipSince": "Aug 2015",
     "referredBy": "Sarunyu Siripat",
     "familyMembers": [
-      { "relation": "Daughter", "name": "Pacharee Chaiwong" },
-      { "relation": "Son", "name": "Natthaphon Chaiwong" }
+      {
+        "relation": "Daughter",
+        "name": "Pacharee Chaiwong"
+      },
+      {
+        "relation": "Son",
+        "name": "Natthaphon Chaiwong"
+      }
     ]
   },
   "110005": {
+    "accountNo": "11000522",
+    "nameTh": "วิชัย ทองคำ",
     "phone": "+66 95 678 9012",
     "email": "wichai.t@thongkam.co.th",
     "birthday": "3 Sep 1965",
@@ -76,6 +101,8 @@
     "relationshipSince": "Nov 2012"
   },
   "110006": {
+    "accountNo": "11000622",
+    "nameTh": "ศิริพร ลดาวัลย์",
     "phone": "+66 86 789 0123",
     "email": "siriporn.l@gmail.com",
     "lineId": "siriporn_lad",
@@ -89,6 +116,8 @@
     "relationshipSince": "Apr 2019"
   },
   "110007": {
+    "accountNo": "11000722",
+    "nameTh": "ธนวัฒน์ บุญมี",
     "phone": "+66 81 890 1234",
     "email": "thanawat.b@boonmee.co.th",
     "lineId": "thanawat_b",
@@ -101,11 +130,19 @@
     "riskProfile": "Aggressive",
     "relationshipSince": "Feb 2014",
     "familyMembers": [
-      { "relation": "Spouse", "name": "Orathai Boonmee" },
-      { "relation": "Son", "name": "Teerapat Boonmee" }
+      {
+        "relation": "Spouse",
+        "name": "Orathai Boonmee"
+      },
+      {
+        "relation": "Son",
+        "name": "Teerapat Boonmee"
+      }
     ]
   },
   "110008": {
+    "accountNo": "11000822",
+    "nameTh": "กรรณิการ์ ศรีสุพรรณ",
     "phone": "+66 98 901 2345",
     "email": "kannika.s@kannikasri.com",
     "birthday": "8 Oct 1978",
@@ -118,6 +155,8 @@
     "relationshipSince": "Sep 2021"
   },
   "default": {
+    "accountNo": "—",
+    "nameTh": "—",
     "phone": "+66 80 000 0000",
     "email": "client@example.com",
     "birthday": "1 Jan 1980",

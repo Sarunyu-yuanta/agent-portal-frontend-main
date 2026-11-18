@@ -13,7 +13,10 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม", "รับประกันเงินต้น"],
+      "tags": [
+        "ใกล้เต็ม",
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-0.jpg",
         "/bond-logos/sp-1.jpg"
@@ -37,7 +40,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม"],
+      "tags": [
+        "ใกล้เต็ม"
+      ],
       "logos": [
         "/bond-logos/sp-2.jpg",
         "/bond-logos/sp-3.jpg",
@@ -62,7 +67,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม"],
+      "tags": [
+        "ใกล้เต็ม"
+      ],
       "logos": [
         "/bond-logos/sp-5.jpg",
         "/bond-logos/sp-6.jpg"
@@ -81,14 +88,16 @@
   ],
   "products": [
     {
-      "id": "sp-ko-wmt",
-      "underlying": "KO - WMT",
+      "id": "sp-msft-orcl",
+      "underlying": "MSFT - ORCL",
       "coupon": "14.22%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-0.jpg",
         "/bond-logos/sp-1.jpg"
@@ -105,14 +114,16 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "sp-aapl-amzn-nflx",
-      "underlying": "AAPL - AMZN - NFLX",
+      "id": "sp-tsla-rivn-lcid",
+      "underlying": "TSLA - RIVN - LCID",
       "coupon": "12.56%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม"],
+      "tags": [
+        "ใกล้เต็ม"
+      ],
       "logos": [
         "/bond-logos/sp-2.jpg",
         "/bond-logos/sp-3.jpg",
@@ -130,14 +141,17 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "sp-sawad-ptt",
-      "underlying": "SAWAD - PTT",
+      "id": "sp-pttep-banpu",
+      "underlying": "PTTEP - BANPU",
       "coupon": "13.98%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม", "รับประกันเงินต้น"],
+      "tags": [
+        "ใกล้เต็ม",
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-5.jpg",
         "/bond-logos/sp-6.jpg"
@@ -161,7 +175,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-7.jpg",
         "/bond-logos/sp-3.jpg",
@@ -202,18 +218,70 @@
       "updatedAt": "10 Sep 2026 - 09:00",
       "requestNotionalSize": "100,000 / 100,000",
       "confirmedRequest": "0 / 100,000"
+    },
+    {
+      "id": "sp-googl-msft-crm",
+      "underlying": "GOOGL - MSFT - CRM",
+      "coupon": "9.80%",
+      "tenor": "6 เดือน",
+      "ko": "100.00%",
+      "strike": "85.00%",
+      "ki": "65.00%",
+      "tags": [],
+      "logos": [
+        "/bond-logos/sp-2.jpg",
+        "/bond-logos/sp-5.jpg",
+        "/bond-logos/sp-7.jpg"
+      ],
+      "offerDate": "9 Feb 2029",
+      "couponPeriod": "ทุก 3 เดือน",
+      "detailTenor": "12 เดือน",
+      "productName": "Global FCN",
+      "productType": "Yield Enhancement",
+      "currency": "USD",
+      "minInvestment": "10,000 USD",
+      "updatedAt": "10 Sep 2026 - 09:00",
+      "requestNotionalSize": "100,000 / 100,000",
+      "confirmedRequest": "0 / 100,000"
+    },
+    {
+      "id": "sp-amd-mu-avgo",
+      "underlying": "AMD - MU - AVGO",
+      "coupon": "13.20%",
+      "tenor": "6 เดือน",
+      "ko": "100.00%",
+      "strike": "80.00%",
+      "ki": "60.00%",
+      "tags": [],
+      "logos": [
+        "/bond-logos/sp-4.jpg",
+        "/bond-logos/sp-6.jpg",
+        "/bond-logos/sp-1.jpg"
+      ],
+      "offerDate": "9 Feb 2029",
+      "couponPeriod": "ทุก 3 เดือน",
+      "detailTenor": "12 เดือน",
+      "productName": "Global FCN",
+      "productType": "Yield Enhancement",
+      "currency": "USD",
+      "minInvestment": "10,000 USD",
+      "updatedAt": "10 Sep 2026 - 09:00",
+      "requestNotionalSize": "100,000 / 100,000",
+      "confirmedRequest": "0 / 100,000"
     }
   ],
   "allProductsBase": [
     {
-      "id": "asp-aapl-amzn-nflx",
-      "underlying": "AAPL - AMZN - NFLX",
+      "id": "asp-jpm-bac-gs",
+      "underlying": "JPM - BAC - GS",
       "coupon": "30.00%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-2.jpg",
         "/bond-logos/sp-3.jpg",
@@ -231,14 +299,17 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "asp-sawad-ptt",
-      "underlying": "SAWAD - PTT",
+      "id": "asp-cpall-bdms",
+      "underlying": "CPALL - BDMS",
       "coupon": "27.45%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม", "รับประกันเงินต้น"],
+      "tags": [
+        "ใกล้เต็ม",
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-5.jpg",
         "/bond-logos/sp-6.jpg"
@@ -255,8 +326,8 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "asp-nasdaq-amzn-nflx",
-      "underlying": "Nasdaq - AMZN - NFLX",
+      "id": "asp-dis-nke-sbux",
+      "underlying": "DIS - NKE - SBUX",
       "coupon": "25.89%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
@@ -280,14 +351,17 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "asp-ko-wmt",
-      "underlying": "KO - WMT",
+      "id": "asp-cost-tgt",
+      "underlying": "COST - TGT",
       "coupon": "28.33%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม", "รับประกันเงินต้น"],
+      "tags": [
+        "ใกล้เต็ม",
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-0.jpg",
         "/bond-logos/sp-1.jpg"
@@ -304,14 +378,16 @@
       "confirmedRequest": "0 / 100,000"
     },
     {
-      "id": "asp-nvda-amzn-axp",
-      "underlying": "NVDA - AMZN - AXP",
+      "id": "asp-adbe-crm-now",
+      "underlying": "ADBE - CRM - NOW",
       "coupon": "24.12%",
       "tenor": "6 เดือน",
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-8.jpg",
         "/bond-logos/sp-3.jpg",
@@ -338,7 +414,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-2.jpg",
         "/bond-logos/sp-3.jpg",
@@ -388,7 +466,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["รับประกันเงินต้น"],
+      "tags": [
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-8.jpg",
         "/bond-logos/sp-3.jpg",
@@ -413,7 +493,10 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม", "รับประกันเงินต้น"],
+      "tags": [
+        "ใกล้เต็ม",
+        "รับประกันเงินต้น"
+      ],
       "logos": [
         "/bond-logos/sp-0.jpg",
         "/bond-logos/sp-1.jpg"
@@ -437,7 +520,9 @@
       "ko": "100.00%",
       "strike": "80.00%",
       "ki": "60.00%",
-      "tags": ["ใกล้เต็ม"],
+      "tags": [
+        "ใกล้เต็ม"
+      ],
       "logos": [
         "/bond-logos/sp-5.jpg",
         "/bond-logos/sp-6.jpg"

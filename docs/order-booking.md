@@ -252,15 +252,19 @@ caret เปิดเมนู 3 ช่องทาง (SMS / LINE / นัด�
 
 ---
 
-## ⚠️ สองจุดที่ต้องเปลี่ยนตอนต่อ backend
+## ⚠️ สามจุดที่ต้องเปลี่ยนตอนต่อ backend
 
-ทั้งคู่อยู่ใน [`src/contexts/orders-context.tsx`](../src/contexts/orders-context.tsx)
+ทั้งสามอยู่ใน [`src/contexts/orders-context.tsx`](../src/contexts/orders-context.tsx)
 และมีคอมเมนต์กำกับไว้ที่ตัวมันเอง
 
 | ค่าคงที่ | จำลองอะไร | ของจริงคือ |
 | --- | --- | --- |
 | `REQUIREMENT_TURNAROUND_MS` (15 วิ) | ลูกค้าไปกรอกฟอร์มในระบบอื่นจนเสร็จ | webhook หรือ poll ระบบนั้น |
-| `SUBMISSION_TURNAROUND_MS` (12 วิ) | ระบบหลังบ้านรับคำสั่งซื้อ | สถานะบน order record ที่ส่งกลับมา |
+| `BACKOFFICE_PICKUP_MS` (10 วิ) | ระบบหลังบ้านรับงาน — เก็บ basket ที่ครบ หรือเริ่มทำ bond order ที่ IC ส่งมา | job ฝั่งหลังบ้าน หรือ webhook ที่แอปนี้รับ |
+| `SUBMISSION_TURNAROUND_MS` (12 วิ) | ระบบหลังบ้านตอบผลคำสั่งซื้อ | สถานะบน order record ที่ส่งกลับมา |
+
+`sendProposal` (ส่ง Offer) ยังไม่ได้ส่งอะไรจริง — ไม่มีบริการ YSInvest / Email / LINE /
+Voice AI ต่ออยู่ แค่บันทึก log ที่ใช้วัดผล Offer ไว้ ต่อบริการจริงเมื่อไหร่ แก้ที่ฟังก์ชันนี้ที่เดียว
 
 ทุก mutator เป็น `async` และทุกที่เรียกใช้ `await` อยู่แล้ว — เปลี่ยนเป็น endpoint จริง
 แก้ไฟล์นี้ไฟล์เดียว `isLoading` อยู่ใน contract และเป็น `false` ตลอด ด้วยเหตุผลเดียวกับ

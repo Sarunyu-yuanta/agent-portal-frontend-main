@@ -1,0 +1,263 @@
+[
+  {
+    "id": "ra-01",
+    "kind": "margin-call",
+    "severity": "critical",
+    "ruleCode": "MR-02",
+    "clientId": "110005",
+    "accountLabel": "Margin Trading a/c 11000522",
+    "title": "Margin Call — หลักประกันต่ำกว่าเกณฑ์รักษา",
+    "message": "อัตราหลักประกันของบัญชีมาร์จิ้นลดลงต่ำกว่าเกณฑ์รักษา 35% ต้องวางหลักประกันเพิ่มภายในรอบที่กำหนด มิฉะนั้นระบบจะบังคับขายอัตโนมัติ",
+    "metrics": [
+      { "label": "อัตราหลักประกัน", "value": "27.4%", "emphasis": true },
+      { "label": "เกณฑ์รักษา (Maintenance)", "value": "35.0%" },
+      { "label": "ต้องวางหลักประกันเพิ่ม", "amountThb": 2140000, "emphasis": true },
+      { "label": "มูลค่าหลักทรัพย์ในบัญชี", "amountThb": 18300000 },
+      { "label": "กำหนดวางหลักประกัน", "value": "14:30 น." }
+    ],
+    "recommendedAction": "โทรแจ้งลูกค้าให้โอนเงินเข้าบัญชีมาร์จิ้นก่อนรอบ 14:30 น. หรือยืนยันรายการขายบางส่วนเพื่อคืนอัตราหลักประกัน",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": false,
+    "detectedMinutesAgo": 215,
+    "dueOffset": 0
+  },
+  {
+    "id": "ra-02",
+    "kind": "force-sell",
+    "severity": "warning",
+    "ruleCode": "MR-04",
+    "clientId": "110001",
+    "accountLabel": "Margin Trading a/c 11000122",
+    "title": "เตือน Force Sell — เหลือระยะห่างจากจุดบังคับขาย 0.6%",
+    "message": "อัตราหลักประกันอยู่เหนือจุดบังคับขายเพียงเล็กน้อย หาก PTT ปรับลดอีกประมาณ 2.3% บัญชีจะเข้าเกณฑ์บังคับขายในรอบถัดไป หลักทรัพย์ที่วางเป็นหลักประกันกระจุกอยู่ในตัวเดียว",
+    "metrics": [
+      { "label": "อัตราหลักประกัน", "value": "25.6%", "emphasis": true },
+      { "label": "จุดบังคับขาย", "value": "25.0%", "emphasis": true },
+      { "label": "ราคา PTT ที่ทริกเกอร์", "value": "฿ 31.25" },
+      { "label": "มูลค่าในบัญชีมาร์จิ้น", "amountThb": 33600000 },
+      { "label": "รอบบังคับขาย", "value": "10:00 น." }
+    ],
+    "recommendedAction": "แจ้งลูกค้าวันนี้ และเสนอวางหลักประกันเพิ่มประมาณ ฿ 2,120,000 เพื่อถอยกลับไปที่ระดับ 30%",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 150,
+    "dueOffset": 1
+  },
+  {
+    "id": "ra-03",
+    "kind": "settlement-overdue",
+    "severity": "warning",
+    "ruleCode": "CR-01",
+    "clientId": "110003",
+    "accountLabel": "Cash a/c 11000322",
+    "title": "ค้างชำระค่าซื้อหลักทรัพย์ T+2",
+    "message": "รายการซื้อ SET50 ETF ครบกำหนดชำระ T+2 แล้วแต่ยังไม่ได้รับชำระ เงินในบัญชีส่วนใหญ่อยู่ใน Money Market Fund ซึ่งต้องขายก่อนจึงจะนำมาชำระได้ บัญชีถูกระงับการส่งคำสั่งซื้อจนกว่าจะชำระครบ",
+    "metrics": [
+      { "label": "ยอดค้างชำระ", "amountThb": 1250000, "emphasis": true },
+      { "label": "เงินสดพร้อมชำระ", "amountThb": 180000, "emphasis": true },
+      { "label": "เงินใน MMF (ต้องขายก่อน)", "amountThb": 7420000 },
+      { "label": "วงเงินคงเหลือ", "amountThb": 3234043 }
+    ],
+    "recommendedAction": "ติดต่อลูกค้าให้ขาย MMF ประมาณ ฿ 1,100,000 หรือโอนเงินเข้าบัญชีวันนี้ ก่อนถูกส่งรายชื่อเข้า Suspension List",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 1150,
+    "dueOffset": -1
+  },
+  {
+    "id": "ra-04",
+    "kind": "credit-limit",
+    "severity": "warning",
+    "ruleCode": "CR-03",
+    "clientId": "110008",
+    "accountLabel": "Cash Balance a/c 11000822",
+    "title": "คำสั่งซื้อรวมวันนี้เกินวงเงินที่อนุมัติ",
+    "message": "มูลค่าคำสั่งซื้อรวมของวันนี้สูงกว่าวงเงินคงเหลือ ส่วนที่เกินจะถูกปฏิเสธเมื่อถึงรอบ Pre-open รอบถัดไป ทั้งที่ลูกค้ามีเงินสดพักอยู่ในบัญชีมากพออยู่แล้ว",
+    "metrics": [
+      { "label": "มูลค่าคำสั่งซื้อวันนี้", "amountThb": 9200000, "emphasis": true },
+      { "label": "วงเงินคงเหลือ", "amountThb": 7489362 },
+      { "label": "ส่วนที่เกินวงเงิน", "amountThb": 1710638, "emphasis": true },
+      { "label": "เงินสดพักในบัญชี", "amountThb": 61600000 }
+    ],
+    "recommendedAction": "เสนอลูกค้าโอนเงินสดพัก ฿ 2,000,000 เข้าบัญชีซื้อขาย หรือลดคำสั่งซื้อลงก่อนรอบ Pre-open",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 75,
+    "dueOffset": 0
+  },
+  {
+    "id": "ra-10",
+    "kind": "concentration",
+    "severity": "warning",
+    "ruleCode": "SU-05",
+    "clientId": "110001",
+    "accountLabel": null,
+    "title": "Concentration Risk — PTT 18.9% ของพอร์ต",
+    "message": "สัดส่วนการถือ PTT PCL เกินเพดานหลักทรัพย์เดี่ยวที่ 15% ของมูลค่าพอร์ตรวม และหลักทรัพย์เดียวกันนี้ยังถูกใช้เป็นหลักประกันในบัญชีมาร์จิ้นด้วย ความเสี่ยงจึงซ้อนกันสองชั้น",
+    "metrics": [
+      { "label": "สัดส่วน PTT ในพอร์ต", "value": "18.9%", "emphasis": true },
+      { "label": "เพดานหลักทรัพย์เดี่ยว", "value": "15.0%" },
+      { "label": "มูลค่าที่ควรลด", "amountThb": 17550000, "emphasis": true },
+      { "label": "มูลค่าพอร์ตรวม", "amountThb": 450000000 }
+    ],
+    "recommendedAction": "เสนอลดสัดส่วน PTT และกระจายเข้ากองทุนตาม House View ล่าสุด โดยดูผลกระทบต่อหลักประกันในบัญชีมาร์จิ้นประกอบ",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 2950,
+    "dueOffset": null
+  },
+  {
+    "id": "ra-11",
+    "kind": "suitability-expired",
+    "severity": "warning",
+    "ruleCode": "SU-01",
+    "clientId": "110002",
+    "accountLabel": null,
+    "title": "แบบประเมิน Suitability ใกล้ครบกำหนดทบทวน",
+    "message": "แบบประเมินความเหมาะสมในการลงทุนของลูกค้าใกล้ครบรอบทบทวน เมื่อหมดอายุจะไม่สามารถส่งคำสั่งซื้อผลิตภัณฑ์ที่มีระดับความเสี่ยงสูงกว่าระดับ 4 ได้",
+    "metrics": [
+      { "label": "ผลประเมินล่าสุด", "value": "{riskProfile}", "emphasis": true },
+      { "label": "ระดับความเสี่ยงที่รับได้", "value": "ระดับ 4" },
+      { "label": "ผลิตภัณฑ์ที่จะถูกบล็อก", "value": "2 รายการ" }
+    ],
+    "recommendedAction": "นัดลูกค้าทำแบบประเมินใหม่ผ่าน Risk Consent ก่อนวันครบกำหนด",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 5700,
+    "dueOffset": 5
+  },
+  {
+    "id": "ra-12",
+    "kind": "concentration",
+    "severity": "warning",
+    "ruleCode": "SU-05",
+    "clientId": "110004",
+    "accountLabel": null,
+    "title": "Concentration Risk — NVDA 20.0% ของพอร์ต",
+    "message": "สัดส่วนการถือ Nvidia Corp (NVDA) เกินเพดานหลักทรัพย์เดี่ยวที่ 15% และเมื่อรวมกับ Asia Growth ETF ซึ่งมีน้ำหนักในกลุ่ม Semiconductor สูง ความกระจุกตัวในกลุ่มอุตสาหกรรมเดียวจึงสูงกว่าที่ House View แนะนำ",
+    "metrics": [
+      { "label": "สัดส่วน NVDA ในพอร์ต", "value": "20.0%", "emphasis": true },
+      { "label": "เพดานหลักทรัพย์เดี่ยว", "value": "15.0%" },
+      { "label": "มูลค่าที่ควรลด", "amountThb": 31000000, "emphasis": true },
+      { "label": "มูลค่าพอร์ตรวม", "amountThb": 620000000 }
+    ],
+    "recommendedAction": "เสนอขายบางส่วนหรือทำ Collar เพื่อลดความกระจุกตัวก่อนรอบประกาศผลประกอบการ",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 1500,
+    "dueOffset": null
+  },
+  {
+    "id": "ra-13",
+    "kind": "risk-profile-breach",
+    "severity": "warning",
+    "ruleCode": "SU-03",
+    "clientId": "110006",
+    "accountLabel": null,
+    "title": "ผลิตภัณฑ์เสี่ยงเกินระดับความเสี่ยงที่ลูกค้ารับได้",
+    "message": "มีการเสนอ FCN อ้างอิง NVDA / TSLA ซึ่งเป็นผลิตภัณฑ์ระดับความเสี่ยง 8 ให้กับลูกค้าที่ประเมินได้ระดับ {riskProfile} ระบบบล็อกการจองซื้อไว้จนกว่าจะมีการอนุมัติ Override จากหัวหน้าทีม",
+    "metrics": [
+      { "label": "ระดับความเสี่ยงผลิตภัณฑ์", "value": "8 — เสี่ยงสูงมาก", "emphasis": true },
+      { "label": "ระดับที่ลูกค้ารับได้", "value": "{riskProfile}", "emphasis": true },
+      { "label": "มูลค่าคำสั่งที่ถูกบล็อก", "amountThb": 5000000 }
+    ],
+    "recommendedAction": "คงสถานะบล็อกไว้ หรือเสนอผลิตภัณฑ์ที่ \"รับประกันเงินต้น\" แทน — การขอ Override ต้องผ่านหัวหน้าทีม",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": false,
+    "detectedMinutesAgo": 95,
+    "dueOffset": 3
+  },
+  {
+    "id": "ra-14",
+    "kind": "cash-balance-stock",
+    "severity": "watch",
+    "ruleCode": "MC-01",
+    "clientId": "110007",
+    "accountLabel": "Cash Balance a/c 11000722",
+    "title": "หุ้นในพอร์ตถูกประกาศใช้มาตรการ Cash Balance",
+    "message": "DELTA ถูกประกาศใช้มาตรการกำกับการซื้อขายระดับ 1 มีผลตั้งแต่รอบซื้อขายถัดไป ลูกค้าถือครองอยู่และจะต้องวางเงินสดเต็มจำนวนก่อนส่งคำสั่งซื้อเพิ่ม",
+    "metrics": [
+      { "label": "มูลค่าที่ถือครอง", "amountThb": 36000000, "emphasis": true },
+      { "label": "สัดส่วนของพอร์ต", "value": "4.0%" },
+      { "label": "ระดับมาตรการ", "value": "ระดับ 1 — Cash Balance" }
+    ],
+    "recommendedAction": "แจ้งลูกค้าว่าคำสั่งซื้อเพิ่มต้องวางเงินสดเต็มจำนวน และทบทวนว่าจะถือต่อหรือลดสัดส่วน",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 1080,
+    "dueOffset": null
+  },
+  {
+    "id": "ra-15",
+    "kind": "price-band",
+    "severity": "warning",
+    "ruleCode": "MC-04",
+    "clientId": "110004",
+    "accountLabel": null,
+    "title": "ส่งคำสั่งซื้อใกล้ราคา Ceiling ผิดปกติ",
+    "message": "ส่งคำสั่งซื้อ BANPU ที่ราคา Ceiling ซ้ำหลายครั้งในช่วง 10 นาทีก่อนปิดตลาด แล้วยกเลิกเกือบทั้งหมด เข้าข่ายการส่งคำสั่งที่อาจทำให้ราคาปิดไม่เป็นไปตามสภาพปกติของตลาด",
+    "metrics": [
+      { "label": "คำสั่งที่ราคา Ceiling", "value": "12 ครั้ง", "emphasis": true },
+      { "label": "ยกเลิกภายหลัง", "value": "10 ครั้ง", "emphasis": true },
+      { "label": "ช่วงเวลา", "value": "10 นาทีก่อนปิดตลาด" },
+      { "label": "หลักทรัพย์", "value": "BANPU" }
+    ],
+    "recommendedAction": "บันทึกคำชี้แจงจากลูกค้าและส่งข้อมูลให้ฝ่ายกำกับภายใน 1 วันทำการ",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": false,
+    "detectedMinutesAgo": 1100,
+    "dueOffset": null
+  },
+  {
+    "id": "ra-16",
+    "kind": "wash-trade",
+    "severity": "critical",
+    "ruleCode": "MC-02",
+    "clientId": "110007",
+    "accountLabel": null,
+    "title": "ซื้อขายจับคู่กันเอง (Wash Trade)",
+    "message": "พบการจับคู่ซื้อขาย GULF ระหว่างบัญชีของลูกค้ากับบัญชีบุคคลที่เกี่ยวข้อง ราคาและปริมาณตรงกันภายในเวลาไม่กี่วินาที โดยไม่มีการเปลี่ยนแปลงผู้ถือครองที่แท้จริง",
+    "metrics": [
+      { "label": "คู่รายการที่จับคู่กันเอง", "value": "6 คู่", "emphasis": true },
+      { "label": "มูลค่ารวม", "amountThb": 18200000, "emphasis": true },
+      { "label": "ส่วนต่างเวลาเฉลี่ย", "value": "1.8 วินาที" },
+      { "label": "หลักทรัพย์", "value": "GULF" }
+    ],
+    "recommendedAction": "ส่งเรื่องให้ฝ่ายกำกับทันที และระงับการรับคำสั่งในหลักทรัพย์นี้จนกว่าจะได้ข้อสรุป",
+    "contactAllowed": false,
+    "contactNote": "อยู่ระหว่างการสอบสวนของฝ่ายกำกับ ห้ามติดต่อลูกค้าเรื่องนี้เอง",
+    "dismissible": false,
+    "detectedMinutesAgo": 45,
+    "dueOffset": null
+  },
+  {
+    "id": "ra-17",
+    "kind": "suitability-expired",
+    "severity": "watch",
+    "ruleCode": "SU-01",
+    "clientId": "110007",
+    "accountLabel": null,
+    "title": "แบบประเมิน Suitability ครบรอบทบทวน 2 ปี",
+    "message": "แบบประเมินความเหมาะสมในการลงทุนครบรอบทบทวน 2 ปี ลูกค้ามีผลิตภัณฑ์ความเสี่ยงสูงถืออยู่หลายรายการ จึงควรทบทวนก่อนครบกำหนด",
+    "metrics": [
+      { "label": "ผลประเมินล่าสุด", "value": "{riskProfile}", "emphasis": true },
+      { "label": "ผลิตภัณฑ์เสี่ยงสูงที่ถืออยู่", "value": "3 รายการ" }
+    ],
+    "recommendedAction": "นัดทบทวนแบบประเมินผ่าน Risk Consent ในรอบการพบลูกค้าครั้งถัดไป",
+    "contactAllowed": true,
+    "contactNote": null,
+    "dismissible": true,
+    "detectedMinutesAgo": 7100,
+    "dueOffset": 12
+  }
+]

@@ -1,53 +1,251 @@
 {
   "หุ้นไทย": [
-    { "id": "ptt", "name": "PTT Public Co.", "ticker": "PTT", "clientCount": 6, "totalAmountThb": 99000000 },
-    { "id": "advanc", "name": "Advanced Info Service", "ticker": "ADVANC", "clientCount": 5, "totalAmountThb": 87800000 },
-    { "id": "kbank", "name": "กสิกรไทย", "ticker": "KBANK", "clientCount": 5, "totalAmountThb": 74500000 },
-    { "id": "aot", "name": "ท่าอากาศยานไทย", "ticker": "AOT", "clientCount": 4, "totalAmountThb": 68200000 },
-    { "id": "scb", "name": "ไทยพาณิชย์", "ticker": "SCB", "clientCount": 4, "totalAmountThb": 62000000 },
-    { "id": "cpall", "name": "ซีพีออลล์", "ticker": "CPALL", "clientCount": 3, "totalAmountThb": 51100000 },
-    { "id": "tisco", "name": "ทิสโก้ ไฟแนนเชียล", "ticker": "TISCO", "clientCount": 2, "totalAmountThb": 39400000 }
+    {
+      "id": "ptt",
+      "name": "PTT Public Co.",
+      "ticker": "PTT",
+      "clientCount": 6,
+      "totalAmountThb": 99000000
+    },
+    {
+      "id": "advanc",
+      "name": "Advanced Info Service",
+      "ticker": "ADVANC",
+      "clientCount": 5,
+      "totalAmountThb": 87800000
+    },
+    {
+      "id": "kbank",
+      "name": "กสิกรไทย",
+      "ticker": "KBANK",
+      "clientCount": 5,
+      "totalAmountThb": 74500000
+    },
+    {
+      "id": "aot",
+      "name": "ท่าอากาศยานไทย",
+      "ticker": "AOT",
+      "clientCount": 4,
+      "totalAmountThb": 68200000
+    },
+    {
+      "id": "scb",
+      "name": "ไทยพาณิชย์",
+      "ticker": "SCB",
+      "clientCount": 4,
+      "totalAmountThb": 62000000
+    },
+    {
+      "id": "cpall",
+      "name": "ซีพีออลล์",
+      "ticker": "CPALL",
+      "clientCount": 3,
+      "totalAmountThb": 51100000
+    },
+    {
+      "id": "tisco",
+      "name": "ทิสโก้ ไฟแนนเชียล",
+      "ticker": "TISCO",
+      "clientCount": 2,
+      "totalAmountThb": 39400000
+    }
   ],
   "หุ้นต่างประเทศ": [
-    { "id": "aapl", "name": "Apple Inc.", "ticker": "AAPL", "clientCount": 7, "totalAmountThb": 112000000 },
-    { "id": "msft", "name": "Microsoft Corp.", "ticker": "MSFT", "clientCount": 6, "totalAmountThb": 98500000 },
-    { "id": "nvda", "name": "NVIDIA Corp.", "ticker": "NVDA", "clientCount": 5, "totalAmountThb": 87300000 },
-    { "id": "amzn", "name": "Amazon.com Inc.", "ticker": "AMZN", "clientCount": 4, "totalAmountThb": 72000000 },
-    { "id": "tsla", "name": "Tesla Inc.", "ticker": "TSLA", "clientCount": 3, "totalAmountThb": 63200000 },
-    { "id": "meta", "name": "Meta Platforms", "ticker": "META", "clientCount": 3, "totalAmountThb": 55000000 },
-    { "id": "googl", "name": "Alphabet Inc.", "ticker": "GOOGL", "clientCount": 2, "totalAmountThb": 44000000 }
+    {
+      "id": "aapl",
+      "name": "Apple Inc.",
+      "ticker": "AAPL",
+      "clientCount": 7,
+      "totalAmountThb": 112000000
+    },
+    {
+      "id": "msft",
+      "name": "Microsoft Corp.",
+      "ticker": "MSFT",
+      "clientCount": 6,
+      "totalAmountThb": 98500000
+    },
+    {
+      "id": "nvda",
+      "name": "NVIDIA Corp.",
+      "ticker": "NVDA",
+      "clientCount": 5,
+      "totalAmountThb": 87300000
+    },
+    {
+      "id": "amzn",
+      "name": "Amazon.com Inc.",
+      "ticker": "AMZN",
+      "clientCount": 4,
+      "totalAmountThb": 72000000
+    },
+    {
+      "id": "tsla",
+      "name": "Tesla Inc.",
+      "ticker": "TSLA",
+      "clientCount": 3,
+      "totalAmountThb": 63200000
+    },
+    {
+      "id": "meta",
+      "name": "Meta Platforms",
+      "ticker": "META",
+      "clientCount": 3,
+      "totalAmountThb": 55000000
+    },
+    {
+      "id": "googl",
+      "name": "Alphabet Inc.",
+      "ticker": "GOOGL",
+      "clientCount": 2,
+      "totalAmountThb": 44000000
+    }
   ],
   "หุ้นกู้ที่มีอนุพันธ์แฝง": [
-    { "id": "kbank-sp1", "name": "KBANK Barrier Reverse Conv.", "ticker": "KBANK-SP1", "clientCount": 5, "totalAmountThb": 80000000 },
-    { "id": "scb-sp2", "name": "SCB Capital Protected Note", "ticker": "SCB-SP2", "clientCount": 4, "totalAmountThb": 65000000 },
-    { "id": "bbl-sp3", "name": "BBL ELN USD/THB", "ticker": "BBL-SP3", "clientCount": 3, "totalAmountThb": 48000000 },
-    { "id": "gs-sp5", "name": "GS Autocall Note", "ticker": "GS-SP5", "clientCount": 4, "totalAmountThb": 40000000 },
-    { "id": "kr-sp4", "name": "Krungthai ELN SET50", "ticker": "KR-SP4", "clientCount": 2, "totalAmountThb": 33000000 }
+    {
+      "id": "kbank-sp1",
+      "name": "KBANK Barrier Reverse Conv.",
+      "ticker": "KBANK-SP1",
+      "clientCount": 5,
+      "totalAmountThb": 80000000
+    },
+    {
+      "id": "scb-sp2",
+      "name": "SCB Capital Protected Note",
+      "ticker": "SCB-SP2",
+      "clientCount": 4,
+      "totalAmountThb": 65000000
+    },
+    {
+      "id": "bbl-sp3",
+      "name": "BBL ELN USD/THB",
+      "ticker": "BBL-SP3",
+      "clientCount": 3,
+      "totalAmountThb": 48000000
+    },
+    {
+      "id": "gs-sp5",
+      "name": "GS Autocall Note",
+      "ticker": "GS-SP5",
+      "clientCount": 4,
+      "totalAmountThb": 40000000
+    },
+    {
+      "id": "kr-sp4",
+      "name": "Krungthai ELN SET50",
+      "ticker": "KR-SP4",
+      "clientCount": 2,
+      "totalAmountThb": 33000000
+    }
   ],
   "กองทุนรวม": [
-    { "id": "kf-star", "name": "KF-STAR กสิกรไทย", "clientCount": 6, "totalAmountThb": 56000000 },
-    { "id": "mfc-hi", "name": "MFC Hi-Dividend", "clientCount": 5, "totalAmountThb": 44300000 },
-    { "id": "scb-mid", "name": "SCBMID Mid-Small Cap", "clientCount": 5, "totalAmountThb": 38700000 },
-    { "id": "one-fin", "name": "ONE-FINTECH", "clientCount": 3, "totalAmountThb": 43200000 },
-    { "id": "kkp-robo", "name": "KKP Robo Wealth", "clientCount": 4, "totalAmountThb": 29800000 }
+    {
+      "id": "kf-star",
+      "name": "KF-STAR กสิกรไทย",
+      "clientCount": 6,
+      "totalAmountThb": 56000000
+    },
+    {
+      "id": "mfc-hi",
+      "name": "MFC Hi-Dividend",
+      "clientCount": 5,
+      "totalAmountThb": 44300000
+    },
+    {
+      "id": "scb-mid",
+      "name": "SCBMID Mid-Small Cap",
+      "clientCount": 5,
+      "totalAmountThb": 38700000
+    },
+    {
+      "id": "one-fin",
+      "name": "ONE-FINTECH",
+      "clientCount": 3,
+      "totalAmountThb": 43200000
+    },
+    {
+      "id": "kkp-robo",
+      "name": "KKP Robo Wealth",
+      "clientCount": 4,
+      "totalAmountThb": 29800000
+    }
   ],
   "ตราสารหนี้": [
-    { "id": "gov-5y", "name": "พันธบัตรรัฐบาล 5 ปี", "clientCount": 7, "totalAmountThb": 47900000 },
-    { "id": "kbank-2y", "name": "หุ้นกู้ KBANK 2 ปี", "clientCount": 5, "totalAmountThb": 45200000 },
-    { "id": "scb-3y", "name": "หุ้นกู้ SCB 3 ปี", "clientCount": 4, "totalAmountThb": 36500000 },
-    { "id": "cpall-bd", "name": "หุ้นกู้ CPALL 3.5%", "clientCount": 3, "totalAmountThb": 30000000 }
+    {
+      "id": "gov-5y",
+      "name": "พันธบัตรรัฐบาล 5 ปี",
+      "clientCount": 7,
+      "totalAmountThb": 47900000
+    },
+    {
+      "id": "kbank-2y",
+      "name": "หุ้นกู้ KBANK 2 ปี",
+      "clientCount": 5,
+      "totalAmountThb": 45200000
+    },
+    {
+      "id": "scb-3y",
+      "name": "หุ้นกู้ SCB 3 ปี",
+      "clientCount": 4,
+      "totalAmountThb": 36500000
+    },
+    {
+      "id": "cpall-bd",
+      "name": "หุ้นกู้ CPALL 3.5%",
+      "clientCount": 3,
+      "totalAmountThb": 30000000
+    }
   ],
   "อนุพันธ์": [
-    { "id": "set50-fut", "name": "SET50 Index Futures", "clientCount": 4, "totalAmountThb": 32000000 },
-    { "id": "gold-fut", "name": "Gold Futures (GF)", "clientCount": 3, "totalAmountThb": 18500000 },
-    { "id": "oil-fut", "name": "Brent Crude Futures", "clientCount": 2, "totalAmountThb": 15300000 },
-    { "id": "usd-opt", "name": "USD/THB Currency Option", "clientCount": 2, "totalAmountThb": 14000000 }
+    {
+      "id": "set50-fut",
+      "name": "SET50 Index Futures",
+      "clientCount": 4,
+      "totalAmountThb": 32000000
+    },
+    {
+      "id": "gold-fut",
+      "name": "Gold Futures (GF)",
+      "clientCount": 3,
+      "totalAmountThb": 18500000
+    },
+    {
+      "id": "oil-fut",
+      "name": "Brent Crude Futures",
+      "clientCount": 2,
+      "totalAmountThb": 15300000
+    },
+    {
+      "id": "usd-opt",
+      "name": "USD/THB Currency Option",
+      "clientCount": 2,
+      "totalAmountThb": 14000000
+    }
   ],
   "ตราสารหนี้ต่างประเทศ": [
-    { "id": "us-10y", "name": "US Treasury 10Y", "clientCount": 5, "totalAmountThb": 10200000 },
-    { "id": "hsbc-28", "name": "HSBC Bond 2028", "clientCount": 4, "totalAmountThb": 8700000 },
-    { "id": "jgb-5y", "name": "Japan Govt Bond 5Y", "clientCount": 2, "totalAmountThb": 5100000 },
-    { "id": "bund-7y", "name": "German Bund 7Y", "clientCount": 1, "totalAmountThb": 2600000 }
-  ],
-  "เงินสด": []
+    {
+      "id": "us-10y",
+      "name": "US Treasury 10Y",
+      "clientCount": 5,
+      "totalAmountThb": 10200000
+    },
+    {
+      "id": "hsbc-28",
+      "name": "HSBC Bond 2028",
+      "clientCount": 4,
+      "totalAmountThb": 8700000
+    },
+    {
+      "id": "jgb-5y",
+      "name": "Japan Govt Bond 5Y",
+      "clientCount": 2,
+      "totalAmountThb": 5100000
+    },
+    {
+      "id": "bund-7y",
+      "name": "German Bund 7Y",
+      "clientCount": 1,
+      "totalAmountThb": 2600000
+    }
+  ]
 }

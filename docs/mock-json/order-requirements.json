@@ -1,0 +1,10 @@
+[
+  { "clientId": "110001", "wealth": "passed", "acknowledge": "passed" },
+  { "clientId": "110002", "wealth": "passed", "acknowledge": "missing" },
+  { "clientId": "110003", "wealth": "missing", "acknowledge": "missing" },
+  { "clientId": "110004", "wealth": "passed", "acknowledge": "pending" },
+  { "clientId": "110005", "wealth": "expired", "acknowledge": "passed" },
+  { "clientId": "110006", "wealth": "missing", "acknowledge": "passed" },
+  { "clientId": "110007", "wealth": "passed", "acknowledge": "passed" },
+  { "clientId": "110008", "wealth": "passed", "acknowledge": "pending" }
+]

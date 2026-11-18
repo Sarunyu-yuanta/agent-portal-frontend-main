@@ -1,12 +1,48 @@
 {
   "gapItems": [
-    { "label": "Revenue Shortfall", "value": "฿5.8M", "sub": "to hit Q2 target", "badge": "19% gap", "progress": 81 },
-    { "label": "AUM Growth Gap", "value": "−1.6pp", "sub": "below target rate", "badge": "16% gap", "progress": 84 },
-    { "label": "Product Penetration", "value": "−0.6", "sub": "products / client gap", "badge": "20% gap", "progress": 80 }
+    {
+      "label": "Revenue Shortfall",
+      "value": "฿5.8M",
+      "sub": "to hit Q2 target",
+      "badge": "19% gap",
+      "progress": 81
+    },
+    {
+      "label": "AUM Growth Gap",
+      "value": "−1.6pp",
+      "sub": "below target rate",
+      "badge": "16% gap",
+      "progress": 84
+    },
+    {
+      "label": "Product Penetration",
+      "value": "−0.6",
+      "sub": "products / client gap",
+      "badge": "20% gap",
+      "progress": 80
+    }
   ],
   "aiSteps": [
-    { "n": 1, "title": "Close 2 Structured Note proposals", "detail": "฿110M combined · 85% and 78% probability. Closes ฿2.4M rev gap immediately.", "cta": "Follow Up", "impact": "+฿2.4M" },
-    { "n": 2, "title": "Re-engage Wichai Thongkam", "detail": "฿45M bond proposal stalled 25 days. Pitch Short-term Fixed Income instead.", "cta": "Draft Message", "impact": "+฿0.5M" },
-    { "n": 3, "title": "Pitch Asia Equity Fund to 3 UHNW clients", "detail": "Somchai, Nattaporn, Thanawat hold idle cash. Optimal window this week.", "cta": "Generate Pitch Decks", "impact": "+฿1.8M" }
+    {
+      "n": 1,
+      "title": "Close 2 Structured Note proposals",
+      "detail": "฿110M combined · 85% and 78% probability. Closes ฿2.4M rev gap immediately.",
+      "cta": "Follow Up",
+      "impact": "+฿2.4M"
+    },
+    {
+      "n": 2,
+      "title": "Re-engage Wichai Thongkam",
+      "detail": "฿45M bond proposal stalled 25 days. Pitch Short-term Fixed Income instead.",
+      "cta": "Draft Message",
+      "impact": "+฿0.5M"
+    },
+    {
+      "n": 3,
+      "title": "Pitch Asia Equity Fund to 3 UHNW clients",
+      "detail": "Somchai, Nattaporn, Thanawat hold idle cash. Optimal window this week.",
+      "cta": "Generate Pitch Decks",
+      "impact": "+฿1.8M"
+    }
   ]
 }

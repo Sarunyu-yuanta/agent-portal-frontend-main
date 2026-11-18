@@ -1,7 +1,9 @@
 [
   {
-    "id": 1,
-    "clientIds": ["110001"],
+    "id": "note-1",
+    "clientIds": [
+      "110001"
+    ],
     "title": "Portfolio review follow-up",
     "body": "Client wants to increase equity allocation next quarter.",
     "author": "John Doe",
@@ -11,7 +13,7 @@
     "reminderDone": false
   },
   {
-    "id": 2,
+    "id": "note-2",
     "clientIds": [],
     "title": null,
     "body": "General note not tied to any client.",
