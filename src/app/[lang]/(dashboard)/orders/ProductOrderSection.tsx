@@ -42,15 +42,18 @@ import {
 } from "@sarunyu/system-one";
 import {
   CheckCircleIcon,
+  ClipboardTextIcon,
   ClockIcon,
   PlusIcon,
   UsersThreeIcon,
   WarningCircleIcon,
   XCircleIcon,
 } from "@phosphor-icons/react";
+import { EmptyState, ErrorState } from "@/components/ui/empty-state";
+import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useClients } from "@/hooks/use-api";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { IC_NAME } from "@/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
@@ -61,10 +64,8 @@ import type {
   RequirementStatus,
 } from "@/types/domain";
 import { bookingModeFor, type BookableProduct } from "./bookable-products";
-import { ORDER_WORDS } from "./order-words";
 import { useOrderBook, useRosterReadiness } from "./use-order-books";
 import {
-  BOOKING_PHASE_LABEL,
   bookingPhase,
   bookingPhaseSteps,
   isBookingOpen,
@@ -79,6 +80,7 @@ import {
   emailStatus,
   paymentStatus,
 } from "./booking-status";
+import { useT } from "@/i18n/I18nProvider";
 
 const PAGE_SIZE = 10;
 
@@ -112,11 +114,12 @@ const GROW = { ...PAD, minWidth: 0, whiteSpace: "nowrap" } as const;
 const CENTER = { ...FIT, textAlign: "center" } as const;
 
 /** The four checks, in the order the booking form shows them. */
-const CHECK_COLUMNS: { key: RequirementKey; title: string }[] = [
-  { key: "wealth", title: "Wealth Status" },
-  { key: "acknowledge", title: "Acknowledge Status" },
-  { key: "kyc", title: "KYC Status" },
-  { key: "risk-profile", title: "Risk Profile Status" },
+/** Titles are `t.orders.checkColumn[key]`. */
+const CHECK_COLUMNS: { key: RequirementKey }[] = [
+  { key: "wealth" },
+  { key: "acknowledge" },
+  { key: "kyc" },
+  { key: "risk-profile" },
 ];
 
 /** ลูกค้า, the four checks, then Notional, Currency, Deal, Payment and Email. */
@@ -161,6 +164,7 @@ export function ProductOrderSection({
   /** Where the table sits — see the module note. */
   variant?: "product" | "book";
 }) {
+  const t = useT();
   // Seen once is seen: leaving this tab — for Detail, or another page — clears
   // the highlight, so coming back shows an ordinary row rather than replaying
   // the pulse. Deferred a tick so StrictMode's simulated unmount, which
@@ -174,12 +178,12 @@ export function ProductOrderSection({
     };
   }, [newBookingId, onNewBookingSeen]);
 
-  const { data: book } = useOrderBook(product.id);
+  const { data: book, isLoading: bookLoading, error: bookError, retry: retryBook } = useOrderBook(product.id);
   const clients = useClients();
   const readiness = useRosterReadiness(clients, product);
   // `bookingModeFor(product)`, not `book?.mode` — the book may still be
   // loading, and the product is the authority on its desk either way.
-  const words = ORDER_WORDS[bookingModeFor(product)];
+  const words = t.orders.words[bookingModeFor(product)];
   const { isPrivate } = usePrivacy();
   const [search, setSearch] = useState("");
   const [phase, setPhase] = useState<BookingPhase | null>(null);
@@ -212,9 +216,9 @@ export function ProductOrderSection({
       const { clientId, clientName } = r.booking;
       return (
         maskName(clientName, isPrivate).toLowerCase().includes(query) ||
-        maskName(getClientProfile(clientId).nameTh, isPrivate).includes(query) ||
+        maskName(getAccountIdentity(clientId).nameTh, isPrivate).includes(query) ||
         clientId.includes(query) ||
-        getClientProfile(clientId).accountNo.includes(query)
+        getAccountIdentity(clientId).accountNo.includes(query)
       );
     });
   }, [book, own, phase, search, isPrivate]);
@@ -237,7 +241,19 @@ export function ProductOrderSection({
     return { count: inPhase.length, amount: counted.reduce((sum, b) => sum + b.amount, 0) };
   }, [book, phase, search]);
 
-  if (!book) return null;
+  // Each state says what it is: this used to `return null` for all three,
+  // leaving a blank tab under the tab bar.
+  if (bookLoading) return <OrdersPanelSkeleton />;
+  if (bookError) return <ErrorState onRetry={retryBook} />;
+  if (!book) {
+    return (
+      <EmptyState
+        size="compact"
+        icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+        title={t.orders.productOrders.notBookable}
+      />
+    );
+  }
 
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   // A search that shrinks the list can leave the page past its end.
@@ -273,11 +289,11 @@ export function ProductOrderSection({
     // card, and the tab already names it.
     <section
       className="flex w-full flex-col gap-4"
-      aria-label={variant === "product" ? "Order" : `รายการ${words.record}`}
+      aria-label={words.listAria}
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="scrollable-tabs flex min-w-0 items-center gap-2">
-          {bookingPhaseSteps(book.mode).map((s) => (
+          {bookingPhaseSteps(book.mode, t).map((s) => (
             <Chip
               key={s.id}
               label={s.label}
@@ -317,7 +333,7 @@ export function ProductOrderSection({
             // Account No alike, and listing them was a placeholder longer than
             // the box, cut mid-phrase by the narrow width this needs to leave
             // the phase chips their row.
-            placeholder="ค้นหาลูกค้า"
+            placeholder={t.orders.productOrders.searchClient}
             size="sm"
             // 260px was sized for the old placeholder's two clauses. One word
             // needs far less, and the width it gives back goes to the phase
@@ -367,29 +383,29 @@ export function ProductOrderSection({
                     fixedOffset={0}
                     fixedShadow="right"
                   >
-                    ลูกค้า
+                    {t.orders.list.col.client}
                   </TableHeaderCell>
                   {CHECK_COLUMNS.map((c) => (
                     <TableHeaderCell style={CENTER} key={c.key} sortable={false}>
-                      {c.title}
+                      {t.orders.checkColumn[c.key]}
                     </TableHeaderCell>
                   ))}
                   <TableHeaderCell style={CENTER} sortable={false}>
-                    Notional Amount
+                    {t.orders.field.notionalAmount}
                   </TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>Currency</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>Deal Status</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>Payment Status</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>Email Pre-Confirmation</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.currency}</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.dealStatus}</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.paymentStatus}</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.emailPreConfirmation}</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.map((row) => {
                   const b = row.booking;
                   const { clientId, clientName } = b;
-                  const status = dealStatus(b, book);
-                  const payment = paymentStatus(b, book);
-                  const email = emailStatus(b, book);
+                  const status = dealStatus(b, book, t);
+                  const payment = paymentStatus(b, book, t);
+                  const email = emailStatus(b, book, t);
                   const cancelled = b.status === "cancelled";
                   /* A booking carries the checks it was placed against; the
                      client's live ones only stand in for a seeded one. */
@@ -403,7 +419,7 @@ export function ProductOrderSection({
                       key={b.id}
                       hoverable
                       tabIndex={0}
-                      aria-label={`ดูรายละเอียดการจองของ ${maskName(clientName, isPrivate)}`}
+                      aria-label={t.orders.productOrders.openBookingAria(maskName(clientName, isPrivate))}
                       onClick={() => setOpenId(b.id)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -433,7 +449,7 @@ export function ProductOrderSection({
                                 and the account is the number an order is
                                 actually placed on. */}
                             <span className="type-caption truncate text-muted-foreground">
-                              บัญชี {getClientProfile(clientId).accountNo}
+                              {t.orders.productOrders.account(getAccountIdentity(clientId).accountNo)}
                             </span>
                           </div>
                         </div>
@@ -492,7 +508,7 @@ export function ProductOrderSection({
                             not a row competing with the IC's own clients. */}
                         <UsersThreeIcon size={14} weight="fill" className="shrink-0" />
                         <span>
-                          ลูกค้าของ IC อื่น {others.count} รายการ · ยอดรวม{" "}
+                          {t.orders.productOrders.othersLine(others.count)}{" "}
                           <span className="font-semibold tabular-nums">
                             {money(others.amount)} {book.currency}
                           </span>
@@ -509,15 +525,24 @@ export function ProductOrderSection({
           <div className="flex flex-col items-center justify-center gap-1 px-4 py-8 text-center">
             <p className="type-body-2 font-semibold text-foreground">
               {search
-                ? "ไม่พบรายการที่ค้นหา"
+                ? t.states.noResultTitle
                 : phase
-                  ? `ไม่มีรายการที่อยู่ในขั้น "${BOOKING_PHASE_LABEL[book.mode][phase]}"`
-                  : `ยังไม่มี${words.record}`}
+                  ? t.orders.noRowsInPhase(t.orders.phase[book.mode][phase] ?? "")
+                  : words.noneYet}
             </p>
             {!search && !phase && canBook && (
               <p className="type-caption text-muted-foreground">
-                กด &quot;{words.ctaShort}&quot; เพื่อทำรายการให้ลูกค้ารายแรก — รายการจะแสดงที่นี่
+                {words.noneYetHint}
               </p>
+            )}
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="mt-1 text-body-sm font-medium text-primary-action hover:underline cursor-pointer"
+              >
+                {t.states.clearFilters}
+              </button>
             )}
           </div>
         )}
@@ -538,14 +563,14 @@ export function ProductOrderSection({
               cell is the issue's quota being drawn down, which is a different
               claim about the same arithmetic. The split of that figure between
               this IC and the rest is on the Detail tab — see `DealProgress`. */}
-          <Total label={`ยอด${words.record}ของฉัน`} value={money(notionalIc)} />
-          <Total label="สำเร็จของฉัน" value={money(confirmedIc)} tone="green" />
+          <Total label={words.myTotal} value={money(notionalIc)} />
+          <Total label={t.orders.productOrders.myCompleted} value={money(confirmedIc)} tone="green" />
           <Total
-            label={book.mode === "basket" ? "ยอดจองทั้งดีล" : "โควตาที่ใช้ไป"}
+            label={book.mode === "basket" ? t.orders.progress.dealTotal : t.orders.progress.quotaUsed}
             value={`${money(book.mode === "basket" ? notional : book.quotaUsed)} / ${money(book.targetAmount)}`}
           />
           <Total
-            label={book.mode === "basket" ? "สำเร็จทั้งดีล" : "สำเร็จทั้งหมด"}
+            label={book.mode === "basket" ? t.orders.productOrders.dealCompleted : t.orders.productOrders.allCompleted}
             value={money(book.confirmedAmount)}
             tone="green"
           />
@@ -553,7 +578,7 @@ export function ProductOrderSection({
       )}
 
       <div className="flex items-center justify-between gap-3">
-        <span className="type-body-2 text-muted-foreground">Total {rows.length} Records</span>
+        <span className="type-body-2 text-muted-foreground">{t.orders.productOrders.totalRecords(rows.length)}</span>
         {totalPages > 1 && (
           <Pagination totalPages={totalPages} currentPage={current} onPageChange={setPage} />
         )}
@@ -567,9 +592,9 @@ export function ProductOrderSection({
         checks={
           opened ? checksAtBooking(opened, readiness.get(opened.clientId)?.items ?? []) : []
         }
-        deal={opened ? dealStatus(opened, book) : CLOSED_TAG}
-        payment={opened ? paymentStatus(opened, book) : CLOSED_TAG}
-        email={opened ? emailStatus(opened, book) : CLOSED_TAG}
+        deal={opened ? dealStatus(opened, book, t) : CLOSED_TAG}
+        payment={opened ? paymentStatus(opened, book, t) : CLOSED_TAG}
+        email={opened ? emailStatus(opened, book, t) : CLOSED_TAG}
         onClose={() => {
           // Opening the new booking is looking at it — it closes as an
           // ordinary row, the same as leaving the tab would.

@@ -25,6 +25,16 @@ export type StructuredProduct = {
   underlyingSectors?: string[];
 };
 
+/**
+ * The feed's tag values. They double as ids (the feed sends no separate one),
+ * so code compares against these and the label shown comes from
+ * `t.products.structured.tags`.
+ */
+export const STRUCTURED_TAG = {
+  almostFull: "ใกล้เต็ม",
+  principalProtected: "รับประกันเงินต้น",
+} as const;
+
 export const TOP_PICKS = structuredProductsRaw.topPicks as StructuredProduct[];
 export const STRUCTURED_PRODUCTS = structuredProductsRaw.products as StructuredProduct[];
 

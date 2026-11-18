@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { BottomSheet, Modal, useIsMobile } from "@sarunyu/system-one";
 import { PhoneIcon, WarningIcon } from "@phosphor-icons/react";
 import type { StructuredProduct } from "./structured-product-data";
+import { useT } from "@/i18n/I18nProvider";
 
 const TICKER_INFO: Record<string, { name: string; sector: string }> = {
   KO: { name: "The Coca-Cola Company", sector: "Consumer Staples" },
@@ -46,6 +47,8 @@ function FooterIconCircle({ color, children }: { color: string; children: React.
 }
 
 function FCNCard({ product }: { product: StructuredProduct }) {
+  const t = useT();
+  const labels = t.products.fcn;
   const tickers = parseTickers(product.underlying);
   const issuer = product.issuer ?? "NOMURA";
 
@@ -69,7 +72,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
         <YuantaLogoMark />
         <div className="text-right">
           <p className="font-bold text-[#0a6ee7] text-sm leading-[24px]">FCN Pricing</p>
-          <p className="text-[#0a6ee7] text-xs leading-[20px]">as of {product.offerDate}</p>
+          <p className="text-[#0a6ee7] text-xs leading-[20px]">{labels.asOf(product.offerDate)}</p>
         </div>
       </div>
 
@@ -127,8 +130,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
             <PhoneIcon size={13} color="white" weight="fill" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </FooterIconCircle>
           <p className="text-meta leading-[20px] text-[#101828]">
-            สอบถามข้อมูลเพิ่มเติม / สนใจลงทุน ติดต่อผู้แนะนำการลงทุนของท่าน หรือ{" "}
-            <strong>Online-Service 02-009-8000</strong>
+            {labels.contact((s) => <strong>{s}</strong>)}
           </p>
         </div>
 
@@ -137,8 +139,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
             <WarningIcon size={13} color="white" weight="fill" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </FooterIconCircle>
           <p className="text-meta leading-[20px] text-[#6a7282]">
-            ข้อมูลนี้เป็นเพียงข้อมูลเบื้องต้น ผู้ลงทุนต้องศึกษารายละเอียดก่อนตัดสินใจ
-            บริษัทมิได้รับประกันเงินต้นและผลตอบแทนตามเอกสารนี้
+            {labels.disclaimer}
           </p>
         </div>
       </div>
@@ -153,6 +154,7 @@ type FCNPresentationModalProps = {
 };
 
 export function FCNPresentationModal({ product, open, onClose }: FCNPresentationModalProps) {
+  const t = useT();
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -190,7 +192,7 @@ export function FCNPresentationModal({ product, open, onClose }: FCNPresentation
         headerType="text"
         title="FCN Presentation"
         rightSide="action"
-        actionLabel="ดาวน์โหลด PDF"
+        actionLabel={t.products.fcn.downloadPdf}
         onActionClick={handlePrintPDF}
         showHandle
         contentClassName="flex flex-col gap-0 overflow-y-auto pb-4 px-4"
@@ -216,7 +218,7 @@ export function FCNPresentationModal({ product, open, onClose }: FCNPresentation
           showClose
           onClose={onClose}
           actionLayout="single"
-          primaryLabel="ดาวน์โหลด PDF"
+          primaryLabel={t.products.fcn.downloadPdf}
           onPrimaryClick={handlePrintPDF}
           className="!max-w-[720px] w-[calc(var(--vw)*100-2rem)]"
         >

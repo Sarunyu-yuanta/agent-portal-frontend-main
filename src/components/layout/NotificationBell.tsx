@@ -5,6 +5,7 @@ import { BellIcon } from "@phosphor-icons/react";
 import type { NotificationGroup, NotificationItem } from "@sarunyu/system-one";
 import { useStoredIds } from "@/hooks/use-stored-ids";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The header bell, in place of the DS `NavHeaderNotification`.
@@ -46,6 +47,7 @@ export function NotificationBell({
    */
   isLoading?: boolean;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -160,7 +162,7 @@ export function NotificationBell({
     <div ref={rootRef} className="relative shrink-0">
       <button
         type="button"
-        aria-label="Open notifications"
+        aria-label={t.nav.openNotifications}
         aria-expanded={open}
         onClick={() => {
           // Opening is the acknowledgement — everything on screen at that
@@ -190,7 +192,7 @@ export function NotificationBell({
       {open && (
         <div
           role="dialog"
-          aria-label="Notifications"
+          aria-label={t.nav.notifications}
           className="absolute right-0 top-full z-50 mt-2 w-[375px] max-w-[calc(var(--vw)*100-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div className="max-h-[480px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

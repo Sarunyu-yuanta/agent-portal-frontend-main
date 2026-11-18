@@ -7,35 +7,38 @@ import {
   ClockIcon,
   XCircleIcon,
 } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 export function KpiBar() {
+  const t = useT();
+  const k = t.compliance.kpi;
   const kpis = [
     {
-      label: "Critical Alerts",
+      label: k.criticalAlerts,
       value: "2",
-      sub: "Require immediate action",
+      sub: k.criticalAlertsSub,
       Icon: XCircleIcon,
       variant: "red" as const,
       valueColor: "text-destructive",
     },
     {
-      label: "Pending KYC",
+      label: k.pendingKyc,
       value: "3",
-      sub: "Documents outstanding",
+      sub: k.pendingKycSub,
       Icon: FileTextIcon,
       variant: "yellow" as const,
       valueColor: "text-foreground",
     },
     {
-      label: "Suitability Flags",
+      label: k.suitabilityFlags,
       value: "1",
-      sub: "Trade blocked",
+      sub: k.suitabilityFlagsSub,
       Icon: ShieldCheckIcon,
       variant: "red" as const,
       valueColor: "text-foreground",
     },
     {
-      label: "Expiring in 30 Days",
+      label: k.expiring30,
       value: "2",
       sub: "Malee · Wichai",
       Icon: ClockIcon,

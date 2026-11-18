@@ -29,6 +29,8 @@ import { itemBadge, SourceBadgeIcon } from "../../calendar/source-badge";
 import { useDayItemModals } from "../../calendar/use-day-item-modals";
 import { formatDayOnly } from "../../notes/note-format";
 import { snippet } from "../../notes/notes-grouping";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * What the desktop table's Status column reads off, in the order it matters
@@ -45,12 +47,6 @@ import { snippet } from "../../notes/notes-grouping";
  * buckets at all — see `daySections` below for why they're grouped by calendar
  * day instead.
  */
-const BUCKET_LABEL: Record<ReminderBucket, string> = {
-  overdue: "Overdue",
-  today: "Today",
-  upcoming: "Upcoming",
-  done: "Done",
-};
 
 /** One row: an item, the day it was read off, which bucket it landed in, and
  *  that day's offset from today (negative = past) for the "in N days" line. */
@@ -104,6 +100,7 @@ export function ClientRemindersTab({
    */
   onViewAll?: () => void;
 }) {
+  const t = useT();
   const clients = useClients();
   const { notes, isLoading } = useNotes();
   // No holder list: this whole page is one client, so the panel would be
@@ -122,8 +119,8 @@ export function ClientRemindersTab({
   // Computed once and read by both `rows` and `daySections` below — the two
   // are different regroupings of the same items, not two different fetches.
   const dayMap = useMemo(
-    () => groupDayItems(notes, new Date(todayKey), clientId),
-    [notes, clientId, todayKey],
+    () => groupDayItems(notes, new Date(todayKey), t, clientId),
+    [notes, clientId, todayKey, t],
   );
 
   const rows = useMemo(() => {
@@ -176,9 +173,24 @@ export function ClientRemindersTab({
     return <ListTabSkeleton />;
   }
 
+  // Same empty state as the desktop table, for the card lists too: with no
+  // reminders at all, a lone "Today · 0 — nothing due today" reads as "today
+  // is clear" when the truth is that nothing has ever been set.
+  const isEmpty = rows.length === 0;
+  const emptyState = (size: "default" | "compact") => (
+    <EmptyState
+      size={size}
+      icon={<CalendarBlankIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+      title={t.client.reminders.emptyTitle}
+      body={t.client.reminders.emptyBody}
+    />
+  );
+
   return (
     <>
-      {compact ? (
+      {compact && isEmpty ? (
+        emptyState("compact")
+      ) : compact ? (
         // ~4 cards' worth before it scrolls — enough to read as "here's what's
         // coming" without the dialog outgrowing the screen the way an
         // unbounded list would. Past that, View All is the way out rather
@@ -190,7 +202,9 @@ export function ClientRemindersTab({
         <>
           {/* Mobile / tablet — day-sectioned cards */}
           <div className="md:hidden">
-            <DaySectionedList sections={daySections} onOpen={openItem} />
+            {isEmpty ? emptyState("default") : (
+              <DaySectionedList sections={daySections} onOpen={openItem} />
+            )}
           </div>
 
           {/* Desktop — table, still bucketed by status rather than by day: a
@@ -198,23 +212,17 @@ export function ClientRemindersTab({
               so a day header above each group would be repeating the Date
               column rather than adding anything the table doesn't already say. */}
           <div className="hidden md:block">
-            {rows.length === 0 ? (
-              <EmptyState
-                icon={<CalendarBlankIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-                title="No reminders"
-                // Says where they come from, because there is nothing on this tab
-                // that makes one — a reminder is an attribute of a note.
-                body="Set one from a note on the Notes tab."
-              />
-            ) : (
+            {/* The body says where they come from, because there is nothing on
+                this tab that makes one — a reminder is an attribute of a note. */}
+            {isEmpty ? emptyState("default") : (
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Status</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Date</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Source</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0">Reminder</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0">Detail</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.status}</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.date}</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.source}</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0">{t.client.reminders.reminder}</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0">{t.client.reminders.detail}</TableHeaderCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -240,12 +248,14 @@ function DaySectionedList({
   sections: DaySection[];
   onOpen: (item: DayItem, day: Date) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   return (
     <div className="flex flex-col gap-7">
       {sections.map((section) => (
         <div key={section.key} className="flex flex-col gap-2">
           <p className="type-subtitle-2 text-muted-foreground">
-            {section.isToday ? "Today" : dayLabel(section.day)} · {section.items.length}
+            {t.client.reminders.daySection(section.isToday ? t.dates.today : dayLabel(section.day, locale), section.items.length)}
           </p>
           {section.items.length === 0 ? (
             // Only Today can ever land here — every other key in `daySections`
@@ -256,7 +266,7 @@ function DaySectionedList({
             // here, since other days already have things in them.
             <div className="flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-border py-6 text-center">
               <CalendarCheckIcon size={22} className="text-muted-foreground/40" />
-              <p className="type-body-2 text-muted-foreground/60">Nothing due today</p>
+              <p className="type-body-2 text-muted-foreground/60">{t.client.reminders.nothingDueToday}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -272,6 +282,7 @@ function DaySectionedList({
 }
 
 function ReminderCard({ item, onOpen }: { item: DayItem; onOpen: () => void }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -282,7 +293,7 @@ function ReminderCard({ item, onOpen }: { item: DayItem; onOpen: () => void }) {
           own handwriting, orange for anything the system raised. Read from the
           shared lookup rather than restated here; a local copy is how the
           alert panel stayed green after the Calendar's pills turned orange. */}
-      <SourceBadgeIcon item={item} size="default" label={item.source === "note" ? "Note" : "System"} />
+      <SourceBadgeIcon item={item} size="default" label={item.source === "note" ? t.client.reminders.sourceNote : t.client.reminders.sourceSystem} />
       <div className="min-w-0 flex-1 flex flex-col gap-0.5">
         <span
           className={`type-body-2 font-semibold truncate ${
@@ -292,7 +303,7 @@ function ReminderCard({ item, onOpen }: { item: DayItem; onOpen: () => void }) {
           {item.title}
         </span>
         <span className="type-caption text-muted-foreground truncate">
-          {item.detail ? snippet(item.detail, 60) : "No additional text"}
+          {item.detail ? snippet(item.detail, 60) : t.client.reminders.noAdditionalText}
         </span>
       </div>
       <CaretRightIcon size={14} className="shrink-0 self-center text-muted-foreground/60" />
@@ -301,8 +312,10 @@ function ReminderCard({ item, onOpen }: { item: DayItem; onOpen: () => void }) {
 }
 
 function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
+  const locale = useLocale();
+  const t = useT();
   const { item, day, bucket, daysDiff } = row;
-  const badge = itemBadge(item);
+  const badge = itemBadge(item, t);
 
   return (
     <TableRow
@@ -314,14 +327,14 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 type-caption font-medium ${BUCKET_TONE[bucket]}`}
         >
-          {BUCKET_LABEL[bucket]}
+          {t.buckets.reminder[bucket]}
         </span>
       </TableCell>
 
       <TableCell className="min-w-0 whitespace-nowrap">
         <div className="flex flex-col">
-          <span className="type-body-2 text-foreground font-medium">{formatDayOnly(day.toISOString())}</span>
-          <span className="type-caption text-muted-foreground">{relativeDayLabel(daysDiff)}</span>
+          <span className="type-body-2 text-foreground font-medium">{formatDayOnly(day.toISOString(), locale)}</span>
+          <span className="type-caption text-muted-foreground">{relativeDayLabel(daysDiff, t)}</span>
         </div>
       </TableCell>
 
@@ -334,7 +347,7 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
           className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 type-caption font-medium ${badge.className}`}
         >
           {badge.icon}
-          {item.source === "note" ? "Note" : "System"}
+          {item.source === "note" ? t.client.reminders.sourceNote : t.client.reminders.sourceSystem}
         </span>
       </TableCell>
 
@@ -350,7 +363,7 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
 
       <TableCell className="min-w-0">
         <span className="type-body-2 text-foreground">
-          {item.detail ? snippet(item.detail, 60) : "No additional text"}
+          {item.detail ? snippet(item.detail, 60) : t.client.reminders.noAdditionalText}
         </span>
       </TableCell>
     </TableRow>

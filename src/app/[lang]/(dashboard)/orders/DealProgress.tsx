@@ -17,10 +17,12 @@
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { IC_NAME } from "@/lib/current-ic";
 import { useOrderBook } from "./use-order-books";
+import { useT } from "@/i18n/I18nProvider";
 
 const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 export function DealProgress({ productId }: { productId: string }) {
+  const t = useT();
   const { data: book } = useOrderBook(productId);
   if (!ORDER_BOOKING_ENABLED || !book) return null;
 
@@ -37,7 +39,7 @@ export function DealProgress({ productId }: { productId: string }) {
   // Overbooked deals clamp the bar to full; the figures still say by how much.
   const scale = Math.max(target, used, 1);
   const pct = (n: number) => `${(n / scale) * 100}%`;
-  const label = book.mode === "basket" ? "ยอดจองทั้งดีล" : "โควตาที่ใช้ไป";
+  const label = book.mode === "basket" ? t.orders.progress.dealTotal : t.orders.progress.quotaUsed;
 
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-white px-4 py-3">
@@ -51,17 +53,17 @@ export function DealProgress({ productId }: { productId: string }) {
       <div
         className="flex h-2.5 w-full overflow-hidden rounded-full bg-[var(--fill-gray-100)]"
         role="img"
-        aria-label={`${label}: ของฉัน ${money(mine)}, IC อื่น ${money(others)}, คงเหลือ ${money(remaining)} จาก ${money(target)} ${book.currency}`}
+        aria-label={t.orders.progress.progressAria(label, money(mine), money(others), money(remaining), money(target), book.currency)}
       >
         <div className="h-full bg-primary-action" style={{ width: pct(mine) }} />
         <div className="h-full bg-[var(--fill-emerald-400)]" style={{ width: pct(others) }} />
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs leading-[20px] text-[#6a7282]">
-        <Legend swatch="bg-primary-action" label="ของฉัน" value={money(mine)} />
-        <Legend swatch="bg-[var(--fill-emerald-400)]" label="IC อื่น" value={money(others)} />
+        <Legend swatch="bg-primary-action" label={t.orders.progress.mine} value={money(mine)} />
+        <Legend swatch="bg-[var(--fill-emerald-400)]" label={t.orders.progress.otherIcs} value={money(others)} />
         <Legend
           swatch="border border-[var(--fill-gray-300)] bg-[var(--fill-gray-100)]"
-          label="คงเหลือ"
+          label={t.orders.progress.remaining}
           value={money(remaining)}
         />
       </div>

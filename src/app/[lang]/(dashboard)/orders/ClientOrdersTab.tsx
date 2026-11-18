@@ -12,7 +12,8 @@
  * `tab` for its own tabs (this one is `tab=orders`).
  */
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { TabGroup } from "@sarunyu/system-one";
 import { FadeIn } from "@/components/ui/fade-in";
 import { TabsSkeleton } from "@/components/ui/skeleton";
@@ -26,9 +27,11 @@ import { BasketBooksPanel } from "./BasketBooksPanel";
 import { QuotaBooksPanel } from "./QuotaBooksPanel";
 import { TransactionsPanel } from "./TransactionsPanel";
 import { DEFAULT_ORDER_TAB, ORDER_TABS, normalizeOrderTab } from "./order-tabs";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ClientOrdersTab({ clientId }: { clientId: string }) {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const tab = normalizeOrderTab(searchParams.get("otab"));
   // First load (the order records and trades the panels read): the tab strip
@@ -49,7 +52,10 @@ export function ClientOrdersTab({ clientId }: { clientId: string }) {
       ) : (
       <div className="transparent-tabs scrollable-tabs">
         <TabGroup
-          items={ORDER_TABS.map((t) => ({ id: t.id, title: t.title }))}
+          items={ORDER_TABS.map((tab) => ({
+            id: tab.id,
+            title: tab.id === "all" ? t.orders.tabAll : tab.title,
+          }))}
           activeId={tab.id}
           // Every filter belongs to one sub-tab, so none is carried into the
           // next — only the profile's own `tab` stays.

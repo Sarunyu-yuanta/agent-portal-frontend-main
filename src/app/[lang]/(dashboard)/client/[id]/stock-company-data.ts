@@ -2,7 +2,8 @@
 
 import type { MarketFact } from "../../calendar/market-feed";
 
-export const COMPANY_SUB_TABS = ["Company Profile", "Financials", "Company Events"] as const;
+/** Ids — the labels are `t.stock.company.subTabs[id]`. */
+export const COMPANY_SUB_TABS = ["profile", "financials", "events"] as const;
 
 export type CompanySubTab = (typeof COMPANY_SUB_TABS)[number];
 

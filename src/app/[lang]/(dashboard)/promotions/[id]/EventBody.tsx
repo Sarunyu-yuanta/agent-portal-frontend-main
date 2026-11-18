@@ -8,9 +8,11 @@ import {
 } from "@phosphor-icons/react";
 import { Tag } from "@sarunyu/system-one";
 import type { Campaign } from "@/types/domain";
-import { PRODUCT_LABEL, SEGMENT_LABEL, thaiDay } from "../campaign-data";
+import { campaignDay } from "../campaign-data";
 import { DetailSectionGroup, DetailSubsection } from "./DetailSection";
 import { Disclaimer } from "./PromotionBody";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * What happens on the day, who is speaking, and where.
@@ -22,11 +24,13 @@ import { Disclaimer } from "./PromotionBody";
  * order from `PromotionBody`, so the two detail pages read as one surface.
  */
 export function EventBody({ campaign }: { campaign: Campaign }) {
+  const locale = useLocale();
+  const t = useT();
   const online = campaign.format === "online";
 
   return (
     <DetailSectionGroup>
-      <DetailSubsection title="เกี่ยวกับงานนี้">
+      <DetailSubsection title={t.campaigns.body.aboutEvent}>
         {/* The long form, not `summary` — that one-liner is already in the
             banner directly above this section. */}
         <div className="flex flex-col gap-3">
@@ -41,16 +45,16 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         </div>
         <div className="mt-4 flex flex-wrap gap-1.5">
           {campaign.products.map((product) => (
-            <Tag key={product} text={PRODUCT_LABEL[product]} variant="blue" size="small" />
+            <Tag key={product} text={t.promotions.product[product]} variant="blue" size="small" />
           ))}
           {campaign.segments.map((segment) => (
-            <Tag key={segment} text={SEGMENT_LABEL[segment]} variant="gray" size="small" />
+            <Tag key={segment} text={t.promotions.segment[segment]} variant="gray" size="small" />
           ))}
         </div>
       </DetailSubsection>
 
       {campaign.agenda && campaign.agenda.length > 0 && (
-        <DetailSubsection title="กำหนดการ">
+        <DetailSubsection title={t.campaigns.body.agenda}>
           <div className="flex flex-col">
             {campaign.agenda.map((item, index) => (
               <div
@@ -74,7 +78,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
                   </p>
                   {item.speaker && (
                     <p className="text-label text-muted-foreground">
-                      โดย {item.speaker}
+                      {t.campaigns.body.by(item.speaker)}
                     </p>
                   )}
                 </div>
@@ -85,7 +89,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
       )}
 
       {campaign.speakers && campaign.speakers.length > 0 && (
-        <DetailSubsection title="วิทยากร">
+        <DetailSubsection title={t.campaigns.body.speakers}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {campaign.speakers.map((speaker) => (
               <div
@@ -121,7 +125,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         </DetailSubsection>
       )}
 
-      <DetailSubsection title="สถานที่และการเข้าร่วม">
+      <DetailSubsection title={t.campaigns.body.venueAndAttendance}>
         <div className="flex flex-col gap-2.5">
           <div className="flex items-start gap-2.5">
             <span
@@ -139,9 +143,9 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
                 {campaign.venue ?? "—"}
               </p>
               <p className="text-label text-muted-foreground">
-                {campaign.eventDate ? thaiDay(campaign.eventDate) : "—"}
+                {campaign.eventDate ? campaignDay(campaign.eventDate, locale) : "—"}
                 {campaign.seatsTotal
-                  ? ` · ที่นั่งทั้งหมด ${campaign.seatsTotal} ที่นั่ง`
+                  ? t.campaigns.body.totalSeats(campaign.seatsTotal)
                   : ""}
               </p>
             </div>
@@ -161,7 +165,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         </div>
       </DetailSubsection>
 
-      <DetailSubsection title="เงื่อนไขการเข้าร่วม">
+      <DetailSubsection title={t.campaigns.body.conditions}>
         <ul className="flex list-none flex-col gap-3 p-0">
           {campaign.conditions.map((condition) => (
             <li
@@ -183,7 +187,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         </ul>
       </DetailSubsection>
 
-      <DetailSubsection title="ข้อกำหนดและเงื่อนไข">
+      <DetailSubsection title={t.campaigns.body.terms}>
         <ol className="flex list-none flex-col gap-3 p-0">
           {campaign.terms.map((term, index) => (
             <li

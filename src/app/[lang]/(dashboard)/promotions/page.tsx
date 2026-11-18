@@ -20,9 +20,7 @@ import {
   hasActiveFilters,
   isNewCampaign,
   campaignStatus,
-  SEAT_STATE_LABEL,
   SEAT_STATES,
-  STATUS_LABEL,
   seatState,
   sortByEndingSoonest,
   type SeatState,
@@ -35,6 +33,8 @@ import type {
   CampaignStatus,
   ClientSegment,
 } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /**
  * Promotions & Events — what the firm is running, and who of this IC's clients
@@ -75,9 +75,10 @@ const PATH = "/promotions";
  * for why. Promotions lead because they are the larger half of the book and
  * the first word in the section's own name.
  */
-const TABS: { id: CampaignTab; title: string }[] = [
-  { id: "promotion", title: "โปรโมชัน" },
-  { id: "event", title: "สัมมนา/อีเว้นท์" },
+/** Titles: `t.promotions.type[id]`. */
+const TABS: { id: CampaignTab }[] = [
+  { id: "promotion" },
+  { id: "event" },
 ];
 
 const DEFAULT_TAB: CampaignTab = "promotion";
@@ -91,6 +92,7 @@ function normalizeTab(value: string | null): CampaignTab {
 }
 
 function PromotionsPageInner() {
+  const t = useT();
   const searchParams = useSearchParams();
   const { data: campaigns, isLoading } = useCampaigns();
   // Only the seat count reaches this page now — everything else the store
@@ -190,7 +192,7 @@ function PromotionsPageInner() {
     if (tab === "promotion") {
       return PROMOTION_STATUSES.map((value) => ({
         key: value,
-        label: STATUS_LABEL[value],
+        label: t.promotions.status[value],
         count: filtered.filter((c) => campaignStatus(c, today) === value).length,
         selected: filters.status === value,
         onClick: () =>
@@ -199,7 +201,7 @@ function PromotionsPageInner() {
     }
     return SEAT_STATES.map((value) => ({
       key: value,
-      label: SEAT_STATE_LABEL[value],
+      label: t.promotions.seatState[value],
       count: filtered.filter(
         (c) => seatState(c, today, seatsLeft(c.id)) === value,
       ).length,
@@ -207,7 +209,7 @@ function PromotionsPageInner() {
       onClick: () =>
         updateQuery({ seats: seats === value ? null : value, new: null }),
     }));
-  }, [tab, filtered, today, filters.status, seats, seatsLeft, updateQuery]);
+  }, [tab, filtered, today, filters.status, seats, seatsLeft, updateQuery, t]);
 
   const newCount = useMemo(
     () => filtered.filter((c) => isNewCampaign(c, today)).length,
@@ -260,7 +262,7 @@ function PromotionsPageInner() {
         <CampaignFilters
           tabs={
             <TabGroup
-              items={TABS.map((t) => ({ id: t.id, title: t.title }))}
+              items={TABS.map((tabItem) => ({ id: tabItem.id, title: t.promotions.type[tabItem.id] }))}
               activeId={tab}
               // `push`: a tab is a destination, and the back button should walk
               // out of it rather than off the page.
@@ -293,14 +295,14 @@ function PromotionsPageInner() {
 
         <div className="flex flex-wrap gap-2">
           <Chip
-            label={`ทั้งหมด (${filtered.length})`}
+            label={t.campaigns.list.withCount(t.campaigns.list.all, filtered.length)}
             type="single"
             size="small"
             selected={!newOnly && statusChips.every((chip) => !chip.selected)}
             onClick={() => updateQuery({ status: null, seats: null, new: null })}
           />
           <Chip
-            label={`ใหม่ (${newCount})`}
+            label={t.campaigns.list.withCount(t.campaigns.list.new, newCount)}
             type="single"
             size="small"
             selected={newOnly}
@@ -311,7 +313,7 @@ function PromotionsPageInner() {
           {statusChips.map((chip) => (
             <Chip
               key={chip.key}
-              label={`${chip.label} (${chip.count})`}
+              label={t.campaigns.list.withCount(chip.label, chip.count)}
               type="single"
               size="small"
               selected={chip.selected}
@@ -334,11 +336,11 @@ function PromotionsPageInner() {
                   className="text-[var(--text-default-placeholder)]"
                 />
               }
-              title={emptyTitle(tab, narrowed)}
-              body={emptyBody(tab, narrowed)}
+              title={emptyTitle(tab, narrowed, t)}
+              body={emptyBody(tab, narrowed, t)}
               action={
                 narrowed
-                  ? { label: "ล้างตัวกรอง", onClick: clearFilters }
+                  ? { label: t.campaigns.list.clearFilters, onClick: clearFilters }
                   : undefined
               }
             />
@@ -360,19 +362,21 @@ function PromotionsPageInner() {
   );
 }
 
-function emptyTitle(tab: CampaignTab, narrowed: boolean): string {
-  if (narrowed) return "ไม่พบแคมเปญที่ค้นหา";
-  return tab === "promotion" ? "ยังไม่มีโปรโมชัน" : "ยังไม่มีสัมมนา/อีเว้นท์";
+function emptyTitle(tab: CampaignTab, narrowed: boolean, t: Dictionary): string {
+  const m = t.campaigns.list;
+  if (narrowed) return m.emptyNarrowed;
+  return tab === "promotion" ? m.emptyPromotion : m.emptyEvent;
 }
 
-function emptyBody(tab: CampaignTab, narrowed: boolean): string {
+function emptyBody(tab: CampaignTab, narrowed: boolean, t: Dictionary): string {
+  const m = t.campaigns.list;
   if (narrowed) {
     // Scoped to the tab now that there is no combined view to fall back to —
     // telling someone to clear filters "to see everything" would promise a
     // list that no longer exists.
     return tab === "promotion"
-      ? "ลองค้นหาด้วยคำอื่น หรือล้างตัวกรองเพื่อดูโปรโมชันทั้งหมด"
-      : "ลองค้นหาด้วยคำอื่น หรือล้างตัวกรองเพื่อดูสัมมนา/อีเว้นท์ทั้งหมด";
+      ? m.emptyNarrowedPromotionBody
+      : m.emptyNarrowedEventBody;
   }
-  return "เมื่อมีแคมเปญใหม่จากส่วนกลาง จะแสดงที่นี่";
+  return m.emptyBody;
 }

@@ -22,10 +22,13 @@ import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords } from "@/lib/client-utils";
 import { KycDetailPanel } from "./KycDetailPanel";
+import { useT } from "@/i18n/I18nProvider";
 import { kycFilterOpts, type KycRow, type SortKey, type SortDir } from "./compliance-data";
 
 export function KycTable() {
   const { isPrivate } = usePrivacy();
+  const t = useT();
+  const tt = t.compliance.table;
   const [filter, setFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("none");
@@ -59,13 +62,13 @@ export function KycTable() {
     <>
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <p className="type-subtitle-1 text-foreground">KYC & Document Pipeline</p>
+        <p className="type-subtitle-1 text-foreground">{tt.title}</p>
         <Button variant="outline-black" size="sm" leftIcon={<DownloadSimpleIcon size={14} />}>
-          Export
+          {tt.export}
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        <span className="type-caption text-muted-foreground shrink-0">Filter by:</span>
+        <span className="type-caption text-muted-foreground shrink-0">{tt.filterBy}</span>
         <div className="relative flex-1 min-w-0">
           <div
             className="scrollable-tabs flex items-center gap-2"
@@ -78,7 +81,7 @@ export function KycTable() {
             {kycFilterOpts.map((opt) => (
               <Chip
                 key={opt.value}
-                label={opt.label}
+                label={tt.filters[opt.id]}
                 type="single"
                 size="small"
                 selected={filter === opt.value}
@@ -93,11 +96,11 @@ export function KycTable() {
         <Table className="table-fixed min-w-[560px]">
           <TableHead>
             <TableRow>
-              <TableHeaderCell className="w-[26%]" sortDirection={dirFor("client")} onSortChange={handleSort("client")}>Client</TableHeaderCell>
-              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("riskRating")} onSortChange={handleSort("riskRating")}>Risk Rating</TableHeaderCell>
-              <TableHeaderCell className="w-[16%]" sortable={false}>KYC Status</TableHeaderCell>
-              <TableHeaderCell className="w-[22%]" sortDirection={dirFor("nextReview")} onSortChange={handleSort("nextReview")}>Next Review</TableHeaderCell>
-              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("daysUntilExpiry")} onSortChange={handleSort("daysUntilExpiry")}>Expiry</TableHeaderCell>
+              <TableHeaderCell className="w-[26%]" sortDirection={dirFor("client")} onSortChange={handleSort("client")}>{tt.columns.client}</TableHeaderCell>
+              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("riskRating")} onSortChange={handleSort("riskRating")}>{tt.columns.riskRating}</TableHeaderCell>
+              <TableHeaderCell className="w-[16%]" sortable={false}>{tt.columns.kycStatus}</TableHeaderCell>
+              <TableHeaderCell className="w-[22%]" sortDirection={dirFor("nextReview")} onSortChange={handleSort("nextReview")}>{tt.columns.nextReview}</TableHeaderCell>
+              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("daysUntilExpiry")} onSortChange={handleSort("daysUntilExpiry")}>{tt.columns.expiry}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -106,6 +109,7 @@ export function KycTable() {
               const soon   = row.daysUntilExpiry <= 30;
               const maskedClient = maskName(row.client, isPrivate);
               const initials = getInitialsFromWords(maskedClient);
+              const ratingLabel = t.compliance.riskRating[row.riskRating] ?? row.riskRating;
 
               return (
                 <TableRow key={row.id} hoverable className="cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]" onClick={() => { setSelectedRow(row); setDrawerOpen(true); }}>
@@ -114,19 +118,19 @@ export function KycTable() {
                       <Avatar type="text" initials={initials} size="s" />
                       <div className="flex flex-col gap-0.5 min-w-0">
                         <span className="type-body-2 font-medium text-foreground truncate">{maskedClient}</span>
-                        <span className="type-caption text-[var(--text-default-disabled)]">{row.riskRating} Risk</span>
+                        <span className="type-caption text-[var(--text-default-disabled)]">{t.compliance.riskRatingLabel(ratingLabel)}</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Tag
-                      text={row.riskRating}
+                      text={ratingLabel}
                       variant={row.riskRating === "High" ? "red" : row.riskRating === "Medium" ? "yellow" : "green"}
                       size="small"
                     />
                   </TableCell>
                   <TableCell>
-                    <StatusTag type={row.kycStatus} />
+                    <StatusTag type={row.kycStatus} text={t.compliance.kycStatus[row.kycStatus]} />
                   </TableCell>
                   <TableCell>
                     <span className="type-body-2 text-foreground">{row.nextReview}</span>
@@ -137,7 +141,7 @@ export function KycTable() {
                       <span className={`type-body-2 font-medium tabular-nums ${
                         urgent ? "text-destructive" : soon ? "text-warning" : "text-success"
                       }`}>
-                        {row.daysUntilExpiry}d
+                        {tt.daysShort(row.daysUntilExpiry)}
                       </span>
                     </div>
                   </TableCell>
@@ -146,12 +150,16 @@ export function KycTable() {
             })}
           </TableBody>
         </Table>
-        {isEmpty && (
-          <TableEmptyOverlay
-            body="ลองเลือกตัวกรองอื่น หรือล้างตัวกรองเพื่อดูรายการทั้งหมด"
-            onClearFilters={filter ? () => setFilter("") : undefined}
-          />
-        )}
+        {isEmpty &&
+          (mockKYCData.length === 0 ? (
+            <TableEmptyOverlay variant="empty" title={tt.empty} />
+          ) : (
+            <TableEmptyOverlay
+              title={t.states.noFilterResultTitle}
+              body={tt.emptyBody}
+              onClearFilters={filter ? () => setFilter("") : undefined}
+            />
+          ))}
       </div>
     </div>
 

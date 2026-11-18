@@ -1,6 +1,7 @@
 "use client";
 
 import type { DayItem } from "./day-items";
+import { useT } from "@/i18n/I18nProvider";
 import {
   actionKindName,
   actionKindRank,
@@ -43,6 +44,7 @@ export function CalendarLegend({
   /** Whether any market closure is drawn this month, holidays layer included. */
   hasHolidays: boolean;
 }) {
+  const t = useT();
   const kinds = new Set<string>();
   const categories = new Set<string>();
   let hasNote = false;
@@ -61,7 +63,7 @@ export function CalendarLegend({
     (a, b) => actionKindRank(a) - actionKindRank(b) || a.localeCompare(b),
   );
   const sortedCategories = [...categories].sort((a, b) =>
-    eventCategory(a).label.localeCompare(eventCategory(b).label),
+    eventCategory(a, t).label.localeCompare(eventCategory(b, t).label),
   );
 
   if (
@@ -89,13 +91,13 @@ export function CalendarLegend({
               borderLeft: `2px solid ${palette.accent}`,
             }}
             swatch={kind}
-            label={actionKindName(kind)}
+            label={actionKindName(kind, t)}
           />
         );
       })}
 
       {sortedCategories.map((category) => {
-        const meta = eventCategory(category);
+        const meta = eventCategory(category, t);
         return (
           <Entry
             key={`c:${category}`}
@@ -117,7 +119,7 @@ export function CalendarLegend({
               <HolidayIcon size={12} weight="fill" />
             </span>
           }
-          label="วันหยุดตลาด"
+          label={t.planner.calendar.legend.holiday}
         />
       )}
 
@@ -128,7 +130,7 @@ export function CalendarLegend({
         <Entry
           swatchClassName="bg-[var(--fill-p1-200)] text-[var(--fill-p1-700)]"
           swatch={<span className="size-2 rounded-full bg-current" />}
-          label="โน้ต / การเตือนของคุณ"
+          label={t.planner.calendar.legend.note}
         />
       )}
 
@@ -136,7 +138,7 @@ export function CalendarLegend({
         <Entry
           swatchClassName="bg-[var(--fill-gray-100)] text-subtle-text"
           swatch={<span className="size-2 rounded-full bg-current" />}
-          label="เตือนที่ทำแล้ว"
+          label={t.planner.calendar.legend.doneNote}
         />
       )}
     </div>

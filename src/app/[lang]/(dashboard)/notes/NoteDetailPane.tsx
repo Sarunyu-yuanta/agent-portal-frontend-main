@@ -12,6 +12,8 @@ import { ClientField, ReminderField } from "./NoteAttributeFields";
 import { NoteAttributesControl } from "./NoteAttributesControl";
 import { NoteEditorFields } from "./NoteEditorFields";
 import { formatDateTime, reminderTag, TAG_CHIP_TONE } from "./note-format";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * A tag that can carry a real icon.
@@ -82,7 +84,12 @@ export function NoteDetailPane({
   pinnedClientId?: string | null;
   /** Shown as a back arrow next to the date — mobile drill-in only. */
   onBack?: () => void;
-  onSave: (patch: Partial<Note>) => void;
+  /**
+   * Writes a change. May return the write's promise: if it rejects, the pane
+   * says the save failed and offers to retry, instead of sitting on
+   * "กำลังบันทึก…" for good.
+   */
+  onSave: (patch: Partial<Note>) => void | Promise<unknown>;
   /**
    * Whether the editor is currently blank. Reported off the live field values
    * rather than the 500ms save debounce below, so the parent never decides to
@@ -123,6 +130,8 @@ export function NoteDetailPane({
   /** Called on every keystroke with the current title and body — lets the parent read values for a manual save. */
   onValuesChange?: (values: { title: string; body: string }) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const [title, setTitle] = useState(note.title ?? "");
   const [body, setBody] = useState(note.body);
 
@@ -183,24 +192,41 @@ export function NoteDetailPane({
    */
   const [savingFrom, setSavingFrom] = useState<string | null>(null);
   const saving = savingFrom !== null && savingFrom === note.updatedAt;
+  // The last debounced write rejected. Cleared by the next successful one.
+  const [saveFailed, setSaveFailed] = useState(false);
 
   // Title and body save together, debounced, rather than independently on
   // blur: two independent saves fired close together (tabbing from Title
   // straight into the body) can resolve out of order, and whichever lands
   // second — still holding the *other* field's old value — clobbers it.
+  // Writes whatever title/body differ from the saved note. Shared by the
+  // debounce and the "ลองใหม่" button, so a retry sends exactly what a fresh
+  // save would.
+  const flushRef = useRef<() => void>(() => {});
+  const flush = () => {
+    const { note: current, onSave: save } = latestRef.current;
+    const nextTitle = title.trim() || null;
+    const patch: Partial<Note> = {};
+    if (nextTitle !== current.title) patch.title = nextTitle;
+    if (body !== current.body) patch.body = body;
+    if (Object.keys(patch).length === 0) return;
+    setSavingFrom(current.updatedAt);
+    Promise.resolve(save(patch)).then(
+      () => setSaveFailed(false),
+      (err: unknown) => {
+        console.warn("[NoteDetailPane] save failed", err);
+        setSavingFrom(null);
+        setSaveFailed(true);
+      },
+    );
+  };
+  useEffect(() => {
+    flushRef.current = flush;
+  });
+
   useEffect(() => {
     if (manualSave) return;
-    const timer = setTimeout(() => {
-      const { note: current, onSave: save } = latestRef.current;
-      const nextTitle = title.trim() || null;
-      const patch: Partial<Note> = {};
-      if (nextTitle !== current.title) patch.title = nextTitle;
-      if (body !== current.body) patch.body = body;
-      if (Object.keys(patch).length > 0) {
-        setSavingFrom(current.updatedAt);
-        save(patch);
-      }
-    }, SAVE_DEBOUNCE_MS);
+    const timer = setTimeout(() => flushRef.current(), SAVE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [title, body, manualSave]);
 
@@ -226,7 +252,7 @@ export function NoteDetailPane({
     ...(pinnedClientId && note.clientIds.includes(pinnedClientId) ? [pinnedClientId] : []),
     ...note.clientIds.filter((id) => id !== pinnedClientId),
   ].map(nameFor);
-  const reminder = reminderTag(note);
+  const reminder = reminderTag(note, t, locale);
 
 
   return (
@@ -241,7 +267,7 @@ export function NoteDetailPane({
           <button
             type="button"
             onClick={onBack}
-            aria-label="Back"
+            aria-label={t.common.back}
             className="absolute left-3 flex items-center justify-center size-7 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-foreground cursor-pointer"
           >
             <ArrowLeftIcon size={18} />
@@ -252,7 +278,7 @@ export function NoteDetailPane({
             anything to keep it that way. */}
         <div className="flex min-w-0 flex-col items-center gap-0.5 px-10">
           <p className="type-caption text-muted-foreground truncate">
-            {formatDateTime(note.updatedAt)}
+            {formatDateTime(note.updatedAt, locale)}
           </p>
           {/* Hidden until something has been written — on a note you've only just
               created there is nothing to have saved, and claiming otherwise is
@@ -275,20 +301,36 @@ export function NoteDetailPane({
                 ? "invisible"
                 : saving
                   ? "text-muted-foreground"
-                  : "text-[var(--text-success-primary)]"
+                  : saveFailed
+                    ? "text-[var(--text-danger-primary)]"
+                    : "text-[var(--text-success-primary)]"
             }`}
           >
-            {/* "Auto saved" rather than "Saved": the job of the resting state
-                is to say there is no Save button to look for, which past tense
-                alone doesn't. */}
-            {saving ? "Saving…" : "Auto saved"}
+            {/* "บันทึกอัตโนมัติแล้ว" rather than "บันทึกแล้ว": the job of the
+                resting state is to say there is no Save button to look for. */}
+            {saving ? (
+              t.common.saving
+            ) : saveFailed ? (
+              <>
+                {t.planner.notes.saveFailedInline}{" "}
+                <button
+                  type="button"
+                  onClick={() => flushRef.current()}
+                  className="font-medium underline cursor-pointer"
+                >
+                  {t.states.retry}
+                </button>
+              </>
+            ) : (
+              t.planner.notes.autosaved
+            )}
           </p>
         </div>
         {layout === "side" && onDelete && (
           <button
             type="button"
             onClick={onDelete}
-            aria-label="Delete note"
+            aria-label={t.planner.notes.deleteNote}
             className="absolute right-3 flex items-center justify-center size-7 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-muted-foreground hover:text-destructive cursor-pointer"
           >
             <TrashIcon size={16} />
@@ -418,7 +460,7 @@ export function NoteDetailPane({
                     className="-mb-1 flex items-center gap-1.5 self-end rounded-lg px-2 py-1 type-caption text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
                   >
                     <XIcon size={12} weight="bold" className="shrink-0" />
-                    Clear
+                    {t.planner.notes.fields.clear}
                   </button>
                 )}
                 <ClientField
@@ -461,11 +503,11 @@ export function NoteDetailPane({
           onReminderChange={(reminderAt) => onSave({ reminderAt, reminderDone: false })}
           onClear={() => onSave({ clientIds: [], reminderAt: null, reminderDone: false })}
         />
-        <Tooltip content="Delete note" side="top">
+        <Tooltip content={t.planner.notes.deleteNote} side="top">
           <button
             type="button"
             onClick={onDelete}
-            aria-label="Delete note"
+            aria-label={t.planner.notes.deleteNote}
             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--bg-default-secondary)] text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-danger-light)] hover:text-destructive"
           >
             <TrashIcon size={16} />

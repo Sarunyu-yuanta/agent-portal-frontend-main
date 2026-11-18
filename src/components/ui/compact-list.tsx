@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "@sarunyu/system-one";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * A scroll-capped list plus a "View all" button below it — the shape a quick
@@ -21,12 +22,13 @@ export function CompactList({
   contentClassName?: string;
   children: ReactNode;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2">
       <div className={`flex flex-col ${contentClassName}`}>{children}</div>
       {onViewAll && (
         <Button variant="plain" size="sm" className="self-end" onClick={onViewAll}>
-          View all
+          {t.shell.compactList.viewAll}
         </Button>
       )}
     </div>

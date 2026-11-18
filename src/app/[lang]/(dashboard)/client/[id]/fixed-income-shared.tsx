@@ -1,6 +1,7 @@
 import { Button } from "@sarunyu/system-one";
 import { ArrowSquareOutIcon, FileTextIcon } from "@phosphor-icons/react";
 import type { FixedIncomeStatus } from "./fixed-income-data";
+import { useT } from "@/i18n/I18nProvider";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -55,14 +56,6 @@ export const cellBorderStyle = (opts?: { bottom?: boolean }) => ({
   borderBottom: opts?.bottom === false ? undefined : `1px solid ${BORDER_COLOR}`,
 });
 
-// ─── Fixed income action labels ───────────────────────────────────────────────
-
-export const ACTION_LABELS = {
-  invest: "สร้างคำสั่งซื้อ",
-  follow: "ติดตาม",
-  followed: "ติดตามแล้ว",
-} as const;
-
 // ─── Shared components ────────────────────────────────────────────────────────
 
 export function StatusTag({
@@ -103,7 +96,8 @@ export function BondLogo({
   logoCrop,
   className = "size-5 rounded",
 }: {
-  src: string;
+  /** Missing (an unknown `logoIdx`) draws the placeholder rather than nothing. */
+  src: string | undefined;
   logoCrop?: boolean;
   className?: string;
 }) {
@@ -121,7 +115,7 @@ export function BondLogo({
         <img
           alt=""
           className="absolute h-[149.62%] left-[-92.5%] max-w-none top-[-24.81%] w-[285%]"
-          src={src}
+          src={src || LOGO_PLACEHOLDER}
           onError={handleLogoError}
         />
       ) : (
@@ -129,7 +123,7 @@ export function BondLogo({
         <img
           alt=""
           className="absolute inset-0 size-full object-cover rounded pointer-events-none"
-          src={src}
+          src={src || LOGO_PLACEHOLDER}
           onError={handleLogoError}
         />
       )}
@@ -140,13 +134,14 @@ export function BondLogo({
 // ─── Shared bond-list primitives (used by GlobalBondTab + GlobalBondAllPage) ─
 
 export function TopPickTag({ small }: { small?: boolean }) {
+  const t = useT();
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center rounded bg-[#fff7ed] text-[#f54a00] whitespace-nowrap ${
         small ? "px-1 py-0.5 text-micro leading-[18px]" : "px-1 py-0.5 text-xs leading-[20px]"
       }`}
     >
-      Top Pick
+      {t.products.common.topPick}
     </span>
   );
 }
@@ -161,6 +156,7 @@ export function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 export function FactsheetButton() {
+  const t = useT();
   return (
     <Button
       variant="outline"
@@ -169,7 +165,7 @@ export function FactsheetButton() {
       className="whitespace-nowrap"
       onClick={(e) => e.stopPropagation()}
     >
-      Factsheet
+      {t.products.common.factsheet}
     </Button>
   );
 }
@@ -187,6 +183,7 @@ export function InvestButton({
   fullWidth?: boolean;
   href?: string;
 }) {
+  const t = useT();
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (href) window.open(href, "_blank", "noopener,noreferrer");
@@ -199,7 +196,7 @@ export function InvestButton({
         className="w-full max-w-[343px]"
         onClick={handleClick}
       >
-        สร้างคำสั่งซื้อ
+        {t.products.common.createOrder}
       </Button>
     );
   }
@@ -211,7 +208,7 @@ export function InvestButton({
       className="whitespace-nowrap"
       onClick={handleClick}
     >
-      สร้างคำสั่งซื้อ
+      {t.products.common.createOrder}
     </Button>
   );
 }

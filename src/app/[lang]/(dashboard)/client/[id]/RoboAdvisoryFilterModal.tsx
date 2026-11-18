@@ -14,6 +14,7 @@ import {
   type RoboRebalanceFilter,
 } from "./robo-advisory-filter-data";
 import type { RoboRiskTier } from "./robo-risk-level";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Figma 33787:152139 — chip group label + wrapped chip row. */
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
@@ -33,6 +34,7 @@ type FilterContentProps = {
 };
 
 function FilterContent({ draft, onToggleProvider, onToggleRisk, onToggleRebalance }: FilterContentProps) {
+  const t = useT();
   return (
     <div className="flex w-full flex-col gap-4">
       <FilterSection title="Model type">
@@ -49,12 +51,12 @@ function FilterContent({ draft, onToggleProvider, onToggleRisk, onToggleRebalanc
         </div>
       </FilterSection>
 
-      <FilterSection title="ความเสี่ยง">
+      <FilterSection title={t.products.advisory.filter.risk}>
         <div className="flex w-full flex-wrap items-center gap-2">
           {ROBO_RISK_FILTERS.map((option) => (
             <Chip
               key={option.id}
-              label={option.label}
+              label={t.products.advisory.filter.riskOptions[option.id]}
               size="medium"
               selected={draft.risks.includes(option.id)}
               onClick={() => onToggleRisk(option.id)}
@@ -81,13 +83,14 @@ function FilterContent({ draft, onToggleProvider, onToggleRisk, onToggleRebalanc
 }
 
 function FilterFooter({ onClear, onApply }: { onClear: () => void; onApply: () => void }) {
+  const t = useT();
   return (
     <div className="flex w-full items-start gap-4">
       <Button variant="outline-black" size="xl" className="min-w-0 flex-1 max-w-[343px] text-[#0a6ee7]" onClick={onClear}>
-        ล้างตัวเลือก
+        {t.products.common.clearSelection}
       </Button>
       <Button variant="primary" size="xl" className="min-w-0 flex-1 max-w-[343px]" onClick={onApply}>
-        แสดงผล
+        {t.products.common.showResults}
       </Button>
     </div>
   );
@@ -102,6 +105,7 @@ type RoboAdvisoryFilterModalProps = {
 
 /** Figma 33787:152139 — Robo Advisory filter modal (Model type / ความเสี่ยง / Rebalance Timing). */
 export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: RoboAdvisoryFilterModalProps) {
+  const t = useT();
   const isMobile = useIsMobile();
   const [draft, setDraft] = useState<RoboAdvisoryFilters>(filters);
   const [syncSnapshot, setSyncSnapshot] = useState({ open, filters });
@@ -120,7 +124,7 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
   }, [open, isMobile, onClose]);
 
   const activeCount = countRoboAdvisoryFilters(draft);
-  const title = `ตัวกรอง (${activeCount})`;
+  const title = t.products.common.filterCount(activeCount);
 
   const toggleProvider = (provider: RoboProviderFilter) => {
     setDraft((prev) => ({
@@ -166,7 +170,7 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
         }}
         title={title}
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         showHandle
         contentClassName="flex max-h-[calc(var(--dvh)*100-8rem)] flex-col gap-6 overflow-y-auto pb-2"
@@ -200,7 +204,7 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
           <button
             type="button"
             onClick={onClose}
-            aria-label="ปิด"
+            aria-label={t.common.close}
             className="flex size-5 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0"
           >
             <XIcon size={20} className="text-[#101828]" />

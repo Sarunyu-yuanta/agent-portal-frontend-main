@@ -30,15 +30,14 @@ import {
   TABLE_CARD_STYLE,
   headerBorderStyle,
   cellBorderStyle,
-  ACTION_LABELS,
   StatusTag,
   BondLogo,
 } from "./fixed-income-shared";
 import { FixedIncomeFilterModal } from "./FixedIncomeFilterModal";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import type { BookableProduct } from "@/app/(dashboard)/orders/bookable-products";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
-import { QuotaBookButton, useQuotaBooking } from "@/app/(dashboard)/orders/useQuotaBooking";
+import type { BookableProduct } from "@/app/[lang]/(dashboard)/orders/bookable-products";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { QuotaBookButton, useQuotaBooking } from "@/app/[lang]/(dashboard)/orders/useQuotaBooking";
 
 /** Opens the booking modal for a bond — see `useQuotaBooking`. */
 type OnBook = (product: BookableProduct) => void;
@@ -46,6 +45,8 @@ type OnBook = (product: BookableProduct) => void;
 /** Only a bond open for subscription can be booked; the rest keep their follow action. */
 const bookable = (bond: FixedIncomeBond) => ORDER_BOOKING_ENABLED && bond.action === "invest";
 import { FixedIncomeAppliedFilterChips } from "./FixedIncomeAppliedFilterChips";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 function offerTypeVariant(type: string): TagVariant {
   if (type === "PO") return "blue";
@@ -74,6 +75,7 @@ function MarketSwitcher({
   market: "primary" | "secondary";
   onChange: (market: "primary" | "secondary") => void;
 }) {
+  const t = useT();
   return (
     <div
       className="flex flex-1 min-w-0 max-w-[604px] gap-0 p-1 rounded-full"
@@ -98,7 +100,7 @@ function MarketSwitcher({
             color: market === "primary" ? "#101828" : "#6a7282",
           }}
         >
-          หุ้นกู้ตลาดแรก
+          {t.products.fixedIncome.category.primary}
         </span>
       </button>
       <button
@@ -120,7 +122,7 @@ function MarketSwitcher({
             color: market === "secondary" ? "#101828" : "#6a7282",
           }}
         >
-          หุ้นกู้ตลาดรอง
+          {t.products.fixedIncome.category.secondary}
         </span>
       </button>
     </div>
@@ -128,12 +130,13 @@ function MarketSwitcher({
 }
 
 function ActionButton({ bond, onBook }: { bond: FixedIncomeBond; onBook: OnBook }) {
+  const t = useT();
   if (bookable(bond)) {
     return (
       <QuotaBookButton
         product={fixedIncomeToBookableProduct(bond)}
         onBook={onBook}
-        label="สร้างคำสั่งซื้อ"
+        label={t.products.common.createOrder}
       />
     );
   }
@@ -144,12 +147,13 @@ function ActionButton({ bond, onBook }: { bond: FixedIncomeBond; onBook: OnBook 
       className="inline-flex items-center justify-center px-1.5 py-1 rounded text-xs font-medium leading-[22px] whitespace-nowrap max-w-[343px]"
       style={{ backgroundColor: "#0a6ee7", color: "white", cursor: "pointer" }}
     >
-      สร้างคำสั่งซื้อ
+      {t.products.common.createOrder}
     </button>
   );
 }
 
 function CardActionButton({ bond, onBook }: { bond: FixedIncomeBond; onBook: OnBook }) {
+  const t = useT();
   const action = bond.action;
   if (bookable(bond)) {
     return (
@@ -158,7 +162,7 @@ function CardActionButton({ bond, onBook }: { bond: FixedIncomeBond; onBook: OnB
         onBook={onBook}
         size="lg"
         className="shrink-0 max-w-[343px]"
-        label={ACTION_LABELS[action]}
+        label={t.products.fixedIncome.action[action]}
       />
     );
   }
@@ -171,7 +175,7 @@ function CardActionButton({ bond, onBook }: { bond: FixedIncomeBond; onBook: OnB
       className="shrink-0 max-w-[343px]"
       onClick={(e) => e.stopPropagation()}
     >
-      {ACTION_LABELS[action]}
+      {t.products.fixedIncome.action[action]}
     </Button>
   );
 }
@@ -185,6 +189,7 @@ function FixedIncomeCard({
   onSelect: (bond: FixedIncomeBond) => void;
   onBook: OnBook;
 }) {
+  const t = useT();
   return (
     <div
       role="button"
@@ -219,13 +224,13 @@ function FixedIncomeCard({
           </span>
         </div>
         <div className="flex gap-2 items-center w-full text-xs leading-[20px] text-[#101828]">
-          <span className="flex-1 min-w-0">ครบกำหนด: {bond.maturity}</span>
+          <span className="flex-1 min-w-0">{t.products.fixedIncome.maturesOn(bond.maturity)}</span>
           <span className="shrink-0 whitespace-nowrap">{bond.tenor}</span>
         </div>
         <div className="flex gap-2 items-center w-full text-xs leading-[20px] text-[#101828]">
           <OfferTypeTag offerType={bond.offerType} />
           <span className="shrink-0 whitespace-nowrap">
-            {getBookingLabel(bond)}
+            {getBookingLabel(bond, t)}
           </span>
         </div>
       </div>
@@ -244,7 +249,7 @@ function FixedIncomeCard({
             {bond.companyName}
           </span>
           <span className="text-xs leading-[20px] text-[#4a5565] whitespace-nowrap shrink-0">
-            {bond.bondRating} / Risk {getRiskNumber(bond.risk)}
+            {t.products.fixedIncome.ratingAndRisk(bond.bondRating, getRiskNumber(bond.risk))}
           </span>
         </div>
         <CardActionButton bond={bond} onBook={onBook} />
@@ -254,26 +259,28 @@ function FixedIncomeCard({
 }
 
 function TableHeader() {
+  const t = useT();
+  const cols = t.products.fixedIncome.columns;
   return (
     <div className="flex h-11 items-stretch shrink-0 min-w-[1440px] bg-white">
       <div
         className="sticky left-0 z-[1] flex w-[160px] shrink-0 items-center px-3 bg-white group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]"
         style={headerBorderStyle()}
       >
-        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>หุ้นกู้</span>
+        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.bond}</span>
       </div>
       <div
         className="flex w-20 items-center justify-center px-3"
         style={headerBorderStyle()}
       >
-        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>สถานะ</span>
+        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.status}</span>
       </div>
       <div
         className="flex w-[136px] items-center justify-center px-3"
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          อัตราดอกเบี้ย
+          {cols.couponRate}
         </span>
       </div>
       <div
@@ -281,18 +288,18 @@ function TableHeader() {
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          งวดดอกเบี้ย
+          {cols.couponPeriod}
         </span>
       </div>
       <div className="flex w-32 items-center px-3" style={headerBorderStyle()}>
-        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>อายุ</span>
+        <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.tenor}</span>
       </div>
       <div
         className="flex w-[120px] items-center px-3"
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          วันครบกำหนด
+          {cols.maturity}
         </span>
       </div>
       <div
@@ -313,12 +320,12 @@ function TableHeader() {
             style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
           >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-              บริษัท
+              {cols.company}
             </span>
           </div>
           <div className="flex flex-1 items-center justify-center px-3">
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-              หุ้นกู้
+              {cols.bond}
             </span>
           </div>
         </div>
@@ -328,7 +335,7 @@ function TableHeader() {
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          ความเสี่ยง
+          {cols.risk}
         </span>
       </div>
       <div
@@ -336,7 +343,7 @@ function TableHeader() {
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          ประเภทเสนอขาย
+          {cols.offerType}
         </span>
       </div>
       <div
@@ -344,7 +351,7 @@ function TableHeader() {
         style={headerBorderStyle()}
       >
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
-          คาดว่าเปิดขาย
+          {cols.expectedOpen}
         </span>
       </div>
       <div
@@ -366,6 +373,7 @@ function BondTableRow({
   onSelect: (bond: FixedIncomeBond) => void;
   onBook: OnBook;
 }) {
+  const t = useT();
   const border = () => cellBorderStyle({ bottom: !isLast });
 
   return (
@@ -391,7 +399,7 @@ function BondTableRow({
         </span>
       </div>
       <div className="flex w-20 items-center justify-center p-3" style={border()}>
-        <StatusTag status={bond.status} label={bond.status === "open" ? "Active" : "Inactive"} />
+        <StatusTag status={bond.status} label={bond.status === "open" ? t.products.fixedIncome.active : t.products.fixedIncome.inactive} />
       </div>
       <div
         className="flex w-[136px] items-center justify-center px-3 py-3.5"
@@ -461,6 +469,7 @@ export function FixedIncomeTab({
 }: {
   onBondSelect: (bond: FixedIncomeBond) => void;
 }) {
+  const t = useT();
   const [market, setMarket] = useState<"primary" | "secondary">("primary");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<FixedIncomeFilters>(
@@ -491,11 +500,24 @@ export function FixedIncomeTab({
 
   const activeFilterCount = countFixedIncomeFilters(appliedFilters);
   const appliedFilterChips = useMemo(
-    () => getFixedIncomeFilterChips(appliedFilters),
-    [appliedFilters],
+    () => getFixedIncomeFilterChips(appliedFilters, t),
+    [appliedFilters, t],
   );
 
   const openFilters = () => setFiltersOpen(true);
+
+  // No bonds at all, versus filters that matched none of them.
+  const clearFilters = () => {
+    setAppliedFilters(EMPTY_FIXED_INCOME_FILTERS);
+    setCurrentPage(1);
+  };
+  const emptyState =
+    total > 0 ? null : (
+      <CatalogSectionEmpty
+        title={t.products.states.noBonds}
+        onClearFilters={openBonds.length > 0 ? clearFilters : undefined}
+      />
+    );
 
   const removeFilterChip = (chip: (typeof appliedFilterChips)[number]) => {
     setAppliedFilters((current) => removeFixedIncomeFilterChip(current, chip));
@@ -511,14 +533,14 @@ export function FixedIncomeTab({
             <Badge
               variant="button"
               iconOnly
-              label="Filter"
+              label={t.products.common.filter}
               count={activeFilterCount}
               onClick={openFilters}
               className="shrink-0 md:hidden"
             />
             <Badge
               variant="button"
-              label="Filter"
+              label={t.products.common.filter}
               count={activeFilterCount}
               onClick={openFilters}
               className="shrink-0 hidden md:flex"
@@ -543,7 +565,7 @@ export function FixedIncomeTab({
               <MarketSwitcher market={market} onChange={setMarket} />
               <Badge
                 variant="button"
-                label="Filter"
+                label={t.products.common.filter}
                 count={activeFilterCount}
                 onClick={openFilters}
                 className="shrink-0"
@@ -559,15 +581,18 @@ export function FixedIncomeTab({
           </div>
         </div>
         <div className="flex items-center justify-end w-full px-1 text-sm leading-[24px] text-[#6a7282] whitespace-nowrap">
-          <span>อัปเดตล่าสุด 25 August 2026 - 9:00</span>
+          <span>{t.products.common.updatedAt("25 August 2026 - 9:00")}</span>
         </div>
       </div>
 
       {/* ── Mobile/Tablet: count text ── */}
       <div className="flex items-center justify-between w-full px-1 text-xs leading-[20px] text-[#6a7282] whitespace-nowrap lg:hidden">
-        <span>อัปเดตล่าสุด 25 Aug 2026 - 9:00</span>
+        <span>{t.products.common.updatedAt("25 Aug 2026 - 9:00")}</span>
       </div>
 
+      {emptyState ? (
+        <div className="w-full lg:hidden">{emptyState}</div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:hidden">
         {pagedBonds.map((bond) => (
           <FixedIncomeCard
@@ -578,6 +603,7 @@ export function FixedIncomeTab({
           />
         ))}
       </div>
+      )}
 
       <div
         ref={tableCardRef}
@@ -603,6 +629,7 @@ export function FixedIncomeTab({
               tableCardRef.current.dataset.scrolled = String((body?.scrollLeft ?? 0) > 0);
           }}
         >
+          {emptyState ?? (
           <div className="flex flex-col min-w-[1440px]">
             {pagedBonds.map((bond, i) => (
               <BondTableRow
@@ -614,13 +641,15 @@ export function FixedIncomeTab({
               />
             ))}
           </div>
+          )}
         </div>
       </div>
 
-      {/* Pagination bar */}
+      {/* Pagination bar — hidden with no rows, as on GlobalBondAllPage */}
+      {total > 0 && (
       <div className="flex flex-wrap-reverse items-center justify-end gap-3 w-full">
         <div className="flex items-center gap-2">
-          <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+          <p className="text-label text-muted-foreground whitespace-nowrap">{t.products.pagination.perPage}</p>
           <select
             value={pageSize}
             onChange={(e) => {
@@ -636,17 +665,10 @@ export function FixedIncomeTab({
         </div>
         <div className="flex items-center gap-3">
           <p className="text-label text-muted-foreground">
-            Showing{" "}
-            <span className="font-medium text-foreground">
-              {(safePage - 1) * pageSize + 1}
-            </span>
-            {" – "}
-            <span className="font-medium text-foreground">
-              {Math.min(safePage * pageSize, total)}
-            </span>
-            {" of "}
-            <span className="font-medium text-foreground">{total}</span>{" "}
-            items
+            {t.products.pagination.showing(
+              { from: (safePage - 1) * pageSize + 1, to: Math.min(safePage * pageSize, total), total },
+              (n) => <span className="font-medium text-foreground">{n}</span>,
+            )}
           </p>
           <Pagination
             totalPages={totalPages}
@@ -655,6 +677,7 @@ export function FixedIncomeTab({
           />
         </div>
       </div>
+      )}
 
       {booking.ui}
 

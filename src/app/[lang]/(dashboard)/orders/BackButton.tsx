@@ -2,6 +2,7 @@
 
 import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The back arrow of the order and proposal flows — beside the title on a
@@ -10,11 +11,13 @@ import { ArrowLeftIcon } from "@phosphor-icons/react";
  */
 export function BackButton({
   onClick,
-  label = "ย้อนกลับไปเลือกลูกค้า",
+  label,
 }: {
   onClick: () => void;
   label?: string;
 }) {
+  const t = useT();
+  label ??= t.orders.backToClientPicker;
   return (
     <Button
       variant="plain-black"

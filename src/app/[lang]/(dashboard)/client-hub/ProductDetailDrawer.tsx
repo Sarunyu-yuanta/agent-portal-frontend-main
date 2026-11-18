@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar, TabGroup } from "@sarunyu/system-one";
-import { CaretRightIcon, CaretDownIcon } from "@phosphor-icons/react";
+import { Avatar, TabGroup, Toaster } from "@sarunyu/system-one";
+import { CaretRightIcon, CaretDownIcon, UsersIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useToasts } from "@/hooks/use-toasts";
 import { StatCardRow } from "@/components/ui/finance-ui";
 import { useSlideOver, SlideOverPanel } from "@/components/ui/slide-over";
 import { usePrivacy } from "@/contexts/privacy-context";
@@ -11,6 +13,7 @@ import { getInitials, formatThbAmount } from "@/lib/client-utils";
 import { PRODUCT_SUB_DATA, type SubProduct } from "@/data/product-sub-data";
 import { ClientDetailPanel } from "./ClientDetailPanel";
 import type { Client, ProductRow } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Content of the product drawer: stats, holdings/clients tabs, and a pushed
  * client detail overlay. Owns its own tab/expand/push state so remounting on a
@@ -24,16 +27,22 @@ export function ProductDetailDrawer({
   clients: Client[];
   onViewFullProfile: (clientId: string) => void;
 }) {
+  const t = useT();
+  const d = t.client.productDrawer;
   const { isPrivate } = usePrivacy();
   const subProducts: SubProduct[] = PRODUCT_SUB_DATA[product.label] ?? [];
   const hasSub = subProducts.length > 0;
   const [tab, setTab] = useState<"sub" | "clients">(hasSub ? "sub" : "clients");
   const [expandedSubIds, setExpandedSubIds] = useState<Set<string>>(new Set());
   const push = useSlideOver<Client>();
+  const { toasts, addToast, removeToast } = useToasts();
 
+  // A holder whose client isn't in the loaded list can't open a panel — say
+  // so instead of leaving the press doing nothing.
   const openClient = (clientId: string) => {
     const c = clients.find((cl) => cl.id === clientId);
     if (c) push.open(c);
+    else addToast({ status: "warning", message: t.states.notFoundClient });
   };
 
   return (
@@ -46,7 +55,7 @@ export function ProductDetailDrawer({
         </span>
         <div className="flex-1 min-w-0">
           <p className="type-subtitle-1 font-bold text-foreground truncate">{product.label}</p>
-          <p className="type-caption text-muted-foreground">{product.clientCount} clients</p>
+          <p className="type-caption text-muted-foreground">{d.clientCount(product.clientCount)}</p>
         </div>
       </div>
 
@@ -55,7 +64,7 @@ export function ProductDetailDrawer({
         <StatCardRow
           stats={[
             {
-              label: "Total AUM",
+              label: d.totalAum,
               value: (
                 <>
                   {formatThbAmount(product.totalAmountThb)}{" "}
@@ -64,7 +73,7 @@ export function ProductDetailDrawer({
               ),
             },
             {
-              label: "Avg Allocation",
+              label: d.avgAllocation,
               value: `${product.avgAllocationPct.toFixed(1)}%`,
             },
           ]}
@@ -76,8 +85,8 @@ export function ProductDetailDrawer({
         <div className="shrink-0 px-4 pt-3 pb-0">
           <TabGroup
             items={[
-              { id: "sub", title: `Holdings (${subProducts.length})` },
-              { id: "clients", title: `Clients (${product.clientCount})` },
+              { id: "sub", title: d.holdingsTab(subProducts.length) },
+              { id: "clients", title: d.clientsTab(product.clientCount) },
             ]}
             activeId={tab}
             size="sm"
@@ -98,7 +107,7 @@ export function ProductDetailDrawer({
                   className="text-label text-blue-600 hover:underline cursor-pointer"
                   onClick={() => setExpandedSubIds(new Set())}
                 >
-                  Collapse All
+                  {t.client.assets.collapseAll}
                 </button>
               ) : (
                 <button
@@ -106,7 +115,7 @@ export function ProductDetailDrawer({
                   className="text-label text-blue-600 hover:underline cursor-pointer"
                   onClick={() => setExpandedSubIds(new Set(subProducts.map((s) => s.id)))}
                 >
-                  Expand All
+                  {t.client.assets.expandAll}
                 </button>
               )}
             </div>
@@ -146,7 +155,7 @@ export function ProductDetailDrawer({
                     {/* Client count badge (prominent) */}
                     <div className="shrink-0 flex flex-col items-center bg-[var(--bg-default-secondary)] rounded-lg px-3 py-1.5 min-w-[52px]">
                       <span className="text-title font-bold text-foreground leading-none">{sub.clientCount}</span>
-                      <span className="text-meta text-muted-foreground leading-tight mt-0.5">clients</span>
+                      <span className="text-meta text-muted-foreground leading-tight mt-0.5">{d.clientsBadge(sub.clientCount)}</span>
                     </div>
 
                     {/* Chevron */}
@@ -189,6 +198,13 @@ export function ProductDetailDrawer({
         {/* Clients tab */}
         {(!hasSub || tab === "clients") && (
           <div className="flex flex-col gap-2 p-4">
+            {product.holders.length === 0 && (
+              <EmptyState
+                size="compact"
+                icon={<UsersIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                title={d.noHolders}
+              />
+            )}
             {product.holders.map((holder) => (
               <button
                 key={holder.clientId}
@@ -211,6 +227,8 @@ export function ProductDetailDrawer({
           </div>
         )}
       </div>
+
+      <Toaster items={toasts} onRemove={removeToast} />
 
       {/* Push overlay: client detail */}
       {push.mounted && push.data && (

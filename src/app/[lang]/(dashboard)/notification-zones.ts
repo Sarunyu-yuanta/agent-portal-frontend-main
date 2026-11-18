@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatTime, weekdayNames } from "@/i18n/format";
 import type { NotificationItem } from "@sarunyu/system-one";
 
 /**
@@ -29,13 +31,6 @@ export const ZONE_ORDER: NotificationZone[] = [
   "next2Weeks",
 ];
 
-export const ZONE_LABEL_TH: Record<NotificationZone, string> = {
-  overdue: "เลยกำหนด",
-  today: "วันนี้",
-  tomorrow: "พรุ่งนี้",
-  thisWeek: "สัปดาห์นี้",
-  next2Weeks: "2 สัปดาห์ข้างหน้า",
-};
 
 /**
  * Which zone a due-date falls in, or `null` past 15 days — the point nothing
@@ -89,19 +84,11 @@ export type ZonedNotification = {
  *
  * `daysAgo` is `-daysLeft`, so 0 is today and 1 is yesterday.
  */
-export function daysAgoLabelTh(daysAgo: number): string {
-  if (daysAgo <= 0) return "วันนี้";
-  if (daysAgo === 1) return "เมื่อวาน";
-  return `${daysAgo} วันก่อน`;
-}
 
-/** Bucket headings in panel order, newest first. */
-export const PAST_BUCKETS_TH = [
-  "วันนี้",
-  "เมื่อวาน",
-  "7 วันที่ผ่านมา",
-  "ก่อนหน้านี้",
-] as const;
+
+/** Bucket ids in panel order, newest first. Headings: `t.buckets.past[id]`. */
+export const PAST_BUCKETS = ["today", "yesterday", "week", "earlier"] as const;
+export type PastBucket = (typeof PAST_BUCKETS)[number];
 
 /**
  * The heading a past row is grouped under in the bell.
@@ -111,15 +98,13 @@ export const PAST_BUCKETS_TH = [
  * their own; the rest share a week bucket and an "earlier" bucket, and each
  * row carries its own stamp from `notificationStampEn`.
  */
-export function pastBucketTh(daysAgo: number): (typeof PAST_BUCKETS_TH)[number] {
-  if (daysAgo <= 0) return "วันนี้";
-  if (daysAgo === 1) return "เมื่อวาน";
-  if (daysAgo <= 7) return "7 วันที่ผ่านมา";
-  return "ก่อนหน้านี้";
+export function pastBucket(daysAgo: number): PastBucket {
+  if (daysAgo <= 0) return "today";
+  if (daysAgo === 1) return "yesterday";
+  if (daysAgo <= 7) return "week";
+  return "earlier";
 }
 
-const CLOCK_EN = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
-const WEEKDAY_EN = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 
 /**
  * The small stamp beside a bell row's title, sized to its bucket:
@@ -134,11 +119,11 @@ const WEEKDAY_EN = new Intl.DateTimeFormat("en-US", { weekday: "short" });
  * Only ever rendered once the panel is open (client-side), so formatting in
  * the browser's own zone can't cause a hydration mismatch.
  */
-export function notificationStampEn(daysAgo: number, at?: Date): string {
+export function notificationStamp(daysAgo: number, locale: Locale, at?: Date): string {
   const day = at ?? new Date(new Date().setHours(0, 0, 0, 0) - daysAgo * 86_400_000);
-  const clock = at ? CLOCK_EN.format(at) : "";
+  const clock = at ? formatTime(locale, at) : "";
   if (daysAgo <= 0) return clock;
-  const weekday = WEEKDAY_EN.format(day);
+  const weekday = weekdayNames(locale, "short")[day.getDay()];
   if (daysAgo <= 7) return clock ? `${weekday} ${clock}` : weekday;
-  return `${weekday} ${day.getMonth() + 1}/${day.getDate()}`;
+  return `${weekday} ${formatDate(locale, day, "dayMonth")}`;
 }

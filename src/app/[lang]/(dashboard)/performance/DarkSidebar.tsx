@@ -2,15 +2,17 @@
 
 import { SparkleIcon, TargetIcon } from "@phosphor-icons/react";
 import { GAP_ITEMS, AI_STEPS } from "./performance-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function GapAnalysisSidebar() {
+  const t = useT();
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <TargetIcon size={14} style={{ color: "rgba(255,255,255,0.45)" }} />
-          <p className="text-body-sm font-semibold text-white">Gap Analysis</p>
+          <p className="text-body-sm font-semibold text-white">{t.performance.gap.title}</p>
         </div>
         <span
           className="text-meta font-semibold px-2 py-0.5 rounded-full"
@@ -24,16 +26,16 @@ function GapAnalysisSidebar() {
       <div className="flex flex-col gap-1.5">
         {GAP_ITEMS.map((g) => (
           <div
-            key={g.label}
+            key={g.id}
             className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div className="flex flex-col gap-0.5">
               <p className="text-label font-medium" style={{ color: "rgba(255,255,255,0.80)" }}>
-                {g.label}
+                {t.performance.gap.items[g.id].label}
               </p>
               <p className="text-meta" style={{ color: "rgba(255,255,255,0.45)" }}>
-                {g.sub}
+                {t.performance.gap.items[g.id].sub}
               </p>
             </div>
             <p className="text-[22px] font-semibold leading-none shrink-0" style={{ color: g.color }}>
@@ -47,14 +49,15 @@ function GapAnalysisSidebar() {
 }
 
 function AiActionPlan() {
+  const t = useT();
   return (
     <div className="flex flex-col gap-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
       <div>
         <div className="flex items-center gap-2">
           <SparkleIcon size={13} weight="fill" style={{ color: "var(--text-brand-primary)" }} />
-          <p className="text-body-sm font-semibold text-white">AI Action Plan</p>
+          <p className="text-body-sm font-semibold text-white">{t.performance.actionPlan.title}</p>
         </div>
-        <p className="text-meta mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>Prioritised steps to close ฿5.8M revenue gap.</p>
+        <p className="text-meta mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{t.performance.actionPlan.subtitle("฿5.8M")}</p>
       </div>
 
       <div className="flex flex-col gap-4">

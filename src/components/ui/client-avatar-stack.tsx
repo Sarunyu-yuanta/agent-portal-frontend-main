@@ -2,6 +2,7 @@
 
 import { AvatarStack } from "@sarunyu/system-one";
 import { getInitial } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 
 type StackSize = "small" | "medium" | "large";
 
@@ -46,6 +47,7 @@ export function ClientAvatarStack({
   slots?: number;
   size?: StackSize;
 }) {
+  const t = useT();
   if (names.length === 0) return null;
 
   const faces = names.length > slots ? names.slice(0, slots - 1) : names;
@@ -81,7 +83,7 @@ export function ClientAvatarStack({
          */
         <span
           role="img"
-          aria-label={`${hidden} more`}
+          aria-label={t.shell.avatarStack.more(hidden)}
           className={`pointer-events-none absolute right-0 top-0 z-10 flex ${box} ${text} select-none items-center justify-center font-bold leading-none`}
           style={{ color: AVATAR_TEXT_COLOR }}
         >

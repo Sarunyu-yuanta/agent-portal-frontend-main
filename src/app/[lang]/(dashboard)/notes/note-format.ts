@@ -1,14 +1,11 @@
 import type { TagProps, TagVariant } from "@sarunyu/system-one";
 import type { Note } from "@/types/domain";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatDate, formatDateTime as fmtDateTime, formatTime } from "@/i18n/format";
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+export function formatDateTime(iso: string, locale: Locale): string {
+  return fmtDateTime(locale, iso);
 }
 
 /**
@@ -17,16 +14,14 @@ export function formatDateTime(iso: string): string {
  * what you're scanning for, not the minute. Deliberately no "Yesterday"/
  * "Today" wording: the group header the row sits under already says that.
  */
-export function formatListStamp(iso: string): string {
+export function formatListStamp(iso: string, locale: Locale): string {
   const d = new Date(iso);
   const now = new Date();
   const isToday =
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate();
-  return isToday
-    ? d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-    : d.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return isToday ? formatTime(locale, d) : formatDate(locale, d, "numeric");
 }
 
 /**
@@ -66,12 +61,8 @@ export function reminderAtFromDate(date: Date): string {
  * A calendar day, no time — for reminders (which have no time to show) and for
  * note cards (where the minute is noise).
  */
-export function formatDayOnly(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+export function formatDayOnly(iso: string, locale: Locale): string {
+  return formatDate(locale, iso, "short");
 }
 
 /**
@@ -110,10 +101,11 @@ export const REMINDER_TONE: Record<NonNullable<TagProps["variant"]>, string> = {
 
 export type ReminderTag = { label: string; variant: NonNullable<TagProps["variant"]> };
 
-export function reminderTag(note: Note): ReminderTag | null {
+export function reminderTag(note: Note, t: Dictionary, locale: Locale): ReminderTag | null {
   if (!note.reminderAt) return null;
-  const when = formatDayOnly(note.reminderAt);
-  if (note.reminderDone) return { label: `Done · ${when}`, variant: "gray" };
+  const when = formatDayOnly(note.reminderAt, locale);
+  const m = t.dates.reminderTag;
+  if (note.reminderDone) return { label: m.done(when), variant: "gray" };
 
   // Compared by day, not by timestamp. The old version measured the gap to
   // `Date.now()`, which for a date-only reminder called today "Overdue" from
@@ -124,11 +116,11 @@ export function reminderTag(note: Note): ReminderTag | null {
   const due = new Date(note.reminderAt);
   due.setHours(0, 0, 0, 0);
 
-  if (due.getTime() < today.getTime()) return { label: `Overdue · ${when}`, variant: "red" };
-  if (due.getTime() === today.getTime()) return { label: `Due today · ${when}`, variant: "yellow" };
+  if (due.getTime() < today.getTime()) return { label: m.overdue(when), variant: "red" };
+  if (due.getTime() === today.getTime()) return { label: m.dueToday(when), variant: "yellow" };
   // `green` for a reminder that's simply scheduled. Blue is the client chip's
   // now, and this is the only reminder state that was competing for it — the
   // urgent ones keep red/yellow and a done one stays gray, so nothing here can
   // collide with a client.
-  return { label: `Reminder · ${when}`, variant: "green" };
+  return { label: m.scheduled(when), variant: "green" };
 }

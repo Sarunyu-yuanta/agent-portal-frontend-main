@@ -27,7 +27,7 @@
 
 import campaignsRaw from "@/data/campaigns.json";
 import { mockClients } from "@/lib/mock-data";
-import { NOTE_AUTHOR } from "@/app/(dashboard)/notes/note-constants";
+import { NOTE_AUTHOR } from "@/app/[lang]/(dashboard)/notes/note-constants";
 import type {
   Campaign,
   CampaignClient,

@@ -1,6 +1,7 @@
 "use client";
 
 import { BottomSheet, Modal, useIsMobile } from "@sarunyu/system-one";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Figma 37712:119199 / 39824:512747 — investment policy read-more modal */
 export function MutualFundInvestmentPolicyModal({
@@ -12,6 +13,7 @@ export function MutualFundInvestmentPolicyModal({
   policy: string;
   onClose: () => void;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -21,10 +23,10 @@ export function MutualFundInvestmentPolicyModal({
         onOpenChange={(next) => {
           if (!next) onClose();
         }}
-        title="นโยบายการลงทุน"
+        title={t.fund.detail.investmentPolicy}
         showHandle
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         contentClassName="flex max-h-[calc(var(--dvh)*100-10rem)] flex-col overflow-y-auto pt-0 pb-10"
       >
@@ -46,7 +48,7 @@ export function MutualFundInvestmentPolicyModal({
       <div onMouseDown={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title="นโยบายการลงทุน"
+          title={t.fund.detail.investmentPolicy}
           showClose
           onClose={onClose}
           actionLayout="none"

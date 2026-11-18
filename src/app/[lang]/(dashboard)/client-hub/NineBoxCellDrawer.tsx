@@ -7,6 +7,7 @@ import { useSlideOver, SlideOverPanel } from "@/components/ui/slide-over";
 import { ClientDetailPanel } from "./ClientDetailPanel";
 import { NINE_BOX_HEAT_STYLES, type NineBoxCellInfo } from "./NineBoxTab";
 import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Content of the nine-box cell drawer: segment header, client list, and a
  * pushed client detail overlay. */
@@ -17,6 +18,8 @@ export function NineBoxCellDrawer({
   cell: NineBoxCellInfo;
   onViewFullProfile: (clientId: string) => void;
 }) {
+  const t = useT();
+  const nb = t.client.nineBox;
   const push = useSlideOver<Client>();
   const style = NINE_BOX_HEAT_STYLES[cell.heat];
 
@@ -26,10 +29,10 @@ export function NineBoxCellDrawer({
       <div className="px-5 py-4 border-b border-[var(--border-default)] shrink-0">
         <div className="flex items-center gap-2">
           <span className={`size-2.5 rounded-full shrink-0 ${style.dot}`} />
-          <p className="type-subtitle-1 font-bold text-foreground">{cell.label}</p>
+          <p className="type-subtitle-1 font-bold text-foreground">{nb.cells[cell.id]}</p>
         </div>
         <p className="type-caption text-muted-foreground mt-1 pl-[18px]">
-          {cell.aumLabel} AUM · {cell.aiLabel} AI Score
+          {nb.cellSubtitle(nb.tiers[cell.aumTier], nb.tiers[cell.aiTier])}
         </p>
       </div>
 
@@ -40,12 +43,12 @@ export function NineBoxCellDrawer({
             <div className="size-12 rounded-full bg-[var(--bg-default-secondary)] flex items-center justify-center">
               <UsersIcon size={24} className="text-muted-foreground" weight="duotone" />
             </div>
-            <p className="type-body-2 text-muted-foreground">No clients in this segment</p>
+            <p className="type-body-2 text-muted-foreground">{nb.noClients}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2 p-4">
             <p className="type-caption text-muted-foreground px-1">
-              {cell.clients.length} client{cell.clients.length !== 1 ? "s" : ""}
+              {nb.clientCount(cell.clients.length)}
             </p>
             {cell.clients.map((c) => (
               <button

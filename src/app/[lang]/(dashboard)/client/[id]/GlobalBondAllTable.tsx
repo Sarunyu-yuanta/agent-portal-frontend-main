@@ -14,6 +14,8 @@ import {
 } from "./fixed-income-shared";
 import { useSyncedTableScroll } from "./use-synced-table-scroll";
 import { GlobalBondListCta } from "./GlobalBondDetailBondList";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const BONDS_COL_MIN_CLS = "min-w-[400px]";
 const INVEST_URL = "https://placeholder.example.com/create-order";
@@ -26,16 +28,25 @@ function IssuerLogo({ src }: { src: string }) {
   );
 }
 
-export function GlobalBondAllTable({ bonds }: { bonds: GlobalBondRow[] }) {
+export function GlobalBondAllTable({
+  bonds,
+  onClearFilters,
+}: {
+  bonds: GlobalBondRow[];
+  /** Given only while a filter is narrowing a non-empty list — see `GlobalBondAllPage`. */
+  onClearFilters?: () => void;
+}) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const { isScrolled, headerScrollRef, bodyScrollRef, onBodyScroll } = useSyncedTableScroll();
 
   if (bonds.length === 0) {
     return (
       <div
-        className="w-full rounded-xl overflow-hidden bg-white px-4 py-10 text-center text-sm text-[#6a7282]"
+        className="w-full rounded-xl overflow-hidden bg-white px-4"
         style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_CARD_STYLE.boxShadow }}
       >
-        ไม่พบรายการที่ตรงกับตัวกรอง
+        <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
       </div>
     );
   }
@@ -54,31 +65,31 @@ export function GlobalBondAllTable({ bonds }: { bonds: GlobalBondRow[] }) {
       >
         <div className="flex items-stretch">
           <div className={`flex h-11 shrink-0 items-center w-[400px] ${BONDS_COL_MIN_CLS} px-4 ${stickyColCls}`} style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Bonds</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.bonds}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center w-[138px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ISIN</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.isin}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-center w-[80px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Currency</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.currency}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-end w-[128px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Coupon Rate</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-end w-[81px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Price</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.price}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-end w-[180px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ผลตอบแทนโดยประมาณ</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-center w-[122px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>วันครบกำหนด</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-end w-[112px] px-4" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ระยะเวลา (ปี)</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-center w-[122px] px-3" style={headerBorderStyle()}>
-            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>เอกสาร</span>
+            <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.documents}</span>
           </div>
           <div className="flex h-11 shrink-0 items-center justify-center w-[138px] px-4" style={headerBorderStyle({ right: false })} />
         </div>

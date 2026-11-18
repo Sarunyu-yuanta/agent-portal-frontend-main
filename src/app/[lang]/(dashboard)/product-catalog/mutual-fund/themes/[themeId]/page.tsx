@@ -1,10 +1,12 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { MutualFundThemeDetailPage } from "../../../../client/[id]/MutualFundThemeDetailPage";
-import { normalizeMutualFundThemeId } from "../../../../client/[id]/mutual-fund-data";
+import { findMutualFundThemeId } from "../../../../client/[id]/mutual-fund-data";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { CatalogNotFound } from "../../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundThemeDetailRoute({
   params,
@@ -12,9 +14,16 @@ export default function MutualFundThemeDetailRoute({
   params: Promise<{ themeId: string }>;
 }) {
   const { themeId: rawThemeId } = use(params);
-  const themeId = normalizeMutualFundThemeId(decodeURIComponent(rawThemeId));
-  const router = useRouter();
+  const t = useT();
+  // The theme list is a static catalog, so an unknown id is known up front —
+  // never stand another theme in for it.
+  const themeId = findMutualFundThemeId(decodeURIComponent(rawThemeId));
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
+
+  if (!themeId) {
+    return <CatalogNotFound message={t.fund.notFound.theme} onBack={goBack} />;
+  }
 
   return (
     <MutualFundThemeDetailPage

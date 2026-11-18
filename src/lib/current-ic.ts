@@ -18,7 +18,7 @@
  * the app has more than one user.
  */
 
-export { NOTE_AUTHOR as IC_NAME } from "@/app/(dashboard)/notes/note-constants";
+export { NOTE_AUTHOR as IC_NAME } from "@/app/[lang]/(dashboard)/notes/note-constants";
 
 /** Shown under the name in the sidebar's account menu. */
 export const IC_ROLE = "Senior RM";

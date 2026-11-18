@@ -27,7 +27,7 @@ import { Button, Tag, type ToastStatus } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import type { Booking, OrderBook, RequirementItem } from "@/types/domain";
 import type { BookableProduct } from "./bookable-products";
@@ -44,17 +44,18 @@ import {
   type Tone,
 } from "./detail-sheet-ui";
 import {
-  BOOKING_PHASE_LABEL,
   bookingPhase,
   submissionFor,
   formatLogTime,
   formatOrderAmount,
   type BookingPhase,
 } from "./order-book";
-import { ORDER_WORDS } from "./order-words";
-import { CALL_DIRECTION_LABEL, EVIDENCE_CHANNEL, formatFileSize } from "./order-evidence";
+import { EVIDENCE_CHANNEL, formatFileSize } from "./order-evidence";
+import { requirementDetailText } from "./order-requirements";
 import { STATUS_CHIP } from "./OrderBookingModal";
 import type { BookingStatusTag } from "./booking-status";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * The disc, by the step the booking is at rather than by its deal status.
@@ -101,11 +102,12 @@ export function BookingDetailModal({
   /** The page owns the toast stack — cancelling closes this, taking its DOM. */
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
+  const t = useT();
   return (
     <ResponsiveBottomSheetModal
       open={booking !== null}
       onClose={onClose}
-      title={`รายละเอียด${ORDER_WORDS[book.mode].record} ${product.underlying} ${product.coupon}`}
+      title={t.orders.words[book.mode].detailTitle(product.underlying, product.coupon)}
       titleId="booking-detail-title"
       // The sheet opens with its own heading — the deal status in colour, with
       // the product named under it. A second heading above said both again.
@@ -137,10 +139,12 @@ export function BookingDetailModal({
  * about a value that is its own. Same bargain the booking form's cards strike.
  */
 function CheckRow({ item }: { item: RequirementItem }) {
+  const locale = useLocale();
+  const t = useT();
   const chip = STATUS_CHIP[item.status];
   const Icon = chip.icon;
   return (
-    <SheetRow label={item.label} hint={item.detail}>
+    <SheetRow label={item.label} hint={requirementDetailText(item.detail, t, locale)}>
       {item.value ? (
         <span className={`text-body-sm font-bold ${chip.fg}`}>{item.value}</span>
       ) : (
@@ -171,16 +175,21 @@ function Body({
   onClose: () => void;
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const { cancelBooking } = useOrders();
   const [cancelling, setCancelling] = useState(false);
+  // Cancelling is destructive and can't be undone from here, so the first
+  // press asks; the second one acts.
+  const [confirming, setConfirming] = useState(false);
   /** The checks start folded — see the block itself for why. */
   const [checksOpen, setChecksOpen] = useState(false);
 
-  const profile = getClientProfile(booking.clientId);
+  const profile = getAccountIdentity(booking.clientId);
   const name = maskName(booking.clientName, isPrivate);
   const submission = submissionFor(booking, book);
-  const words = ORDER_WORDS[book.mode];
+  const words = t.orders.words[book.mode];
   const passed = checks.filter((i) => i.status === "passed").length;
   const phase = bookingPhase(booking, book);
   // Phase, not `booking.status` — a booking whose order was rejected is still
@@ -208,10 +217,20 @@ function Body({
 
   const cancel = async () => {
     setCancelling(true);
-    await cancelBooking(booking.id);
-    setCancelling(false);
+    try {
+      await cancelBooking(booking.id);
+    } catch (err) {
+      // Stays open on the same booking, button back to normal. The likeliest
+      // real cause is the back office having picked the order up meanwhile.
+      console.warn("[cancelBooking]", err);
+      onNotice(words.cancelFailed, "critical");
+      setConfirming(false);
+      return;
+    } finally {
+      setCancelling(false);
+    }
     onClose();
-    onNotice(`${words.cancel}ของ ${name} แล้ว`, "information");
+    onNotice(words.cancelled(name), "information");
   };
 
   return (
@@ -224,7 +243,7 @@ function Body({
               "where is this", which one circle and one word answer. */}
           <StatusDisc variant={PHASE_DISC[phase].tone}>{PHASE_DISC[phase].glyph}</StatusDisc>
           <p className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[PHASE_DISC[phase].tone].text}`}>
-            {BOOKING_PHASE_LABEL[book.mode][phase]}
+            {t.orders.phase[book.mode][phase]}
           </p>
           {/* The product, with the desk as its badge — the sheet is reached
               from a book that is already one desk's, but it is also reached
@@ -248,13 +267,13 @@ function Body({
 
         <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
-            <SheetBlock title={`รายละเอียด${words.record}`}>
+            <SheetBlock title={words.detailSection}>
               <ClientRow clientId={booking.clientId} name={name} />
-              <SheetRow label="Full Name (TH)" value={maskName(profile.nameTh, isPrivate)} />
-              <SheetRow label="Account No" value={profile.accountNo} />
-              <SheetRow label="IC Name" value={booking.createdBy} />
-              <SheetRow label={words.placedAt} value={formatLogTime(booking.createdAt)} />
-              {submission && <CopyRow label="เลขที่คำสั่งซื้อ" value={submission.backendRef} />}
+              <SheetRow label={t.orders.field.fullNameTh} value={maskName(profile.nameTh, isPrivate)} />
+              <SheetRow label={t.orders.field.accountNo} value={profile.accountNo} />
+              <SheetRow label={t.orders.field.icName} value={booking.createdBy} />
+              <SheetRow label={words.placedAt} value={formatLogTime(booking.createdAt, locale)} />
+              {submission && <CopyRow label={t.orders.orderRef} value={submission.backendRef} />}
               {/* The three statuses the table's last three columns carry, in
                   the same order and the same `large` tags. Deal Status is back
                   here now that the heading above names the *step* — "ตรวจสอบ"
@@ -262,13 +281,13 @@ function Body({
                   row does. They run on from the rows above rather than being
                   ruled off from them: all of it describes one booking, and the
                   line implied a change of subject that never happened. */}
-              <SheetRow label="Deal Status">
+              <SheetRow label={t.orders.field.dealStatus}>
                 <Tag text={deal.text} variant={deal.variant} size="large" />
               </SheetRow>
-              <SheetRow label="Payment Status">
+              <SheetRow label={t.orders.field.paymentStatus}>
                 <Tag text={payment.text} variant={payment.variant} size="large" />
               </SheetRow>
-              <SheetRow label="Email Pre-Confirmation">
+              <SheetRow label={t.orders.field.emailPreConfirmation}>
                 <Tag text={email.text} variant={email.variant} size="large" />
               </SheetRow>
             </SheetBlock>
@@ -280,27 +299,27 @@ function Body({
             {booking.evidence && (
               <>
                 <div className={SHEET_DASHED} />
-                <SheetBlock title="หลักฐานการรับคำสั่ง">
-                  <SheetRow label="ช่องทาง">
+                <SheetBlock title={t.orders.evidenceSheet.title}>
+                  <SheetRow label={t.orders.evidenceSheet.channel}>
                     <span className="inline-flex items-center gap-1.5 text-body-sm font-bold text-foreground">
                       {(() => {
                         const Icon = EVIDENCE_CHANNEL[booking.evidence.channel].icon;
                         return <Icon size={15} weight="fill" className="shrink-0 text-muted-foreground" />;
                       })()}
-                      {EVIDENCE_CHANNEL[booking.evidence.channel].label}
+                      {t.orders.evidence[booking.evidence.channel].label}
                     </span>
                   </SheetRow>
                   {booking.evidence.source === "call-log" && booking.evidence.callLog ? (
                     <>
                       <SheetRow
-                        label="สายจาก Call Log"
+                        label={t.orders.evidenceSheet.callFromLog}
                         value={`${booking.evidence.callLog.date} ${booking.evidence.callLog.time}`}
                       />
                       <SheetRow
-                        label="ประเภทสาย"
-                        value={`${CALL_DIRECTION_LABEL[booking.evidence.callLog.direction]} · ${booking.evidence.callLog.duration}`}
+                        label={t.orders.evidenceSheet.callType}
+                        value={`${t.orders.callDirection[booking.evidence.callLog.direction]} · ${booking.evidence.callLog.duration}`}
                       />
-                      <SheetRow label="สรุปการสนทนา">
+                      <SheetRow label={t.orders.evidenceSheet.callSummary}>
                         <span className="text-right text-body-sm font-bold text-foreground">
                           {booking.evidence.callLog.summary}
                         </span>
@@ -310,24 +329,24 @@ function Body({
                     <>
                       {/* The name wraps rather than truncates: a recording called
                           `call-110002-2026-11-03.m4a` is only useful whole. */}
-                      <SheetRow label="ไฟล์">
+                      <SheetRow label={t.orders.evidenceSheet.file}>
                         <span className="text-right text-body-sm font-bold break-all text-foreground">
                           {booking.evidence.fileName}
                         </span>
                       </SheetRow>
                       {booking.evidence.fileSize != null && (
-                        <SheetRow label="ขนาด" value={formatFileSize(booking.evidence.fileSize)} />
+                        <SheetRow label={t.orders.evidenceSheet.size} value={formatFileSize(booking.evidence.fileSize)} />
                       )}
                     </>
                   )}
                   {booking.evidence.note && (
-                    <SheetRow label="หมายเหตุ">
+                    <SheetRow label={t.orders.evidenceSheet.note}>
                       <span className="text-right text-body-sm font-bold whitespace-pre-line text-foreground">
                         {booking.evidence.note}
                       </span>
                     </SheetRow>
                   )}
-                  <SheetRow label="แนบเมื่อ" value={formatLogTime(booking.evidence.attachedAt)} />
+                  <SheetRow label={t.orders.evidenceSheet.attachedAt} value={formatLogTime(booking.evidence.attachedAt, locale)} />
                 </SheetBlock>
               </>
             )}
@@ -383,7 +402,7 @@ function Body({
               cancelled ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">Notional Amount</p>
+            <p className="text-body-sm font-bold text-foreground">{t.orders.field.notionalAmount}</p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 cancelled ? "text-muted-foreground line-through" : "text-primary-action"
@@ -403,15 +422,41 @@ function Body({
               next happens somewhere else. */}
           {cancellable && (
             <div className="flex flex-col items-center gap-1 pt-2">
-              <Button
-                variant={cancelling ? "disabled" : "plain"}
-                size="md"
-                disabled={cancelling}
-                onClick={cancel}
-                className="text-[var(--fill-red-600)]"
-              >
-                {cancelling ? "กำลังยกเลิก…" : words.cancel}
-              </Button>
+              {confirming ? (
+                <div className="flex flex-col items-center gap-2">
+                  <p className="type-body-2 text-center text-foreground">
+                    {words.confirmCancelOf(name)}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="md"
+                      disabled={cancelling}
+                      onClick={() => setConfirming(false)}
+                    >
+                      {t.orders.keepBooking}
+                    </Button>
+                    <Button
+                      variant={cancelling ? "disabled" : "plain"}
+                      size="md"
+                      disabled={cancelling}
+                      onClick={cancel}
+                      className="text-[var(--fill-red-600)]"
+                    >
+                      {cancelling ? words.cancelling : words.confirmCancel}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="plain"
+                  size="md"
+                  onClick={() => setConfirming(true)}
+                  className="text-[var(--fill-red-600)]"
+                >
+                  {words.cancel}
+                </Button>
+              )}
               {/* Why this one can be pulled when the next one along cannot.
                   Both read "กำลังดำเนินการรับคำสั่งซื้อ" — the difference is
                   whether the back office has taken it up (`OrderSubmissionStatus`
@@ -420,7 +465,7 @@ function Body({
                   depends on it. */}
               {book.mode === "quota" && (
                 <p className="type-caption text-center text-muted-foreground">
-                  ยกเลิกได้จนกว่าระบบหลังบ้านจะรับคำสั่งซื้อไปดำเนินการ
+                  {t.orders.cancellableUntilTaken}
                 </p>
               )}
             </div>

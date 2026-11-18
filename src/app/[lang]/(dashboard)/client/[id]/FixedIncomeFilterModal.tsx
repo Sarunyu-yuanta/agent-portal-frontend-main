@@ -18,6 +18,7 @@ import {
   type FixedIncomeRiskFilter,
 } from "./fixed-income-data";
 import { BondLogo } from "./fixed-income-shared";
+import { useT } from "@/i18n/I18nProvider";
 
 function CompanyFilterChip({
   label,
@@ -87,6 +88,8 @@ function FilterContent({
   onToggleOfferType,
   onToggleRisk,
 }: FilterContentProps) {
+  const t = useT();
+  const labels = t.products.fixedIncome.filter;
   const companies = getFixedIncomeFilterCompanies();
   const gridClass = mobile
     ? "grid w-full grid-cols-2 gap-x-3 gap-y-2"
@@ -94,7 +97,7 @@ function FilterContent({
 
   return (
     <div className={`flex w-full flex-col ${mobile ? "gap-6" : "gap-4"}`}>
-      <FilterSection title="บริษัท" mobile={mobile}>
+      <FilterSection title={labels.company} mobile={mobile}>
         <div className={gridClass}>
           {companies.map((company) => (
             <CompanyFilterChip
@@ -108,12 +111,12 @@ function FilterContent({
         </div>
       </FilterSection>
 
-      <FilterSection title="ดอกเบี้ย" mobile={mobile}>
+      <FilterSection title={labels.coupon} mobile={mobile}>
         <div className={gridClass}>
           {FIXED_INCOME_COUPON_FILTERS.map((option) => (
             <Chip
               key={option.id}
-              label={option.label}
+              label={labels.couponOptions[option.id]}
               size="medium"
               selected={draft.coupons.includes(option.id)}
               onClick={() => onToggleCoupon(option.id)}
@@ -123,7 +126,7 @@ function FilterContent({
         </div>
       </FilterSection>
 
-      <FilterSection title="เสนอขาย" mobile={mobile}>
+      <FilterSection title={labels.offerType} mobile={mobile}>
         <div className={gridClass}>
           {FIXED_INCOME_OFFER_FILTERS.map((option) => (
             <Chip
@@ -138,12 +141,12 @@ function FilterContent({
         </div>
       </FilterSection>
 
-      <FilterSection title="ความเสี่ยง" mobile={mobile}>
+      <FilterSection title={labels.risk} mobile={mobile}>
         <div className={gridClass}>
           {FIXED_INCOME_RISK_FILTERS.map((option) => (
             <Chip
               key={option.id}
-              label={option.label}
+              label={labels.riskOptions[option.id]}
               size="medium"
               selected={draft.risks.includes(option.id)}
               onClick={() => onToggleRisk(option.id)}
@@ -165,6 +168,7 @@ function FilterFooter({
   onClear: () => void;
   onApply: () => void;
 }) {
+  const t = useT();
   return (
     <div className={`flex w-full items-center ${mobile ? "gap-4 pt-6" : "gap-4"}`}>
       <Button
@@ -173,7 +177,7 @@ function FilterFooter({
         className="min-w-0 flex-1 max-w-[343px] text-[#0a6ee7]"
         onClick={onClear}
       >
-        ล้างตัวเลือก
+        {t.products.common.clearSelection}
       </Button>
       <Button
         variant="primary"
@@ -181,7 +185,7 @@ function FilterFooter({
         className="min-w-0 flex-1 max-w-[343px]"
         onClick={onApply}
       >
-        ยืนยันตัวเลือก
+        {t.products.common.confirmSelection}
       </Button>
     </div>
   );
@@ -200,6 +204,7 @@ export function FixedIncomeFilterModal({
   onClose,
   onApply,
 }: FixedIncomeFilterModalProps) {
+  const t = useT();
   const isMobile = useIsMobile();
   const [draft, setDraft] = useState<FixedIncomeFilters>(filters);
   const [syncSnapshot, setSyncSnapshot] = useState({ open, filters });
@@ -218,7 +223,7 @@ export function FixedIncomeFilterModal({
   }, [open, isMobile, onClose]);
 
   const activeCount = countFixedIncomeFilters(draft);
-  const title = `Filter${activeCount > 0 ? ` (${activeCount})` : ""}`;
+  const title = t.products.common.filterTitle(activeCount);
 
   const toggleCompany = (companyId: string) => {
     setDraft((prev) => ({
@@ -278,7 +283,7 @@ export function FixedIncomeFilterModal({
         leftIcon={<FunnelSimpleIcon size={22} className="text-[#101828]" />}
         title={title}
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         showHandle
         contentClassName="flex max-h-[calc(var(--dvh)*100-8rem)] flex-col gap-0 overflow-y-auto pb-2"
@@ -308,7 +313,7 @@ export function FixedIncomeFilterModal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="ปิด"
+          aria-label={t.common.close}
           className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full border-none p-1 cursor-pointer"
           style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
         >

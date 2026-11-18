@@ -16,19 +16,28 @@ import {
   GlobeIcon,
   TrophyIcon,
   PuzzlePieceIcon,
+  MagnifyingGlassIcon,
+  UsersIcon,
   type Icon as PhosphorIcon,
 } from "@phosphor-icons/react";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { FadeIn } from "@/components/ui/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { type AnalystItem } from "@/lib/mock-data";
 import { useResearch } from "@/hooks/use-catalog";
 import { useHasLoaded } from "@/hooks/use-api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
+/** The "every category" pseudo-option. An id, so it can be labelled per
+ *  language; the rest are the categories reports carry, from the data. */
+const ALL_RESEARCH = "__all__";
+
 const RESEARCH_CATS = [
-  "บทวิเคราะห์ทั้งหมด",
+  ALL_RESEARCH,
   "Wealth Designs Daily",
   "Chart Perspective Morning",
   "Chart Perspective Afternoon",
@@ -55,22 +64,25 @@ const MOCK_PDF_URL = "/mock-reports/sample-report.pdf";
 const RESEARCH_HOME_OPTION = "__home__";
 
 
-type LandingTile = { id: string; title: string; subtitle: string; icon: PhosphorIcon; color: string; span?: string };
+/** Title and subtitle: `t.research.research.tiles[id]`. */
+type LandingTile = { id: TileId; icon: PhosphorIcon; color: string; span?: string };
+
+type TileId = keyof Dictionary["research"]["research"]["tiles"];
 
 const RESEARCH_LANDING_TILES: LandingTile[] = [
-  { id: "t01", title: "Smart Pick",          subtitle: "แนะนำหุ้นเด่นประจำวัน",     icon: SparkleIcon,      color: "#f59e0b", span: "lg:col-start-1 lg:row-start-1 lg:row-span-2" },
-  { id: "t02", title: "Afternoon Tactic",    subtitle: "แนวโน้มตลาดบ่าย",           icon: SunIcon,          color: "#f97316" },
-  { id: "t03", title: "Yuanta Channel",      subtitle: "ช่องทางอัปเดตข่าวสาร",     icon: BroadcastIcon,    color: "#06b6d4" },
-  { id: "t04", title: "เปิดพอร์ตโชว์หุ้น",   subtitle: "พอร์ตจำลองแนะนำ",          icon: BriefcaseIcon,    color: "#64748b" },
-  { id: "t13", title: "Theme Strategy",      subtitle: "ธีมการลงทุนเด่น",           icon: PuzzlePieceIcon,  color: "#6366f1" },
-  { id: "t10", title: "Sector Update",       subtitle: "วิเคราะห์อุตสาหกรรม",       icon: FactoryIcon,      color: "#3f3f46" },
-  { id: "t05", title: "Company Focus",       subtitle: "วิเคราะห์หุ้นรายตัว",       icon: BuildingsIcon,    color: "#0ea5e9" },
-  { id: "t07", title: "Warrant UPDATE",      subtitle: "อัปเดตวอร์แรนต์",          icon: FileTextIcon,     color: "#71717a", span: "lg:col-start-3 lg:row-start-3 lg:row-span-2" },
-  { id: "t08", title: "Derivative Warrant",  subtitle: "อนุพันธ์และวอร์แรนต์",     icon: LightningIcon,    color: "#ef4444", span: "lg:col-start-1 lg:row-start-4 lg:col-span-2" },
-  { id: "t09", title: "เทคนิคและอนุพันธ์",   subtitle: "Technical & Future",        icon: ChartLineUpIcon,  color: "#8b5cf6", span: "lg:col-start-1 lg:row-start-5 lg:row-span-2" },
-  { id: "t06", title: "Analyst Note",        subtitle: "ความเห็นนักวิเคราะห์",      icon: NotePencilIcon,   color: "#10b981" },
-  { id: "t11", title: "Yuanta Universe",     subtitle: "โมเดลพอร์ตการลงทุน",        icon: GlobeIcon,        color: "#0891b2" },
-  { id: "t12", title: "Top 5 DCA",           subtitle: "หุ้นเด่นสะสมประจำสัปดาห์",  icon: TrophyIcon,       color: "#52525b", span: "lg:col-start-2 lg:row-start-6 lg:col-span-2" },
+  { id: "t01", icon: SparkleIcon,      color: "#f59e0b", span: "lg:col-start-1 lg:row-start-1 lg:row-span-2" },
+  { id: "t02", icon: SunIcon,          color: "#f97316" },
+  { id: "t03", icon: BroadcastIcon,    color: "#06b6d4" },
+  { id: "t04", icon: BriefcaseIcon,    color: "#64748b" },
+  { id: "t13", icon: PuzzlePieceIcon,  color: "#6366f1" },
+  { id: "t10", icon: FactoryIcon,      color: "#3f3f46" },
+  { id: "t05", icon: BuildingsIcon,    color: "#0ea5e9" },
+  { id: "t07", icon: FileTextIcon,     color: "#71717a", span: "lg:col-start-3 lg:row-start-3 lg:row-span-2" },
+  { id: "t08", icon: LightningIcon,    color: "#ef4444", span: "lg:col-start-1 lg:row-start-4 lg:col-span-2" },
+  { id: "t09", icon: ChartLineUpIcon,  color: "#8b5cf6", span: "lg:col-start-1 lg:row-start-5 lg:row-span-2" },
+  { id: "t06", icon: NotePencilIcon,   color: "#10b981" },
+  { id: "t11", icon: GlobeIcon,        color: "#0891b2" },
+  { id: "t12", icon: TrophyIcon,       color: "#52525b", span: "lg:col-start-2 lg:row-start-6 lg:col-span-2" },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -105,16 +117,17 @@ function AnalystCard({ analyst }: { analyst: AnalystItem }) {
 }
 
 function ResearchLandingGrid() {
+  const r = useT().research.research;
   return (
     <div className="flex-1 overflow-y-auto hide-scrollbar p-4">
       <BentoGrid className="grid-cols-2 lg:grid-cols-3 auto-rows-[130px] lg:auto-rows-[150px] gap-2 lg:gap-3 grid-flow-dense">
         {RESEARCH_LANDING_TILES.map((tile) => (
           <BentoCard
             key={tile.id}
-            name={tile.title}
-            description={tile.subtitle}
+            name={r.tiles[tile.id].title}
+            description={r.tiles[tile.id].subtitle}
             href={MOCK_PDF_URL}
-            cta="เปิดเอกสาร"
+            cta={r.openDocument}
             Icon={tintIcon(tile.icon, tile.color)}
             className={tile.span ?? "col-span-1 row-span-1"}
             background={
@@ -133,6 +146,8 @@ function ResearchLandingGrid() {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function Research() {
+  const t = useT();
+  const r = t.research.research;
   const [subTab, setSubTab] = useState<"research" | "analyst">("research");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchDate, setSearchDate] = useState<Date | undefined>(undefined);
@@ -146,6 +161,13 @@ export function Research() {
     setDateInputResetKey((k) => k + 1);
   };
 
+  /** Clears the search and date, keeping the category. */
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchDate(undefined);
+    setDateInputResetKey((k) => k + 1);
+  };
+
   const isSearching = searchQuery.trim().length > 0;
   const showList = activeCategory !== null || isSearching || searchDate !== undefined;
 
@@ -153,7 +175,7 @@ export function Research() {
   const hasLoaded = useHasLoaded(isLoading);
 
   const filtered = feed.reports.filter((item) => {
-    const catOk = activeCategory === null || activeCategory === "บทวิเคราะห์ทั้งหมด" || item.category === activeCategory;
+    const catOk = activeCategory === null || activeCategory === ALL_RESEARCH || item.category === activeCategory;
     const dateOk = !searchDate || item.date === formatBuddhistDate(searchDate);
     const searchOk = !isSearching || item.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
     return catOk && dateOk && searchOk;
@@ -163,8 +185,8 @@ export function Research() {
   // on the feed (search, date, categories, the reports) waits for it.
   const subTabs = (
     <div className="flex items-center gap-2 pb-2">
-      <Chip label="Research" type="single" selected={subTab === "research"} onClick={() => setSubTab("research")} />
-      <Chip label="Analyst Contact" type="single" selected={subTab === "analyst"} onClick={() => setSubTab("analyst")} />
+      <Chip label={r.research} type="single" selected={subTab === "research"} onClick={() => setSubTab("research")} />
+      <Chip label={r.analystContact} type="single" selected={subTab === "analyst"} onClick={() => setSubTab("analyst")} />
     </div>
   );
 
@@ -192,7 +214,7 @@ export function Research() {
         {subTabs}
         <div className={`hidden md:flex items-center gap-2 pb-2 ${subTab === "research" ? "" : "invisible"}`}>
           <SearchInput
-            placeholder="ค้นหาชื่อหุ้น"
+            placeholder={r.searchStock}
             value={searchQuery}
             onChange={setSearchQuery}
             onClear={() => setSearchQuery("")}
@@ -202,7 +224,7 @@ export function Research() {
           <DateInput
             key={dateInputResetKey}
             mode="single"
-            placeholder="เลือกวันที่"
+            placeholder={r.pickDate}
             value={searchDate}
             onChange={setSearchDate}
             className="w-56"
@@ -224,7 +246,7 @@ export function Research() {
                   : "text-foreground hover:bg-muted/50"
               }`}
             >
-              หน้าแรก
+              {r.home}
             </button>
             {RESEARCH_CATS.map((cat) => (
               <button
@@ -237,7 +259,7 @@ export function Research() {
                     : "text-foreground hover:bg-muted/50"
                 }`}
               >
-                {cat}
+                {cat === ALL_RESEARCH ? t.insights.allResearch : cat}
               </button>
             ))}
           </div>
@@ -255,13 +277,20 @@ export function Research() {
                   <AnalystCard key={analyst.id} analyst={analyst} />
                 ))}
               </div>
+              {feed.analysts.length === 0 && (
+                <EmptyState
+                  size="compact"
+                  icon={<UsersIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+                  title={r.noAnalysts}
+                />
+              )}
             </div>
           ) : (
             <>
               {/* Mobile category picker */}
               <div className="md:hidden flex flex-col gap-2 p-3 border-b border-border shrink-0">
                 <SearchInput
-                  placeholder="ค้นหาชื่อหุ้น"
+                  placeholder={r.searchStock}
                   value={searchQuery}
                   onChange={setSearchQuery}
                   onClear={() => setSearchQuery("")}
@@ -270,7 +299,7 @@ export function Research() {
                 <DateInput
                   key={dateInputResetKey}
                   mode="single"
-                  placeholder="เลือกวันที่"
+                  placeholder={r.pickDate}
                   value={searchDate}
                   onChange={setSearchDate}
                   className="w-full"
@@ -282,10 +311,10 @@ export function Research() {
                     else setActiveCategory(v);
                   }}
                   options={[
-                    { label: "‹ หน้าแรก", value: RESEARCH_HOME_OPTION },
-                    ...RESEARCH_CATS.map((c) => ({ label: c, value: c })),
+                    { label: r.homeOption, value: RESEARCH_HOME_OPTION },
+                    ...RESEARCH_CATS.map((c) => ({ label: c === ALL_RESEARCH ? t.insights.allResearch : c, value: c })),
                   ]}
-                  placeholder="เลือกหมวดบทวิเคราะห์"
+                  placeholder={r.pickCategory}
                 />
               </div>
 
@@ -298,17 +327,31 @@ export function Research() {
                     className="hidden md:grid px-5 py-2.5 bg-muted/40 border-b border-border shrink-0"
                     style={{ gridTemplateColumns: "110px 180px 1fr" }}
                   >
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">วันที่</span>
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">บทวิเคราะห์</span>
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">รายละเอียด</span>
+                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.date}</span>
+                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.report}</span>
+                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.detail}</span>
                   </div>
 
                   {/* Items */}
                   <div className="flex-1 overflow-y-auto hide-scrollbar divide-y divide-border">
                     {filtered.length === 0 ? (
-                      <div className="flex items-center justify-center py-16 text-body-sm text-muted-foreground">
-                        ไม่พบข้อมูลที่ค้นหา
-                      </div>
+                      // A search or date that matched nothing can be cleared; a
+                      // category with no reports in it is simply empty.
+                      isSearching || searchDate !== undefined ? (
+                        <EmptyState
+                          size="compact"
+                          icon={<MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+                          title={t.states.noResultTitle}
+                          body={t.states.noResultBody}
+                          action={{ label: t.states.clearFilters, onClick: clearSearch }}
+                        />
+                      ) : (
+                        <EmptyState
+                          size="compact"
+                          icon={<FileTextIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+                          title={r.emptyCategory}
+                        />
+                      )
                     ) : (
                       filtered.map((item) => (
                         <a

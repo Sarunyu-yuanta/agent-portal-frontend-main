@@ -7,6 +7,7 @@ import type { AdvisoryService } from "./portfolio-advisory-client";
 import { ROBO_ASSETS } from "./robo-advisory-assets";
 import { useClientsResource } from "@/hooks/use-api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n/I18nProvider";
 
 const HOVER_TRANSITION = "duration-500 ease-in-out";
 
@@ -67,20 +68,12 @@ function AdvisoryServiceCard({
   );
 }
 
-/** Figma 33772:161292 / 33777:122715 — mobile+tablet 311–312×60 (3×20px lines). */
-const ROBO_COMPACT_DESCRIPTION_LINES = [
-  "คือบริการลงทุนแบบอัตโนมัติด้วย AI",
-  "ที่จะช่วยให้บรรลุเป้าหมายการลงทุนได้",
-  "อย่างง่ายดาย",
-] as const;
-
-/** Figma 33787:150673 — desktop 500×40 (2×20px lines, body-1 16px). */
-const ROBO_DESKTOP_DESCRIPTION_LINES = [
-  "คือบริการลงทุนแบบอัตโนมัติด้วย AI ที่จะช่วยให้บรรลุ",
-  "เป้าหมายการลงทุนได้อย่างง่ายดาย",
-] as const;
-
 function RoboAdvisoryDescription() {
+  const t = useT();
+  // Figma 33772:161292 / 33777:122715 — mobile+tablet 311–312×60 (3×20px lines).
+  const ROBO_COMPACT_DESCRIPTION_LINES = t.products.advisory.robo.tagline.cardCompact;
+  // Figma 33787:150673 — desktop 500×40 (2×20px lines, body-1 16px).
+  const ROBO_DESKTOP_DESCRIPTION_LINES = t.products.advisory.robo.tagline.cardDesktop;
   return (
     <div className="w-full min-w-0 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px] lg:text-black/60">
       <div className="max-lg:w-full max-lg:max-w-[311px] lg:hidden">
@@ -137,13 +130,6 @@ function RoboAdvisoryCard({ onSelect }: { onSelect?: () => void }) {
   );
 }
 
-/** Figma mobile/tablet Definit card — 3×20px lines. */
-const DEFINIT_COMPACT_DESCRIPTION_LINES = [
-  "เหมาะกับนักลงทุนในตลาดไทย ",
-  "วิเคราะห์ปัจจัยรอบด้านทั้ง พื้นฐาน ",
-  "มูลค่า และ เทคนิค ",
-] as const;
-
 /** definit-finno.png placement matched to Figma 34028:17715 via export diff (532×135 card). */
 const DEFINIT_FINNO_STYLE: CSSProperties = {
   right: -11.19,
@@ -154,6 +140,9 @@ const DEFINIT_FINNO_STYLE: CSSProperties = {
 
 /** Figma 33772:161290 mobile / 33777:122714 tablet / 34028:17715 desktop */
 function DefinitCard({ onSelect }: { onSelect?: () => void }) {
+  const t = useT();
+  // Figma mobile/tablet Definit card — 3×20px lines.
+  const DEFINIT_COMPACT_DESCRIPTION_LINES = t.products.advisory.definit.tagline.card;
   return (
     <AdvisoryServiceCard
       backgroundImage="linear-gradient(to right, #ffffff, #7eabe2)"
@@ -204,13 +193,14 @@ function DefinitCard({ onSelect }: { onSelect?: () => void }) {
 }
 
 function PortfolioAdvisoryHeader() {
+  const t = useT();
   return (
     <div className="flex flex-col">
       <h2 className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg font-bold leading-[28px] text-transparent lg:text-xl lg:leading-[34px]">
-        บริการวางแผนพอร์ต
+        {t.products.advisory.sectionTitle}
       </h2>
       <p className="text-sm leading-[24px] text-black/60">
-        ให้ Yuanta ช่วยคุณบริหารสินทรัพย์ด้วยแผนการลงทุน Robo Advisory และจากผู้เชี่ยวชาญ
+        {t.products.advisory.sectionSubtitle}
       </p>
     </div>
   );

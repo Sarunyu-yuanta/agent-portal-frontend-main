@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { BellIcon, CalendarBlankIcon, CalendarCheckIcon } from "@phosphor-icons/react";
 import { formatDayOnly, TAG_CHIP_TONE } from "../notes/note-format";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * One reminder the way the Client 360 Overview card draws it: a bell, the
@@ -48,6 +49,8 @@ export function ReminderPreviewRow({
   /** Fill + text classes for that badge, overriding the due/not-due pair. */
   iconToneClassName?: string;
 }) {
+  const locale = useLocale();
+  const t = useT();
   return (
     <button
       type="button"
@@ -68,12 +71,12 @@ export function ReminderPreviewRow({
         {meta ? <p className="type-caption text-muted-foreground truncate">{meta}</p> : null}
         {!showDate ? null : dueToday ? (
           <p className="type-caption text-muted-foreground/70">
-            Due today · {formatDayOnly(dayIso)}
+            {t.dates.reminderTag.dueToday(formatDayOnly(dayIso, locale))}
           </p>
         ) : (
           <p className="flex items-center gap-1 type-caption text-muted-foreground/70">
             <CalendarBlankIcon size={12} />
-            {formatDayOnly(dayIso)}
+            {formatDayOnly(dayIso, locale)}
           </p>
         )}
       </div>
@@ -83,16 +86,19 @@ export function ReminderPreviewRow({
 
 /** The Overview card's empty state, used wherever that card's list can run out. */
 export function RemindersPreviewEmpty({
-  hint = "Set one from a note on the Notes tab.",
+  hint,
 }: {
-  /** `null` hides the line under the title — a caller that offers its own next step. */
+  /** `null` hides the line under the title — a caller that offers its own next step.
+   *  Omitted, it is the default "set one from a note" line. */
   hint?: string | null;
 }) {
+  const t = useT();
+  const line = hint === undefined ? t.planner.reminders.previewEmptyHint : hint;
   return (
     <div className="flex flex-col items-center gap-2 py-4 text-center">
       <CalendarCheckIcon size={32} className="text-muted-foreground/40" weight="duotone" />
-      <p className="type-body-2 text-muted-foreground">No reminders yet</p>
-      {hint ? <p className="type-caption text-muted-foreground/60">{hint}</p> : null}
+      <p className="type-body-2 text-muted-foreground">{t.planner.reminders.previewEmptyTitle}</p>
+      {line ? <p className="type-caption text-muted-foreground/60">{line}</p> : null}
     </div>
   );
 }

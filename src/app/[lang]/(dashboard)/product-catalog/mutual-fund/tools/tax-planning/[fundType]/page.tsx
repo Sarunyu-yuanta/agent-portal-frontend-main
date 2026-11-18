@@ -1,25 +1,33 @@
 "use client";
 
 import { use, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { MutualFundFilterResultsPage } from "../../../../../client/[id]/MutualFundFilterResultsPage";
-import { getTaxSavingFunds, normalizeTaxSavingFundType } from "../../../../../client/[id]/mutual-fund-data";
+import { findTaxSavingFundType, getTaxSavingFunds } from "../../../../../client/[id]/mutual-fund-data";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { CatalogNotFound } from "../../../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundTaxPlanningResultsRoute({
   params,
 }: {
   params: Promise<{ fundType: string }>;
 }) {
+  const t = useT();
   const { fundType: rawFundType } = use(params);
-  const fundType = normalizeTaxSavingFundType(decodeURIComponent(rawFundType));
-  const router = useRouter();
+  const fundType = findTaxSavingFundType(decodeURIComponent(rawFundType));
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
   const funds = useMemo(() => getTaxSavingFunds(false, 16), []);
 
+  // An unknown type is a dead link — never show RMF's list under it.
+  if (!fundType) {
+    return <CatalogNotFound message={t.fund.notFound.taxType} onBack={goBack} />;
+  }
+
   return (
     <MutualFundFilterResultsPage
-      title={`ผลการกรอง ${fundType}`}
+      title={t.products.filterResults.titleFor(fundType)}
       funds={funds}
       defaultPeriod="1Y"
       onBack={goBack}

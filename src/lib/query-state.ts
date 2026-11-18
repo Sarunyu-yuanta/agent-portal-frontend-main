@@ -1,5 +1,8 @@
 "use client";
 
+import { DEFAULT_LOCALE } from "@/i18n/config";
+import { localeOf, localizePath } from "@/i18n/locale-path";
+
 /**
  * Helpers for keeping view state — category tab, filter chip, open panel, sub-tab
  * — in the query string instead of in component state that dies on unmount.
@@ -33,6 +36,9 @@ export function withQuery(
  * otherwise pile up entries they have to click through (filters, sub-tabs).
  */
 export function setQueryState(url: string, mode: "push" | "replace" = "replace") {
-  if (mode === "push") window.history.pushState(null, "", url);
-  else window.history.replaceState(null, "", url);
+  // Callers pass unprefixed app paths (`/client-hub?...`). Keep the language
+  // the page is already in — writing a bare path here would silently drop it.
+  const localized = localizePath(url, localeOf(window.location.pathname) ?? DEFAULT_LOCALE);
+  if (mode === "push") window.history.pushState(null, "", localized);
+  else window.history.replaceState(null, "", localized);
 }

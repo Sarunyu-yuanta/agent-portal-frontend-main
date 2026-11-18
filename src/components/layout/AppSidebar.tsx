@@ -1,8 +1,9 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useT } from "@/i18n/I18nProvider";
+import { useAppPathname } from "@/i18n/navigation";
 import {
   UsersIcon,
   SquaresFourIcon,
@@ -12,6 +13,7 @@ import {
   EyeSlashIcon,
   NotePencilIcon,
   CalendarBlankIcon,
+  AlarmIcon,
   GaugeIcon,
   LayoutIcon,
   MegaphoneIcon,
@@ -21,7 +23,7 @@ import {
 } from "@phosphor-icons/react";
 import { SidebarUserMenu } from "@/components/layout/SidebarUserMenu";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { NOTE_AUTHOR } from "@/app/(dashboard)/notes/note-constants";
+import { NOTE_AUTHOR } from "@/app/[lang]/(dashboard)/notes/note-constants";
 import { IC_ROLE } from "@/lib/current-ic";
 import {
   CALENDAR_ENABLED,
@@ -185,6 +187,16 @@ const plannerItems: NavItem[] = [
           icon: CalendarBlankIcon,
           badge: null,
         },
+        // The same reminders as the calendar, read as one list. Its own entry
+        // rather than a tab on Calendar so the month grid can own the whole
+        // screen.
+        {
+          href: "/reminders",
+          section: "reminders" as const,
+          label: "Reminders",
+          icon: AlarmIcon,
+          badge: null,
+        },
       ]
     : []),
 ];
@@ -212,7 +224,8 @@ function NavSection({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
+  const t = useT();
   useSyncExternalStore(subscribeNavVisits, navVisitSnapshot, () => "");
   const activeSection = activeSectionForPath(pathname);
 
@@ -253,6 +266,8 @@ function NavSection({
 
       {items.map((item) => {
         const Icon = item.icon;
+        // `label` in the item list is the fallback; the dictionary wins.
+        const label = t.nav.items[item.section as keyof typeof t.nav.items] ?? item.label;
         // Section-wide, so Client 360 stays lit on a Full Profile (/client/:id).
         const isActive = activeSection === item.section;
         return (
@@ -261,7 +276,7 @@ function NavSection({
             href={item.href}
             className="no-underline block px-2"
             onClick={handleNavigate(item)}
-            title={item.label}
+            title={label}
           >
             <div
               className={`flex items-center gap-3 py-2.5 rounded-lg transition-colors overflow-hidden ${isActive ? "bg-slate-700/60" : "hover:bg-slate-800"
@@ -282,7 +297,7 @@ function NavSection({
                 className={`text-[length:13.5px] leading-[18px] whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden ${collapsed ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
                   } ${isActive ? "text-white" : "text-slate-300"} font-medium`}
               >
-                {item.label}
+                {label}
               </span>
 
               {item.badge != null && (
@@ -313,6 +328,7 @@ export function AppSidebar({
   onToggleCollapse?: () => void;
 }) {
   const { isPrivate, toggle } = usePrivacy();
+  const t = useT();
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Toggle button — icon zone keeps it still */}
@@ -322,7 +338,7 @@ export function AppSidebar({
             <button
               type="button"
               onClick={onToggleCollapse}
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={collapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
               className="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
             >
               <SidebarSimpleIcon size={18} />
@@ -360,20 +376,20 @@ export function AppSidebar({
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto">
         <NavSection
-          label="Workspace"
+          label={t.nav.sections.workspace}
           items={workspaceItems}
           collapsed={collapsed}
           onNavigate={onClose}
         />
         <NavSection
-          label="Sales"
+          label={t.nav.sections.sales}
           items={salesItems}
           collapsed={collapsed}
           onNavigate={onClose}
         />
         {plannerItems.length > 0 && (
           <NavSection
-            label="Planner"
+            label={t.nav.sections.planner}
             items={plannerItems}
             collapsed={collapsed}
             onNavigate={onClose}
@@ -381,7 +397,7 @@ export function AppSidebar({
         )}
         {growthItems.length > 0 && (
           <NavSection
-            label="Growth"
+            label={t.nav.sections.growth}
             items={growthItems}
             collapsed={collapsed}
             onNavigate={onClose}
@@ -397,7 +413,7 @@ export function AppSidebar({
         <button
           type="button"
           onClick={toggle}
-          title={isPrivate ? "แสดงชื่อลูกค้า" : "ซ่อนชื่อลูกค้า"}
+          title={isPrivate ? t.nav.showClientNames : t.nav.hideClientNames}
           className={`w-full flex items-center gap-1.5 py-2.5 pr-2 rounded-lg transition-colors cursor-pointer ${isPrivate ? "hover:bg-primary-action/20" : "hover:bg-slate-700/50"}`}
         >
           <div className={ICON_ZONE}>
@@ -407,7 +423,7 @@ export function AppSidebar({
             }
           </div>
           <span className={`text-[length:13px] leading-normal whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"} ${isPrivate ? "text-primary-action font-medium" : "text-slate-300"}`}>
-            ซ่อนชื่อลูกค้า
+            {t.nav.hideClientNames}
           </span>
           {/* Switch indicator */}
           <div className={`ml-auto shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[40px] opacity-100"}`}>

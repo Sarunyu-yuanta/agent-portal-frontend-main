@@ -20,12 +20,12 @@ import {
   fundHasHighlightTag,
   fundHasViewTag,
   MOBILE_FUND_GROUPS,
-  TOP_PERFORMERS_HERO_SUBTITLE,
   TOP_PERFORMERS_LIST_UPDATED_AT,
   getMobileGroupGridFunds,
   type MobileFundGroupId,
   type MobilePerformancePeriod,
 } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function MobileCategoryTabs({
   activeId,
@@ -34,6 +34,7 @@ function MobileCategoryTabs({
   activeId: MobileFundGroupId;
   onSelect: (id: MobileFundGroupId) => void;
 }) {
+  const t = useT();
   return (
     <div className="w-full overflow-x-auto">
       <div className="flex w-max min-w-full">
@@ -48,7 +49,7 @@ function MobileCategoryTabs({
                 active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
               }`}
             >
-              {group.label}
+              {t.fund.groups[group.id]}
             </button>
           );
         })}
@@ -58,16 +59,17 @@ function MobileCategoryTabs({
 }
 
 function MobileHero({ groupId }: { groupId: MobileFundGroupId }) {
+  const t = useT();
   const group = MOBILE_FUND_GROUPS.find((g) => g.id === groupId) ?? MOBILE_FUND_GROUPS[0];
-  const title = group.id === "all" ? "กองทุนทั้งหมด" : group.label;
+  const title = group.id === "all" ? t.fund.list.allFunds : t.fund.groups[group.id];
 
   return (
     <div className="relative flex h-[126px] w-full shrink-0 items-center gap-2.5 overflow-visible bg-[#f9fafb] px-6 pb-2.5 pt-2.5">
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{title}</p>
-        <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{TOP_PERFORMERS_HERO_SUBTITLE}</p>
+        <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{t.fund.topPerformers.heroSubtitle}</p>
         <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
-          ข้อมูล ณ วันที่ {TOP_PERFORMERS_LIST_UPDATED_AT}
+          {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
         </p>
       </div>
       <MutualFundGroupHeroGraphic groupId={groupId} />
@@ -86,6 +88,7 @@ export function MutualFundTopPerformersMobile({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [groupId, setGroupId] = useState<MobileFundGroupId>("all");
   const [period, setPeriod] = useState<MobilePerformancePeriod>("1M");
   const [legendOpen, setLegendOpen] = useState(false);
@@ -99,7 +102,7 @@ export function MutualFundTopPerformersMobile({
   const showViewTag = bothOrNeitherTag || viewActive;
   const showHighlightTag = bothOrNeitherTag || highlightActive;
   const tagFunds = searchFunds(filterFundsByTag(funds, viewActive, highlightActive), query);
-  const listCountLabel = `${tagFunds.length} รายการ`;
+  const listCountLabel = t.fund.list.count(tagFunds.length);
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white">
@@ -108,13 +111,13 @@ export function MutualFundTopPerformersMobile({
           variant="plain"
           size="icon-sm"
           onClick={onBack}
-          aria-label="กลับ"
+          aria-label={t.common.back}
           className="size-[30px] shrink-0 rounded-md p-[5px]"
         >
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">
-          กองทุนผลตอบแทนเด่น
+          {t.fund.topPerformers.title}
         </h1>
       </div>
 
@@ -145,7 +148,7 @@ export function MutualFundTopPerformersMobile({
                     value={query}
                     onChange={setQuery}
                     onClear={() => setQuery("")}
-                    placeholder="ค้นหากองทุน"
+                    placeholder={t.fund.list.searchPlaceholder}
                     size="sm"
                     className="w-full"
                   />
@@ -172,7 +175,7 @@ export function MutualFundTopPerformersMobile({
 
             {tagFunds.length === 0 ? (
               <p className="px-3 text-center text-sm text-[#6a7282]">
-                {query.trim() ? `ไม่พบกองทุนที่ตรงกับ "${query.trim()}"` : "ไม่พบกองทุนในหมวดนี้"}
+                {query.trim() ? t.fund.list.noMatchForQuery(query.trim()) : t.fund.list.noFundsInCategory}
               </p>
             ) : null}
           </div>

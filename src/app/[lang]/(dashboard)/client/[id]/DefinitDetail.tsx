@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
@@ -29,6 +29,8 @@ import { AdvisoryDetailSkeleton } from "./AdvisoryDetailSkeleton";
 import { DefinitPlanDetailModal } from "./RoboAdvisoryPlanDetailModal";
 import { ROBO_ASSETS } from "./robo-advisory-assets";
 import { RoboRiskLevel } from "./RoboRiskLevel";
+import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 
 const DEFINIT_PROVIDER = "Definit x Yuanta";
@@ -84,21 +86,8 @@ function DefinitChartOverlay({ layout }: { layout: "mobile" | "tablet" | "deskto
   );
 }
 
-/** Figma 34315:85726 — desktop hero subtitle (2 lines). */
-const DEFINIT_HERO_DESCRIPTION_LINES = [
-  "เหมาะกับนักลงทุนในตลาดไทย วิเคราะห์ปัจจัยรอบด้านทั้ง",
-  "พื้นฐานมูลค่า และ เทคนิค",
-] as const;
-
-/** Figma mobile — compact hero lines. */
-const DEFINIT_MOBILE_HERO_LINES = [
-  "เหมาะกับนักลงทุนในตลาดไทย",
-  "วิเคราะห์ปัจจัยรอบด้านทั้ง พื้นฐาน",
-  "มูลค่า และ เทคนิค",
-] as const;
-
 function DefinitMobileBreadcrumb() {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const clients = useClients();
   const { isPrivate } = usePrivacy();
   const breadcrumb = usePageBreadcrumb(pathname, { clients, isPrivate });
@@ -113,9 +102,10 @@ function DefinitMobileBreadcrumb() {
 }
 
 function DesktopBackHeader({ onBack }: { onBack: () => void }) {
+  const t = useT();
   return (
     <div className="flex w-full items-center gap-3 rounded-lg p-2">
-      <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[34px] shrink-0 p-2">
+      <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="size-[34px] shrink-0 p-2">
         <ArrowLeftIcon size={18} />
       </Button>
       <h1 className="shrink-0 text-lg font-bold leading-[28px] text-black">Definit x Yuanta</h1>
@@ -196,6 +186,8 @@ function DefinitPlanCard({
   onDetailsClick: () => void;
   layout?: DefinitPlanCardLayout;
 }) {
+  const t = useT();
+  const stats = t.products.advisory.stats;
   const isCompact = layout !== "desktop";
   const paddingClassName =
     layout === "mobile" ? "p-4" : layout === "tablet" ? "px-6 py-4" : "px-6 py-4";
@@ -243,16 +235,16 @@ function DefinitPlanCard({
         <div className="flex w-full items-end">
           <DefinitStatItem
             iconSrc={ROBO_ASSETS.iconMoney}
-            labelLines={["เงินตั้งต้น", "ขั้นต่ำ (บาท)"]}
-            labelSingle="เงินตั้งต้นขั้นต่ำ (บาท)"
+            labelLines={stats.minInvestmentLines}
+            labelSingle={stats.minInvestment}
             value={plan.minInvestment}
             compact={isCompact}
           />
           <div className="h-[58px] w-px shrink-0 bg-black/10" />
           <DefinitStatItem
             iconSrc={ROBO_ASSETS.iconClock}
-            labelLines={["ระยะเวลา", "ถือครอง"]}
-            labelSingle="ระยะเวลาถือครอง"
+            labelLines={stats.holdingPeriodLines}
+            labelSingle={stats.holdingPeriod}
             value={plan.holdingPeriod}
             compact={isCompact}
           />
@@ -278,7 +270,7 @@ function DefinitPlanCard({
             <Image src={ROBO_ASSETS.iconCaretDown} alt="" width={20} height={20} className="size-5 shrink-0" />
           }
         >
-          รายละเอียด
+          {t.products.common.details}
         </Button>
         <AdvisoryCtaButton cta={advisoryCta(client, "definit")} className="shrink-0" />
       </div>
@@ -310,12 +302,18 @@ function DefinitHeroMobile({
   advisory,
   client,
   onPlanDetails,
+  empty,
 }: {
   plans: DefinitPlan[];
   advisory: AdvisoryClientState;
   client: Client;
   onPlanDetails: (plan: DefinitPlan) => void;
+  /** Shown in place of the cards when `plans` is empty. */
+  empty: ReactNode;
 }) {
+  const t = useT();
+  // Figma mobile — compact hero lines.
+  const DEFINIT_MOBILE_HERO_LINES = t.products.advisory.definit.tagline.heroMobile;
   return (
     <div className={`relative flex w-full flex-1 flex-col items-center overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}>
       <DefinitChartOverlay layout="mobile" />
@@ -338,10 +336,10 @@ function DefinitHeroMobile({
           <AdvisoryClientBar state={advisory} />
         </div>
         <div className="flex w-full items-center px-4">
-          <p className="text-base font-bold leading-[28px] text-white">แผนลงทุนทั้งหมด ({plans.length})</p>
+          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
         </div>
         <div className="flex w-[343px] max-w-[calc(100%-32px)] flex-col gap-3">
-          {plans.map((plan) => (
+          {plans.length === 0 ? empty : plans.map((plan) => (
             <DefinitPlanCard
               key={plan.id}
               plan={plan}
@@ -361,12 +359,18 @@ function DefinitHeroTablet({
   advisory,
   client,
   onPlanDetails,
+  empty,
 }: {
   plans: DefinitPlan[];
   advisory: AdvisoryClientState;
   client: Client;
   onPlanDetails: (plan: DefinitPlan) => void;
+  /** Shown in place of the cards when `plans` is empty. */
+  empty: ReactNode;
 }) {
+  const t = useT();
+  // Figma 34315:85726 — desktop hero subtitle (2 lines).
+  const DEFINIT_HERO_DESCRIPTION_LINES = t.products.advisory.definit.tagline.heroDesktop;
   return (
     <div className={`relative flex min-h-[910px] w-full flex-1 flex-col gap-3 overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}>
       <DefinitChartOverlay layout="tablet" />
@@ -381,10 +385,10 @@ function DefinitHeroTablet({
       <div className="relative z-10 flex w-full flex-col gap-4 px-8">
         <AdvisoryClientBar state={advisory} />
         <div className="flex w-full items-center">
-          <p className="text-base font-bold leading-[28px] text-white">แผนลงทุนทั้งหมด ({plans.length})</p>
+          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
         </div>
         <div className="flex w-full flex-col gap-4">
-          {plans.map((plan) => (
+          {plans.length === 0 ? empty : plans.map((plan) => (
             <DefinitPlanCard
               key={plan.id}
               plan={plan}
@@ -405,12 +409,18 @@ function DefinitHeroDesktop({
   advisory,
   client,
   onPlanDetails,
+  empty,
 }: {
   plans: DefinitPlan[];
   advisory: AdvisoryClientState;
   client: Client;
   onPlanDetails: (plan: DefinitPlan) => void;
+  /** Shown in place of the cards when `plans` is empty. */
+  empty: ReactNode;
 }) {
+  const t = useT();
+  // Figma 34315:85726 — desktop hero subtitle (2 lines).
+  const DEFINIT_HERO_DESCRIPTION_LINES = t.products.advisory.definit.tagline.heroDesktop;
   return (
     <div className={`relative flex w-full flex-col items-center overflow-clip px-14 pb-12 ${DEFINIT_HERO_BG}`}>
       <DefinitChartOverlay layout="desktop" />
@@ -432,11 +442,11 @@ function DefinitHeroDesktop({
       <div className="relative z-10 flex w-full max-w-[884px] flex-col gap-4">
         <AdvisoryClientBar state={advisory} />
         <div className="flex w-full items-center">
-          <p className="text-base font-bold leading-[28px] text-white">แผนลงทุนทั้งหมด ({plans.length})</p>
+          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
         </div>
 
         <div className="flex w-full items-stretch gap-6">
-          {plans.map((plan) => (
+          {plans.length === 0 ? empty : plans.map((plan) => (
             <DefinitPlanCard
               key={plan.id}
               plan={plan}
@@ -459,6 +469,8 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
   const { isLoading: clientsLoading } = useClientsResource();
   const advisory = useAdvisoryClient("definit");
   const client = advisory.client;
+  // Definit has no filter, so an empty list can only mean "no plans".
+  const plansEmpty = <AdvisoryPlansEmpty />;
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -487,6 +499,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
                 advisory={advisory}
                 client={client}
                 onPlanDetails={setDetailPlan}
+                empty={plansEmpty}
               />
             </div>
             <div className="hidden md:block">
@@ -495,6 +508,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
                 advisory={advisory}
                 client={client}
                 onPlanDetails={setDetailPlan}
+                empty={plansEmpty}
               />
             </div>
           </>
@@ -511,6 +525,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
               advisory={advisory}
               client={client}
               onPlanDetails={setDetailPlan}
+              empty={plansEmpty}
             />
           </div>
         ) : null}

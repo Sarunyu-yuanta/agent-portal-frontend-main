@@ -1,7 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { useIndustrySectorPage } from "@/hooks/use-catalog";
 import { SetIndustrySectorDetailSkeleton } from "./StockCatalogSkeletons";
 import {
@@ -16,6 +17,7 @@ const NARROW = CATALOG_DETAIL_WIDTH.narrow;
 import {
   getSectorStockBatch,
   industrySectorHref,
+  localizeSector,
   SECTOR_STOCK_PAGE_SIZE,
   type IndustrySectorPage,
 } from "./stock-industry-sector-data";
@@ -26,9 +28,10 @@ import {
   navigateWithoutFlicker,
   StockDetailList,
 } from "./stock-detail-list";
+import { useT } from "@/i18n/I18nProvider";
 
-function SectorHeroBand({ page }: { page: IndustrySectorPage }) {
-  const { sector, description } = page;
+function SectorHeroBand({ page, sector }: { page: IndustrySectorPage; sector: IndustrySectorPage["sector"] }) {
+  const { description } = page;
   const trend = sector.trend;
   return (
     <div className="relative w-full overflow-hidden">
@@ -73,8 +76,13 @@ export function SetIndustrySectorDetail({
   sectorId: string;
   onBack: () => void;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   const { data: page, isLoading } = useIndustrySectorPage(sectorId);
+  const sectors = useMemo(
+    () => (page ? page.sectors.map((s) => localizeSector(t, page.market, s)) : []),
+    [page, t],
+  );
 
   useCatalogDetailScrollTop([sectorId]);
 
@@ -86,8 +94,8 @@ export function SetIndustrySectorDetail({
   if (!page) {
     return (
       <div className="flex min-h-full w-full flex-1 flex-col bg-white">
-        <CatalogDetailBackHeader title="SET Industry Sector" onBack={onBack} className="!pt-8" />
-        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>ไม่พบข้อมูล</p>
+        <CatalogDetailBackHeader title={t.stock.sectorSection.title} onBack={onBack} className="!pt-8" />
+        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
   }
@@ -98,11 +106,11 @@ export function SetIndustrySectorDetail({
           sharing a wrapper: a sticky element can't travel outside its parent's
           box, and a two-row wrapper is only as tall as the two rows. */}
       <div className="bg-white pb-2">
-        <CatalogDetailBackHeader title={page.title} onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader title={t.stock.sectorSection.title} onBack={onBack} className="!pt-8" />
       </div>
       <CatalogDetailTextTabs
         sticky
-        items={page.sectors.map((s) => ({
+        items={sectors.map((s) => ({
           id: s.id,
           label: s.name,
           icon: <SectorGlyph id={s.id} size={20} />,
@@ -119,14 +127,14 @@ export function SetIndustrySectorDetail({
         scrollButtons
       />
 
-      <SectorHeroBand page={page} />
+      <SectorHeroBand page={page} sector={localizeSector(t, page.market, page.sector)} />
 
       <StockDetailList
         resetKey={sectorId}
         initialStocks={page.stocks}
         loadBatch={(offset) => getSectorStockBatch(offset, SECTOR_STOCK_PAGE_SIZE, page.market)}
         totalCount={page.totalCount}
-        updatedAt={page.updatedAt}
+        updatedAt={t.stock.latestUpdate(page.updatedAt)}
         onSelect={(row) => router.push(stockProductHref(row.symbol))}
       />
     </div>

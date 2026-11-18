@@ -3,6 +3,7 @@ import { dayKey } from "./calendar-grid";
 import { actionKindRank } from "./market-taxonomy";
 import { marketFeed } from "./mock-market-feed";
 import type { MarketFact } from "./market-feed";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /**
  * What put a row on a day.
@@ -85,11 +86,11 @@ const SOURCE_RANK: Record<DayItemSource, number> = {
   note: 2,
 };
 
-function fromNote(note: Note): DayItem {
+function fromNote(note: Note, t: Dictionary): DayItem {
   return {
     id: `note:${note.id}`,
     source: "note",
-    title: note.title || "Untitled note",
+    title: note.title || t.planner.untitledNote,
     detail: note.body,
     clientIds: note.clientIds,
     done: note.reminderDone,
@@ -124,10 +125,12 @@ function dayFromIso(iso: string): Date {
  * because an action's holder list is the feed's business, not the UI's, and
  * filtering it afterwards would mean every caller learning the shape of a
  * source it otherwise never touches.
+ * @param t the dictionary an untitled note's fallback title comes from.
  */
 export function groupDayItems(
   notes: Note[],
   anchorMonth: Date,
+  t: Dictionary,
   clientId?: string,
 ): Map<string, DayItem[]> {
   const map = new Map<string, DayItem[]>();
@@ -142,7 +145,7 @@ export function groupDayItems(
   for (const note of notes) {
     if (!note.reminderAt) continue;
     if (clientId && !note.clientIds.includes(clientId)) continue;
-    push(new Date(note.reminderAt), fromNote(note));
+    push(new Date(note.reminderAt), fromNote(note, t));
   }
 
   const feed = marketFeed(anchorMonth);

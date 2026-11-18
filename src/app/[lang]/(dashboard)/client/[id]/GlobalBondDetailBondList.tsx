@@ -8,8 +8,8 @@ import {
   globalBondToBookableProduct,
   type GlobalBondRow,
 } from "./global-bond-data";
-import type { BookableProduct } from "@/app/(dashboard)/orders/bookable-products";
-import { QuotaBookButton } from "@/app/(dashboard)/orders/useQuotaBooking";
+import type { BookableProduct } from "@/app/[lang]/(dashboard)/orders/bookable-products";
+import { QuotaBookButton } from "@/app/[lang]/(dashboard)/orders/useQuotaBooking";
 import {
   BORDER_COLOR,
   HEADER_TEXT_CLS as HEADER_CLS,
@@ -19,6 +19,8 @@ import {
   InvestButton as CreateOrderButton,
   TopPickTag,
 } from "./fixed-income-shared";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const TOP_PICK_COL_CLS = "w-[112px]";
 
@@ -76,6 +78,7 @@ export const GlobalBondProposalContext = createContext<
  * order, but the order is what the row is for.
  */
 function ProposalButton({ row, fullWidth }: { row: GlobalBondRow; fullWidth?: boolean }) {
+  const t = useT();
   const onSend = useContext(GlobalBondProposalContext);
   const match = onSend ? findBookableGlobalBond(row) : undefined;
   if (!onSend || !match) return null;
@@ -92,7 +95,7 @@ function ProposalButton({ row, fullWidth }: { row: GlobalBondRow; fullWidth?: bo
         onSend(product);
       }}
     >
-      ส่ง Proposal
+      {t.products.common.sendProposal}
     </Button>
   );
 }
@@ -103,6 +106,7 @@ function ProposalButton({ row, fullWidth }: { row: GlobalBondRow; fullWidth?: bo
  * "สนใจลงทุน" interest button, which places nothing.
  */
 function InvestButton({ row, fullWidth }: { row: GlobalBondRow; fullWidth?: boolean }) {
+  const t = useT();
   const onBook = useContext(GlobalBondBookingContext);
   const match = onBook ? findBookableGlobalBond(row) : undefined;
   if (onBook && match) {
@@ -122,7 +126,7 @@ function InvestButton({ row, fullWidth }: { row: GlobalBondRow; fullWidth?: bool
       className={fullWidth ? "w-full max-w-[343px]" : "whitespace-nowrap"}
       onClick={(e) => e.stopPropagation()}
     >
-      สนใจลงทุน
+      {t.products.common.interested}
     </Button>
   );
 }
@@ -141,6 +145,7 @@ export function GlobalBondListCta({
   fullWidth?: boolean;
   href?: string;
 }) {
+  const t = useT();
   const onBook = useContext(GlobalBondBookingContext);
   const match = onBook ? findBookableGlobalBond(row) : undefined;
   if (onBook && match) {
@@ -150,25 +155,38 @@ export function GlobalBondListCta({
         onBook={onBook}
         size={fullWidth ? "xl" : "xs"}
         className={fullWidth ? "w-full max-w-[343px]" : undefined}
-        label="สร้างคำสั่งซื้อ"
+        label={t.products.common.createOrder}
       />
     );
   }
   return <CreateOrderButton fullWidth={fullWidth} href={href} />;
 }
 
-function EmptyBondsCard() {
+/**
+ * `onClearFilters` given → the hero's filters matched nothing; omitted → the
+ * issuer has no open bonds at all, and there is no filter to blame.
+ */
+function EmptyBondsCard({ onClearFilters }: { onClearFilters?: () => void }) {
+  const t = useT();
   return (
     <div
-      className="w-full rounded-xl overflow-hidden bg-white px-4 py-10 text-center text-sm text-[#6a7282]"
+      className="w-full rounded-xl overflow-hidden bg-white px-4"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW }}
     >
-      ไม่พบรายการที่ตรงกับตัวกรอง
+      <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
     </div>
   );
 }
 
-export function GlobalBondDetailAccordion({ bonds }: { bonds: GlobalBondRow[] }) {
+type BondListProps = {
+  bonds: GlobalBondRow[];
+  /** Given only while a filter is narrowing a non-empty list. */
+  onClearFilters?: () => void;
+};
+
+export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListProps) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [expandedId, setExpandedId] = useState<string | null>(
     bonds[0]?.id ?? null,
   );
@@ -178,7 +196,7 @@ export function GlobalBondDetailAccordion({ bonds }: { bonds: GlobalBondRow[] })
     setExpandedId(bonds[0]?.id ?? null);
   }
 
-  if (bonds.length === 0) return <EmptyBondsCard />;
+  if (bonds.length === 0) return <EmptyBondsCard onClearFilters={onClearFilters} />;
 
   return (
     <div
@@ -226,12 +244,12 @@ export function GlobalBondDetailAccordion({ bonds }: { bonds: GlobalBondRow[] })
             {expanded && (
               <div className="flex flex-col gap-3 items-center px-3 pb-3 w-full">
                 <div className="flex flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2 w-full">
-                  <DetailRow label="Currency" value={row.currency} />
-                  <DetailRow label="Coupon Rate" value={row.couponRate} />
-                  <DetailRow label="Price" value={row.price} />
-                  <DetailRow label="ผลตอบแทนโดยประมาณ" value={row.yieldPct} />
-                  <DetailRow label="วันครบกำหนด" value={row.maturity} />
-                  <DetailRow label="ระยะเวลา (ปี)" value={row.duration} />
+                  <DetailRow label={cols.currency} value={row.currency} />
+                  <DetailRow label={cols.couponRate} value={row.couponRate} />
+                  <DetailRow label={cols.price} value={row.price} />
+                  <DetailRow label={cols.estimatedYield} value={row.yieldPct} />
+                  <DetailRow label={cols.maturity} value={row.maturity} />
+                  <DetailRow label={cols.durationYears} value={row.duration} />
                 </div>
                 <InvestButton row={row} fullWidth />
                 <ProposalButton row={row} fullWidth />
@@ -244,8 +262,10 @@ export function GlobalBondDetailAccordion({ bonds }: { bonds: GlobalBondRow[] })
   );
 }
 
-export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
-  if (bonds.length === 0) return <EmptyBondsCard />;
+export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
+  if (bonds.length === 0) return <EmptyBondsCard onClearFilters={onClearFilters} />;
 
   const isLastRow = (i: number) => (i === bonds.length - 1 ? false : undefined);
 
@@ -261,7 +281,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center px-4"
               style={headerBorder({ left: true, right: false })}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>Bonds</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.bonds}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -297,7 +317,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
           </div>
           <div className="flex flex-col w-[138px] shrink-0">
             <div className="flex h-11 items-center px-4" style={headerBorder()}>
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>ISIN</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.isin}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -314,7 +334,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-center px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>Currency</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.currency}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -331,7 +351,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-end px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>Coupon Rate</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -348,7 +368,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-end px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>Price</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.price}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -365,7 +385,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-end px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>ผลตอบแทนโดยประมาณ</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -382,7 +402,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-end px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>วันครบกำหนด</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -399,7 +419,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex h-11 items-center justify-end px-4"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>ระยะเวลา (ปี)</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
             </div>
             {bonds.map((row, i) => (
               <div
@@ -416,7 +436,7 @@ export function GlobalBondDetailTable({ bonds }: { bonds: GlobalBondRow[] }) {
               className="flex items-center justify-center p-3"
               style={headerBorder()}
             >
-              <span className={`${HEADER_CLS} whitespace-nowrap`}>เอกสาร</span>
+              <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.documents}</span>
             </div>
             {bonds.map((row, i) => (
               <div

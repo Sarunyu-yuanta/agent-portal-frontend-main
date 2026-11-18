@@ -24,6 +24,10 @@ type NotesContextValue = {
    * against it, so a real endpoint needs no screen changes.
    */
   isLoading: boolean;
+  /** The first load of the notes failed; screens show `ErrorState`. */
+  error: Error | null;
+  /** Fetch the notes again. */
+  retry: () => void;
   /**
    * `localId` lets a caller that was already showing the note under an id of its
    * own hand that id over instead of being given a new one. `NotesSplitView`
@@ -70,7 +74,7 @@ let localIdSeq = 0;
  * single caller.
  */
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const { isLoading } = useStatic(SEED_NOTES);
+  const { isLoading, error, retry } = useStatic(SEED_NOTES);
   const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
 
   const addNote = useCallback(async (draft: NoteDraft, presetLocalId?: string) => {
@@ -97,7 +101,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotesContext.Provider
-      value={{ notes, isLoading, addNote, editNote, removeNote }}
+      value={{ notes, isLoading, error, retry, addNote, editNote, removeNote }}
     >
       {children}
     </NotesContext.Provider>

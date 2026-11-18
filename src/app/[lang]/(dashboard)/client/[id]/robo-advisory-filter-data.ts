@@ -22,11 +22,11 @@ export const ROBO_PROVIDER_FILTERS: { id: RoboProviderFilter; label: string }[] 
   { id: "alpha-one", label: "Alpha One" },
 ];
 
-/** Figma 33787:152139 — "ความเสี่ยง" chip group. */
-export const ROBO_RISK_FILTERS: { id: RoboRiskTier; label: string }[] = [
-  { id: "medium", label: "กลาง" },
-  { id: "high", label: "สูง" },
-  { id: "super-high", label: "สูงมาก" },
+/** Figma 33787:152139 — risk chip group. Labels: `t.products.advisory.filter.riskOptions`. */
+export const ROBO_RISK_FILTERS: { id: "medium" | "high" | "super-high" }[] = [
+  { id: "medium" },
+  { id: "high" },
+  { id: "super-high" },
 ];
 
 /** Figma 33787:152139 — "Rebalance Timing" chip group. */

@@ -10,6 +10,7 @@ import {
 } from "@/data/asset-account-details";
 import { AssetHoldingAccordion } from "@/components/AssetHoldingRow";
 import { displayAssetLabel } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 
 export type AssetListViewMode = "product" | "account";
 
@@ -33,6 +34,7 @@ export function AssetAccountCard({
    * panel instead of expanding inline. */
   selected?: boolean;
 }) {
+  const t = useT();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggleOpen = onToggle ?? (() => setInternalOpen((p) => !p));
@@ -66,7 +68,7 @@ export function AssetAccountCard({
           </span>
           <div className="flex flex-1 flex-col items-start min-w-0">
             <p className="type-subtitle-2 text-[var(--text-default-primary)] whitespace-nowrap leading-5 truncate w-full">
-              {displayAssetLabel(account.name)}
+              {displayAssetLabel(account.name, t)}
             </p>
             <p className="type-caption text-[var(--text-default-tertiary)] leading-4 truncate w-full">
               {account.accountNo}
@@ -83,7 +85,7 @@ export function AssetAccountCard({
           </div>
           {account.avgYield ? (
             <p className="type-caption text-[var(--text-default-tertiary)] leading-4 whitespace-nowrap">
-              Avg. Yield: {account.avgYield}%
+              {t.client.assets.avgYield(account.avgYield)}
             </p>
           ) : account.changeAmount && account.changePercent ? (
             <ProfitLossBadge
@@ -116,6 +118,7 @@ export function AssetAccountCard({
  * account number, and value, matching the row that was clicked.
  * Pass `onClose` to show a close button; omit it when a drawer provides its own. */
 export function AssetDetailDrawerHeader({ item, onClose }: { item: AssetAccountItem; onClose?: () => void }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-default)] shrink-0">
       <span className="relative shrink-0 size-2">
@@ -124,7 +127,7 @@ export function AssetDetailDrawerHeader({ item, onClose }: { item: AssetAccountI
       </span>
       <div className="flex-1 min-w-0">
         <p className="type-subtitle-2 font-bold text-[var(--text-default-primary)] truncate leading-5">
-          {displayAssetLabel(item.name)}
+          {displayAssetLabel(item.name, t)}
         </p>
         <p className="type-caption text-[var(--text-default-tertiary)] truncate leading-4">
           {item.accountNo}
@@ -141,7 +144,7 @@ export function AssetDetailDrawerHeader({ item, onClose }: { item: AssetAccountI
           type="button"
           onClick={onClose}
           className="w-8 h-8 shrink-0 flex items-center justify-center rounded text-[var(--text-default-tertiary)] hover:text-[var(--text-default-secondary)] hover:bg-[var(--bg-default-secondary)] transition-colors cursor-pointer"
-          aria-label="ปิดรายละเอียด"
+          aria-label={t.client.assets.closeDetail}
         >
           <XIcon size={16} />
         </button>

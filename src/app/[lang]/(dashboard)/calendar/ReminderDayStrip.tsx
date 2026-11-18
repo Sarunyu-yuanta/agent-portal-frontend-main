@@ -2,9 +2,12 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
-import { addDays, dayKey, WEEKDAY_LABELS } from "./calendar-grid";
+import { addDays, dayKey } from "./calendar-grid";
 import type { ReminderDay } from "./CalendarRemindersTab";
 import { useIsoLayoutEffect } from "@/hooks/use-iso-layout-effect";
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatDateWith, weekdayNames } from "@/i18n/format";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /** One cell's width. Fixed rather than content-sized so the strip keeps a
  *  rhythm — a two-digit day and a one-digit day must not shift the row.
@@ -77,10 +80,11 @@ export function ReminderDayStrip({
   centreNonce: number;
   onSelect: (key: string) => void;
 }) {
+  const locale = useLocale();
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
 
-  const cells = buildCells(days, today);
+  const cells = buildCells(days, today, locale);
 
   /** Whether there is anything left to scroll to on each side — what decides
    *  if an arrow is there at all. An arrow that does nothing is worse than no
@@ -178,12 +182,7 @@ export function ReminderDayStrip({
                 onClick={() => onSelect(cell.key)}
                 // The visible cell is three characters of date; the month it sits
                 // in is a divider beside it, which a screen reader is told to skip.
-                aria-label={cell.day.toLocaleDateString("en-GB", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                aria-label={formatDate(locale, cell.day, "weekdayLong")}
                 style={{ width: CELL_W }}
                 // Square, all of them. The band used to round its two ends, which
                 // worked while it floated clear of the strip's edges; flush top
@@ -203,7 +202,7 @@ export function ReminderDayStrip({
                 }`}
               >
                 <span className="text-meta leading-[20px] text-[var(--text-default-placeholder)]">
-                  {WEEKDAY_LABELS[cell.day.getDay()]}
+                  {weekdayNames(locale, "short")[cell.day.getDay()]}
                 </span>
                 <span
                   className={`flex size-9 items-center justify-center rounded-full text-body tabular-nums transition-colors ${
@@ -277,7 +276,7 @@ function MonthDivider({ label, inWeek }: { label: string; inWeek: boolean }) {
  * and the list cannot disagree about where the timeline begins and ends — one
  * of them would eventually be changed without the other.
  */
-function buildCells(days: ReminderDay[], today: Date): Cell[] {
+function buildCells(days: ReminderDay[], today: Date, locale: Locale): Cell[] {
   if (days.length === 0) return [];
 
   const withRows = new Set(
@@ -286,7 +285,7 @@ function buildCells(days: ReminderDay[], today: Date): Cell[] {
   const reachable = new Set(days.map((d) => d.key));
   const todayKey = dayKey(today);
 
-  // Sunday to Saturday, the week `WEEKDAY_LABELS` and the month grid are both
+  // Sunday to Saturday, the week `weekdayNames(locale, "short")` and the month grid are both
   // laid out in — a band running Monday to Sunday under a row that starts on
   // Sunday would cut across itself.
   const weekStart = addDays(today, -today.getDay());
@@ -308,7 +307,7 @@ function buildCells(days: ReminderDay[], today: Date): Cell[] {
       // what.
       month:
         day.getDate() === 1 || cells.length === 0
-          ? day.toLocaleDateString("en-GB", { month: "short" })
+          ? formatDateWith(locale, day, { month: "short" })
           : null,
       // Today is always reachable — the timeline keeps a block for it even when
       // nothing falls on it, which is the one day worth jumping to empty.
@@ -344,6 +343,7 @@ function StripEdge({
   side: "left" | "right";
   onPage: () => void;
 }) {
+  const t = useT();
   const isLeft = side === "left";
   return (
     <>
@@ -358,7 +358,7 @@ function StripEdge({
       <button
         type="button"
         onClick={onPage}
-        aria-label={isLeft ? "Earlier days" : "Later days"}
+        aria-label={isLeft ? t.planner.reminders.earlierDays : t.planner.reminders.laterDays}
         className={`absolute top-1/2 z-10 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-[0px_2px_8px_rgba(0,0,0,0.12)] transition-colors hover:text-foreground ${
           isLeft ? "left-1" : "right-1"
         }`}

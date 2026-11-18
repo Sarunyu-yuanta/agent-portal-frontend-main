@@ -8,6 +8,7 @@ import {
   type GlobalBondIssuerId,
 } from "./global-bond-data";
 import { TABLE_SHADOW } from "./fixed-income-shared";
+import { useT } from "@/i18n/I18nProvider";
 
 function CardLogo({ card }: { card: DetailRecommendedCard }) {
   return (
@@ -40,6 +41,8 @@ function RecommendedBondCard({
   highlighted: boolean;
   onSelect: () => void;
 }) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   return (
     <div
       className={`box-border flex min-h-[194px] w-[320px] md:w-[416px] shrink-0 lg:w-full lg:min-w-0 flex-col items-center justify-between gap-4 rounded-xl bg-white p-4 ${
@@ -55,7 +58,7 @@ function RecommendedBondCard({
               {card.title}
             </p>
             <div className="flex w-full items-start gap-0.5 whitespace-nowrap text-xs leading-[22px] text-[rgba(0,0,0,0.6)]">
-              <span>Ticker:</span>
+              <span>{t.products.globalBond.hero.tickerLabel}</span>
               <span>{card.ticker}</span>
             </div>
           </div>
@@ -64,7 +67,7 @@ function RecommendedBondCard({
         <div className="flex w-full shrink-0 items-start justify-center gap-4 rounded-lg bg-[#f9f9f9] p-2">
           <div className="flex min-w-0 flex-1 flex-col items-center self-stretch text-center">
             <p className="w-full text-xs leading-[22px] text-[rgba(0,0,0,0.4)]">
-              ผลตอบแทนโดยประมาณ
+              {cols.estimatedYield}
             </p>
             <p className="w-full text-sm font-semibold leading-[26px] text-[rgba(0,0,0,0.75)]">
               {card.estimatedYield}
@@ -73,7 +76,7 @@ function RecommendedBondCard({
           <div className="w-px shrink-0 self-stretch bg-black/10" />
           <div className="flex min-w-0 flex-1 flex-col items-center self-stretch text-center">
             <p className="w-full text-xs leading-[22px] text-[rgba(0,0,0,0.4)]">
-              วันครบกำหนด
+              {cols.maturity}
             </p>
             <p className="w-full text-sm font-semibold leading-[26px] text-[rgba(0,0,0,0.75)]">
               {card.maturityRange}
@@ -88,7 +91,7 @@ function RecommendedBondCard({
         className="w-full shrink-0"
         onClick={onSelect}
       >
-        รายละเอียด
+        {t.products.common.details}
       </Button>
     </div>
   );
@@ -101,6 +104,7 @@ export function GlobalBondDetailRecommended({
   issuerId: GlobalBondIssuerId;
   onIssuerSelect?: (issuerId: GlobalBondIssuerId) => void;
 }) {
+  const t = useT();
   const highlightedIssuerId = DETAIL_RECOMMENDED_ISSUERS.includes(issuerId)
     ? issuerId
     : DETAIL_RECOMMENDED_ISSUERS[0];
@@ -115,7 +119,7 @@ export function GlobalBondDetailRecommended({
           className="size-5 shrink-0"
         />
         <h3 className="text-sm font-semibold leading-[26px] text-[rgba(0,0,0,0.85)] md:text-xl md:font-bold md:leading-[32px] md:tracking-[-0.5px]">
-          Recommended Bonds
+          {t.products.globalBond.recommendedBonds}
         </h3>
       </div>
       <div className="overflow-x-auto hide-scrollbar -mx-4 w-[calc(100%+2rem)] md:-mx-8 md:w-[calc(100%+4rem)] lg:mx-0 lg:w-full lg:overflow-visible">

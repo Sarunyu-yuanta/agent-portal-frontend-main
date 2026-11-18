@@ -13,6 +13,7 @@ import {
   type Deal,
   type Stage,
 } from "./pipeline-data";
+import { useT } from "@/i18n/I18nProvider";
 
 export function StageAdvanceModal({
   deal,
@@ -26,12 +27,15 @@ export function StageAdvanceModal({
   onCancel: () => void;
 }) {
   const { isPrivate } = usePrivacy();
+  const t = useT();
   const maskedClient = maskName(deal.client, isPrivate);
   const checklist = ADVANCE_CHECKLIST[deal.stage as Stage] ?? [];
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const doneCount = checked.size;
   const total = checklist.length;
-  const allDone = total > 0 && doneCount === total;
+  // A stage with no checklist has nothing to tick, so it can advance — it used
+  // to stay disabled for good, with no explanation.
+  const allDone = doneCount === total;
 
   function toggle(id: string) {
     setChecked((prev) => {
@@ -48,7 +52,7 @@ export function StageAdvanceModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <Modal
         variant="content"
-        title="ก่อนไปขั้นตอนถัดไป"
+        title={t.pipeline.advanceModal.title}
         actionLayout="none"
         onClose={onCancel}
       >
@@ -56,10 +60,10 @@ export function StageAdvanceModal({
           {/* Stage transition */}
           <div className="-mt-2 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: STAGE_META[deal.stage as Stage]?.dot }} />
-            <span className="text-label text-muted-foreground">{deal.stage}</span>
+            <span className="text-label text-muted-foreground">{t.pipeline.stage[deal.stage as Stage] ?? deal.stage}</span>
             <ArrowRightIcon size={11} className="text-muted-foreground/30" weight="bold" />
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: STAGE_META[next]?.dot }} />
-            <span className="text-label font-semibold text-foreground">{next}</span>
+            <span className="text-label font-semibold text-foreground">{t.pipeline.stage[next]}</span>
           </div>
 
           {/* Deal summary strip */}
@@ -75,7 +79,7 @@ export function StageAdvanceModal({
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">
-                รายการที่ต้องทำก่อน
+                {t.pipeline.advanceModal.checklist}
               </p>
               <span className={`text-label font-bold tabular-nums transition-colors ${allDone ? "text-success" : "text-muted-foreground"}`}>
                 {doneCount} / {total}
@@ -84,7 +88,7 @@ export function StageAdvanceModal({
             <div className="h-1 rounded-full bg-muted overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${allDone ? "bg-success" : "bg-primary-action"}`}
-                style={{ width: `${(doneCount / total) * 100}%` }}
+                style={{ width: `${total > 0 ? (doneCount / total) * 100 : 100}%` }}
               />
             </div>
           </div>
@@ -101,7 +105,7 @@ export function StageAdvanceModal({
                 >
                   <Checkbox checked={done} onChange={() => toggle(item.id)} />
                   <p className={`text-body-sm leading-snug flex-1 transition-colors ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                    {item.label}
+                    {t.pipeline.checklist[item.id]}
                   </p>
                 </div>
               );
@@ -111,7 +115,7 @@ export function StageAdvanceModal({
           {/* Buttons */}
           <div className="flex items-center gap-3 pt-1">
             <Button variant="outline" size="xl" className="flex-1" onClick={onCancel}>
-              ยกเลิก
+              {t.common.cancel}
             </Button>
             <Button
               variant="primary"
@@ -121,7 +125,7 @@ export function StageAdvanceModal({
               rightIcon={<ArrowRightIcon size={14} weight="bold" />}
               onClick={onConfirm}
             >
-              {advance?.label ?? "Advance"}
+              {advance ? t.pipeline.advance[deal.stage as keyof typeof t.pipeline.advance] : t.pipeline.advanceFallback}
             </Button>
           </div>
         </div>

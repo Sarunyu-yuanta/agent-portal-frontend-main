@@ -76,7 +76,8 @@ export const DEFAULT_ASSET_ACCOUNTS: AssetAccountItem[] = [
 ];
 
 export type PositionField = {
-  label: string;
+  /** Its label is `t.client.assets.position[id]`. */
+  id: "avgCost" | "currentPrice" | "costAmount" | "marketValue" | "quantity";
   value: string;
 };
 
@@ -445,11 +446,15 @@ const ASSET_PRODUCT_DETAILS: Record<string, AssetAccountDetail> = {
   },
 };
 
+// An account or asset class with no holdings on file returns no sections, and
+// the detail view says so. It used to fall back to the Equity sections, which
+// put Thai stocks and funds under any account — someone else's positions, as
+// far as the IC could tell.
 export function getAssetAccountDetail(accountNo: string): AssetAccountDetail {
   const detail =
     ASSET_ACCOUNT_DETAILS[accountNo] ?? {
-      viewByLabel: "view by Asset Class - Equity",
-      sections: [THAI_STOCK_SECTION, MUTUAL_FUND_SECTION],
+      viewByLabel: "view by Asset Class",
+      sections: [],
     };
 
   return enrichDetailWithPositions(detail);
@@ -459,7 +464,7 @@ export function getAssetProductDetail(productName: string): AssetAccountDetail {
   const detail =
     ASSET_PRODUCT_DETAILS[productName] ?? {
       viewByLabel: `view by Asset Class - ${productName}`,
-      sections: [THAI_STOCK_SECTION],
+      sections: [],
     };
 
   return enrichDetailWithPositions(detail);
@@ -476,11 +481,11 @@ function computePosition(item: HoldingItem): PositionSummary | undefined {
 
   return {
     fields: [
-      { label: "Average Cost (THB)", value: formatThbDecimal(avgCost) },
-      { label: "Current Price (THB)", value: formatThbDecimal(currentPrice) },
-      { label: "Cost Amount (THB)", value: formatThbDecimal(costAmount) },
-      { label: "Market Value (THB)", value: formatThbDecimal(marketValue) },
-      { label: "Quantity", value: item.quantity.toLocaleString("en-US") },
+      { id: "avgCost", value: formatThbDecimal(avgCost) },
+      { id: "currentPrice", value: formatThbDecimal(currentPrice) },
+      { id: "costAmount", value: formatThbDecimal(costAmount) },
+      { id: "marketValue", value: formatThbDecimal(marketValue) },
+      { id: "quantity", value: item.quantity.toLocaleString("en-US") },
     ],
   };
 }

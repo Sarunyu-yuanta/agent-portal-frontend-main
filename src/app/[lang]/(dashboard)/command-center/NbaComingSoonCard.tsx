@@ -3,6 +3,7 @@
 import { Card } from "@sarunyu/system-one";
 import { SparkleIcon } from "@phosphor-icons/react";
 import { CardHeader } from "./CardHeader";
+import { useT } from "@/i18n/I18nProvider";
 import { NbaPanel } from "./NbaPanel";
 import { NBA_ROW_LIMIT, type NbaRow } from "./dashboard-data";
 
@@ -34,7 +35,7 @@ export function NbaComingSoonCard({
 }: {
   rows: NbaRow[];
   /** What the feature will do, in the voice of the surface it sits on. */
-  message: string;
+  message: NbaMessage;
   /**
    * Only meaningful once the blur lifts — the layer below is
    * `pointer-events-none`, so no dismiss button on it can ever be clicked.
@@ -46,6 +47,7 @@ export function NbaComingSoonCard({
    *  the blur rather than letting tall rows set it. */
   paired?: boolean;
 }) {
+  const t = useT();
   return (
     <Card
       variant="default"
@@ -54,7 +56,7 @@ export function NbaComingSoonCard({
       {/* No count while the card is held behind the blur — a number promises
           rows you can read, and these are a preview of a shape, not things
           waiting to be done. */}
-      <CardHeader title="AI Next Best Actions" />
+      <CardHeader title={t.commandCenter.nba.title} />
       <div className={paired ? "relative min-h-0 flex-1" : COMING_SOON_BAND_CLASS}>
         {/* `aria-hidden` and `pointer-events-none` because it is decoration: a
             screen reader should not read out suggestions nobody can act on, and
@@ -90,10 +92,10 @@ export function NbaComingSoonCard({
               <SparkleIcon size={18} weight="fill" className="text-primary-action" />
             </span>
             <p className="type-body-2 leading-relaxed text-muted-foreground">
-              {message}
+              {t.commandCenter.nba.comingSoonMessage[message]}
             </p>
             <p className="text-meta font-semibold uppercase tracking-widest text-primary-action">
-              Coming Soon
+              {t.commandCenter.nba.comingSoon}
             </p>
           </div>
         </div>
@@ -103,9 +105,10 @@ export function NbaComingSoonCard({
 }
 
 /** The Dashboard's framing: the whole book, read first thing in the morning. */
-export const NBA_MESSAGE_BOOK =
-  "ทุกเช้า AI จะบอกว่าวันนี้ควรดูแลลูกค้ารายไหนก่อน ด้วยเรื่องอะไร และเพราะอะไร";
+export const NBA_MESSAGE_BOOK = "book";
 
 /** A single client's profile, where "which client first" is already answered. */
-export const NBA_MESSAGE_CLIENT =
-  "AI จะแนะนำว่าควรคุยเรื่องอะไรกับลูกค้ารายนี้ต่อ เพราะอะไร พร้อมร่างข้อความให้";
+export const NBA_MESSAGE_CLIENT = "client";
+
+/** Which framing the panel's sentence takes — the text is `t.commandCenter.nba.comingSoonMessage`. */
+export type NbaMessage = typeof NBA_MESSAGE_BOOK | typeof NBA_MESSAGE_CLIENT;

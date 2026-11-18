@@ -28,6 +28,7 @@ import {
   type MutualFundTheme,
   type MutualFundThemeId,
 } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function MobileThemeTabs({
   activeId,
@@ -61,6 +62,8 @@ function MobileThemeTabs({
 }
 
 function MobileThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme: MutualFundTheme }) {
+  const t = useT();
+  // Falls back to no icon for a key the app doesn't know, rather than crashing.
   const Icon = THEME_ICON_COMPONENTS[theme.icon];
 
   return (
@@ -71,14 +74,14 @@ function MobileThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex items-center gap-1">
-            <Icon size={20} weight="fill" style={{ color: THEME_HERO_COLOR.title }} />
+            {Icon && <Icon size={20} weight="fill" style={{ color: THEME_HERO_COLOR.title }} />}
             <p className="min-w-0 flex-1 truncate text-xl font-bold leading-[34px]" style={{ color: THEME_HERO_COLOR.title }}>
               {getThemeHeroTitle(themeId)}
             </p>
           </div>
           <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{getThemeDescription(themeId)}</p>
           <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
-            ข้อมูล ณ วันที่ {TOP_PERFORMERS_LIST_UPDATED_AT}
+            {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
           </p>
         </div>
         <ThemeHeroGraphic themeId={themeId} />
@@ -108,6 +111,7 @@ export function MutualFundThemeDetailMobile({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [period, setPeriod] = useState<MobilePerformancePeriod>("1M");
   const [legendOpen, setLegendOpen] = useState(false);
   const [viewActive, setViewActive] = useState(false);
@@ -128,7 +132,7 @@ export function MutualFundThemeDetailMobile({
   const showViewTag = bothOrNeitherTag || viewActive;
   const showHighlightTag = bothOrNeitherTag || highlightActive;
   const tagFunds = filterFundsByTag(funds, viewActive, highlightActive);
-  const listCountLabel = `${tagFunds.length} รายการ`;
+  const listCountLabel = t.fund.list.count(tagFunds.length);
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white">
@@ -137,12 +141,12 @@ export function MutualFundThemeDetailMobile({
           variant="plain"
           size="icon-sm"
           onClick={onBack}
-          aria-label="กลับ"
+          aria-label={t.common.back}
           className="size-[30px] shrink-0 rounded-md p-[5px]"
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">ธีมกองทุนเด่น</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">{t.fund.themes.detailTitle}</h1>
       </div>
 
       {isPageLoading ? (
@@ -183,7 +187,7 @@ export function MutualFundThemeDetailMobile({
             </div>
 
             {tagFunds.length === 0 ? (
-              <p className="px-3 text-center text-sm text-[#6a7282]">ไม่พบกองทุนในธีมนี้</p>
+              <p className="px-3 text-center text-sm text-[#6a7282]">{t.fund.list.noFundsInTheme}</p>
             ) : null}
           </div>
         </>

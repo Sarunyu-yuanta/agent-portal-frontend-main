@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, 
 import { Button, Chip, SearchInput, Tab, Tag } from "@sarunyu/system-one";
 import { ArrowUpLeftIcon, CaretLeftIcon, CaretRightIcon, ChartLineUpIcon } from "@phosphor-icons/react";
 import { ChipScroller } from "@/components/ui/chip-scroller";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState, NotFoundState } from "@/components/ui/empty-state";
 import { FixedIncomeTab } from "./FixedIncomeTab";
 import { FixedIncomeDetail } from "./FixedIncomeDetail";
 import { FixedIncomeCompanyDetail } from "./FixedIncomeCompanyDetail";
@@ -34,7 +34,7 @@ import { StructuredProductAllPage } from "./StructuredProductAllPage";
 import { ThaiStructuredProductTable } from "./ThaiStructuredProductTable";
 import { ThaiStructuredProductDetail } from "./ThaiStructuredProductDetail";
 import { thaiBookableId, type ThaiStructuredProduct } from "./thai-structured-data";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import { TopIdeaAllPage } from "./TopIdeaAllPage";
 import { TopIdeaDetail } from "./TopIdeaDetail";
 import { InvestmentSolutionDetail } from "./InvestmentSolutionDetail";
@@ -42,10 +42,15 @@ import type { TopIdeaSector } from "./top-idea-data";
 import { PRODUCT_CATEGORIES, advisoryDetailHref } from "@/lib/product-catalog-routes";
 import { useScrollThreshold } from "./use-scroll-threshold";
 import { useDragScroll } from "./use-drag-scroll";
-import { useProductCatalogLoading } from "@/hooks/use-catalog";
-import { useRouter } from "next/navigation";
+import {
+  useFixedIncomeCompanyDetail,
+  useGlobalBondIssuer,
+  useProductCatalogLoading,
+} from "@/hooks/use-catalog";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ProductCatalogTabSkeleton } from "./ProductCatalogSkeletons";
+import { FixedIncomeCompanyDetailSkeleton, GlobalBondDetailSkeleton } from "./ProductDetailSkeletons";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
 import { useHasLoaded } from "@/hooks/use-api";
 import type { StructuredProduct } from "./structured-product-data";
@@ -60,6 +65,8 @@ import {
   TopPickSection,
 } from "./ProductCatalogSections";
 import { pageZoom } from "@/lib/page-zoom";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 const SEARCH_MODAL_PADDING = 12;
 const MAX_SEARCH_RESULTS = 20;
@@ -70,14 +77,10 @@ const MAX_SEARCH_RESULTS = 20;
  * the coming-soon sidebar pages make. Each renders nothing but an empty state;
  * drop the entry here once the tab has a real view to show.
  */
-const EMPTY_CATALOG_TABS: Record<
-  string,
-  { icon: ReactNode; title: string; body: string }
-> = {
+const EMPTY_CATALOG_TABS: Record<string, { icon: ReactNode }> = {
+  // Title and body: `t.products.catalog.emptyTabs[id]`.
   tfex: {
     icon: <ChartLineUpIcon size={40} className="text-[var(--text-default-placeholder)]" />,
-    title: "TFEX",
-    body: "Futures and options on the Thailand Futures Exchange will live here. Not built yet — check back soon.",
   },
 };
 
@@ -146,6 +149,7 @@ function TabStripScroller({
   activeKey?: string;
   children: ReactNode;
 }) {
+  const t = useT();
   const scrollRef = useRef<HTMLDivElement>(null);
   // A wrapper that outlives its children: the strip swaps from skeleton bars to
   // the real tabs, which changes its width without resizing the viewport.
@@ -222,7 +226,7 @@ function TabStripScroller({
                 variant="outline"
                 size="icon-sm"
                 onClick={() => step(isLeft ? -1 : 1)}
-                aria-label={isLeft ? "เลื่อนแท็บไปทางซ้าย" : "เลื่อนแท็บไปทางขวา"}
+                aria-label={isLeft ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight}
                 className="pointer-events-auto"
               >
                 {isLeft ? <CaretLeftIcon size={16} /> : <CaretRightIcon size={16} />}
@@ -236,8 +240,8 @@ function TabStripScroller({
 }
 
 /** "All categories" plus the catalog's own tabs, reused as the search modal's filter chips. */
-const SEARCH_FILTER_CHIPS = [
-  { id: null as string | null, title: "ทั้งหมด" },
+const searchFilterChips = (t: Dictionary) => [
+  { id: null as string | null, title: t.products.common.all },
   ...PRODUCT_CATEGORIES,
 ];
 
@@ -313,7 +317,9 @@ export function ProductCatalogTab({
   activeCategory?: string;
   onCategoryChange?: (id: string) => void;
 } = {}) {
-  const router = useRouter();
+  const t = useT();
+  const labels = t.products.catalog;
+  const router = useLocalizedRouter();
   const [activeTabInternal, setActiveTabInternal] = useState("structured");
   const activeProductTab = activeCategory ?? activeTabInternal;
   const [selectedFixedIncomeBond, setSelectedFixedIncomeBond] = useState<FixedIncomeBond | null>(null);
@@ -503,7 +509,10 @@ export function ProductCatalogTab({
         break;
       case "global-bond": {
         const issuerId = getIssuerIdForBondRow(item.bond);
+        // A bond with no issuer page still has a home: the full overseas list
+        // it is part of. Picking it used to close the overlay and do nothing.
         if (issuerId) nav.onGlobalBondIssuerSelect(issuerId);
+        else nav.onAllGlobalBondsView();
         break;
       }
     }
@@ -566,7 +575,7 @@ export function ProductCatalogTab({
   if (!navigation && selectedGlobalBondIssuer) {
     return (
       <div className="flex flex-col w-full">
-        <GlobalBondDetail
+        <InlineGlobalBondDetail
           issuerId={selectedGlobalBondIssuer}
           onBack={() => setSelectedGlobalBondIssuer(null)}
           onIssuerSelect={setSelectedGlobalBondIssuer}
@@ -600,7 +609,7 @@ export function ProductCatalogTab({
   if (!navigation && fixedIncomeView === "company" && selectedFixedIncomeCompany) {
     return (
       <div className="flex flex-col w-full">
-        <FixedIncomeCompanyDetail
+        <InlineFixedIncomeCompanyDetail
           companyId={selectedFixedIncomeCompany}
           onBack={() => {
             if (selectedFixedIncomeBond) {
@@ -642,11 +651,14 @@ export function ProductCatalogTab({
     );
   }
 
-  if (!navigation && selectedInvestmentSolution) {
+  const pickedSolution = selectedInvestmentSolution
+    ? getInvestmentSolution(selectedInvestmentSolution)
+    : undefined;
+  if (!navigation && pickedSolution) {
     return (
       <div className="flex flex-col w-full">
         <InvestmentSolutionDetail
-          solution={getInvestmentSolution(selectedInvestmentSolution)}
+          solution={pickedSolution}
           onBack={() => setSelectedInvestmentSolution(null)}
           onProductSelect={(product) => setSelectedProduct(product)}
         />
@@ -692,7 +704,7 @@ export function ProductCatalogTab({
               <SearchInput
                 value={searchValue}
                 onChange={setSearchValue}
-                placeholder="ค้นหาสินทรัพย์"
+                placeholder={labels.searchPlaceholder}
                 className="w-full"
               />
             )}
@@ -728,7 +740,7 @@ export function ProductCatalogTab({
                   <SearchInput
                     value={searchValue}
                     onChange={setSearchValue}
-                    placeholder="ค้นหาสินทรัพย์"
+                    placeholder={labels.searchPlaceholder}
                     className="w-full"
                   />
                 )}
@@ -777,7 +789,7 @@ export function ProductCatalogTab({
             <SearchInput
               value={searchValue}
               onChange={setSearchValue}
-              placeholder="ค้นหาสินทรัพย์"
+              placeholder={labels.searchPlaceholder}
               className="w-full"
             />
           </div>
@@ -787,13 +799,13 @@ export function ProductCatalogTab({
               style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}
             >
               <div className="flex items-center justify-between px-3">
-                <span className="type-caption text-muted-foreground">ค้นหาล่าสุด</span>
+                <span className="type-caption text-muted-foreground">{labels.recentSearches}</span>
                 <button
                   type="button"
                   onClick={() => setRecentSearches(clearRecentSearches())}
                   className="type-caption text-primary-action hover:underline cursor-pointer"
                 >
-                  ล้างประวัติ
+                  {labels.clearHistory}
                 </button>
               </div>
               <ChipScroller rowClassName="px-3">
@@ -822,7 +834,7 @@ export function ProductCatalogTab({
             </div>
           )}
           <ChipScroller style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-            {SEARCH_FILTER_CHIPS.map((chip) => (
+            {searchFilterChips(t).map((chip) => (
               <Chip
                 key={chip.id ?? "all"}
                 label={chip.title}
@@ -836,7 +848,7 @@ export function ProductCatalogTab({
           <div className="flex flex-col max-h-[420px] overflow-y-auto py-2">
             {searchResults.length === 0 ? (
               <p className="px-4 py-8 text-center type-caption text-muted-foreground">
-                ไม่พบสินทรัพย์{searchValue.trim() ? `ที่ตรงกับ “${searchValue}”` : "ในหมวดนี้"}
+                {searchValue.trim() ? labels.noMatchFor(searchValue) : labels.noneInCategory}
               </p>
             ) : (
               searchResults.map((item) => (
@@ -879,7 +891,11 @@ export function ProductCatalogTab({
           /* Sits in the no-skeleton branch because there is nothing to wait for. */
           <div className="w-full bg-white">
             <div className="max-w-[1280px] mx-auto w-full px-4 lg:px-6 py-12">
-              <EmptyState {...EMPTY_CATALOG_TABS[activeProductTab]} />
+              <EmptyState
+                {...EMPTY_CATALOG_TABS[activeProductTab]}
+                title={labels.emptyTabs[activeProductTab]?.title ?? ""}
+                body={labels.emptyTabs[activeProductTab]?.body ?? ""}
+              />
             </div>
           </div>
         ) : activeProductTab === "robo-advisory" ? (
@@ -912,7 +928,7 @@ export function ProductCatalogTab({
                 <InvestmentSolutionSection onInvestmentSolutionSelect={nav.onInvestmentSolutionSelect} />
                 <TopPickSection onProductSelect={nav.onProductSelect} />
                 <StructuredProductGridSection
-                  title="All Global Structured Product"
+                  title={labels.allGlobalStructured}
                   onProductSelect={nav.onProductSelect}
                   onAllProductsView={nav.onAllProductsView}
                 />
@@ -939,7 +955,7 @@ export function ProductCatalogTab({
                       className="font-bold"
                       style={{ color: "#101828", fontSize: 22, lineHeight: "32px" }}
                     >
-                      All Thai FCN
+                      {labels.allThaiFcn}
                     </p>
                     <ThaiStructuredProductTable onRowClick={nav.onThaiProductSelect} />
                   </div>
@@ -959,5 +975,52 @@ export function ProductCatalogTab({
         )}
       </FadeIn>
     </div>
+  );
+}
+
+/**
+ * The state-based (client page) counterparts of the catalog's
+ * `global-bond/[issuerId]` and `fixed-income/company/[companyId]` routes: the
+ * same lookup, in the same order — skeleton, then not-found, then the detail.
+ */
+function InlineGlobalBondDetail({
+  issuerId,
+  onBack,
+  onIssuerSelect,
+}: {
+  issuerId: GlobalBondIssuerId;
+  onBack: () => void;
+  onIssuerSelect: (issuerId: GlobalBondIssuerId) => void;
+}) {
+  const t = useT();
+  const { data: issuer, isLoading } = useGlobalBondIssuer(issuerId);
+  if (isLoading) return <GlobalBondDetailSkeleton />;
+  if (!issuer) return <NotFoundState message={t.products.notFound.issuer} onBack={onBack} />;
+  return <GlobalBondDetail issuer={issuer} onBack={onBack} onIssuerSelect={onIssuerSelect} />;
+}
+
+function InlineFixedIncomeCompanyDetail({
+  companyId,
+  onBack,
+  onBondSelect,
+}: {
+  companyId: string;
+  onBack: () => void;
+  onBondSelect: (bond: FixedIncomeBond) => void;
+}) {
+  const t = useT();
+  const { data: detail, isLoading } = useFixedIncomeCompanyDetail(companyId);
+  if (isLoading) {
+    return <FixedIncomeCompanyDetailSkeleton hasSecondary={detail.secondaryBonds.length > 0} />;
+  }
+  if (!detail.company) return <NotFoundState message={t.products.notFound.company} onBack={onBack} />;
+  return (
+    <FixedIncomeCompanyDetail
+      company={detail.company}
+      primaryBonds={detail.primaryBonds}
+      secondaryBonds={detail.secondaryBonds}
+      onBack={onBack}
+      onBondSelect={onBondSelect}
+    />
   );
 }

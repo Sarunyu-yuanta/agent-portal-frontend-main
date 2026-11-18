@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@sarunyu/system-one";
-import { CaretLeftIcon, CaretRightIcon, InfoIcon } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon, InfoIcon, TrayIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TagFilterChip } from "./MutualFundCard";
 import { MF_ASSETS } from "./mutual-fund-assets";
 import {
   MOBILE_PERFORMANCE_PERIODS,
   type MobilePerformancePeriod,
 } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Controls shared by every mutual-fund list surface, following the same
@@ -47,6 +49,7 @@ export function MutualFundTagLegend({
    */
   trailing?: React.ReactNode;
 }) {
+  const t = useT();
   const legendLink = (
     <Button
       variant="plain"
@@ -55,7 +58,7 @@ export function MutualFundTagLegend({
       leftIcon={<InfoIcon size={16} />}
       className="shrink-0 !px-0"
     >
-      ดูคำอธิบาย
+      {t.fund.legend.open}
     </Button>
   );
 
@@ -65,13 +68,13 @@ export function MutualFundTagLegend({
         <div className="flex items-center gap-2">
           <TagFilterChip
             icon={MF_ASSETS.performersTagView}
-            label="View"
+            label={t.fund.tags.view}
             active={viewActive}
             onClick={onToggleView}
           />
           <TagFilterChip
             icon={MF_ASSETS.performersTagHighlight}
-            label="Highlight"
+            label={t.fund.tags.highlight}
             active={highlightActive}
             onClick={onToggleHighlight}
           />
@@ -87,13 +90,13 @@ export function MutualFundTagLegend({
       <div className="flex items-center gap-2">
         <TagFilterChip
           icon={MF_ASSETS.performersTagView}
-          label="View"
+          label={t.fund.tags.view}
           active={viewActive}
           onClick={onToggleView}
         />
         <TagFilterChip
           icon={MF_ASSETS.performersTagHighlight}
-          label="Highlight"
+          label={t.fund.tags.highlight}
           active={highlightActive}
           onClick={onToggleHighlight}
         />
@@ -119,9 +122,10 @@ export function MobilePeriodTabs({
   active: MobilePerformancePeriod;
   onChange: (period: MobilePerformancePeriod) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex h-10 w-full items-center gap-1 px-3">
-      <Button variant="plain" size="icon-xs" aria-label="ช่วงเวลาก่อนหน้า" className="shrink-0">
+      <Button variant="plain" size="icon-xs" aria-label={t.fund.list.previousPeriod} className="shrink-0">
         <CaretLeftIcon size={16} />
       </Button>
       <div className="min-w-0 flex-1 overflow-x-auto rounded-full bg-[#f3f3f3] p-1">
@@ -145,9 +149,20 @@ export function MobilePeriodTabs({
           })}
         </div>
       </div>
-      <Button variant="plain" size="icon-xs" aria-label="ช่วงเวลาถัดไป" className="shrink-0">
+      <Button variant="plain" size="icon-xs" aria-label={t.fund.list.nextPeriod} className="shrink-0">
         <CaretRightIcon size={16} />
       </Button>
     </div>
+  );
+}
+
+/** A mutual-fund section (or a card's list) with nothing in it yet — sits under the section's heading. */
+export function MutualFundSectionEmpty({ title }: { title: string }) {
+  return (
+    <EmptyState
+      size="compact"
+      icon={<TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      title={title}
+    />
   );
 }

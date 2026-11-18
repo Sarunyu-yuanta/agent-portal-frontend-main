@@ -1,8 +1,11 @@
 import fixedIncomeRaw from "@/data/fixed-income.json";
 import type { StructuredProduct } from "./structured-product-data";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 export type FixedIncomeStatus = "open" | "upcoming" | "soon";
 export type FixedIncomeAction = "invest" | "follow" | "followed";
+/** Which market a bond trades in — the id behind the `bondCategory` label. */
+export type FixedIncomeBondCategory = "primary" | "secondary";
 
 export type FixedIncomeDocument = {
   label: string;
@@ -19,6 +22,7 @@ export type FixedIncomeBond = {
   status: FixedIncomeStatus;
   statusLabel: string;
   bondCategory: string;
+  category: FixedIncomeBondCategory;
   ytm: string;
   couponRate: string;
   couponPeriod: string;
@@ -48,9 +52,18 @@ export type FixedIncomeCompany = {
 
 export const BOND_LOGOS: string[] = fixedIncomeRaw.logos;
 
-export const FIXED_INCOME_BONDS = fixedIncomeRaw.bonds as FixedIncomeBond[];
+type RawFixedIncomeBond = Omit<FixedIncomeBond, "category">;
 
-const COMPANY_ONLY_BONDS = fixedIncomeRaw.secondaryMarketBonds as FixedIncomeBond[];
+/** The feed splits bonds by market, so the category id comes from which list a bond is in. */
+const withCategory =
+  (category: FixedIncomeBondCategory) =>
+  (bond: RawFixedIncomeBond): FixedIncomeBond => ({ ...bond, category });
+
+export const FIXED_INCOME_BONDS = (fixedIncomeRaw.bonds as RawFixedIncomeBond[]).map(withCategory("primary"));
+
+const COMPANY_ONLY_BONDS = (fixedIncomeRaw.secondaryMarketBonds as RawFixedIncomeBond[]).map(
+  withCategory("secondary"),
+);
 const FIXED_INCOME_COMPANIES = fixedIncomeRaw.companies as FixedIncomeCompany[];
 const FIXED_INCOME_COMPANY_ORDER: string[] = fixedIncomeRaw.companyOrder;
 
@@ -84,13 +97,13 @@ export function resolveFixedIncomeCompany(companyId: string): FixedIncomeCompany
 
 export function getCompanyPrimaryBonds(companyId: string): FixedIncomeBond[] {
   return allBonds().filter(
-    (b) => b.companyName === companyId && b.bondCategory === "หุ้นกู้ตลาดแรก",
+    (b) => b.companyName === companyId && b.category === "primary",
   );
 }
 
 export function getCompanySecondaryBonds(companyId: string): FixedIncomeBond[] {
   return allBonds().filter(
-    (b) => b.companyName === companyId && b.bondCategory === "หุ้นกู้ตลาดรอง",
+    (b) => b.companyName === companyId && b.category === "secondary",
   );
 }
 
@@ -158,9 +171,9 @@ export function fixedIncomeToBookableProduct(bond: FixedIncomeBond): StructuredP
   };
 }
 
-export function getBookingLabel(bond: FixedIncomeBond): string {
-  const prefix = bond.status === "open" ? "เปิดขาย" : "คาดว่าเปิดขาย";
-  return `${prefix} ${bond.subscriptionPeriod}`;
+export function getBookingLabel(bond: FixedIncomeBond, t: Dictionary): string {
+  const labels = t.products.fixedIncome.booking;
+  return bond.status === "open" ? labels.open(bond.subscriptionPeriod) : labels.expected(bond.subscriptionPeriod);
 }
 
 export function getRiskNumber(risk: string): string {
@@ -218,25 +231,12 @@ export type FixedIncomeFilterChip = {
   value: string;
 };
 
-function getCouponChipLabel(id: FixedIncomeCouponFilter): string {
-  switch (id) {
-    case "lt2":
-      return "ดอกเบี้ย น้อยกว่า 2%";
-    case "2to4":
-      return "ดอกเบี้ย 2 - 4%";
-    case "5to7":
-      return "ดอกเบี้ย 5 - 7%";
-    case "gt7":
-      return "ดอกเบี้ย มากกว่า 7%";
-  }
+function getRiskChipLabel(id: FixedIncomeRiskFilter, t: Dictionary): string {
+  const label = t.products.fixedIncome.filter.riskOptions[id];
+  return label ? t.products.fixedIncome.filter.riskChip(label) : id;
 }
 
-function getRiskChipLabel(id: FixedIncomeRiskFilter): string {
-  const option = FIXED_INCOME_RISK_FILTERS.find((item) => item.id === id);
-  return option ? `ความเสี่ยง ${option.label}` : id;
-}
-
-export function getFixedIncomeFilterChips(filters: FixedIncomeFilters): FixedIncomeFilterChip[] {
+export function getFixedIncomeFilterChips(filters: FixedIncomeFilters, t: Dictionary): FixedIncomeFilterChip[] {
   const chips: FixedIncomeFilterChip[] = [];
 
   for (const companyId of filters.companies) {
@@ -251,7 +251,7 @@ export function getFixedIncomeFilterChips(filters: FixedIncomeFilters): FixedInc
   for (const couponId of filters.coupons) {
     chips.push({
       id: `coupon:${couponId}`,
-      label: getCouponChipLabel(couponId),
+      label: t.products.fixedIncome.filter.couponChips[couponId],
       category: "coupon",
       value: couponId,
     });
@@ -270,7 +270,7 @@ export function getFixedIncomeFilterChips(filters: FixedIncomeFilters): FixedInc
   for (const riskId of filters.risks) {
     chips.push({
       id: `risk:${riskId}`,
-      label: getRiskChipLabel(riskId),
+      label: getRiskChipLabel(riskId, t),
       category: "risk",
       value: riskId,
     });

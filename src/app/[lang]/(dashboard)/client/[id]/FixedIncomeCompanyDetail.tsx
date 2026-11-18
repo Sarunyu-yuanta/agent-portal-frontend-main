@@ -9,6 +9,7 @@ import {
 import {
   BOND_LOGOS,
   type FixedIncomeBond,
+  type FixedIncomeCompany,
 } from "./fixed-income-data";
 import {
   BORDER_COLOR,
@@ -19,8 +20,8 @@ import {
   StatusTag,
   BondLogo,
 } from "./fixed-income-shared";
-import { useFixedIncomeCompanyDetail } from "@/hooks/use-catalog";
-import { FixedIncomeCompanyDetailSkeleton } from "./ProductDetailSkeletons";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const GRADIENT_TITLE =
   "bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-transparent";
@@ -71,6 +72,7 @@ function GuaranteeCell({ value }: { value: string }) {
 }
 
 function ViewInfoButton({ onClick }: { onClick: () => void }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -80,7 +82,7 @@ function ViewInfoButton({ onClick }: { onClick: () => void }) {
       }}
       className="inline-flex items-center justify-center px-1.5 py-1 rounded text-xs font-medium leading-[22px] whitespace-nowrap bg-[#0a6ee7] text-white border-none cursor-pointer"
     >
-      ดูข้อมูล
+      {t.products.common.viewInfo}
     </button>
   );
 }
@@ -115,6 +117,7 @@ function HeaderCellSimple({
 }
 
 function RatingsHeaderCell() {
+  const t = useT();
   return (
     <div
       className="flex flex-col h-[44px] min-w-0 overflow-hidden"
@@ -131,10 +134,10 @@ function RatingsHeaderCell() {
           className="flex flex-1 items-center justify-center px-3"
           style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
         >
-          <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>บริษัท</span>
+          <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{t.products.fixedIncome.columns.company}</span>
         </div>
         <div className="flex flex-1 items-center justify-center px-3">
-          <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>หุ้นกู้</span>
+          <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{t.products.fixedIncome.columns.bond}</span>
         </div>
       </div>
     </div>
@@ -142,23 +145,25 @@ function RatingsHeaderCell() {
 }
 
 function BondTableHeader({ showStatus }: { showStatus: boolean }) {
+  const t = useT();
+  const cols = t.products.fixedIncome.columns;
   return (
     <div className="grid items-stretch bg-white shrink-0 w-max min-w-full" style={bondTableRowStyle(showStatus)}>
-      <HeaderCellSimple borderLeft>หุ้นกู้</HeaderCellSimple>
+      <HeaderCellSimple borderLeft>{cols.bond}</HeaderCellSimple>
       {showStatus && (
-        <HeaderCellSimple align="center">สถานะ</HeaderCellSimple>
+        <HeaderCellSimple align="center">{cols.status}</HeaderCellSimple>
       )}
-      <HeaderCellSimple>ประเภท</HeaderCellSimple>
+      <HeaderCellSimple>{cols.type}</HeaderCellSimple>
       <HeaderCellSimple align="center">YTM</HeaderCellSimple>
       <HeaderCellSimple align="center">Coupon</HeaderCellSimple>
-      <HeaderCellSimple>งวดดอกเบี้ย</HeaderCellSimple>
-      <HeaderCellSimple>อายุ</HeaderCellSimple>
-      <HeaderCellSimple>วันครบกำหนด</HeaderCellSimple>
+      <HeaderCellSimple>{cols.couponPeriod}</HeaderCellSimple>
+      <HeaderCellSimple>{cols.tenor}</HeaderCellSimple>
+      <HeaderCellSimple>{cols.maturity}</HeaderCellSimple>
       <RatingsHeaderCell />
-      <HeaderCellSimple>ความเสี่ยง</HeaderCellSimple>
-      <HeaderCellSimple>การค้ำประกัน</HeaderCellSimple>
-      <HeaderCellSimple>ประเภทเสนอขาย</HeaderCellSimple>
-      <HeaderCellSimple>คาดว่าเปิดขาย</HeaderCellSimple>
+      <HeaderCellSimple>{cols.risk}</HeaderCellSimple>
+      <HeaderCellSimple>{cols.guarantee}</HeaderCellSimple>
+      <HeaderCellSimple>{cols.offerType}</HeaderCellSimple>
+      <HeaderCellSimple>{cols.expectedOpen}</HeaderCellSimple>
       <HeaderCellSimple align="center" borderRight={false} className={STICKY_ACTION_HEADER_CLS} />
     </div>
   );
@@ -175,6 +180,7 @@ function BondTableRow({
   showStatus: boolean;
   onSelect: (bond: FixedIncomeBond) => void;
 }) {
+  const t = useT();
   const border = () => cellBorderStyle({ bottom: !isLast });
 
   const cell = "flex items-center px-3 py-3.5 min-w-0";
@@ -203,7 +209,7 @@ function BondTableRow({
         </div>
       )}
       <div className={`${cell}`} style={border()}>
-        <CategoryTag label={bond.bondCategory} />
+        <CategoryTag label={t.products.fixedIncome.category[bond.category]} />
       </div>
       <div className={`${cell} justify-end`} style={border()}>
         <span className="text-sm font-bold leading-[24px] text-[#101828] whitespace-nowrap">{bond.ytm}</span>
@@ -312,6 +318,7 @@ function BondSection({
   updatedAt: string;
   onBondSelect: (bond: FixedIncomeBond) => void;
 }) {
+  const t = useT();
   if (bonds.length === 0) return null;
 
   return (
@@ -323,8 +330,8 @@ function BondSection({
           {title}
         </h2>
         <div className="flex items-center justify-between w-full text-sm leading-[24px] text-[#6a7282]">
-          <span>จำนวน {bonds.length} รายการ</span>
-          <span className="hidden sm:inline">อัปเดตล่าสุด {updatedAt}</span>
+          <span>{t.products.common.itemCount(bonds.length)}</span>
+          <span className="hidden sm:inline">{t.products.common.updatedAt(updatedAt)}</span>
         </div>
       </div>
       <BondTable bonds={bonds} showStatus={showStatus} onBondSelect={onBondSelect} />
@@ -332,20 +339,26 @@ function BondSection({
   );
 }
 
+/**
+ * Handed a resolved company: the lookup, its loading and its not-found belong
+ * to whoever resolves the id (`fixed-income/company/[companyId]/page.tsx`), the
+ * same split as the other catalog detail routes.
+ */
 export function FixedIncomeCompanyDetail({
-  companyId,
+  company,
+  primaryBonds,
+  secondaryBonds,
   onBack,
   onBondSelect,
 }: {
-  companyId: string;
+  company: FixedIncomeCompany;
+  primaryBonds: FixedIncomeBond[];
+  secondaryBonds: FixedIncomeBond[];
   onBack: () => void;
   onBondSelect: (bond: FixedIncomeBond) => void;
 }) {
-  // The `if (isLoading)` return below stays *above* the `!company` branch: once
-  // this resource is fetched, a not-yet-arrived company must read as loading,
-  // not as "ไม่พบข้อมูลบริษัท".
-  const { data: detail, isLoading } = useFixedIncomeCompanyDetail(companyId);
-  const { company, primaryBonds, secondaryBonds } = detail;
+  const t = useT();
+  const companyId = company.id;
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -356,21 +369,6 @@ export function FixedIncomeCompanyDetail({
     }
   }, [companyId]);
 
-  if (isLoading) return <FixedIncomeCompanyDetailSkeleton hasSecondary={secondaryBonds.length > 0} />;
-
-  if (!company) {
-    return (
-      <div className="flex flex-col items-center w-full pt-6 pb-20 px-4 md:px-8 lg:px-20">
-        <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px]">
-          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ">
-            <ArrowLeftIcon size={20} />
-          </Button>
-          <h1 className="text-lg font-bold leading-[30px] text-[#101828]">ไม่พบข้อมูลบริษัท</h1>
-        </div>
-      </div>
-    );
-  }
-
   const logoSrc = BOND_LOGOS[company.logoIdx];
 
   return (
@@ -379,7 +377,7 @@ export function FixedIncomeCompanyDetail({
       style={{ backgroundColor: "#f9fafb" }}
     >
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
@@ -403,7 +401,9 @@ export function FixedIncomeCompanyDetail({
                 className="relative shrink-0 size-14 rounded-xl overflow-hidden"
                 style={{ border: "1px solid rgba(0,0,0,0.08)" }}
               >
-                <Image alt="" fill sizes="56px" className="object-cover pointer-events-none" src={logoSrc} />
+                {logoSrc && (
+                  <Image alt="" fill sizes="56px" className="object-cover pointer-events-none" src={logoSrc} />
+                )}
               </div>
               <h2 className="flex-1 min-w-0 text-[32px] font-bold leading-[1.5] text-[rgba(0,0,0,0.9)]">
                 {company.fullName}
@@ -414,20 +414,26 @@ export function FixedIncomeCompanyDetail({
             )}
           </div>
           <div className="relative flex flex-col gap-4 w-full">
-            <p className="text-base font-bold leading-[28px] text-[rgba(0,0,0,0.75)]">รายละเอียดสินทรัพย์</p>
+            <p className="text-base font-bold leading-[28px] text-[rgba(0,0,0,0.75)]">{t.products.fixedIncome.company.assetDetails}</p>
             <div className="flex flex-wrap gap-3 items-start">
-              <AssetTag iconSrc={ASSET_TAG_ICONS.ticker} label={`Ticker : ${company.ticker}`} />
-              <AssetTag iconSrc={ASSET_TAG_ICONS.offering} label={`ประเภทการเสนอขาย : ${company.offeringType}`} />
+              <AssetTag iconSrc={ASSET_TAG_ICONS.ticker} label={t.products.fixedIncome.company.ticker(company.ticker)} />
+              <AssetTag iconSrc={ASSET_TAG_ICONS.offering} label={t.products.fixedIncome.company.offeringType(company.offeringType)} />
               <AssetTag
                 iconSrc={ASSET_TAG_ICONS.minSubscription}
-                label={`สั่งซื้อขั้นต่ำ : ${company.minSubscription}`}
+                label={t.products.fixedIncome.company.minSubscription(company.minSubscription)}
               />
             </div>
           </div>
         </div>
 
+        {/* Each market's section is left out when it has no bonds; with
+            neither, say so rather than end the page after the hero. */}
+        {primaryBonds.length === 0 && secondaryBonds.length === 0 && (
+          <CatalogSectionEmpty title={t.products.states.noBonds} />
+        )}
+
         <BondSection
-          title="หุ้นกู้ตลาดแรก"
+          title={t.products.fixedIncome.category.primary}
           titleGradient
           bonds={primaryBonds}
           showStatus
@@ -438,7 +444,7 @@ export function FixedIncomeCompanyDetail({
         {secondaryBonds.length > 0 && (
           <div className="-mx-[9999px] px-[9999px] bg-[#f9fafb] py-8">
             <BondSection
-              title="หุ้นกู้ตลาดรอง"
+              title={t.products.fixedIncome.category.secondary}
               bonds={secondaryBonds}
               showStatus={false}
               updatedAt={company.updatedAt}

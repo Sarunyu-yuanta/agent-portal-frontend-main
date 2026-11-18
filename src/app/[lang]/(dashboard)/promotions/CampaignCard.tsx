@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Card, Tag } from "@sarunyu/system-one";
 import type { CardTagStatus } from "@sarunyu/system-one";
 import type { Campaign } from "@/types/domain";
-import { campaignDateLine, FORMAT_LABEL, PRODUCT_LABEL } from "./campaign-data";
+import { campaignDateLine } from "./campaign-data";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * One campaign in the grid: the design system's `Card variant="event"`.
@@ -31,6 +33,8 @@ export function CampaignCard({
   /** Recently opened — see `isNewCampaign`. Pinned over the cover's corner. */
   isNew?: boolean;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const isEvent = campaign.type === "event";
 
   /**
@@ -55,9 +59,9 @@ export function CampaignCard({
   /** The second fact on the date row, so its divider isn't left orphaned. */
   const secondary = isEvent
     ? campaign.format
-      ? FORMAT_LABEL[campaign.format]
+      ? t.promotions.format[campaign.format]
       : ""
-    : campaign.products.map((p) => PRODUCT_LABEL[p]).join(" · ");
+    : campaign.products.map((p) => t.promotions.product[p]).join(" · ");
 
   return (
     <Link
@@ -72,7 +76,7 @@ export function CampaignCard({
         locked={false}
         image={campaign.cover}
         title={campaign.title}
-        date={campaignDateLine(campaign)}
+        date={campaignDateLine(campaign, t, locale)}
         time={secondary}
         location={campaign.venue ?? ""}
         showLocation={isEvent && Boolean(campaign.venue)}
@@ -116,7 +120,7 @@ export function CampaignCard({
           second tag, and the corner is where a glance lands first. */}
       {isNew && (
         <span className="pointer-events-none absolute left-3 top-3 z-10">
-          <Tag text="ใหม่" variant="red" size="large" />
+          <Tag text={t.campaigns.list.newTag} variant="red" size="large" />
         </span>
       )}
     </Link>

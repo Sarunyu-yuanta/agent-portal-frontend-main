@@ -1,7 +1,7 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
+import { useMemo, type CSSProperties } from "react";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import {
   MARKET_LATEST_UPDATE,
@@ -10,8 +10,9 @@ import {
   type SectorRow,
   type Trend,
 } from "./stock-data";
-import { industrySectorHref } from "./stock-industry-sector-data";
-import { CARD_SHADOW, PercentPill, SectorGlyph, TREND_TEXT } from "./stock-ui";
+import { industrySectorHref, localizeSector } from "./stock-industry-sector-data";
+import { CARD_SHADOW, PercentPill, SectorGlyph, StockSectionEmpty, TREND_TEXT } from "./stock-ui";
+import { useT } from "@/i18n/I18nProvider";
 
 function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?: () => void }) {
   const inner = (
@@ -94,12 +95,16 @@ function HeatmapTile({
   labelTone = "primary",
   style,
 }: {
-  sector: SectorRow;
+  /** Missing when the feed leaves a sector out — the tile keeps its slot, empty. */
+  sector: SectorRow | undefined;
   variant: "lg" | "md" | "sm" | "xs";
   palette?: "soft" | "mid" | "bold";
   labelTone?: "primary" | "secondary";
   style?: CSSProperties;
 }) {
+  if (!sector) {
+    return <div aria-hidden className="min-w-0 flex-1 rounded-md bg-[#f3f4f6]" style={style} />;
+  }
   const trend = sector.heatmapTrend ?? sector.trend;
   const changeAmount = sector.heatmapChangeAmount ?? sector.changeAmount;
   const changePercent = sector.heatmapChangePercent ?? sector.changePercent;
@@ -295,33 +300,39 @@ function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: Heat
  *  list on the left, the market's heatmap permutation on the right. Everything
  *  that differs per market arrives as props from `MARKET_CATALOG`. */
 export function SetIndustrySectorSection({
-  title,
-  sectors,
+  sectors: feedSectors,
   layout,
   sectorsMarket,
 }: {
-  title: string;
   sectors: SectorRow[];
   layout: HeatmapLayout;
   /** Taxonomy the rows drill into — decides which detail route they open. */
   sectorsMarket: IndustrySectorMarket;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
+  const sectors = useMemo(
+    () => feedSectors.map((s) => localizeSector(t, sectorsMarket, s)),
+    [feedSectors, sectorsMarket, t],
+  );
   return (
     <div className={`flex flex-col gap-4 bg-white rounded-xl p-6 w-full ${CARD_SHADOW}`}>
       <div className="flex gap-4 items-center justify-between w-full flex-wrap">
         <div className="flex flex-col gap-1">
           <p className="font-bold text-lg" style={{ color: "#101828" }}>
-            {title}
+            {t.stock.sectorSection.title}
           </p>
           <p className="text-sm" style={{ color: "#4a5565" }}>
-            Select stocks with strong fundamentals from sectors you like.
+            {t.stock.sectorSection.desc}
           </p>
         </div>
         <p className="text-xs shrink-0" style={{ color: "#6a7282" }}>
-          {MARKET_LATEST_UPDATE}
+          {t.stock.latestUpdate(MARKET_LATEST_UPDATE)}
         </p>
       </div>
+      {sectors.length === 0 ? (
+        <StockSectionEmpty title={t.stock.empty.sectors} />
+      ) : (
       <div className="flex gap-10 items-stretch w-full">
         <div className="flex-1 min-w-0">
           {sectors.map((s) => (
@@ -334,6 +345,7 @@ export function SetIndustrySectorSection({
         </div>
         <SectorHeatmap sectors={sectors} layout={layout} />
       </div>
+      )}
     </div>
   );
 }

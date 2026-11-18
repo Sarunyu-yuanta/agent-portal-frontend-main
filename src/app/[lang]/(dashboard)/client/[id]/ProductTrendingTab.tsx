@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import { Button } from "@sarunyu/system-one";
 import { FireIcon } from "@phosphor-icons/react";
 import { formatAumThb } from "@/lib/client-utils";
@@ -11,7 +12,7 @@ import { RankBadge, TrendingFill, TrendingSortChips } from "./ProductTrendingAll
 import { bookForItem, trendingRows, useTrendingBooks } from "./use-trending-books";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import {
-  PRODUCT_TRENDING_UPDATED_AT,
+  productTrendingUpdatedAt,
   DEFAULT_TRENDING_SORT,
   emptyTrendingMessage,
   isRankedSort,
@@ -26,6 +27,8 @@ import {
 import type { CatalogNavigation } from "./ProductCatalogTab";
 import { useProductTrendingGroups } from "@/hooks/use-catalog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 function TrendingRow({
   item,
@@ -42,6 +45,7 @@ function TrendingRow({
   showBorder: boolean;
   onSelect: () => void;
 }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -66,7 +70,7 @@ function TrendingRow({
             <span className="flex items-center gap-1.5">
               {item.orders !== undefined && (
                 <span className="type-caption text-muted-foreground whitespace-nowrap">
-                  {item.orders.toLocaleString("en-US")} ออเดอร์
+                  {t.products.trending.orderCount(item.orders)}
                 </span>
               )}
               {item.trend && item.changePct && (
@@ -103,6 +107,7 @@ function TrendingGroupCard({
   onSelect: (target: TrendingTarget) => void;
   onViewAll: () => void;
 }) {
+  const t = useT();
   const shown = items.slice(0, TRENDING_CARD_ROWS);
   return (
     <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
@@ -115,14 +120,14 @@ function TrendingGroupCard({
         </p>
         {items.length > TRENDING_CARD_ROWS && (
           <Button variant="plain" size="sm" onClick={onViewAll}>
-            ดูทั้งหมด
+            {t.products.common.viewAll}
           </Button>
         )}
       </div>
       <div className="flex flex-col p-3 w-full">
         {shown.length === 0 && (
           <p className="type-caption text-muted-foreground text-center py-8">
-            {emptyTrendingMessage(sort)}
+            {emptyTrendingMessage(sort, t)}
           </p>
         )}
         {shown.map((item, i) => (
@@ -160,7 +165,7 @@ type TrendingNav = Pick<
  * and this does the same.
  */
 export function useTrendingSelect(nav: TrendingNav) {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   return (target: TrendingTarget) => {
     switch (target.kind) {
       case "stock":
@@ -191,8 +196,9 @@ export function ProductTrendingTab({
 }: {
   nav: TrendingNav & Pick<CatalogNavigation, "onTrendingSeeAll">;
 }) {
+  const t = useT();
   const select = useTrendingSelect(nav);
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const sort = normalizeTrendingSort(searchParams.get(TRENDING_SORT_PARAM));
   const setSort = (next: TrendingSort) =>
@@ -216,20 +222,22 @@ export function ProductTrendingTab({
           <div className="flex items-center gap-2">
             <FireIcon size={20} weight="fill" style={{ color: "#f54a00" }} />
             <p className="font-bold text-title leading-[28px]" style={{ color: "rgba(0,0,0,0.75)" }}>
-              Recommended Products
+              {t.products.trending.title}
             </p>
           </div>
           {/* Two sentences because there are two rankings here, and one of
               them used to be described as the other: a note or a bond has no
               weekly turnover, so those cards rank by how full the book is. */}
           <p className="text-sm" style={{ color: "rgba(0,0,0,0.6)" }}>
-            หุ้นและกองทุนเรียงตามยอดขายสัปดาห์ล่าสุด · สินค้าที่จองเป็นตะกร้าเรียงตามยอดจองในตะกร้า
-            และแสดงเฉพาะตะกร้าที่ยังเปิดให้จอง
+            {t.products.trending.intro}
           </p>
         </div>
 
         <TrendingSortChips value={sort} onChange={setSort} />
 
+        {groups.length === 0 ? (
+          <CatalogSectionEmpty title={t.products.states.noTrendingGroups} />
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {groups.map(({ group, items }) => (
             <TrendingGroupCard
@@ -243,9 +251,10 @@ export function ProductTrendingTab({
             />
           ))}
         </div>
+        )}
 
         <p className="type-caption text-muted-foreground text-center">
-          {PRODUCT_TRENDING_UPDATED_AT}
+          {productTrendingUpdatedAt(t)}
         </p>
       </div>
     </div>

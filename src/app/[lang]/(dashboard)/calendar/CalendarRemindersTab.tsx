@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import type { Client, Note } from "@/types/domain";
 import { EmptyState } from "@/components/ui/empty-state";
-import { kycExpiry, kycExpiryLabelTh } from "../client/[id]/client-detail-data";
+import { kycExpiry, kycExpiryLabel } from "../client/[id]/client-detail-data";
 import { kycCheckpointTone } from "../use-kyc-notification-feed";
 import { addDays, addMonths, dayFromKey, dayKey, dayOffset } from "./calendar-grid";
 import { groupDayItems, type DayItem } from "./day-items";
@@ -18,6 +18,11 @@ import { ReminderDayStrip } from "./ReminderDayStrip";
 import { ReminderPreviewRow } from "./reminder-preview";
 import { useIsoLayoutEffect } from "@/hooks/use-iso-layout-effect";
 import { pageZoom } from "@/lib/page-zoom";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatDate } from "@/i18n/format";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /** How far either side of today this tab reaches — the same three months the
  *  mini calendar can point at. Notes ignore it (see `buildAllReminders`); it
@@ -111,6 +116,8 @@ export function buildAllReminders(
   clients: Client[],
   clientNames: Map<string, string>,
   today: Date,
+  t: Dictionary,
+  locale: Locale,
 ): ReminderRow[] {
   const rows: ReminderRow[] = [];
 
@@ -118,6 +125,7 @@ export function buildAllReminders(
     const map = groupDayItems(
       offset === -MONTHS_EITHER_SIDE ? notes : [],
       addMonths(today, offset),
+      t,
     );
     for (const [key, items] of map) {
       const day = dayFromKey(key);
@@ -154,7 +162,7 @@ export function buildAllReminders(
       // under it is the same `kycExpiryLabelTh` the Dashboard card prints, so
       // the two surfaces word the same deadline the same way.
       title: clientNames.get(client.id) ?? client.id,
-      meta: kycExpiryLabelTh(client.id) ?? undefined,
+      meta: kycExpiryLabel(client.id, t, locale) ?? undefined,
       day: addDays(today, expiry.daysLeft),
       daysUntil: expiry.daysLeft,
       clientId: client.id,
@@ -211,13 +219,8 @@ function byDay(rows: ReminderRow[], today: Date): ReminderDay[] {
  *  when twenty of them are stacked. An explicit locale, not the reader's: the
  *  server renders this too, and a heading that disagreed between the two
  *  renders would be a hydration error. */
-function dayHeading(day: Date): string {
-  return day.toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+function dayHeading(day: Date, locale: Locale): string {
+  return formatDate(locale, day, "weekdayShort");
 }
 
 /**
@@ -228,10 +231,10 @@ function dayHeading(day: Date): string {
  * half these rows are exchange facts, and an XD that has already gone has not
  * slipped, it has happened. This is a record of what fell on which day.
  */
-function relativeDay(daysUntil: number): string {
-  if (daysUntil === 1) return "พรุ่งนี้";
-  if (daysUntil === -1) return "เมื่อวาน";
-  return daysUntil > 0 ? `อีก ${daysUntil} วัน` : `${-daysUntil} วันที่แล้ว`;
+function relativeDay(daysUntil: number, t: Dictionary): string {
+  if (daysUntil === 1) return t.dates.tomorrow;
+  if (daysUntil === -1) return t.dates.yesterday;
+  return daysUntil > 0 ? t.dates.inDays(daysUntil) : t.dates.daysPast(-daysUntil);
 }
 
 /**
@@ -243,6 +246,8 @@ function relativeDay(daysUntil: number): string {
  * this — it is always one day, so it writes "วันนี้" and stops.
  */
 function ReminderDayHeading({ day, daysUntil }: { day: Date; daysUntil: number }) {
+  const locale = useLocale();
+  const t = useT();
   const isToday = daysUntil === 0;
   return (
     <div className="flex items-baseline gap-2">
@@ -253,15 +258,15 @@ function ReminderDayHeading({ day, daysUntil }: { day: Date; daysUntil: number }
             : "type-caption font-semibold text-muted-foreground"
         }
       >
-        {dayHeading(day)}
+        {dayHeading(day, locale)}
       </p>
       {isToday ? (
         <span className="rounded-md bg-primary-action px-1.5 py-0.5 text-meta font-semibold leading-[20px] text-on-primary-action">
-          วันนี้
+          {t.dates.today}
         </span>
       ) : (
         <span className="type-caption text-[var(--text-default-placeholder)]">
-          {relativeDay(daysUntil)}
+          {relativeDay(daysUntil, t)}
         </span>
       )}
     </div>
@@ -299,9 +304,11 @@ export function CalendarRemindersTab({
   clientNames: Map<string, string>;
   onOpen: (item: DayItem, day: Date) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const days = useMemo(
-    () => byDay(buildAllReminders(notes, clients, clientNames, today), today),
-    [notes, clients, clientNames, today],
+    () => byDay(buildAllReminders(notes, clients, clientNames, today, t, locale), today),
+    [notes, clients, clientNames, today, t, locale],
   );
 
   /** The client whose contact card is open, from a KYC row. A row opens the
@@ -432,8 +439,8 @@ export function CalendarRemindersTab({
       <div className="flex min-h-[320px] items-center justify-center">
         <EmptyState
           icon={<BellIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-          title="ยังไม่มีรายการเตือน"
-          body="รายการเตือนจากโน้ต ปฏิทินตลาด และกิจกรรมของเดสก์จะมารวมกันที่นี่"
+          title={t.planner.reminders.emptyTitle}
+          body={t.planner.reminders.emptyBody}
         />
       </div>
     );
@@ -454,7 +461,7 @@ export function CalendarRemindersTab({
           it scrolls; anchored to the outer box instead, `top-3` measured from
           the top of the day strip and put the button on top of the dates. */}
       <div className="relative flex min-h-0 flex-1 flex-col">
-        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-4">
+        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 py-4 lg:px-10!">
           {days.map((d) => {
             const isToday = d.daysUntil === 0;
             return (
@@ -467,11 +474,11 @@ export function CalendarRemindersTab({
                 }}
                 // A band across the full width, heading included, rather than a
                 // tinted card: the highlight is the day, and the date is part of
-                // the day. `-mx-4` cancels the scroller's own padding so the
-                // colour reaches both edges, `px-4` puts the content back where
+                // the day. `-mx-*` cancels the scroller's own side padding so the
+                // colour reaches both edges, `px-*` puts the content back where
                 // every other day's is, so nothing shifts as you scroll past it.
                 className={`flex flex-col gap-2 ${
-                  isToday ? "-mx-4 bg-[var(--fill-p1-100)] px-4 py-3" : ""
+                  isToday ? "-mx-6 bg-[var(--fill-p1-100)] px-6 py-3 lg:-mx-10! lg:px-10!" : ""
                 }`}
               >
                 <ReminderDayHeading day={d.day} daysUntil={d.daysUntil} />
@@ -484,7 +491,7 @@ export function CalendarRemindersTab({
                   }`}
                 >
                   {d.items.length === 0 ? (
-                    <p className="type-caption p-3 text-muted-foreground">ไม่มีรายการวันนี้</p>
+                    <p className="type-caption p-3 text-muted-foreground">{t.planner.reminders.noneToday}</p>
                   ) : (
                     d.items.map((row) => (
                       <ReminderPreviewRow
@@ -544,7 +551,7 @@ export function CalendarRemindersTab({
             ) : (
               <ArrowDownIcon size={14} weight="bold" />
             )}
-            ไปยังวันปัจจุบัน
+            {t.planner.reminders.jumpToToday}
           </button>
         )}
       </div>

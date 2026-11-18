@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { SparkleIcon } from "@phosphor-icons/react";
 import { StructuredProductCard } from "../client/[id]/StructuredProductCard";
 import { BOND_LOGOS, type FixedIncomeBond } from "../client/[id]/fixed-income-data";
@@ -7,6 +7,7 @@ import type { GlobalBondIssuer } from "../client/[id]/global-bond-data";
 import { MutualFundListCard } from "../client/[id]/MutualFundCard";
 import { getRecommendedFundsForInsight } from "../client/[id]/mutual-fund-data";
 import { getRelatedProducts } from "./house-view-data";
+import { useT } from "@/i18n/I18nProvider";
 
 const CARD_STYLE = {
   backgroundColor: "white",
@@ -38,6 +39,7 @@ function StatRow({ stats }: { stats: { label: string; value: string }[] }) {
 }
 
 function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
+  const r = useT().research.related;
   return (
     <div className="flex flex-col gap-3 p-4 rounded-xl w-full" style={CARD_STYLE}>
       <div className="flex items-center justify-between gap-2">
@@ -50,14 +52,14 @@ function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
         </div>
         <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
           <p className="font-bold text-title-sm leading-[28px] text-[#101828]">{bond.ytm}</p>
-          <p className="text-label leading-[20px] text-[#6a7282]">YTM</p>
+          <p className="text-label leading-[20px] text-[#6a7282]">{r.ytm}</p>
         </div>
       </div>
       <StatRow
         stats={[
-          { label: "Coupon", value: bond.couponRate },
-          { label: "Tenor", value: bond.tenor },
-          { label: "Rating", value: bond.bondRating },
+          { label: r.coupon, value: bond.couponRate },
+          { label: r.tenor, value: bond.tenor },
+          { label: r.rating, value: bond.bondRating },
         ]}
       />
     </div>
@@ -65,6 +67,7 @@ function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
 }
 
 function GlobalBondRelatedCard({ issuer }: { issuer: GlobalBondIssuer }) {
+  const r = useT().research.related;
   return (
     <div className="flex flex-col gap-3 p-4 rounded-xl w-full" style={CARD_STYLE}>
       <div className="flex items-center justify-between gap-2">
@@ -80,14 +83,14 @@ function GlobalBondRelatedCard({ issuer }: { issuer: GlobalBondIssuer }) {
         </div>
         <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
           <p className="font-bold text-title-sm leading-[28px] text-[#101828]">{issuer.estimatedYield}</p>
-          <p className="text-label leading-[20px] text-[#6a7282]">Est. Yield</p>
+          <p className="text-label leading-[20px] text-[#6a7282]">{r.estYield}</p>
         </div>
       </div>
       <StatRow
         stats={[
-          { label: "Coupon", value: issuer.couponRateRange },
-          { label: "Maturity", value: issuer.maturityRange },
-          { label: "Rating", value: issuer.sp },
+          { label: r.coupon, value: issuer.couponRateRange },
+          { label: r.maturity, value: issuer.maturityRange },
+          { label: r.rating, value: issuer.sp },
         ]}
       />
     </div>
@@ -98,6 +101,7 @@ export function RelatedProductsCard({
   strategy,
   variant = "card",
 }: { strategy?: { id?: string; assetClass?: string }; variant?: "card" | "plain" } = {}) {
+  const r = useT().research.related;
   const { structured, fixedIncome, globalBond } = getRelatedProducts(strategy);
 
   // This detail page is shared by the Insights list and by Product Catalog's
@@ -126,16 +130,16 @@ export function RelatedProductsCard({
     >
       <div className="flex items-center gap-2.5">
         <SparkleIcon size={24} weight="fill" className="text-primary-action shrink-0" />
-        <p className="type-subtitle-1 font-bold text-foreground">Related Products</p>
+        <p className="type-subtitle-1 font-bold text-foreground">{r.title}</p>
       </div>
 
       {isEmpty ? (
-        <p className="text-body-sm text-muted-foreground text-center py-4">ยังไม่มีสินค้าที่เกี่ยวข้องในขณะนี้</p>
+        <p className="text-body-sm text-muted-foreground text-center py-4">{r.empty}</p>
       ) : (
         <div className="flex flex-col gap-6">
           {mutualFund.length > 0 && (
             <div className="flex flex-col gap-2">
-              <GroupLabel>Mutual Fund</GroupLabel>
+              <GroupLabel>{r.groups.mutualFund}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {mutualFund.map((fund) => (
                   <MutualFundListCard key={fund.id} fund={fund} />
@@ -145,7 +149,7 @@ export function RelatedProductsCard({
           )}
           {structured.length > 0 && (
             <div className="flex flex-col gap-2">
-              <GroupLabel>Global Structured Product</GroupLabel>
+              <GroupLabel>{r.groups.structured}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {structured.map((product) => (
                   <Link key={product.id} href={`/product-catalog/product/${product.id}`} className="block">
@@ -157,7 +161,7 @@ export function RelatedProductsCard({
           )}
           {fixedIncome.length > 0 && (
             <div className="flex flex-col gap-2">
-              <GroupLabel>Fixed Income</GroupLabel>
+              <GroupLabel>{r.groups.fixedIncome}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {fixedIncome.map((bond) => (
                   <Link key={bond.id} href={`/product-catalog/fixed-income/bond/${bond.id}`} className="block">
@@ -169,7 +173,7 @@ export function RelatedProductsCard({
           )}
           {globalBond.length > 0 && (
             <div className="flex flex-col gap-2">
-              <GroupLabel>Global Bond</GroupLabel>
+              <GroupLabel>{r.groups.globalBond}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {globalBond.map((issuer) => (
                   <Link key={issuer.id} href={`/product-catalog/global-bond/${issuer.id}`} className="block">

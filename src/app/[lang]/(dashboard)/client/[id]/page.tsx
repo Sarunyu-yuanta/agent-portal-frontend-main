@@ -1,11 +1,14 @@
 "use client";
 
 import { Suspense, use, useState, useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import { Avatar, Card, TabGroup } from "@sarunyu/system-one";
 import { ClientAssetSidebarContent } from "@/components/ClientAssetSidebarContent";
 import { ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
-import { mockClients, mockClientDetails } from "@/lib/mock-data";
+import { ErrorState, NotFoundState } from "@/components/ui/empty-state";
+import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/domain";
 import {
   useClientAssetAccounts,
   useClientCallLogs,
@@ -27,7 +30,7 @@ import { LiabilitiesDetailModal } from "@/components/LiabilitiesDetailModal";
 import type { LiabilitiesDetail } from "@/data/liabilities-details";
 import {
   clientDetailById,
-  kycExpiryLabelTh,
+  kycExpiryLabel,
   type SortDir,
   type HoldingsSortKey,
 } from "./client-detail-data";
@@ -36,9 +39,10 @@ import { CallLogTable } from "./ClientSections";
 import { ClientNotesTab } from "./ClientNotesTab";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ClientRemindersTab } from "./ClientRemindersTab";
-import { ClientOrdersTab } from "@/app/(dashboard)/orders/ClientOrdersTab";
+import { ClientOrdersTab } from "@/app/[lang]/(dashboard)/orders/ClientOrdersTab";
 import { KycTab } from "./KycTab";
 import { OverviewTab } from "./OverviewTab";
+import { useLocale } from "@/i18n/I18nProvider";
 
 export default function ClientPage({
   params,
@@ -56,19 +60,67 @@ export default function ClientPage({
   );
 }
 
+/**
+ * Resolves the client, in the order every screen checks: loading → error →
+ * not found → the profile.
+ *
+ * An unknown id used to fall back to the first client in the list, and a
+ * client with no detail record to client 1's holdings — a real-looking profile
+ * of the wrong person, which on a wealth platform is worse than no profile.
+ */
 function ClientPageInner({ id }: { id: string }) {
+  const router = useLocalizedRouter();
+  const t = useT();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const resource = useClientsResource();
+  const tabParam = searchParams.get("tab");
+  const activeTab = tabParam && CLIENT_TABS.includes(tabParam) ? tabParam : "overview";
+
+  if (resource.isLoading) {
+    return (
+      <div className="flex flex-col -mt-6 pt-6">
+        <ClientProfileSkeleton tab={activeTab} />
+      </div>
+    );
+  }
+  if (resource.error) return <ErrorState onRetry={resource.retry} />;
+
+  const client = resource.data.find((c) => c.id === id);
+  if (!client) {
+    return (
+      <NotFoundState
+        message={t.states.notFoundClient}
+        onBack={() => router.push("/client-hub")}
+        backLabel={t.states.backToClientHub}
+      />
+    );
+  }
+  return <ClientProfile id={id} client={client} clients={resource.data} />;
+}
+
+function ClientProfile({
+  id,
+  client,
+  clients,
+}: {
+  id: string;
+  client: Client;
+  clients: Client[];
+}) {
+  const locale = useLocale();
+  const t = useT();
+  const searchParams = useSearchParams();
+  const pathname = useAppPathname();
   const { isPrivate } = usePrivacy();
-  const { data: clients, isLoading } = useClientsResource();
 
   // Same source as the desktop top-bar breadcrumb — this page renders its own
   // only so it can live inside the sticky identity bar.
   const breadcrumb = usePageBreadcrumb(pathname, { clients, isPrivate });
 
-  const client = clients.find((c) => c.id === id) ?? clients[0] ?? mockClients[0];
   const maskedClientName = maskName(client.name, isPrivate);
-  const detail = clientDetailById[client.id] ?? mockClientDetails["1"];
+  // `undefined` for a client with no detail record yet — the Overview sections
+  // show their own empty states rather than borrowing another client's.
+  const detail = clientDetailById[client.id];
 
   // Page tab state — URL-owned, so returning to this profile (browser back or
   // the sidebar's Client 360 entry) comes back to the sub-tab left open.
@@ -87,7 +139,7 @@ function ClientPageInner({ id }: { id: string }) {
   const { data: callLogs, isLoading: callLogsLoading } = useClientCallLogs(client.id);
   const { data: profile, isLoading: profileLoading } = useClientProfile(client.id);
   const { data: assetAccounts, isLoading: assetsLoading } = useClientAssetAccounts(client.id);
-  const kycExpiryLabel = kycExpiryLabelTh(client.id);
+  const kycLine = kycExpiryLabel(client.id, t, locale);
   const [liabilitiesOpen, setLiabilitiesOpen] = useState(false);
   const [liabilitiesData, setLiabilitiesData] = useState<{ amount: string; detail: LiabilitiesDetail } | null>(null);
 
@@ -147,21 +199,13 @@ function ClientPageInner({ id }: { id: string }) {
   const tabStrip = (
     <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
       <TabGroup
-        items={CLIENT_TAB_ITEMS}
+        items={CLIENT_TAB_ITEMS.map((tab) => ({ id: tab.id, title: t.client.tabs[tab.id] }))}
         activeId={activeTab}
         onChange={setActiveTab}
         size="md"
       />
     </div>
   );
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col -mt-6 pt-6">
-        <ClientProfileSkeleton tab={activeTab} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col -mt-6">
@@ -205,9 +249,9 @@ function ClientPageInner({ id }: { id: string }) {
                           is itself dropped when the client has no KYC record:
                           the pill's own outline is the separator, so the
                           middot went with it. */}
-                      {kycExpiryLabel && (
+                      {kycLine && (
                         <span className="type-caption text-muted-foreground rounded-md bg-muted px-2 py-0.5">
-                          {kycExpiryLabel}
+                          {kycLine}
                         </span>
                       )}
                     </div>
@@ -241,7 +285,7 @@ function ClientPageInner({ id }: { id: string }) {
                 drops it: the desktop layout right-aligns each stat against
                 its own edge instead of splitting a shared box in half. */}
             <div className="flex flex-1 md:flex-none flex-col items-center text-center md:items-end md:text-right gap-1 md:pr-8">
-              <p className="type-caption text-muted-foreground">Total AUM</p>
+              <p className="type-caption text-muted-foreground">{t.client.profile.totalAum}</p>
               {/* `type-h3` is a fixed 32px — fine on the desktop layout this
                   block switches to at `md`, but on a narrow phone that's wide
                   enough to wrap "฿ 220M" onto two lines. `!` on the mobile
@@ -255,7 +299,7 @@ function ClientPageInner({ id }: { id: string }) {
             </div>
             <div className="w-px bg-border self-stretch -my-4 md:my-1 shrink-0" />
             <div className="flex flex-1 md:flex-none flex-col items-center text-center md:items-end md:text-right gap-1 md:pl-8">
-              <p className="type-caption text-muted-foreground">YTD P&L</p>
+              <p className="type-caption text-muted-foreground">{t.client.profile.ytdPl}</p>
               <div className="flex items-center gap-1.5">
                 {client.plYtdPct >= 0 ? (
                   <ArrowUpIcon size={scrolled ? 14 : 18} className="text-success shrink-0" weight="bold" />
@@ -304,7 +348,7 @@ function ClientPageInner({ id }: { id: string }) {
           <div className="pt-8 w-full">
             <Card variant="default">
               <div className="flex flex-col gap-4">
-                <h6 className="type-h6 text-foreground">Order</h6>
+                <h6 className="type-h6 text-foreground">{t.client.tabs.orders}</h6>
                 <ClientOrdersTab clientId={client.id} />
               </div>
             </Card>
@@ -313,7 +357,7 @@ function ClientPageInner({ id }: { id: string }) {
           <div className="pt-8 w-full">
             <Card variant="default">
               <div className="flex flex-col gap-4">
-                <h6 className="type-h6 text-foreground">Call Log</h6>
+                <h6 className="type-h6 text-foreground">{t.client.tabs["call-log"]}</h6>
                 {callLogsLoading ? (
                   // Already inside the Call Log card — rows only, no second card.
                   <div className="flex flex-col gap-2" aria-busy="true">
@@ -335,7 +379,7 @@ function ClientPageInner({ id }: { id: string }) {
           <div className="pt-8 w-full">
             <Card variant="default">
               <div className="flex flex-col gap-4">
-                <h6 className="type-h6 text-foreground">Reminders</h6>
+                <h6 className="type-h6 text-foreground">{t.client.tabs.reminders}</h6>
                 <ClientRemindersTab clientId={client.id} />
               </div>
             </Card>

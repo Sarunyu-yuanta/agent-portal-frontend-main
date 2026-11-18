@@ -13,7 +13,8 @@
 
 import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { FunnelSimpleIcon, ReceiptIcon } from "@phosphor-icons/react";
 import {
   Button,
@@ -35,7 +36,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { IC_NAME } from "@/lib/current-ic";
@@ -46,7 +47,6 @@ import { PAGE_SIZE_OPTIONS } from "../client/[id]/fixed-income-shared";
 import {
   ALL_ASSETS,
   ALL_ASSET_LABEL,
-  STATUS_BUCKET_LABEL,
   matchesStatus,
   statusChipsFor,
   buildAllRows,
@@ -61,9 +61,10 @@ import { formatLogTime, formatOrderAmount } from "./order-book";
 import { ProposalChip, PROPOSAL_VARIANT } from "./ProposalChip";
 import { ProposalDetailModal } from "./ProposalDetailModal";
 import { TransactionDetailModal } from "./TransactionDetailModal";
-import { SIDE_LABEL } from "./transaction-display";
 import { useOrderBooks, useRosterReadiness } from "./use-order-books";
 import { useTransactions } from "./use-transactions";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 const COLUMNS = 6;
 const SIDES: TransactionSide[] = ["buy", "sell", "switch"];
@@ -76,7 +77,8 @@ const FALLBACK_PRODUCT = { id: "", tags: [], currency: "", minInvestment: "0" } 
  *   else is as on Order Management; "สร้าง Order" books for this client.
  */
 export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const { isPrivate } = usePrivacy();
   const { proposals } = useOrders();
@@ -104,7 +106,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
   // The chips follow the asset: its own tab's statuses, or the shared buckets
   // when every asset is showing. A status left over from another asset is
   // simply not one of these, and reads as "ทั้งหมด".
-  const statusChips = statusChipsFor(asset);
+  const statusChips = statusChipsFor(asset, t);
   const status = statusChips.find((s) => s.id === searchParams.get("status"))?.id ?? null;
   const side = SIDES.find((s) => s === searchParams.get("side")) ?? null;
 
@@ -120,8 +122,9 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
         books,
         proposals,
         icName: IC_NAME,
+        dict: t,
       }),
-    [stock.data, tfex.data, fund.data, books, proposals],
+    [stock.data, tfex.data, fund.data, books, proposals, t],
   );
 
   const query = search.trim().toLowerCase();
@@ -137,6 +140,12 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
       ));
 
   const visible = rows.filter((r) => matches(r, { asset, side }));
+  /** Nothing at all for this scope — before any search or filter. */
+  const nothingYet = !rows.some((r) => !clientId || r.clientId === clientId);
+  const clearFilters = () => {
+    setSearch("");
+    setParams({ asset: null, side: null, status: null });
+  };
   const previewed = rows.filter((r) => matches(r, draft)).length;
   const activeFilters = (asset ? 1 : 0) + (side ? 1 : 0);
 
@@ -151,6 +160,15 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
     opened?.kind === "booking" ? findBookableProduct(opened.book.productId) : undefined;
   const offerProduct =
     opened?.kind === "offer" ? findBookableProduct(opened.book.productId) : undefined;
+  /** A booking or offer whose product is gone has no receipt to open — say so
+   *  rather than letting the click do nothing. */
+  const openRow = (r: AllRow) => {
+    if ((r.kind === "booking" || r.kind === "offer") && !findBookableProduct(r.book.productId)) {
+      notice(t.states.notFoundProduct, "warning");
+      return;
+    }
+    setOpenedId(r.id);
+  };
   const readiness = useRosterReadiness(clients, bookingProduct ?? FALLBACK_PRODUCT);
 
   if (isLoading) return <OrdersPanelSkeleton withCreate />;
@@ -160,7 +178,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="scrollable-tabs flex min-w-0 items-center gap-2">
           <Chip
-            label="ทั้งหมด"
+            label={t.orders.tabAll}
             type="single"
             selected={status === null}
             onClick={() => setParams({ status: null })}
@@ -188,7 +206,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
               setFilterOpen(true);
             }}
           >
-            ตัวกรอง
+            {t.orders.list.filter}
             {activeFilters > 0 && (
               <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
                 {activeFilters}
@@ -203,7 +221,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
                 setPage(1);
               }}
               onClear={() => setSearch("")}
-              placeholder="ค้นหาสินค้า หรือลูกค้า"
+              placeholder={t.orders.list.searchPlaceholder}
               className="w-full"
             />
           </div>
@@ -215,9 +233,9 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
       <ResponsiveDialog
         open={filterOpen}
         onOpenChange={setFilterOpen}
-        title="ตัวกรอง"
+        title={t.orders.list.filter}
         headerAction={{
-          label: "ล้างทั้งหมด",
+          label: t.orders.list.clearAll,
           onClick: () => setDraft({ asset: null, side: null }),
         }}
         closeOnBackdrop
@@ -225,14 +243,14 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
       >
         <div className="flex flex-col gap-4 pt-1">
           <FilterGroup
-            label="สินทรัพย์"
+            label={t.orders.list.asset}
             options={ALL_ASSETS.map((a) => ({ value: a, label: ALL_ASSET_LABEL[a] }))}
             value={draft.asset}
             onChange={(v) => setDraft((d) => ({ ...d, asset: v }))}
           />
           <FilterGroup
-            label="ประเภท (เฉพาะ Stock / TFEX / Mutual Fund)"
-            options={SIDES.map((s) => ({ value: s, label: SIDE_LABEL[s] }))}
+            label={t.orders.list.sideListedOnly}
+            options={SIDES.map((s) => ({ value: s, label: t.orders.side[s] }))}
             value={draft.side}
             onChange={(v) => setDraft((d) => ({ ...d, side: v }))}
           />
@@ -246,37 +264,45 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
                 setFilterOpen(false);
               }}
             >
-              ดูผลลัพธ์ ({previewed})
+              {t.orders.list.viewResults(previewed)}
             </Button>
           </div>
         </div>
       </ResponsiveDialog>
 
       {!isLoading && visible.length === 0 ? (
-        <EmptyState
-          icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-          title={search ? "ไม่พบรายการที่ค้นหา" : "ไม่มีรายการในเงื่อนไขนี้"}
-          body="ลองเปลี่ยนตัวกรอง หรือค้นหาด้วยชื่อสินค้า รหัสลูกค้า หรือชื่อลูกค้า"
-        />
+        nothingYet ? (
+          <EmptyState
+            icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={t.orders.list.emptyTitle}
+          />
+        ) : (
+          <EmptyState
+            icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={query ? t.states.noResultTitle : t.states.noFilterResultTitle}
+            body={query ? t.orders.list.noMatchHint : t.states.noFilterResultBody}
+            action={{ label: t.states.clearFilters, onClick: clearFilters }}
+          />
+        )
       ) : (
         <FadeIn key={`${status}|${asset}|${side}`} className="flex flex-col gap-3">
           <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
             <Table className="table-fixed min-w-[960px]">
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell className="w-[15%] whitespace-nowrap">วันเวลา</TableHeaderCell>
-                  <TableHeaderCell className="w-[19%] whitespace-nowrap">ลูกค้า</TableHeaderCell>
-                  <TableHeaderCell className="w-[25%] whitespace-nowrap">สินค้า</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">สินทรัพย์</TableHeaderCell>
-                  <TableHeaderCell className="w-[13%] whitespace-nowrap text-right">มูลค่า</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">สถานะ</TableHeaderCell>
+                  <TableHeaderCell className="w-[15%] whitespace-nowrap">{t.orders.list.col.time}</TableHeaderCell>
+                  <TableHeaderCell className="w-[19%] whitespace-nowrap">{t.orders.list.col.client}</TableHeaderCell>
+                  <TableHeaderCell className="w-[25%] whitespace-nowrap">{t.orders.list.col.product}</TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{t.orders.list.col.asset}</TableHeaderCell>
+                  <TableHeaderCell className="w-[13%] whitespace-nowrap text-right">{t.orders.list.col.amount}</TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{t.orders.list.col.status}</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={COLUMNS}>
-                      <span className="type-caption text-muted-foreground">กำลังโหลด…</span>
+                      <span className="type-caption text-muted-foreground">{t.common.loading}</span>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -287,7 +313,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
                       isPrivate={isPrivate}
                       showClient
                       // A stock or fund Proposal has no receipt of its own.
-                      onOpen={r.kind === "offered" ? undefined : () => setOpenedId(r.id)}
+                      onOpen={r.kind === "offered" ? undefined : () => openRow(r)}
                     />
                   ))
                 )}
@@ -298,7 +324,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
           {!isLoading && (
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
-                <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+                <p className="text-label text-muted-foreground whitespace-nowrap">{t.orders.list.perPage}</p>
                 <select
                   value={pageSize}
                   onChange={(e) => {
@@ -316,14 +342,14 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
               </div>
               <div className="flex items-center gap-3">
                 <p className="text-label text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-medium text-foreground">{(safePage - 1) * pageSize + 1}</span>
-                  {" – "}
-                  <span className="font-medium text-foreground">
-                    {Math.min(safePage * pageSize, visible.length)}
-                  </span>
-                  {" of "}
-                  <span className="font-medium text-foreground">{visible.length}</span> items
+                  {t.products.pagination.showing(
+                    {
+                      from: (safePage - 1) * pageSize + 1,
+                      to: Math.min(safePage * pageSize, visible.length),
+                      total: visible.length,
+                    },
+                    (n) => <span className="font-medium text-foreground">{n}</span>,
+                  )}
                 </p>
                 <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setPage} />
               </div>
@@ -343,9 +369,9 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
           book={opened.book}
           product={bookingProduct}
           checks={checksAtBooking(opened.booking, readiness.get(opened.booking.clientId)?.items ?? [])}
-          deal={dealStatus(opened.booking, opened.book)}
-          payment={paymentStatus(opened.booking, opened.book)}
-          email={emailStatus(opened.booking, opened.book)}
+          deal={dealStatus(opened.booking, opened.book, t)}
+          payment={paymentStatus(opened.booking, opened.book, t)}
+          email={emailStatus(opened.booking, opened.book, t)}
           onClose={() => setOpenedId(null)}
           onNotice={notice}
         />
@@ -374,13 +400,15 @@ function Row({
   showClient: boolean;
   onOpen?: () => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const name = maskName(row.clientName, isPrivate);
   const cancelled = row.bucket === "cancelled";
   return (
     <TableRow
       hoverable={Boolean(onOpen)}
       tabIndex={onOpen ? 0 : undefined}
-      aria-label={onOpen ? `ดูรายละเอียด ${row.title} ของ ${name}` : undefined}
+      aria-label={onOpen ? t.orders.list.openRowAria(row.title, name) : undefined}
       onClick={onOpen}
       onKeyDown={
         onOpen
@@ -400,7 +428,7 @@ function Row({
     >
       <TableCell>
         <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-          {formatLogTime(row.at)}
+          {formatLogTime(row.at, locale)}
         </p>
       </TableCell>
       {showClient && (
@@ -408,7 +436,7 @@ function Row({
           <div className="flex min-w-0 flex-col gap-0.5">
             <p className="type-body-2 truncate !font-semibold text-foreground">{name}</p>
             <p className="type-caption truncate text-muted-foreground">
-              {row.clientId} · บัญชี {getClientProfile(row.clientId).accountNo}
+              {t.orders.list.clientAccount(row.clientId, getAccountIdentity(row.clientId).accountNo)}
             </p>
           </div>
         </TableCell>
@@ -445,7 +473,7 @@ function Row({
         ) : row.kind === "offer" ? (
           <ProposalChip size="lg" />
         ) : (
-          <Tag text={STATUS_BUCKET_LABEL.proposed} variant={PROPOSAL_VARIANT} size="large" />
+          <Tag text={t.orders.statusBucket.proposed} variant={PROPOSAL_VARIANT} size="large" />
         )}
       </TableCell>
     </TableRow>

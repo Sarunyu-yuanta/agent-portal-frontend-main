@@ -14,10 +14,14 @@ import { mockClientDetails, mockClients } from "@/lib/mock-data";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords, formatAumThb, formatPlYtdPct } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 import { CATEGORY_CONFIG, confidenceColor, type Insight } from "./insight-config";
 
 export function InsightDrawerPanel({ insight }: { insight: Insight }) {
   const { isPrivate } = usePrivacy();
+  const t = useT();
+  const ai = t.research.aiInsights;
+  const d = ai.drawer;
   const maskedName = maskName(insight.clientName, isPrivate);
   const config = CATEGORY_CONFIG[insight.type as keyof typeof CATEGORY_CONFIG];
   const client = mockClients.find((c) => c.id === insight.clientId);
@@ -25,7 +29,7 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
 
   const tierVariant = client?.tier === "UHNW" ? ("blue" as const) : ("gray" as const);
   const tagVariant = config?.tagVariant ?? "gray";
-  const tagText = config?.tagText ?? insight.type;
+  const tagText = ai.category[insight.type] ?? insight.type;
 
   const confColor = confidenceColor(insight.confidence);
   const isRisk = insight.type === "Risk Alert";
@@ -48,10 +52,10 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
         {/* Quick Actions */}
         <div className="grid grid-cols-4 gap-2">
           {[
-            { icon: <PhoneIcon size={20} />,        label: "Call" },
-            { icon: <ChatCircleIcon size={20} />,   label: "Message" },
-            { icon: <FileTextIcon size={20} />,     label: "Proposal" },
-            { icon: <CalendarPlusIcon size={20} />, label: "Meet" },
+            { icon: <PhoneIcon size={20} />,        label: d.actions.call },
+            { icon: <ChatCircleIcon size={20} />,   label: d.actions.message },
+            { icon: <FileTextIcon size={20} />,     label: d.actions.proposal },
+            { icon: <CalendarPlusIcon size={20} />, label: d.actions.meet },
           ].map(({ icon, label }) => (
             <button
               key={label}
@@ -71,10 +75,10 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
         {client && (
           <div className="grid grid-cols-2 gap-2">
             {[
-              { label: "Total AUM",   value: formatAumThb(client.aum),                sub: null,                                           accent: null },
-              { label: "Cash Idle",   value: `${client.cashIdlePct}%`,  sub: client.cashIdlePct > 20 ? "Above 10% target" : null, accent: client.cashIdlePct > 20 ? "text-warning" : "text-success" },
-              { label: "YTD P&L",    value: formatPlYtdPct(client.plYtdPct),               sub: null,                                           accent: client.plYtdPct >= 0 ? "text-success" : "text-destructive" },
-              { label: "Risk Profile",value: client.riskProfile,         sub: null,                                           accent: null },
+              { label: d.totalAum,   value: formatAumThb(client.aum),                sub: null,                                           accent: null },
+              { label: d.cashIdle,   value: `${client.cashIdlePct}%`,  sub: client.cashIdlePct > 20 ? d.aboveTarget : null, accent: client.cashIdlePct > 20 ? "text-warning" : "text-success" },
+              { label: d.ytdPl,    value: formatPlYtdPct(client.plYtdPct),               sub: null,                                           accent: client.plYtdPct >= 0 ? "text-success" : "text-destructive" },
+              { label: d.riskProfile,value: client.riskProfile,         sub: null,                                           accent: null },
             ].map((kpi) => (
               <div key={kpi.label} className="flex flex-col justify-between gap-2 p-3 rounded-xl bg-[var(--bg-default-primary-medium)] border border-[var(--border-default)] min-h-[80px]">
                 <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide leading-none">{kpi.label}</p>
@@ -90,7 +94,7 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
         {/* 2. AI Insight */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">AI Insight</p>
+            <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{d.aiInsight}</p>
             <div className="inline-flex items-center gap-1 bg-primary-action/10 rounded-full px-1.5 py-0.5">
               <SparkleIcon size={9} className="text-primary-action" weight="fill" />
               <span className="text-micro font-bold text-primary-action">AI</span>
@@ -101,14 +105,14 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
             <p className="text-label text-primary-action leading-relaxed">{insight.insight}</p>
             <div className="flex items-center justify-between gap-2">
               <div className="flex flex-col gap-0.5">
-                <p className="text-micro font-semibold text-muted-foreground uppercase tracking-wide leading-none">Confidence</p>
+                <p className="text-micro font-semibold text-muted-foreground uppercase tracking-wide leading-none">{d.confidence}</p>
                 <span className="text-body-sm font-bold leading-none" style={{ color: confColor }}>
                   {insight.confidence}%
                 </span>
               </div>
               {!isRisk && (
                 <div className="flex flex-col gap-0.5 items-end">
-                  <p className="text-micro font-semibold text-muted-foreground uppercase tracking-wide leading-none">Revenue Potential</p>
+                  <p className="text-micro font-semibold text-muted-foreground uppercase tracking-wide leading-none">{d.revenuePotential}</p>
                   <div className="flex items-center gap-1">
                     <CurrencyCircleDollarIcon size={13} weight="fill" className="text-success" />
                     <span className="text-body-sm font-bold text-success leading-none">{insight.revenueImpact}</span>
@@ -122,7 +126,7 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
         {/* 3. Portfolio Allocation — individual bars per slice */}
         {detail?.allocationData && (
           <div className="flex flex-col gap-2">
-            <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">Asset Allocation</p>
+            <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{d.assetAllocation}</p>
             <div className="bg-[var(--bg-default-primary-medium)] border border-[var(--border-default)] rounded-xl px-3 py-3 flex flex-col gap-3">
               {detail.allocationData.map((slice) => (
                 <div key={slice.name} className="flex flex-col gap-1.5">
@@ -143,7 +147,7 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
       {/* Sticky footer */}
       <div className="shrink-0 border-t border-[var(--border-default)] px-5 py-4">
         <Button variant="outline" size="lg" className="w-full" leftIcon={<UserIcon size={16} />}>
-          View Full Profile
+          {d.viewProfile}
         </Button>
       </div>
     </div>

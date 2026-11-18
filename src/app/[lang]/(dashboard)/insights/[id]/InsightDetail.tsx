@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Tag, Button } from "@sarunyu/system-one";
 import { SparkleIcon, ArrowLeftIcon, FilePdfIcon } from "@phosphor-icons/react";
 import { mockHouseViewStrategies, mockAnalysts } from "@/lib/mock-data";
@@ -15,11 +15,16 @@ import { useSectionBack } from "@/hooks/use-section-back";
 import { useInsightStrategy } from "@/hooks/use-catalog";
 import { findMutualFundInsightByDetailId } from "../../client/[id]/mutual-fund-data";
 import { InsightDetailSkeleton } from "./InsightDetailSkeleton";
+import { useT } from "@/i18n/I18nProvider";
+import { NotFoundState } from "@/components/ui/empty-state";
 
 export function InsightDetail({ id }: { id: string }) {
   const { data: strategy, isLoading } = useInsightStrategy(id);
   // Called before the early return below — a missing strategy must not skip a hook.
   const goBack = useSectionBack();
+  const router = useLocalizedRouter();
+  const t = useT();
+  const d = t.research.detail;
 
   // Ahead of the `!strategy` branch, not after it as it used to be: an insight
   // that simply has not arrived yet is loading, not missing. While this
@@ -32,15 +37,7 @@ export function InsightDetail({ id }: { id: string }) {
 
   if (!strategy) {
     return (
-      <div className="flex flex-col items-center gap-3 py-24 text-center">
-        <p className="type-subtitle-1 text-foreground">ไม่พบบทวิเคราะห์นี้</p>
-        <Link
-          href="/insights"
-          className="text-body-sm text-primary-action hover:underline"
-        >
-          กลับไปหน้า Insights
-        </Link>
-      </div>
+      <NotFoundState message={d.notFound} onBack={() => router.push("/insights")} backLabel={d.backToInsights} />
     );
   }
 
@@ -73,11 +70,11 @@ export function InsightDetail({ id }: { id: string }) {
             className="text-primary-action shrink-0"
           />
           <p className="type-subtitle-1 font-bold text-foreground">
-            รายงานฉบับเต็ม
+            {d.fullReport}
           </p>
         </div>
         <p className="text-label text-muted-foreground whitespace-nowrap">
-          อ่านฉบับเต็มในไฟล์ PDF
+          {d.fullReportBody}
         </p>
       </div>
       <Button
@@ -87,7 +84,7 @@ export function InsightDetail({ id }: { id: string }) {
         className="shrink-0"
         onClick={() => {}}
       >
-        View full PDF
+        {d.viewFullPdf}
       </Button>
     </div>
   );
@@ -115,12 +112,12 @@ export function InsightDetail({ id }: { id: string }) {
             <SparkleIcon size={18} weight="fill" className="text-white" />
           </div>
           <p className="type-subtitle-1 font-bold text-foreground">
-            AI Summary
+            {d.aiSummary}
           </p>
         </div>
         <div className="flex flex-col gap-1">
           <p className="text-label text-muted-foreground">
-            บทสรุปจาก AI อ้างอิงโดยบทวิเคราะห์
+            {d.aiSummaryNote}
           </p>
           <p className="text-body text-foreground leading-relaxed">
             {detail.aiSummary}
@@ -133,7 +130,7 @@ export function InsightDetail({ id }: { id: string }) {
   const analystsSection = (
     <div className="flex flex-col gap-4">
       <h2 className="type-subtitle-1 font-bold text-foreground">
-        บทวิเคราะห์โดย
+        {d.analysedBy}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
         {mockAnalysts.slice(0, 3).map((analyst) => (
@@ -172,12 +169,12 @@ export function InsightDetail({ id }: { id: string }) {
           onClick={goBack}
           className="self-start hidden xl:inline-flex"
         >
-          กลับ
+          {t.common.back}
         </Button>
 
         <div className="flex flex-col gap-4">
           <Tag
-            text={cat}
+            text={t.research.houseView.category[cat] ?? cat}
             variant={CATEGORY_TAG_VARIANT[cat] ?? "gray"}
             size="small"
           />
@@ -237,7 +234,7 @@ export function InsightDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4 mt-4">
             <div className="border-t border-border" />
             <h2 className="type-subtitle-1 font-bold text-foreground mt-2">
-              บทวิเคราะห์อื่นๆ ประจำ{strategy.periodLabel}
+              {d.otherInPeriod(strategy.periodLabel)}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {related.map((s) => (

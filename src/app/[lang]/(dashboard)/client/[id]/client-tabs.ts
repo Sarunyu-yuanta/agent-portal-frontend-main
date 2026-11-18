@@ -17,17 +17,21 @@ import {
  * Its own module rather than living in `page.tsx`, only because the skeleton is
  * imported *by* `page.tsx` and would otherwise have to import back out of it.
  */
-export const CLIENT_TAB_ITEMS = [
-  { id: "overview", title: "Overview" },
-  { id: "kyc", title: "KYC" },
-  { id: "assets", title: "Assets" },
+/** A sub-tab's id — also its `?tab=` value and its key in `t.client.tabs`. */
+export type ClientTabId = "overview" | "kyc" | "assets" | "orders" | "call-log" | "reminders" | "notes";
+
+/** Ids only — the tab strip reads each title from `t.client.tabs[id]`. */
+export const CLIENT_TAB_ITEMS: { id: ClientTabId }[] = [
+  { id: "overview" },
+  { id: "kyc" },
+  { id: "assets" },
   // This client's orders, every asset — Order Management's "ทั้งหมด" for one
   // client (`AllOrdersPanel` with `clientId`).
-  ...(ORDER_BOOKING_ENABLED ? [{ id: "orders", title: "Order" }] : []),
-  ...(CALL_LOG_ENABLED ? [{ id: "call-log", title: "Call Log" }] : []),
-  ...(REMINDERS_ENABLED ? [{ id: "reminders", title: "Reminders" }] : []),
-  ...(NOTES_ENABLED ? [{ id: "notes", title: "Notes" }] : []),
+  ...(ORDER_BOOKING_ENABLED ? [{ id: "orders" as const }] : []),
+  ...(CALL_LOG_ENABLED ? [{ id: "call-log" as const }] : []),
+  ...(REMINDERS_ENABLED ? [{ id: "reminders" as const }] : []),
+  ...(NOTES_ENABLED ? [{ id: "notes" as const }] : []),
 ];
 
 /** Sub-tabs that `?tab=` may address; anything else falls back to Overview. */
-export const CLIENT_TABS = CLIENT_TAB_ITEMS.map((tab) => tab.id);
+export const CLIENT_TABS: string[] = CLIENT_TAB_ITEMS.map((tab) => tab.id);

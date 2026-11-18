@@ -2,12 +2,15 @@
 
 import { useState, Fragment } from "react";
 import { Chip, Button, BottomSheet, Modal } from "@sarunyu/system-one";
-import { ArrowRightIcon, FilePdfIcon, XIcon } from "@phosphor-icons/react";
+import { ArrowRightIcon, FilePdfIcon, FileTextIcon, FunnelSimpleIcon, XIcon } from "@phosphor-icons/react";
 import { mockHouseViewStrategies } from "@/lib/mock-data";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { FadeIn } from "@/components/ui/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PlaybookCard } from "./PlaybookCard";
 import { PlaybookCardCompact } from "./PlaybookCardCompact";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
@@ -62,12 +65,17 @@ function groupByPeriodLabel(strategies: Strategy[]): PeriodGroup[] {
   }));
 }
 
+/** English on purpose — it also names the downloaded file. */
 function periodBadgeLabel(period: string) {
   return period === "monthly" ? "Monthly" : "Weekly";
 }
 
-function modalTitle(group: PeriodGroup) {
-  return `${periodBadgeLabel(group.period)} — ${group.periodLabel}`;
+function periodName(t: Dictionary, period: string) {
+  return period === "monthly" ? t.research.houseView.period.monthly : t.research.houseView.period.weekly;
+}
+
+function modalTitle(t: Dictionary, group: PeriodGroup) {
+  return t.research.houseView.modalTitle(periodName(t, group.period), group.periodLabel);
 }
 
 /** `House-View-Weekly-22–26-มิถุนายน-2569.pdf` — one file per period group. */
@@ -85,6 +93,7 @@ function downloadFullReport(group: PeriodGroup) {
 
 /** Shared by the period header and both "ดูทั้งหมด" surfaces. */
 function FullReportButton({ group }: { group: PeriodGroup }) {
+  const hv = useT().research.houseView;
   return (
     <Button
       size="sm"
@@ -93,8 +102,8 @@ function FullReportButton({ group }: { group: PeriodGroup }) {
       onClick={() => downloadFullReport(group)}
       className="shrink-0"
     >
-      ดาวน์โหลด PDF
-      <span className="hidden sm:inline">&nbsp;ฉบับเต็ม</span>
+      {hv.downloadPdf}
+      <span className="hidden sm:inline">&nbsp;{hv.fullEdition}</span>
     </Button>
   );
 }
@@ -109,6 +118,8 @@ export function StrategyPlaybooks({
   filter: AssetClassFilter;
   onFilterChange: (filter: AssetClassFilter) => void;
 }) {
+  const t = useT();
+  const hv = t.research.houseView;
   const [modalGroup, setModalGroup] = useState<ModalGroup>(null);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -124,7 +135,7 @@ export function StrategyPlaybooks({
         <div className="flex items-center gap-2 flex-nowrap md:flex-wrap px-4 xl:px-6">
           {ASSET_FILTERS.map((f) => (
             <span key={f} className="shrink-0">
-              <Chip label={f} type="single" size="small" selected={filter === f} onClick={() => onFilterChange(f)} />
+              <Chip label={hv.category[f] ?? f} type="single" size="small" selected={filter === f} onClick={() => onFilterChange(f)} />
             </span>
           ))}
         </div>
@@ -132,6 +143,22 @@ export function StrategyPlaybooks({
 
       {/* Period groups */}
       <FadeIn key={filter} className="flex flex-col gap-8">
+        {groups.length === 0 &&
+          (isFiltered && all.length > 0 ? (
+            <EmptyState
+              size="compact"
+              icon={<FunnelSimpleIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+              title={t.states.noFilterResultTitle}
+              body={t.states.noFilterResultBody}
+              action={{ label: t.states.clearFilters, onClick: () => onFilterChange("All") }}
+            />
+          ) : (
+            <EmptyState
+              size="compact"
+              icon={<FileTextIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+              title={hv.empty}
+            />
+          ))}
         {groups.map((group, idx) => {
           const isFirstMonthly = !isFiltered && idx === 0 && group.period === "monthly";
           const [featured, ...rest] = group.items;
@@ -145,7 +172,7 @@ export function StrategyPlaybooks({
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span className="px-2.5 py-1 rounded bg-primary-action-light text-primary-action text-meta font-bold">
-                      {periodBadgeLabel(group.period)}
+                      {periodName(t, group.period)}
                     </span>
                     <p className="type-subtitle-1 font-bold text-foreground">{group.periodLabel}</p>
                     <FullReportButton group={group} />
@@ -159,7 +186,7 @@ export function StrategyPlaybooks({
                         onClick={() => setModalGroup(group)}
                         className={isFirstMonthly ? "lg:hidden" : ""}
                       >
-                        ดูทั้งหมด
+                        {hv.viewAll}
                       </Button>
                     ) : null}
                   </div>
@@ -210,11 +237,11 @@ export function StrategyPlaybooks({
       <BottomSheet
         open={!!modalGroup && isMobile}
         onOpenChange={(o) => { if (!o) setModalGroup(null); }}
-        title={modalGroup ? modalTitle(modalGroup) : ""}
+        title={modalGroup ? modalTitle(t, modalGroup) : ""}
         showHandle
         showHeader
         rightSide="action"
-        actionLabel="ดาวน์โหลด PDF"
+        actionLabel={hv.downloadPdf}
         onActionClick={() => { if (modalGroup) downloadFullReport(modalGroup); }}
         contentClassName="overflow-y-auto"
       >
@@ -248,12 +275,12 @@ export function StrategyPlaybooks({
                 <div className="-mt-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <p className="text-title leading-[32px] font-bold text-foreground truncate">
-                      {modalTitle(modalGroup)}
+                      {modalTitle(t, modalGroup)}
                     </p>
                     <FullReportButton group={modalGroup} />
                   </div>
                   <Button
-                    aria-label="Close dialog"
+                    aria-label={hv.closeDialog}
                     className="h-5 w-5 shrink-0 rounded-none text-subtle-text"
                     onClick={() => setModalGroup(null)}
                     size="icon-xs"

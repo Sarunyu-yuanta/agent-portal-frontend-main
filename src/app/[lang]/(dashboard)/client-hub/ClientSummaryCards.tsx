@@ -22,6 +22,7 @@ import {
   type KycDueEntry,
 } from "./client-hub-data";
 import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 const SEGMENT_COLORS: Record<string, string> = {
   UHNW: "#3b82f6",
@@ -149,6 +150,7 @@ function PopoverList({
   onExpand?: () => void;
   children: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <div
       className={`absolute top-full mt-1 z-50 bg-white border border-border rounded-xl shadow-xl overflow-hidden ${POPOVER_PANEL_W} ${position}`}
@@ -162,8 +164,8 @@ function PopoverList({
           <button
             type="button"
             onClick={onExpand}
-            aria-label={`ขยาย${title}`}
-            title="ขยาย"
+            aria-label={t.client.summary.expandList(title)}
+            title={t.client.summary.expand}
             className="-mr-1 shrink-0 cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <ArrowsOutSimpleIcon size={14} weight="bold" />
@@ -210,11 +212,8 @@ function ClientListRow({ rank, name, sub, right }: { rank?: number; name: string
  */
 type KycFilter = "all" | "expired" | "upcoming";
 
-const KYC_FILTERS: { id: KycFilter; label: string }[] = [
-  { id: "all", label: "ทั้งหมด" },
-  { id: "upcoming", label: "ใกล้หมดอายุ" },
-  { id: "expired", label: "หมดอายุแล้ว" },
-];
+/** Segment order; each label is `t.client.summary.kycFilter[id]`. */
+const KYC_FILTERS: KycFilter[] = ["all", "upcoming", "expired"];
 
 /**
  * A KPI card whose ⓘ opens a ranked client list — three of the five are this
@@ -337,6 +336,8 @@ function ClientListCard({
 }
 
 export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; isLoading?: boolean }) {
+  const t = useT();
+  const s = t.client.summary;
   const { isPrivate } = usePrivacy();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const {
@@ -392,6 +393,9 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
 
   const assetListContent = (
     <>
+      {topClients.length === 0 && (
+        <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noAssetClients}</p>
+      )}
       {topClients.map((c, i) => {
         const name = maskName(c.name, isPrivate);
         return (
@@ -414,13 +418,13 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
   const cashListContent = (
     <>
       {cashClients.length === 0
-        ? <p className="text-body-sm text-muted-foreground px-4 py-3">ไม่มีลูกค้าที่มีเงินรอลงทุน</p>
+        ? <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noIdleCash}</p>
         : cashClients.map(({ client, cashThb }, i) => (
             <ClientListRow
               key={client.id}
               rank={i + 1}
               name={maskName(client.name, isPrivate)}
-              sub={`${client.tier} · ${client.cashIdlePct}% ของ AUM`}
+              sub={s.cashSub(client.tier, client.cashIdlePct)}
               right={
                 <span className="text-label font-bold text-foreground shrink-0">
                   {formatMillionThb(cashThb)}
@@ -443,7 +447,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
       sub={`${k.client.tier} · ${k.nextReview}`}
       right={
         <span className={`text-label font-bold shrink-0 ${k.daysUntilExpiry <= 7 ? "text-[var(--text-danger-primary)]" : "text-[var(--text-warning-primary)]"}`}>
-          {k.daysUntilExpiry}d
+          {s.kycDays(k.daysUntilExpiry)}
         </span>
       }
     />
@@ -472,10 +476,10 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
    */
   const kycFilterBar = kycFilterable ? (
     <Tabs value={kycFilter} onValueChange={(v) => setKycFilter(v as KycFilter)}>
-      <TabsList aria-label="กรองรายการ KYC" className="w-full">
-        {KYC_FILTERS.map(({ id, label }) => (
+      <TabsList aria-label={s.kycFilterAria} className="w-full">
+        {KYC_FILTERS.map((id) => (
           <TabsTrigger key={id} value={id} className="text-xs">
-            {label} ({kycFilterCounts[id]})
+            {s.kycFilterCount(s.kycFilter[id], kycFilterCounts[id])}
           </TabsTrigger>
         ))}
       </TabsList>
@@ -493,7 +497,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
           before instead of forcing a tall panel. */}
       <div style={{ minHeight: kycDueClients.length * LIST_ROW_H }}>
         {kycRows.length === 0 ? (
-          <p className="text-body-sm text-muted-foreground px-4 py-3">ไม่มีลูกค้าที่ KYC ใกล้ครบกำหนด</p>
+          <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noKycDue}</p>
         ) : (
           kycRows.map(renderKycRow)
         )}
@@ -517,15 +521,15 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
       <div ref={segmentRef} className="relative min-w-0" {...segmentHoverProps}>
         <CardShell open={segmentOpen} onClick={() => setSegmentOpen((p) => !p)}>
           <div className="flex items-center justify-between gap-2">
-            <CardLabel>Total Clients</CardLabel>
+            <CardLabel>{s.totalClients}</CardLabel>
             <PopoverChevron open={segmentOpen} />
           </div>
           <CardValue>{Math.round(animatedClientCount)}</CardValue>
-          <CardSub>ราย</CardSub>
+          <CardSub>{s.clientsUnit}</CardSub>
         </CardShell>
         {!isMobile && segmentOpen && clients.length > 0 && (
           <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-border rounded-xl shadow-xl p-4 min-w-[200px]">
-            <p className="text-meta font-bold uppercase tracking-wider text-muted-foreground mb-2.5">สัดส่วนตาม Segment</p>
+            <p className="text-meta font-bold uppercase tracking-wider text-muted-foreground mb-2.5">{s.bySegment}</p>
             {segmentBreakdownContent}
           </div>
         )}
@@ -533,7 +537,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
           <BottomSheet
             open={segmentOpen && clients.length > 0}
             onOpenChange={setSegmentOpen}
-            title="สัดส่วนตาม Segment"
+            title={s.bySegment}
             showHandle
             showHeader
             rightSide="none"
@@ -545,16 +549,16 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
       </div>
 
       {/* 2. Wealth Under Advice */}
-      <StaticCard label="Wealth Under Advice" value={formatMillionThb(animatedTotalAum)} sub="AUM รวมทั้งหมด" />
+      <StaticCard label={s.wealthUnderAdvice} value={formatMillionThb(animatedTotalAum)} sub={s.totalAumSub} />
 
       {/* 3. มูลค่าทรัพย์สิน — last in the row at 3 columns (768–1023px), third
              of five above that, so which edge its panel hangs from flips at
              `lg`. See `PopoverList`'s `position`. */}
       <ClientListCard
-        label="มูลค่าทรัพย์สิน"
+        label={s.assetValue}
         value={formatMillionThb(animatedAssetValue)}
-        sub="ไม่รวม cash"
-        title="ลูกค้าเรียงตามมูลค่าทรัพย์สิน"
+        sub={s.excludingCash}
+        title={s.byAssetValue}
         position="right-0 lg:right-auto lg:left-0"
       >
         {assetListContent}
@@ -564,11 +568,11 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
              above that. Never the row's last card either way, so the default
              left anchor always has room to its right. */}
       <ClientListCard
-        label="KYC ครบกำหนด"
+        label={s.kycDue}
         value={String(Math.round(animatedKycCount))}
-        sub="ภายใน 30 วัน"
+        sub={s.within30Days}
         valueColorClass={kycDueClients.length > 0 ? "text-[var(--text-warning-primary)]" : "text-foreground"}
-        title="ลูกค้าที่ KYC ใกล้หมดอายุ"
+        title={s.kycDueTitle}
         listHeader={kycFilterBar}
       >
         {kycListContent}
@@ -578,10 +582,10 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
              works from the second column it sits in below that, so this one
              needs no breakpoint switch. */}
       <ClientListCard
-        label="Cash Under Advice"
+        label={s.cashUnderAdvice}
         value={formatMillionThb(animatedTotalCash)}
-        sub="เงินรอลงทุน"
-        title="ลูกค้าเรียงตามเงินรอลงทุน"
+        sub={s.idleCash}
+        title={s.byIdleCash}
         position="right-0"
       >
         {cashListContent}

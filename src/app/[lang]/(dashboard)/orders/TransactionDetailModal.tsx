@@ -19,7 +19,7 @@
 import { CheckIcon, CircleHalfIcon, ClockIcon, XIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import type { ClientTransaction, TransactionStatus } from "@/types/domain";
 import {
@@ -33,17 +33,15 @@ import {
   TONE,
 } from "./detail-sheet-ui";
 import {
-  PRICE_LABEL,
-  QUANTITY_LABEL,
-  SIDE_LABEL,
   SIDE_PILL,
   STATUS_TAG,
   formatAmount,
   formatPrice,
   formatQuantity,
   splitLogTime,
-  unitOf,
 } from "./transaction-display";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /** The disc's glyph — the verdict, before a word of it is read. */
 const STATUS_GLYPH: Record<TransactionStatus, React.ReactNode> = {
@@ -61,11 +59,12 @@ export function TransactionDetailModal({
   transaction: ClientTransaction | null;
   onClose: () => void;
 }) {
+  const dict = useT();
   return (
     <ResponsiveBottomSheetModal
       open={transaction !== null}
       onClose={onClose}
-      title="รายละเอียดรายการซื้อขาย"
+      title={dict.orders.transaction.title}
       titleId="transaction-detail-title"
       // The receipt opens with its own heading — the status, in colour, under
       // the disc. A second one above it in black said the same thing flatter.
@@ -78,10 +77,18 @@ export function TransactionDetailModal({
 }
 
 function Body({ t }: { t: ClientTransaction }) {
+  const locale = useLocale();
+  const dict = useT();
   const { isPrivate } = usePrivacy();
-  const profile = getClientProfile(t.clientId);
+  const profile = getAccountIdentity(t.clientId);
+  // A status this app doesn't know yet reads as itself, in grey, rather than
+  // crashing the sheet.
+  const tag = {
+    text: dict.orders.tradeStatus[t.status] ?? String(t.status),
+    variant: STATUS_TAG[t.status]?.variant ?? ("gray" as const),
+  };
   const name = maskName(t.clientName, isPrivate);
-  const { date, time } = splitLogTime(t.at);
+  const { date, time } = splitLogTime(t.at, locale);
   const cancelled = t.status === "cancelled";
 
   return (
@@ -91,16 +98,16 @@ function Body({ t }: { t: ClientTransaction }) {
             happened and the heading says it in words — one for the glance, one
             for the reader who came for the detail. */}
         <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
-          <StatusDisc variant={STATUS_TAG[t.status].variant}>
+          <StatusDisc variant={tag.variant}>
             {STATUS_GLYPH[t.status]}
           </StatusDisc>
           {/* The status alone, in its own colour — the side rides the badge
               below, so a heading reading "ขายสำเร็จ" was saying half of that
               twice. Coloured because it is the word the sheet was opened for. */}
           <p
-            className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[STATUS_TAG[t.status].variant].text}`}
+            className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[tag.variant].text}`}
           >
-            {STATUS_TAG[t.status].text}
+            {tag.text}
           </p>
           {/* Side and symbol on one line, the company under it. The badge is a
               one-word fact and the symbol is what the row was scanned by —
@@ -116,7 +123,7 @@ function Body({ t }: { t: ClientTransaction }) {
               <span
                 className={`shrink-0 rounded-full px-2 py-0.5 text-meta font-semibold ${SIDE_PILL[t.side]}`}
               >
-                {SIDE_LABEL[t.side]}
+                {dict.orders.side[t.side]}
               </span>
               <span className="text-title-sm leading-[28px] font-bold text-foreground">{t.symbol}</span>
             </span>
@@ -133,16 +140,16 @@ function Body({ t }: { t: ClientTransaction }) {
               the total stays outside it, on the sheet's white, which is what
               makes it the answer rather than the last of eight rows. */}
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
-            <SheetBlock title="รายละเอียดรายการ">
+            <SheetBlock title={dict.orders.transaction.section}>
               <ClientRow clientId={t.clientId} name={name} />
-              <SheetRow label="บัญชี" value={profile.accountNo} />
+              <SheetRow label={dict.orders.transaction.account} value={profile.accountNo} />
               {/* No ประเภท row: the badge under the heading now says ซื้อ/ขาย
                   in colour, and a second copy of one word a hundred pixels
                   below it was the list's longest-serving dead weight. */}
-              <SheetRow label="ช่องทาง" value={t.channel} />
-              <SheetRow label="เวลา" value={time} />
-              <SheetRow label="วันที่" value={date} />
-              <CopyRow label="เลขที่รายการ" value={t.id} />
+              <SheetRow label={dict.orders.transaction.channel} value={t.channel} />
+              <SheetRow label={dict.orders.transaction.time} value={time} />
+              <SheetRow label={dict.orders.transaction.date} value={date} />
+              <CopyRow label={dict.orders.transaction.reference} value={t.id} />
             </SheetBlock>
 
             <div className={SHEET_DASHED} />
@@ -152,10 +159,10 @@ function Body({ t }: { t: ClientTransaction }) {
                   with the figure here, and the table's bracketed heading would
                   have said it twice on one line. */}
               <SheetRow
-                label="จำนวน"
-                value={`${formatQuantity(t.asset, t.quantity)} ${unitOf(QUANTITY_LABEL[t.asset])}`}
+                label={dict.orders.transaction.quantity}
+                value={`${formatQuantity(t.asset, t.quantity)} ${dict.orders.quantityUnit[t.asset]}`}
               />
-              <SheetRow label={PRICE_LABEL[t.asset]} value={formatPrice(t.asset, t.price)} />
+              <SheetRow label={dict.orders.priceLabel[t.asset]} value={formatPrice(t.asset, t.price)} />
             </SheetBlock>
           </div>
 
@@ -170,7 +177,7 @@ function Body({ t }: { t: ClientTransaction }) {
               cancelled ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">รวม</p>
+            <p className="text-body-sm font-bold text-foreground">{dict.orders.transaction.total}</p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 cancelled ? "text-muted-foreground line-through" : "text-primary-action"

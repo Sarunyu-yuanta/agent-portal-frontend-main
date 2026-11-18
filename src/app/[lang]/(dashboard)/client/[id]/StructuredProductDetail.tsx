@@ -10,28 +10,27 @@ import {
 } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
-import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
-import { ProductOrderNotice } from "@/app/(dashboard)/orders/ProductOrderNotice";
-import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
-import { DealProgress } from "@/app/(dashboard)/orders/DealProgress";
-import { ProposalTallyLine } from "@/app/(dashboard)/orders/ProposalTallyLine";
-import { useSendProposal } from "@/app/(dashboard)/orders/useSendProposal";
-import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
-import { headlineRound, isBookingOpen } from "@/app/(dashboard)/orders/order-book";
-import type { StructuredProduct } from "./structured-product-data";
+import { OrderBookingModal } from "@/app/[lang]/(dashboard)/orders/OrderBookingModal";
+import { ProductOrderNotice } from "@/app/[lang]/(dashboard)/orders/ProductOrderNotice";
+import { ProductOrderSection } from "@/app/[lang]/(dashboard)/orders/ProductOrderSection";
+import { DealProgress } from "@/app/[lang]/(dashboard)/orders/DealProgress";
+import { ProposalTallyLine } from "@/app/[lang]/(dashboard)/orders/ProposalTallyLine";
+import { useSendProposal } from "@/app/[lang]/(dashboard)/orders/useSendProposal";
+import { useOrderBook } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { headlineRound, isBookingOpen } from "@/app/[lang]/(dashboard)/orders/order-book";
+import { STRUCTURED_TAG, type StructuredProduct } from "./structured-product-data";
 import { ProductDocumentActions } from "./ProductDocumentActions";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 
 /** The product card's two views — the terms, and who has been booked into them. */
 type ProductTab = "detail" | "orders";
 
-const PRODUCT_TABS: { id: ProductTab; title: string }[] = [
-  { id: "detail", title: "Detail" },
-  { id: "orders", title: "Order" },
-];
+const PRODUCT_TABS: ProductTab[] = ["detail", "orders"];
 
 export type DetailRow = {
   label: string;
@@ -105,18 +104,19 @@ export function DetailTable({ rows }: { rows: DetailRow[] }) {
  * The product's terms as the Detail tab lists them — exported so Order
  * Management's "ดูรายละเอียดสินค้า" modal shows the same rows, not a copy.
  */
-export function structuredProductRows(product: StructuredProduct): DetailRow[] {
+export function structuredProductRows(product: StructuredProduct, t: Dictionary): DetailRow[] {
+  const labels = t.products.structured.detail;
   return [
-    { label: "อัตราดอกเบี้ย (Coupon)", value: product.coupon },
-    { label: "วันเสนอขาย", value: product.offerDate },
-    { label: "งวดดอกเบี้ย", value: product.couponPeriod },
-    { label: "ระยะเวลาการลงทุน (Tenor)", value: product.detailTenor },
-    { label: "ผลิตภัณฑ์", value: product.productName, link: true },
-    { label: "ประเภท", value: product.productType },
-    { label: "สกุลเงินลงทุน", value: product.currency },
-    { label: "ลงทุนขั้นต่ำ", value: product.minInvestment },
+    { label: labels.coupon, value: product.coupon },
+    { label: labels.offerDate, value: product.offerDate },
+    { label: labels.couponPeriod, value: product.couponPeriod },
+    { label: labels.tenor, value: product.detailTenor },
+    { label: labels.productName, value: product.productName, link: true },
+    { label: labels.productType, value: product.productType },
+    { label: labels.currency, value: product.currency },
+    { label: labels.minInvestment, value: product.minInvestment },
     {
-      label: "ข้อมูลเพิ่มเติม",
+      label: labels.moreInfo,
       value: "",
       multiline: [
         `KO: ${product.ko}`,
@@ -134,8 +134,9 @@ export function StructuredProductDetail({
   product: StructuredProduct;
   onBack: () => void;
 }) {
+  const t = useT();
   const showPrincipalTag =
-    product.tags.includes("รับประกันเงินต้น") || product.id === "aapl-amzn-nflx";
+    product.tags.includes(STRUCTURED_TAG.principalProtected) || product.id === "aapl-amzn-nflx";
 
   const [fcnModalOpen, setFcnModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
@@ -171,7 +172,7 @@ export function StructuredProductDetail({
     }
   }, [product.id]);
 
-  const detailRows = structuredProductRows(product);
+  const detailRows = structuredProductRows(product, t);
 
   return (
     <div
@@ -180,7 +181,7 @@ export function StructuredProductDetail({
     >
       {/* Header — back + title */}
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
@@ -216,7 +217,7 @@ export function StructuredProductDetail({
                 <span className="inline-flex items-center gap-0.5 shrink-0 rounded px-2 py-1 bg-[#eff6ff]">
                   <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" className="shrink-0" />
                   <span className="text-xs leading-[20px] text-[#074ea4] whitespace-nowrap">
-                    รับประกันเงินต้น
+                    {t.products.structured.tags.principalProtected}
                   </span>
                 </span>
               )}
@@ -242,7 +243,7 @@ export function StructuredProductDetail({
               about this one deal, and the header is what says which. */}
           {ORDER_BOOKING_ENABLED && (
             <TabGroup
-              items={PRODUCT_TABS}
+              items={PRODUCT_TABS.map((id) => ({ id, title: t.products.common.detailTabs[id] }))}
               activeId={tab}
               onChange={(id) => setTab(id as ProductTab)}
             />
@@ -266,9 +267,9 @@ export function StructuredProductDetail({
             <p className="text-xs leading-[20px] text-[#6a7282] text-center whitespace-nowrap">
               {round
                 ? round.previousRef
-                  ? `ส่งแล้ว (${round.previousRef})`
-                  : "ยังไม่ส่งคำสั่งซื้อ"
-                : `อัปเดตล่าสุด ${product.updatedAt}`}
+                  ? t.products.structured.sentRef(round.previousRef)
+                  : t.products.structured.notSentYet
+                : t.products.common.updatedAt(product.updatedAt)}
             </p>
           </div>
           ) : (
@@ -309,7 +310,7 @@ export function StructuredProductDetail({
                   style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
                 >
                   <UserPlusIcon size={16} />
-                  <span>จองซื้อให้ลูกค้า</span>
+                  <span>{t.products.common.bookForClient}</span>
                 </button>
               ) : null
             ) : (
@@ -320,7 +321,7 @@ export function StructuredProductDetail({
                 className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
                 style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
               >
-                <span>สร้างคำสั่งซื้อ</span>
+                <span>{t.products.common.createOrder}</span>
                 <ArrowSquareOutIcon size={16} />
               </a>
             )}

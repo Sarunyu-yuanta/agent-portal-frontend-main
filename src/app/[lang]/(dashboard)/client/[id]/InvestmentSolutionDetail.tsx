@@ -14,7 +14,9 @@ import {
   INVESTMENT_SOLUTION_DETAIL_PRODUCTS,
   type StructuredProduct,
 } from "./structured-product-data";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 function HeroImageContent({
   src,
@@ -349,6 +351,7 @@ export function InvestmentSolutionDetail({
   onBack: () => void;
   onProductSelect: (product: StructuredProduct) => void;
 }) {
+  const t = useT();
   const products = useOpenProducts(INVESTMENT_SOLUTION_DETAIL_PRODUCTS, (p) => p.id);
 
   useEffect(() => {
@@ -363,7 +366,7 @@ export function InvestmentSolutionDetail({
   return (
     <div className="flex flex-col gap-2 w-full bg-white pt-4 md:pt-6">
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-base font-bold leading-[28px] text-[#101828] truncate lg:text-lg lg:leading-[30px]">
@@ -379,13 +382,13 @@ export function InvestmentSolutionDetail({
         <div className="flex flex-col gap-2 items-center w-full max-w-[1280px] mx-auto px-4 md:max-lg:px-0 md:px-8 lg:px-20">
           <div className="flex gap-3 items-center w-full">
             <p className="flex-1 min-w-0 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
-              {products.length} รายการ
+              {t.products.common.items(products.length)}
             </p>
             {/* Mobile filter */}
             <Button
               variant="outline-black"
               size="icon-sm"
-              aria-label="ตัวกรอง"
+              aria-label={t.products.common.filter}
               className="shrink-0 md:hidden"
             >
               <FunnelSimpleIcon size={18} />
@@ -394,7 +397,7 @@ export function InvestmentSolutionDetail({
             <Button
               variant="outline-black"
               size="icon-sm"
-              aria-label="ตัวกรอง"
+              aria-label={t.products.common.filter}
               className="shrink-0 hidden md:max-lg:flex size-8"
             >
               <FunnelSimpleIcon size={18} />
@@ -406,14 +409,17 @@ export function InvestmentSolutionDetail({
               leftIcon={<FunnelSimpleIcon size={18} />}
               className="shrink-0 hidden lg:inline-flex"
             >
-              ตัวกรอง
+              {t.products.common.filter}
             </Button>
           </div>
           <p className="w-full text-micro leading-[18px] text-[#6a7282] lg:text-xs lg:leading-[20px]">
-            <span className="lg:hidden">อัปเดตล่าสุด {INVESTMENT_SOLUTION_UPDATED_AT_MOBILE}</span>
-            <span className="hidden lg:inline">อัปเดตล่าสุด {INVESTMENT_SOLUTION_UPDATED_AT}</span>
+            <span className="lg:hidden">{t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT_MOBILE)}</span>
+            <span className="hidden lg:inline">{t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT)}</span>
           </p>
 
+          {products.length === 0 ? (
+            <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+          ) : (
           <div className="flex flex-col gap-3 md:max-lg:gap-3 w-full lg:grid lg:grid-cols-3 lg:gap-3">
             {products.map((product) => (
               <StructuredProductCard
@@ -424,6 +430,7 @@ export function InvestmentSolutionDetail({
               />
             ))}
           </div>
+          )}
         </div>
       </div>
       </div>

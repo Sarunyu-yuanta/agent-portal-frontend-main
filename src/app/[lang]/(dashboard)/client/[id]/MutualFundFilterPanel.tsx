@@ -9,7 +9,6 @@ import {
   FUND_MANAGEMENT_COMPANIES,
   FUND_RISK_LEVELS,
   INVESTMENT_POLICY_OPTIONS,
-  fundRiskLevelLabel,
   TAX_SAVING_FUND_TYPES,
   getFundCategoryIds,
   getFundDividendPolicy,
@@ -19,6 +18,7 @@ import {
   type MutualFund,
 } from "./mutual-fund-data";
 import { MF_ASSETS } from "./mutual-fund-assets";
+import { useT } from "@/i18n/I18nProvider";
 
 export type MutualFundFilterState = {
   categories: string[];
@@ -179,12 +179,13 @@ function FilterSection({
   /** Figma 360:78475 — the category block sits 12px under its header; the rest use 16px. */
   compact?: boolean;
 }) {
+  const t = useT();
   return (
     <div className={`flex w-full flex-col ${compact ? "gap-3" : "gap-4"}`}>
       <div className="flex w-full items-center justify-between gap-2">
         <p className="text-sm font-bold leading-[24px] text-[#101828]">{title}</p>
         <Button variant="plain" size="xs" onClick={onClear} className="shrink-0">
-          ล้าง
+          {t.fund.filter.clear}
         </Button>
       </div>
       {children}
@@ -208,14 +209,15 @@ function MutualFundFilterContent({
   draft: MutualFundFilterState;
   setDraft: (updater: (prev: MutualFundFilterState) => MutualFundFilterState) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex w-full flex-col gap-6">
-      <FilterSection title="หมวดหมู่" compact onClear={() => setDraft((prev) => ({ ...prev, categories: [] }))}>
+      <FilterSection title={t.fund.filter.sections.category} compact onClear={() => setDraft((prev) => ({ ...prev, categories: [] }))}>
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {FILTER_CATEGORY_OPTIONS.map((option) => (
             <FilterChip
               key={option.id}
-              label={option.label}
+              label={t.fund.groups[option.id]}
               active={draft.categories.includes(option.id)}
               onClick={() =>
                 setDraft((prev) => ({ ...prev, categories: toggleValue(prev.categories, option.id) }))
@@ -227,7 +229,7 @@ function MutualFundFilterContent({
 
       <FilterDivider />
 
-      <FilterSection title="กองทุนลดหย่อนภาษี" onClear={() => setDraft((prev) => ({ ...prev, taxTypes: [] }))}>
+      <FilterSection title={t.fund.filter.sections.taxSaving} onClear={() => setDraft((prev) => ({ ...prev, taxTypes: [] }))}>
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {TAX_SAVING_FUND_TYPES.map((type) => (
             <FilterChip
@@ -243,14 +245,14 @@ function MutualFundFilterContent({
       <FilterDivider />
 
       <FilterSection
-        title="นโยบายการจ่ายปันผล"
+        title={t.fund.filter.sections.dividendPolicy}
         onClear={() => setDraft((prev) => ({ ...prev, dividendPolicies: [] }))}
       >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {DIVIDEND_POLICY_OPTIONS.map((option) => (
             <FilterChip
               key={option}
-              label={option}
+              label={t.fund.filter.dividendPolicy[option]}
               active={draft.dividendPolicies.includes(option)}
               onClick={() =>
                 setDraft((prev) => ({
@@ -266,14 +268,14 @@ function MutualFundFilterContent({
       <FilterDivider />
 
       <FilterSection
-        title="นโยบายการลงทุน"
+        title={t.fund.filter.sections.investmentPolicy}
         onClear={() => setDraft((prev) => ({ ...prev, investmentPolicies: [] }))}
       >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {INVESTMENT_POLICY_OPTIONS.map((option) => (
             <FilterChip
               key={option}
-              label={option}
+              label={t.fund.filter.investmentPolicy[option]}
               active={draft.investmentPolicies.includes(option)}
               onClick={() =>
                 setDraft((prev) => ({
@@ -289,7 +291,7 @@ function MutualFundFilterContent({
       <FilterDivider />
 
       <FilterSection
-        title="บริษัทจัดการกองทุน"
+        title={t.fund.filter.sections.managementCompany}
         onClear={() => setDraft((prev) => ({ ...prev, managementCompanies: [] }))}
       >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
@@ -312,12 +314,12 @@ function MutualFundFilterContent({
 
       <FilterDivider />
 
-      <FilterSection title="ระดับความเสี่ยง" onClear={() => setDraft((prev) => ({ ...prev, riskLevels: [] }))}>
+      <FilterSection title={t.fund.filter.sections.riskLevel} onClear={() => setDraft((prev) => ({ ...prev, riskLevels: [] }))}>
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {FUND_RISK_LEVELS.map((level) => (
             <FilterChip
               key={level}
-              label={fundRiskLevelLabel(level)}
+              label={t.fund.filter.riskLevel(level)}
               active={draft.riskLevels.includes(level)}
               onClick={() =>
                 setDraft((prev) => ({ ...prev, riskLevels: toggleValue(prev.riskLevels, level) }))
@@ -337,13 +339,14 @@ function FilterFooter({
   onClear: () => void;
   onApply: () => void;
 }) {
+  const t = useT();
   return (
     <div className="flex w-full gap-3">
       <Button variant="outline" size="xl" className="flex-1" onClick={onClear}>
-        ล้างทั้งหมด
+        {t.fund.filter.clearAll}
       </Button>
       <Button variant="primary" size="xl" className="flex-1" onClick={onApply}>
-        ตกลง
+        {t.fund.filter.apply}
       </Button>
     </div>
   );
@@ -361,6 +364,7 @@ export function MutualFundFilterBottomSheet({
   onOpenChange: (open: boolean) => void;
   onApply: (state: MutualFundFilterState) => void;
 }) {
+  const t = useT();
   const [draft, setDraft] = useState(initialState);
   const [wasOpen, setWasOpen] = useState(open);
 
@@ -373,7 +377,7 @@ export function MutualFundFilterBottomSheet({
     <BottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      title="ค้นหากองทุนที่คุณสนใจ"
+      title={t.fund.filter.title}
       showHandle
       showHeader
       rightSide="icon"
@@ -407,6 +411,7 @@ export function MutualFundFilterModal({
   onClose: () => void;
   onApply: (state: MutualFundFilterState) => void;
 }) {
+  const t = useT();
   const [draft, setDraft] = useState(initialState);
   const [wasOpen, setWasOpen] = useState(open);
 
@@ -428,7 +433,7 @@ export function MutualFundFilterModal({
       <div className="relative" onMouseDown={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title="ค้นหากองทุนที่คุณสนใจ"
+          title={t.fund.filter.title}
           showClose
           onClose={onClose}
           className="!max-w-[726px] w-[calc(var(--vw)*100-3rem)]"

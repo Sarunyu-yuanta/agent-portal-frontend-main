@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Avatar } from "@sarunyu/system-one";
 import { CaretUpDownIcon, SignOutIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
 import { pageZoom } from "@/lib/page-zoom";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Floor for the panel width, for when the rail is too narrow to derive a usable
@@ -47,7 +48,8 @@ export function SidebarUserMenu({
   initials: string;
   collapsed: boolean;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   /**
    * Which presentation to mount — not just which to show. Rendering both and
    * letting `md:hidden` hide one would still open the sheet's Base UI dialog on
@@ -156,7 +158,7 @@ export function SidebarUserMenu({
         onClick={toggle}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={`บัญชีของ ${name}`}
+        aria-label={t.nav.accountOf(name)}
         title={collapsed ? name : undefined}
         className={`group w-full flex items-center gap-3 py-2 px-2 transition-colors cursor-pointer ${open ? "bg-slate-700/50" : "hover:bg-slate-700/50"}`}
       >
@@ -193,7 +195,7 @@ export function SidebarUserMenu({
       {open && !isMobile && (
         <div
           role="menu"
-          aria-label={`บัญชีของ ${name}`}
+          aria-label={t.nav.accountOf(name)}
           style={{ left: placement.left, bottom: placement.bottom, width: placement.width }}
           className="fixed z-50 overflow-hidden rounded-xl border border-border bg-card shadow-lg animate-in fade-in duration-150"
         >
@@ -215,7 +217,7 @@ export function SidebarUserMenu({
               className="flex w-full cursor-pointer items-center gap-2.5 px-3 py-2 text-left text-[length:13px] text-destructive transition-colors hover:bg-[var(--bg-default-secondary)]"
             >
               <SignOutIcon size={16} className="shrink-0" />
-              Logout
+              {t.nav.logout}
             </button>
           </div>
         </div>
@@ -245,7 +247,7 @@ export function SidebarUserMenu({
         <SheetContent
           side="bottom"
           showCloseButton={false}
-          aria-label={`บัญชีของ ${name}`}
+          aria-label={t.nav.accountOf(name)}
           className="z-[61] gap-0 rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
         >
           <div className="mx-auto mt-3 mb-1 h-1 w-9 shrink-0 rounded-full bg-[var(--border-default)]" />
@@ -266,7 +268,7 @@ export function SidebarUserMenu({
             className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left text-[length:15px] text-destructive transition-colors active:bg-[var(--bg-default-secondary)]"
           >
             <SignOutIcon size={20} className="shrink-0" />
-            Logout
+            {t.nav.logout}
           </button>
         </SheetContent>
       </Sheet>

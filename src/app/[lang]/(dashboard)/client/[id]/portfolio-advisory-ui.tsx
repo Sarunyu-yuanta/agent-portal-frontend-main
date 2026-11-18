@@ -3,6 +3,7 @@
 import { Button, Tag } from "@sarunyu/system-one";
 import { ArrowSquareOutIcon, CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import type { AdvisoryAccountStatus, AdvisoryCta, PlanSuitability } from "./portfolio-advisory-client";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The two elevations a Portfolio Advisory detail page uses: one for a plan card
@@ -24,11 +25,13 @@ export const SECTION_SHADOW =
 
 /** Whether the client already holds an account with this service. */
 export function AdvisoryAccountTag({ status }: { status: AdvisoryAccountStatus }) {
+  const t = useT();
   const open = status === "open";
-  return <Tag text={open ? "เปิดบัญชีแล้ว" : "ยังไม่เปิดบัญชี"} variant={open ? "green" : "gray"} size="small" />;
+  return <Tag text={open ? t.products.advisory.account.open : t.products.advisory.account.none} variant={open ? "green" : "gray"} size="small" />;
 }
 
 export function PlanSuitabilityBadge({ suitability }: { suitability: PlanSuitability }) {
+  const t = useT();
   const suitable = suitability === "suitable";
   const Icon = suitable ? CheckCircleIcon : WarningCircleIcon;
 
@@ -39,7 +42,7 @@ export function PlanSuitabilityBadge({ suitability }: { suitability: PlanSuitabi
       }`}
     >
       <Icon size={12} weight="fill" />
-      {suitable ? "เหมาะกับลูกค้า" : "เกินระดับความเสี่ยง"}
+      {suitable ? t.products.advisory.suitability.suitable : t.products.advisory.suitability.exceeds}
     </span>
   );
 }
@@ -49,6 +52,7 @@ export function PlanSuitabilityBadge({ suitability }: { suitability: PlanSuitabi
  * keeps the plan list they were comparing from.
  */
 export function AdvisoryCtaButton({ cta, className }: { cta: AdvisoryCta; className?: string }) {
+  const t = useT();
   return (
     <Button
       variant={cta.variant}
@@ -57,7 +61,7 @@ export function AdvisoryCtaButton({ cta, className }: { cta: AdvisoryCta; classN
       rightIcon={<ArrowSquareOutIcon size={18} />}
       onClick={() => window.open(cta.href, "_blank", "noopener,noreferrer")}
     >
-      {cta.label}
+      {t.products.advisory.cta[cta.action]}
     </Button>
   );
 }

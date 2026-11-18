@@ -14,6 +14,7 @@ import { useFlipRows } from "@/hooks/use-flip-rows";
 import { displayAssetLabel, formatThbAmount } from "@/lib/client-utils";
 import type { ProductSortKey, SortDir } from "./types";
 import type { ProductRow } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ProductTable({
   rows,
@@ -23,6 +24,7 @@ export function ProductTable({
   onSort,
   onRowClick,
   onClearFilters,
+  isFiltered = false,
 }: {
   rows: ProductRow[];
   /** Row numbers from the unsorted list, so "No." stays put like the Customer tab's. */
@@ -32,7 +34,10 @@ export function ProductTable({
   onSort: (key: ProductSortKey) => (next: SortDir) => void;
   onRowClick: (row: ProductRow) => void;
   onClearFilters?: () => void;
+  /** Whether a search is narrowing `rows` — tells "no match" apart from "nothing yet". */
+  isFiltered?: boolean;
 }) {
+  const t = useT();
   const flipRef = useFlipRows<string>();
   if (isLoading) return <TableSkeleton />;
 
@@ -47,35 +52,35 @@ export function ProductTable({
               sortDirection={dirFor("rowIndex")}
               onSortChange={onSort("rowIndex")}
             >
-              No.
+              {t.client.hub.rowNo}
             </TableHeaderCell>
             <TableHeaderCell
               className="w-[30%]"
               sortDirection={dirFor("label")}
               onSortChange={onSort("label")}
             >
-              Product
+              {t.client.hub.productTable.product}
             </TableHeaderCell>
             <TableHeaderCell
               className="w-[18%] whitespace-nowrap"
               sortDirection={dirFor("clientCount")}
               onSortChange={onSort("clientCount")}
             >
-              # Clients
+              {t.client.hub.productTable.clientCount}
             </TableHeaderCell>
             <TableHeaderCell
               className="w-[26%] whitespace-nowrap"
               sortDirection={dirFor("totalAmountThb")}
               onSortChange={onSort("totalAmountThb")}
             >
-              Total AUM (THB)
+              {t.client.hub.productTable.totalAum}
             </TableHeaderCell>
             <TableHeaderCell
               className="w-[21%] whitespace-nowrap"
               sortDirection={dirFor("avgAllocationPct")}
               onSortChange={onSort("avgAllocationPct")}
             >
-              Avg Allocation
+              {t.client.hub.productTable.avgAllocation}
             </TableHeaderCell>
           </TableRow>
         </TableHead>
@@ -99,7 +104,7 @@ export function ProductTable({
                     {/* eslint-disable-next-line @next/next/no-img-element -- SVG status dot; the image optimizer rejects SVG */}
                     <img alt="" className="block size-full max-w-none" src={row.statusIcon} />
                   </span>
-                  <p className="text-body font-semibold text-foreground truncate">{displayAssetLabel(row.label)}</p>
+                  <p className="text-body font-semibold text-foreground truncate">{displayAssetLabel(row.label, t)}</p>
                 </div>
               </TableCell>
               <TableCell>
@@ -116,10 +121,14 @@ export function ProductTable({
         </TableBody>
       </Table>
       {isEmpty && (
-        <TableEmptyOverlay
-          body="ลองค้นหาด้วยคำอื่น หรือล้างตัวกรองเพื่อดูสินค้าทั้งหมด"
-          onClearFilters={onClearFilters}
-        />
+        isFiltered ? (
+          <TableEmptyOverlay
+            body={t.client.hub.noProductResultBody}
+            onClearFilters={onClearFilters}
+          />
+        ) : (
+          <TableEmptyOverlay variant="empty" title={t.client.hub.noProductsYet} />
+        )
       )}
     </div>
   );

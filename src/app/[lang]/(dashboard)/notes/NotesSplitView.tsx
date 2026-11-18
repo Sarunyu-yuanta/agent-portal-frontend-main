@@ -12,6 +12,7 @@ import type { Note } from "@/types/domain";
 import { NOTE_AUTHOR } from "./note-constants";
 import { NotesSidebarList, DISCARD_REMOVE_MS } from "./NotesSidebarList";
 import { NoteDetailPane } from "./NoteDetailPane";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Distinguishes one composition from the next, so clicking New Note twice in a
  * row gives the editor a key it hasn't seen and it mounts empty. */
@@ -61,11 +62,32 @@ export function NotesSplitView({
    */
   surfaceClassName?: string;
 }) {
+  const t = useT();
   const { addNote, editNote, removeNote } = useNotes();
   const isMobile = useMediaQuery("(max-width: 767px)");
-  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId ?? null);
+  /**
+   * A `?note=` that names no note — deleted since the link was made, or just
+   * mistyped. Settled once at mount, like `initialSelectedId` itself: the id is
+   * dropped so the pane opens as it would with no link at all (never on some
+   * other note posing as the one asked for), and a toast says why.
+   */
+  const [initialMissing] = useState(
+    () => !!initialSelectedId && !notes.some((n) => n.id === initialSelectedId),
+  );
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialMissing ? null : (initialSelectedId ?? null),
+  );
   const [deleteTarget, setDeleteTarget] = useState<Note | null>(null);
   const { toasts, addToast, removeToast } = useToasts();
+  const missingToastShown = useRef(false);
+  useEffect(() => {
+    if (!initialMissing || missingToastShown.current) return;
+    missingToastShown.current = true;
+    addToast({ status: "warning", message: t.planner.notes.noteNotFound });
+    // Mount-only: `initialMissing` never changes, and `t`/`addToast` changing
+    // later must not re-announce a link the user has already moved past.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Reported by NoteDetailPane on every keystroke, not on its save debounce.
   const [draftBlank, setDraftBlank] = useState(false);
   // Notes mid-exit: still in the list, already animating out of it.
@@ -264,9 +286,13 @@ export function NotesSplitView({
    * the editor were already keyed on it, so the swap from draft to real note is
    * invisible and the caret stays where it is.
    */
+  const promoting = useRef(false);
   const promoteDraft = (values: { title: string; body: string }) => {
-    if (!draft || !written(values.title, values.body)) return;
-    void addNote(
+    if (!draft || promoting.current || !written(values.title, values.body)) return;
+    // The draft is dropped only once the note exists. Dropping it first threw
+    // away what had been typed whenever the create failed.
+    promoting.current = true;
+    addNote(
       {
         clientIds: draft.clientIds,
         title: values.title.trim() || null,
@@ -276,8 +302,17 @@ export function NotesSplitView({
         reminderDone: draft.reminderDone,
       },
       draft.id,
-    );
-    setDraft(null);
+    )
+      .then(
+        () => setDraft(null),
+        (err: unknown) => {
+          console.warn("[NotesSplitView] create failed", err);
+          addToast({ status: "critical", message: t.planner.notes.createFailed });
+        },
+      )
+      .finally(() => {
+        promoting.current = false;
+      });
   };
 
   const handleSelect = (nextId: string | null) => {
@@ -299,7 +334,8 @@ export function NotesSplitView({
     }
     const current = notesRef.current.find((n) => n.id === id);
     if (!current) return;
-    editNote({ ...current, ...patch });
+    // Returned, so the pane can tell a failed save from a slow one.
+    return editNote({ ...current, ...patch });
   };
 
   /** Discarding a draft needs no confirmation — there is nothing to delete. */
@@ -331,10 +367,10 @@ export function NotesSplitView({
     try {
       await removeNote(target.id);
       if (target.id === selectedId) setSelectedId(null);
-      addToast({ status: "success", message: "Note deleted" });
+      addToast({ status: "success", message: t.planner.notes.noteDeleted });
     } catch (err) {
       console.warn("[NotesSplitView] delete failed", err);
-      addToast({ status: "critical", message: "Couldn't delete note. Try again." });
+      addToast({ status: "critical", message: t.planner.notes.noteDeleteFailed });
     }
   };
 
@@ -399,8 +435,8 @@ export function NotesSplitView({
     <div className="flex items-center justify-center h-full p-4">
       <EmptyState
         icon={<NotePencilIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-        title="No notes yet"
-        body="Write your first note and it will show up in the list on the left."
+        title={t.planner.notes.emptyTitle}
+        body={t.planner.notes.emptyBody}
         actionSlot={
           <Button
             variant="primary"
@@ -408,7 +444,7 @@ export function NotesSplitView({
             onClick={handleAdd}
             leftIcon={<NotePencilIcon size={18} weight="bold" />}
           >
-            New Note
+            {t.planner.notes.newNoteTitle}
           </Button>
         }
       />
@@ -468,11 +504,11 @@ export function NotesSplitView({
             <Modal
               variant="alert"
               alertStatus="danger"
-              title="Delete note?"
-              description="This note will be permanently removed."
+              title={t.planner.notes.deleteNoteTitle}
+              description={t.planner.deleteNoteBody}
               actionLayout="double"
-              primaryLabel="Delete"
-              secondaryLabel="Cancel"
+              primaryLabel={t.planner.delete}
+              secondaryLabel={t.common.cancel}
               onPrimaryClick={confirmDelete}
               onSecondaryClick={() => setDeleteTarget(null)}
               onClose={() => setDeleteTarget(null)}

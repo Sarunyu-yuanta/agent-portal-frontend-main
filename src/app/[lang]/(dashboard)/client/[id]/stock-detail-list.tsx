@@ -27,7 +27,8 @@ import { Popover } from "@sarunyu/system-one";
 import { StockLargeAssetCard } from "./StockLargeAssetCard";
 import { CATALOG_DETAIL_WIDTH } from "./ProductCatalogTabbedDetailLayout";
 import type { StockRow, Trend } from "./stock-data";
-import { TREND_PILL_BG } from "./stock-ui";
+import { StockSectionEmpty, TREND_PILL_BG } from "./stock-ui";
+import { useT } from "@/i18n/I18nProvider";
 
 const NARROW = CATALOG_DETAIL_WIDTH.narrow;
 
@@ -65,9 +66,9 @@ export function HeroPercentPill({
  *  trigger's leading glyph, so a closed dropdown still says how the list is
  *  ordered without reading the label. */
 const SORT_OPTIONS = [
-  { id: "all", label: "All Lists", Icon: SquaresFourIcon },
-  { id: "gain", label: "Top Gain", Icon: TrendUpIcon },
-  { id: "loss", label: "Top Loss", Icon: TrendDownIcon },
+  { id: "all", Icon: SquaresFourIcon },
+  { id: "gain", Icon: TrendUpIcon },
+  { id: "loss", Icon: TrendDownIcon },
 ] as const;
 
 type SortId = (typeof SORT_OPTIONS)[number]["id"];
@@ -87,9 +88,11 @@ function SortDropdown({
   value: SortId;
   onChange: (id: SortId) => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const selected = SORT_OPTIONS.find((o) => o.id === value) ?? SORT_OPTIONS[0];
   const SelectedIcon = selected.Icon;
+  const selectedLabel = t.stock.detailList.sort[selected.id];
 
   return (
     <Popover
@@ -104,7 +107,7 @@ function SortDropdown({
       contentStyle={{ width: 200 }}
       content={
         <div className="flex flex-col">
-          {SORT_OPTIONS.map(({ id, label, Icon }) => {
+          {SORT_OPTIONS.map(({ id, Icon }) => {
             const active = id === value;
             return (
               <button
@@ -120,7 +123,7 @@ function SortDropdown({
               >
                 <Icon size={24} className="shrink-0 text-[#4a5565]" />
                 <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#101828]">
-                  {label}
+                  {t.stock.detailList.sort[id]}
                 </span>
               </button>
             );
@@ -130,12 +133,12 @@ function SortDropdown({
     >
       <button
         type="button"
-        aria-label={`Sort: ${selected.label}`}
+        aria-label={t.stock.detailList.sortAria(selectedLabel)}
         className="flex w-[136px] shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2 transition-colors hover:bg-black/[0.02]"
       >
         <SelectedIcon size={20} className="shrink-0 text-[#4a5565]" />
         <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold leading-[24px] text-[#4a5565]">
-          {selected.label}
+          {selectedLabel}
         </span>
         <CaretDownIcon
           size={16}
@@ -271,6 +274,7 @@ export function StockDetailList({
   updatedAt: string;
   onSelect: (row: StockRow) => void;
 }) {
+  const t = useT();
   const { rows, isLoadingMore, sentinelRef } = useInfiniteStockRows(
     resetKey,
     initialStocks,
@@ -286,6 +290,7 @@ export function StockDetailList({
       (a, b) => direction * (percentValue(a.changePercent) - percentValue(b.changePercent)),
     );
   }, [rows, sort]);
+  const isEmpty = rows.length === 0 && !isLoadingMore;
 
   return (
     <div className="w-full flex-1 pb-16">
@@ -293,12 +298,17 @@ export function StockDetailList({
         <div className="flex w-full flex-col gap-3">
           <div className="flex w-full items-center gap-2 border-b border-black/10 px-3 py-3">
             <p className="min-w-0 flex-1 text-base leading-[24px] text-[#4a5565]">
-              {totalCount} Lists
+              {t.stock.detailList.count(isEmpty ? 0 : totalCount)}
             </p>
             <SortDropdown value={sort} onChange={setSort} />
           </div>
           <p className="w-full px-3 text-xs leading-[20px] text-[#6a7282]">{updatedAt}</p>
         </div>
+        {isEmpty ? (
+          // Nothing to page in either — no sentinel, or it would "load more" forever.
+          <StockSectionEmpty title={t.stock.empty.list} />
+        ) : (
+        <>
         <div className="grid w-full grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2">
           {sortedStocks.map((row, index) => (
             <div key={`${row.symbol}-${index}`} className="min-w-0">
@@ -319,10 +329,12 @@ export function StockDetailList({
         {isLoadingMore ? (
           <div className="flex w-full items-center justify-center gap-1 py-2.5 px-3">
             <CircleNotchIcon size={20} className="animate-spin text-[#6a7282]" />
-            <span className="text-sm font-bold leading-[24px] text-[#6a7282]">กำลังโหลดข้อมูล</span>
+            <span className="text-sm font-bold leading-[24px] text-[#6a7282]">{t.stock.detailList.loadingMore}</span>
           </div>
         ) : (
           <div ref={sentinelRef} aria-hidden className="h-px w-full" />
+        )}
+        </>
         )}
       </div>
     </div>

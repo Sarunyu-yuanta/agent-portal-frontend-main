@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { useMarketIndexPage } from "@/hooks/use-catalog";
 import { StockMiniChart } from "./StockMiniChart";
 import { MarketIndexDetailSkeleton } from "./StockCatalogSkeletons";
@@ -25,6 +25,7 @@ import {
   navigateWithoutFlicker,
   StockDetailList,
 } from "./stock-detail-list";
+import { useT } from "@/i18n/I18nProvider";
 
 const NARROW = CATALOG_DETAIL_WIDTH.narrow;
 
@@ -89,7 +90,8 @@ export function MarketIndexDetail({
   slug: string;
   onBack: () => void;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   const { data: page, isLoading } = useMarketIndexPage(slug);
 
   useCatalogDetailScrollTop([slug]);
@@ -102,8 +104,8 @@ export function MarketIndexDetail({
   if (!page) {
     return (
       <div className="flex min-h-full w-full flex-1 flex-col bg-white">
-        <CatalogDetailBackHeader title="Market Index" onBack={onBack} className="!pt-8" />
-        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>ไม่พบข้อมูล</p>
+        <CatalogDetailBackHeader title={t.stock.indexDetail.fallbackTitle} onBack={onBack} className="!pt-8" />
+        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
   }
@@ -114,7 +116,11 @@ export function MarketIndexDetail({
           sharing a wrapper: a sticky element can't travel outside its parent's
           box, and a two-row wrapper is only as tall as the two rows. */}
       <div className="bg-white pb-2">
-        <CatalogDetailBackHeader title={page.title} onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader
+          title={t.stock.indexDetail.boardTitle[page.market] ?? t.stock.indexDetail.fallbackTitle}
+          onBack={onBack}
+          className="!pt-8"
+        />
       </div>
       <CatalogDetailTextTabs
         sticky
@@ -143,7 +149,7 @@ export function MarketIndexDetail({
         initialStocks={page.stocks}
         loadBatch={(offset) => getIndexStockBatch(offset, INDEX_STOCK_PAGE_SIZE, page.market)}
         totalCount={page.totalCount}
-        updatedAt={page.updatedAt}
+        updatedAt={t.stock.latestUpdate(page.updatedAt)}
         onSelect={(row) => router.push(stockProductHref(row.symbol))}
       />
     </div>

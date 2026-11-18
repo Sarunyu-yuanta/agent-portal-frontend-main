@@ -34,12 +34,15 @@ export function StockMiniChart({
   className?: string;
 }) {
   const gradientId = `stock-chart-fill-${useId()}`;
-  const min = Math.min(...series);
-  const max = Math.max(...series);
+  // Fewer than two points can't make a line: `i / (length - 1)` divides by
+  // zero and `Math.min()` of nothing is Infinity. Draw it flat instead.
+  const values = series.length >= 2 ? series : [series[0] ?? 0, series[0] ?? 0];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
   const range = max - min || 1;
-  const points = series
+  const points = values
     .map((v, i) => {
-      const x = (i / (series.length - 1)) * width;
+      const x = (i / (values.length - 1)) * width;
       const y = height - ((v - min) / range) * height;
       return `${x.toFixed(2)},${y.toFixed(2)}`;
     })

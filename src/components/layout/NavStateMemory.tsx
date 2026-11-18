@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { recordVisit } from "@/lib/nav-memory";
 import { useScrollMemory } from "@/hooks/use-scroll-memory";
 
@@ -14,7 +15,7 @@ import { useScrollMemory } from "@/hooks/use-scroll-memory";
  * run after the page's own mount effects, some of which reset `main.scrollTop`.
  */
 export function NavStateMemory() {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const search = useSearchParams().toString();
   const url = search ? `${pathname}?${search}` : pathname;
 

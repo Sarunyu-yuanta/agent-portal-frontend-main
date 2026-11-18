@@ -41,24 +41,24 @@
 import { useMemo } from "react";
 import { useStatic, type Resource } from "@/hooks/use-api";
 import { mockHouseViewStrategies } from "@/lib/mock-data";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import {
   ALL_TOP_IDEAS,
   type TopIdeaSector,
-} from "@/app/(dashboard)/client/[id]/top-idea-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/top-idea-data";
 import {
   ALL_STRUCTURED_PRODUCTS_LIMIT,
   ALL_STRUCTURED_PRODUCTS_POOL,
   findProductById,
   TOP_IDEA_DETAIL_PRODUCTS,
   type StructuredProduct,
-} from "@/app/(dashboard)/client/[id]/structured-product-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/structured-product-data";
 import {
   ALL_OVERSEAS_BONDS,
   getGlobalBondIssuer,
   type GlobalBondIssuer,
   type GlobalBondRow,
-} from "@/app/(dashboard)/client/[id]/global-bond-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/global-bond-data";
 import {
   FIXED_INCOME_BONDS,
   getCompanyPrimaryBonds,
@@ -67,35 +67,34 @@ import {
   resolveFixedIncomeCompany,
   type FixedIncomeBond,
   type FixedIncomeCompany,
-} from "@/app/(dashboard)/client/[id]/fixed-income-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/fixed-income-data";
 import {
   THAI_STRUCTURED_PRODUCTS,
   getThaiStructuredProduct,
   type ThaiStructuredProduct,
-} from "@/app/(dashboard)/client/[id]/thai-structured-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/thai-structured-data";
 import {
   getInvestmentSolution,
   type InvestmentSolution,
-  type InvestmentSolutionId,
-} from "@/app/(dashboard)/client/[id]/investment-solution-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/investment-solution-data";
 import {
   MUTUAL_FUND_CATALOG,
   getMutualFund,
   type MutualFundCatalog,
   type MutualFundDetail,
-} from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
 import {
   PRODUCT_TRENDING_GROUPS,
   type TrendingGroup,
-} from "@/app/(dashboard)/client/[id]/product-trending-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/product-trending-data";
 import {
   getMarketIndexPage,
   type MarketIndexPage,
-} from "@/app/(dashboard)/client/[id]/stock-index-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-index-data";
 import {
   getIndustrySectorPage,
   type IndustrySectorPage,
-} from "@/app/(dashboard)/client/[id]/stock-industry-sector-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-industry-sector-data";
 import {
   getRelatedProducts,
   getStockProductDetail,
@@ -104,16 +103,16 @@ import {
   type StockNoticeTab,
   type StockProductDetail,
   type StockTabNotice,
-} from "@/app/(dashboard)/client/[id]/stock-product-detail-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-product-detail-data";
 import {
   getStockCompanyEvents,
   type StockCompanyEvents,
-} from "@/app/(dashboard)/client/[id]/stock-company-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-company-data";
 import {
   STOCK_CROSS_SELL_DETAIL,
   type StockCrossSellDetailConfig,
   type StockCrossSellKind,
-} from "@/app/(dashboard)/client/[id]/stock-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
 import {
   getAllMutualFunds,
   getMutualFundInsightsPage,
@@ -121,24 +120,24 @@ import {
   type MutualFund,
   type MutualFundTheme,
   type MutualFundThemeId,
-} from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
 import {
   ROBO_ADVISORY_PLANS,
   type RoboAdvisoryPlan,
-} from "@/app/(dashboard)/client/[id]/robo-advisory-plan-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/robo-advisory-plan-data";
 import {
   DEFINIT_PLANS,
   type DefinitPlan,
-} from "@/app/(dashboard)/client/[id]/definit-plan-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/definit-plan-data";
 import {
   RESEARCH_FEED,
   type ResearchFeed,
-} from "@/app/(dashboard)/insights/research-data";
+} from "@/app/[lang]/(dashboard)/insights/research-data";
 import {
   MARKET_CATALOG,
   type MarketCatalog,
   type MarketId,
-} from "@/app/(dashboard)/client/[id]/stock-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
 
 type HouseViewStrategy = (typeof mockHouseViewStrategies)[number];
 
@@ -297,11 +296,11 @@ export function useThaiStructuredProducts(): Resource<ThaiStructuredProduct[]> {
 /**
  * One investment solution by id.
  *
- * Non-optional unlike its neighbours: `getInvestmentSolution` falls back to a
- * default solution rather than returning `undefined`, so its route has no
- * not-found branch to preserve.
+ * `undefined` once loaded means the id isn't a solution. It used to fall back
+ * to High Conviction, so a mistyped link showed a real-looking page for the
+ * wrong solution.
  */
-export function useInvestmentSolution(id: InvestmentSolutionId): Resource<InvestmentSolution> {
+export function useInvestmentSolution(id: string): Resource<InvestmentSolution | undefined> {
   return useStatic(getInvestmentSolution(id));
 }
 

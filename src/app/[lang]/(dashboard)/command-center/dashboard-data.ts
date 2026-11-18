@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 /**
  * What the Dashboard derives, kept out of the components that draw it.
  *
@@ -48,7 +50,7 @@ import {
   type ReminderBucket,
 } from "../calendar/reminder-buckets";
 import { getRelatedProducts } from "../insights/house-view-data";
-import { kycExpiry, kycExpiryLabelTh } from "../client/[id]/client-detail-data";
+import { kycExpiry, kycExpiryLabel } from "../client/[id]/client-detail-data";
 import { lastCheckpointCrossed } from "../use-kyc-notification-feed";
 import { zoneForDays } from "../notification-zones";
 
@@ -112,11 +114,15 @@ export function buildQueue({
   notes,
   today,
   isPrivate,
+  t,
+  locale,
 }: {
   clients: Client[];
   notes: Note[];
   today: Date;
   isPrivate: boolean;
+  t: Dictionary;
+  locale: Locale;
 }): QueueItem[] {
   const rows: QueueItem[] = [];
 
@@ -140,7 +146,7 @@ export function buildQueue({
       id: `kyc:${client.id}:d${checkpoint}`,
       source: "kyc",
       title: maskName(client.name, isPrivate),
-      detail: kycExpiryLabelTh(client.id) ?? "",
+      detail: kycExpiryLabel(client.id, t, locale) ?? "",
       day: addDays(today, expiry.daysLeft),
       daysLeft: expiry.daysLeft,
       done: false,
@@ -155,8 +161,8 @@ export function buildQueue({
   // otherwise stop at the month boundary. Notes are passed to the first call
   // only — they carry their own dates and would come back twice.
   const dayGroups = [
-    groupDayItems(notes, today),
-    groupDayItems([], addMonths(today, 1)),
+    groupDayItems(notes, today, t),
+    groupDayItems([], addMonths(today, 1), t),
   ];
 
   for (const group of dayGroups) {
@@ -204,17 +210,10 @@ export function buildQueue({
  * English. The buckets, their order and their tones are shared; only this is
  * local — see `calendar/reminder-buckets`.
  */
-export const BUCKET_LABEL_TH: Record<ReminderBucket, string> = {
-  overdue: "เลยกำหนด",
-  today: "วันนี้",
-  upcoming: "กำลังจะถึง",
-  done: "เสร็จแล้ว",
-};
 
 /** A headed block of rows — one bucket's worth. */
 export type QueueGroup = {
   bucket: ReminderBucket;
-  label: string;
   items: QueueItem[];
 };
 
@@ -233,7 +232,6 @@ export type QueueGroup = {
 export function groupQueueByBucket(items: QueueItem[], today: Date): QueueGroup[] {
   return REMINDER_BUCKETS.map((bucket) => ({
     bucket,
-    label: BUCKET_LABEL_TH[bucket],
     items: items
       .filter((i) => bucketFor(i.done, dayRelation(i.day, today)) === bucket)
       .sort((a, b) =>
@@ -264,12 +262,16 @@ export function buildDayQueue({
   day,
   today,
   isPrivate,
+  t,
+  locale,
 }: {
   clients: Client[];
   notes: Note[];
   day: Date;
   today: Date;
   isPrivate: boolean;
+  t: Dictionary;
+  locale: Locale;
 }): QueueItem[] {
   const wanted = dayKey(day);
   const rows: QueueItem[] = [];
@@ -286,7 +288,7 @@ export function buildDayQueue({
       id: `kyc:${client.id}:d${checkpoint ?? "none"}`,
       source: "kyc",
       title: maskName(client.name, isPrivate),
-      detail: kycExpiryLabelTh(client.id) ?? "",
+      detail: kycExpiryLabel(client.id, t, locale) ?? "",
       day: expiryDay,
       daysLeft: expiry.daysLeft,
       done: false,
@@ -296,7 +298,7 @@ export function buildDayQueue({
     });
   }
 
-  for (const item of groupDayItems(notes, day).get(wanted) ?? []) {
+  for (const item of groupDayItems(notes, day, t).get(wanted) ?? []) {
     if (!concernsSomeone(item)) continue;
     rows.push({
       id: item.id,
@@ -343,9 +345,9 @@ function datedReminders(map: Map<string, DayItem[]>, today: Date, seen: Set<stri
  * Anchored on that day so a month the mini calendar can reach still has its
  * desk alerts, which `groupDayItems` only loads for the month it is given.
  */
-export function remindersOnDay(notes: Note[], day: Date, today: Date): DatedReminder[] {
+export function remindersOnDay(notes: Note[], day: Date, today: Date, t: Dictionary): DatedReminder[] {
   const key = dayKey(day);
-  const rows = datedReminders(groupDayItems(notes, day), today, new Set());
+  const rows = datedReminders(groupDayItems(notes, day, t), today, new Set());
   return rows
     .filter((row) => dayKey(row.day) === key)
     .sort((a, b) => a.item.title.localeCompare(b.item.title));
@@ -353,9 +355,9 @@ export function remindersOnDay(notes: Note[], day: Date, today: Date): DatedRemi
 
 /** Open reminders for the month on screen, keyed by calendar day — what the
  *  mini calendar's dot and its day popover both read. */
-export function remindersByDay(notes: Note[], viewDate: Date, today: Date): Map<string, DatedReminder[]> {
+export function remindersByDay(notes: Note[], viewDate: Date, today: Date, t: Dictionary): Map<string, DatedReminder[]> {
   const map = new Map<string, DatedReminder[]>();
-  for (const row of datedReminders(groupDayItems(notes, viewDate), today, new Set())) {
+  for (const row of datedReminders(groupDayItems(notes, viewDate, t), today, new Set())) {
     const key = dayKey(row.day);
     const list = map.get(key);
     if (list) list.push(row);
@@ -406,11 +408,13 @@ export function buildMonthDots({
   notes,
   today,
   viewDate,
+  t,
 }: {
   clients: Client[];
   notes: Note[];
   today: Date;
   viewDate: Date;
+  t: Dictionary;
 }): Map<string, DayDots> {
   const map = new Map<string, DayDots>();
   const bump = (day: Date, kind: keyof DayDots) => {
@@ -430,7 +434,7 @@ export function buildMonthDots({
   // `viewDate` rather than `today`, so paging to another month re-anchors the
   // desk's alerts to the month being looked at — the same argument
   // `groupDayItems` takes for the Calendar's own month navigation.
-  for (const [key, items] of groupDayItems(notes, viewDate)) {
+  for (const [key, items] of groupDayItems(notes, viewDate, t)) {
     const day = dayFromKey(key);
     if (!isSameMonth(day, viewDate)) continue;
     for (const item of items) {

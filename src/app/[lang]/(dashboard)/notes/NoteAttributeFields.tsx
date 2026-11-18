@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { BellIcon, UserIcon } from "@phosphor-icons/react";
 import { Alert, DateInput, DropdownMultiple, Toggle } from "@sarunyu/system-one";
 import { defaultReminderDate, reminderAtFromDate } from "./note-format";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The two things a note carries besides its text.
@@ -72,6 +73,7 @@ export function ClientField({
   onChange: (next: string[]) => void;
   resetToken?: number;
 }) {
+  const t = useT();
   // Before the early return below, so the hook order can't shift with the props.
   const [enabled, setEnabled] = useState(clientIds.length > 0);
   useResetToggle(resetToken, () => setEnabled(false));
@@ -88,9 +90,9 @@ export function ClientField({
       <div className="flex flex-col gap-1.5">
         {/* No switch here: the note always has at least the pinned client, so
             there is no "general note" state to toggle into. */}
-        <FieldLabel icon={<UserIcon size={16} />}>Client</FieldLabel>
+        <FieldLabel icon={<UserIcon size={16} />}>{t.planner.notes.fields.client}</FieldLabel>
         <DropdownMultiple
-          placeholder="Select clients"
+          placeholder={t.planner.notes.fields.selectClients}
           value={clientIds}
           options={options}
           onChange={(next) =>
@@ -115,11 +117,11 @@ export function ClientField({
           // note stays general until at least one is actually chosen.
           if (!next) onChange([]);
         }}
-        label={<FieldLabel icon={<UserIcon size={16} />}>Client</FieldLabel>}
+        label={<FieldLabel icon={<UserIcon size={16} />}>{t.planner.notes.fields.client}</FieldLabel>}
       />
       {enabled && (
         <DropdownMultiple
-          placeholder="Select clients"
+          placeholder={t.planner.notes.fields.selectClients}
           value={clientIds}
           options={options}
           onChange={onChange}
@@ -138,6 +140,7 @@ export function ReminderField({
   onChange: (next: string | null) => void;
   resetToken?: number;
 }) {
+  const t = useT();
   const [date, setDate] = useState<Date | undefined>(
     reminderAt ? new Date(reminderAt) : undefined,
   );
@@ -172,11 +175,11 @@ export function ReminderField({
           setDate(target);
           onChange(reminderAtFromDate(target));
         }}
-        label={<FieldLabel icon={<BellIcon size={16} />}>Reminder</FieldLabel>}
+        label={<FieldLabel icon={<BellIcon size={16} />}>{t.planner.notes.fields.reminder}</FieldLabel>}
       />
       {enabled && (
         <DateInput
-          placeholder="Date"
+          placeholder={t.planner.notes.fields.date}
           value={date}
           onChange={(next) => {
             setDate(next);

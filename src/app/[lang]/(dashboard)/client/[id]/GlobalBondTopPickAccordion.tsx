@@ -10,8 +10,11 @@ import {
   TopPickTag,
 } from "./fixed-income-shared";
 import { GlobalBondListCta } from "./GlobalBondDetailBondList";
+import { useT } from "@/i18n/I18nProvider";
 
 export function GlobalBondTopPickAccordion() {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
   return (
@@ -53,16 +56,16 @@ export function GlobalBondTopPickAccordion() {
             {expanded && (
               <div className="flex flex-col gap-3 items-center px-3 pb-3 w-full">
                 <div className="flex flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2 w-full">
-                  <DetailRow label="Currency" value={row.currency} />
-                  <DetailRow label="Coupon Rate" value={row.couponRate} />
-                  <DetailRow label="Price" value={row.price} />
-                  <DetailRow label="ผลตอบแทนโดยประมาณ" value={row.yieldPct} />
-                  <DetailRow label="วันครบกำหนด" value={row.maturity} />
-                  <DetailRow label="ระยะเวลา (ปี)" value={row.duration} />
+                  <DetailRow label={cols.currency} value={row.currency} />
+                  <DetailRow label={cols.couponRate} value={row.couponRate} />
+                  <DetailRow label={cols.price} value={row.price} />
+                  <DetailRow label={cols.estimatedYield} value={row.yieldPct} />
+                  <DetailRow label={cols.maturity} value={row.maturity} />
+                  <DetailRow label={cols.durationYears} value={row.duration} />
                   <div className="flex gap-3 items-start w-full text-sm leading-[24px]">
-                    <span className="flex-1 text-[#4a5565]">เอกสารที่เกี่ยวข้อง</span>
+                    <span className="flex-1 text-[#4a5565]">{t.products.common.relatedDocuments}</span>
                     <button type="button" className="inline-flex items-center gap-0.5 border-none bg-transparent p-0 cursor-pointer">
-                      <span className="text-sm text-[#2b7fff] underline">Factsheet</span>
+                      <span className="text-sm text-[#2b7fff] underline">{t.products.common.factsheet}</span>
                       <FileTextIcon size={14} color="#2b7fff" />
                     </button>
                   </div>

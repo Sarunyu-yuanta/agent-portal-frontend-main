@@ -4,6 +4,8 @@ import { BellIcon, CheckCircleIcon, PlusIcon } from "@phosphor-icons/react";
 import type { Note } from "@/types/domain";
 import { groupNotesByDate } from "./notes-grouping";
 import { formatDayOnly, reminderTag, REMINDER_TONE } from "./note-format";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * Notes as a wall of cards rather than a list beside a reader.
@@ -31,7 +33,9 @@ export function NotesGallery({
   onAdd: () => void;
   addDisabled?: boolean;
 }) {
-  const groups = groupNotesByDate(notes);
+  const locale = useLocale();
+  const t = useT();
+  const groups = groupNotesByDate(notes, t, locale);
 
   return (
     <div className="flex flex-col gap-6">
@@ -71,6 +75,7 @@ function GalleryGrid({ children }: { children: React.ReactNode }) {
 }
 
 function AddTile({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  const t = useT();
   return (
     // `self-start` so it keeps the box's own height instead of being stretched
     // to the full cell: grid items stretch by default, and the cards are taller
@@ -95,7 +100,7 @@ function AddTile({ onClick, disabled }: { onClick: () => void; disabled: boolean
           readable as one scale. */}
       <span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-primary-action bg-[var(--primary-action-light)] text-primary-action transition-colors group-hover/tile:bg-[var(--primary-action-muted)]">
         <PlusIcon size={24} />
-        <span className="type-body-2 font-semibold">New note</span>
+        <span className="type-body-2 font-semibold">{t.planner.notes.newNote}</span>
       </span>
     </button>
   );
@@ -110,7 +115,9 @@ function NoteCard({
   selected: boolean;
   onOpen: () => void;
 }) {
-  const reminder = reminderTag(note);
+  const locale = useLocale();
+  const t = useT();
+  const reminder = reminderTag(note, t, locale);
 
   return (
     <button
@@ -159,7 +166,7 @@ function NoteCard({
           </span>
         )}
         <span className="type-caption whitespace-pre-wrap text-muted-foreground">
-          {note.body || "No additional text"}
+          {note.body || t.planner.noAdditionalText}
         </span>
       </span>
 
@@ -190,7 +197,7 @@ function NoteCard({
           vanishing across the whole wall. */}
       <span className={`flex-col gap-0.5 ${reminder ? "flex" : "hidden md:flex"}`}>
         <span className="type-body-2 font-semibold text-foreground truncate max-md:hidden">
-          {note.title || "New Note"}
+          {note.title || t.planner.notes.newNoteTitle}
         </span>
         {reminder && (
           <span
@@ -205,7 +212,7 @@ function NoteCard({
                 so a screen reader gets "Overdue · 4 Sept" as one phrase rather
                 than a bare date it has no way to place. */}
             <span aria-hidden className="truncate">
-              {formatDayOnly(note.reminderAt!)}
+              {formatDayOnly(note.reminderAt!, locale)}
             </span>
             <span className="sr-only">{reminder.label}</span>
           </span>

@@ -13,12 +13,15 @@ import {
   cellBorderStyle,
   BondLogo,
 } from "./fixed-income-shared";
+import { useT } from "@/i18n/I18nProvider";
 
 export function GlobalBondRecommendedTable({
   onIssuerSelect,
 }: {
   onIssuerSelect?: (id: GlobalBondIssuerId) => void;
 }) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
   function rowCellProps(i: number, bottom?: boolean) {
@@ -46,7 +49,7 @@ export function GlobalBondRecommendedTable({
           {/* Issuer */}
           <div className="flex flex-col w-[296px] shrink-0">
             <div className="flex h-11 items-center px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ผู้ออกตราสาร</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.issuer}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
               <div
@@ -62,7 +65,7 @@ export function GlobalBondRecommendedTable({
           {/* Coupon Rate */}
           <div className="flex flex-col w-[120px] shrink-0">
             <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Coupon Rate</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
               <div
@@ -77,7 +80,7 @@ export function GlobalBondRecommendedTable({
           {/* Maturity */}
           <div className="flex flex-col flex-1 min-w-[100px]">
             <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>วันครบกำหนด</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
               <div
@@ -93,7 +96,7 @@ export function GlobalBondRecommendedTable({
           <div className="flex flex-col w-[210px] shrink-0">
             <div className="flex flex-col h-11 overflow-hidden" style={headerBorderStyle()}>
               <div className="flex flex-1 items-center justify-center px-4" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
-                <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Credit Rating</span>
+                <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.creditRating}</span>
               </div>
               <div className="flex flex-1 items-stretch">
                 <div className="flex flex-1 items-center justify-center px-4" style={{ borderRight: `1px solid ${BORDER_COLOR}` }}>
@@ -128,7 +131,7 @@ export function GlobalBondRecommendedTable({
           {/* Yield */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle({ right: false })}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ผลตอบแทนโดยประมาณ</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
               <div

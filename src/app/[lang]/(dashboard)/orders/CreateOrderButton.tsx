@@ -25,12 +25,12 @@ import { useMemo, useState } from "react";
 import { Button, SearchInput, useIsMobile } from "@sarunyu/system-one";
 import { CaretRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import { MUTUAL_FUND_CATALOG } from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+import { MUTUAL_FUND_CATALOG } from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
 import {
   STOCK_TOP_GAIN,
   STOCK_TOP_LOSS,
   STOCK_TOP_PICK,
-} from "@/app/(dashboard)/client/[id]/stock-data";
+} from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
 import {
   bookableProductsForDesk,
   type BookableProduct,
@@ -43,13 +43,13 @@ import { BackButton } from "./BackButton";
 import { OrderBookingModal } from "./OrderBookingModal";
 import type { ProposalSubject } from "./SendProposalDialog";
 import { useQuotaBooking } from "./useQuotaBooking";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 type Mode = "order" | "proposal";
 
-const MODES: { id: Mode; label: string }[] = [
-  { id: "order", label: "ส่งคำสั่งซื้อ" },
-  { id: "proposal", label: "ส่ง Proposal" },
-];
+/** Labels are `t.orders.create.mode[id]`. */
+const MODES: Mode[] = ["order", "proposal"];
 
 /** Offered but never booked — listed only when sending a Proposal. */
 type OfferedAsset = "Stock" | "Mutual Fund";
@@ -101,7 +101,6 @@ const STOCK_ITEMS: PickItem[] = uniqueBy(
   subject: {
     id: offeredProductId("stock", s.symbol),
     underlying: s.symbol,
-    documents: "บทวิเคราะห์หุ้น",
   },
 }));
 
@@ -123,12 +122,12 @@ const FUND_ITEMS: PickItem[] = uniqueBy(
   },
 }));
 
-function bookableItem(p: BookableProduct): PickItem {
+function bookableItem(p: BookableProduct, t: Dictionary): PickItem {
   return {
     key: p.id,
     title: p.underlying,
     coupon: p.coupon,
-    meta: [p.productType, p.currency, p.minInvestment && `ขั้นต่ำ ${p.minInvestment}`]
+    meta: [p.productType, p.currency, p.minInvestment && t.orders.create.minimum(p.minInvestment)]
       .filter(Boolean)
       .join(" · "),
     subject: p,
@@ -144,6 +143,7 @@ function bookableItem(p: BookableProduct): PickItem {
  *   booking modal skips its client list; a Proposal starts with them ticked.
  */
 export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: string }) {
+  const t = useT();
   const booking = useQuotaBooking();
   const [picking, setPicking] = useState(false);
   const [mode, setMode] = useState<Mode>("order");
@@ -182,12 +182,16 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   );
   const itemsFor = (a: Asset): PickItem[] =>
     a === "Stock"
-      ? STOCK_ITEMS
+      ? STOCK_ITEMS.map((item) => ({
+          ...item,
+          // The documents line is UI copy, so it is filled in per locale here.
+          subject: { ...item.subject, documents: t.orders.proposal.stockDocuments },
+        }))
       : a === "Mutual Fund"
         ? FUND_ITEMS
         : bookableProductsForDesk(a)
             .filter((p) => !closed.has(p.id))
-            .map(bookableItem);
+            .map((p) => bookableItem(p, t));
   const items = listAsset ? itemsFor(listAsset) : [];
 
   const query = search.trim().toLowerCase();
@@ -236,22 +240,22 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   const modeToggle = (
     <div
       role="group"
-      aria-label="ประเภทรายการ"
+      aria-label={t.orders.create.modeAria}
       className="flex gap-1 rounded-lg bg-[var(--bg-default-secondary)] p-1"
     >
       {MODES.map((m) => (
         <button
-          key={m.id}
+          key={m}
           type="button"
-          aria-pressed={mode === m.id}
-          onClick={() => switchMode(m.id)}
+          aria-pressed={mode === m}
+          onClick={() => switchMode(m)}
           className={`flex-1 cursor-pointer rounded-md px-3 py-1.5 text-body-sm font-semibold transition-colors ${
-            mode === m.id
+            mode === m
               ? "bg-white text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          {m.label}
+          {t.orders.create.mode[m]}
         </button>
       ))}
     </div>
@@ -260,11 +264,10 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   const assetPane = (
     <div className="flex flex-col gap-3 px-4 pb-4 pt-3 md:px-6">
       {modeToggle}
-      <p className="pt-1 text-label font-semibold text-muted-foreground">เลือกสินทรัพย์</p>
+      <p className="pt-1 text-label font-semibold text-muted-foreground">{t.orders.create.pickAsset}</p>
       <div className="flex flex-col gap-2">
         {assets.map(({ asset: a, label }) => {
           const count = itemsFor(a).length;
-          const unit = mode === "order" ? "เปิดรับ" : "มี";
           return (
             <button
               key={a}
@@ -283,7 +286,7 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-body-sm font-semibold text-foreground">{label}</span>
                 <span className="text-label text-muted-foreground">
-                  {count > 0 ? `${unit} ${count} รายการ` : "ไม่มีสินค้าที่เปิดรับ"}
+                  {count > 0 ? (mode === "order" ? t.orders.create.openCount(count) : t.orders.create.availableCount(count)) : t.orders.create.noneOpen}
                 </span>
               </span>
               <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
@@ -304,25 +307,25 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
         {/* A phone's sheet has no arrow in its title row. */}
         {isMobile && !desk && (
           <div>
-            <BackButton label="ย้อนกลับ" onClick={backToAssets} />
+            <BackButton label={t.orders.back} onClick={backToAssets} />
           </div>
         )}
         <SearchInput
           value={search}
           onChange={setSearch}
           onClear={() => setSearch("")}
-          placeholder="ค้นหาสินค้า"
+          placeholder={t.orders.create.searchProduct}
           size="sm"
           className="w-full"
         />
         <p className="text-label font-semibold text-muted-foreground">
-          เลือกสินค้า ({shown.length})
+          {t.orders.create.pickProduct(shown.length)}
         </p>
       </div>
       <div className="flex flex-col gap-2 px-4 pt-1 md:px-6">
         {shown.length === 0 ? (
           <p className="py-8 text-center text-body-sm text-muted-foreground">
-            {query ? "ไม่พบสินค้าที่ค้นหา" : "ไม่มีสินค้าที่เปิดรับอยู่ตอนนี้"}
+            {query ? t.orders.create.noProductMatch : t.orders.create.noneOpenNow}
           </p>
         ) : (
           shown.map((item) => (
@@ -349,7 +352,7 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   );
 
   const picked = mode === "order" ? product : subject;
-  const baseTitle = mode === "order" ? "สร้าง Order" : "ส่ง Proposal";
+  const baseTitle = mode === "order" ? t.orders.create.createOrder : t.orders.proposal.send;
 
   return (
     <>
@@ -364,7 +367,7 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
         leftIcon={<PlusIcon size={16} weight="bold" />}
         onClick={() => setPicking(true)}
       >
-        สร้าง Order
+        {t.orders.create.createOrder}
       </Button>
 
       {/* One modal for the whole flow — asset, product, then either the

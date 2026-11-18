@@ -8,6 +8,7 @@ import {
   zoneForDays,
   type ZonedNotification,
 } from "../notification-zones";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The header bell's reminder rows and click targets — every client's reminders,
@@ -18,13 +19,14 @@ import {
  *
  * Returns rows rather than groups. The shell merges them with the KYC feed and
  * groups the combined list once, so both sources share one ordering — see
- * `@/app/(dashboard)/notification-zones`.
+ * `@/app/[lang]/(dashboard)/notification-zones`.
  *
  * A reminder stays in whichever zone it currently falls in until it crosses
  * into the next one, so one that rang at 15 days out doesn't go quiet until 7
  * and read as though it had been dealt with in between.
  */
 export function useNotificationFeed(notes: Note[], clients: { id: string; name: string }[]) {
+  const t = useT();
   // `todayKey` rather than the `Date`: a fresh object every render would make
   // the memo useless, and only the day is what either source is measured
   // against. Same trick the Reminders tab uses.
@@ -36,7 +38,7 @@ export function useNotificationFeed(notes: Note[], clients: { id: string; name: 
     // `ClientRemindersTab` builds, just unfiltered, because the bell is the one
     // surface that isn't already standing on a client's own page. What it does
     // still drop is anything naming nobody at all; see `concernsSomeone`.
-    const dayMap = groupDayItems(notes, today);
+    const dayMap = groupDayItems(notes, today, t);
     const rows: ZonedNotification[] = [];
     // `onItemClick` only gets back the `NotificationItem` it was handed, and
     // that shape has no room for the `DayItem`/day a reminder actually is —
@@ -58,7 +60,7 @@ export function useNotificationFeed(notes: Note[], clients: { id: string; name: 
         const names = item.clientIds
           .map((id) => clients.find((c) => c.id === id)?.name ?? id)
           .join(", ");
-        const badge = itemBadge(item);
+        const badge = itemBadge(item, t);
         // A note's reminder has a time of day; a corporate action or desk
         // event only has its date, so it is stamped by day alone.
         const reminderAt = item.noteId
@@ -78,7 +80,7 @@ export function useNotificationFeed(notes: Note[], clients: { id: string; name: 
             // day still tells the reader something; on the first screen the
             // heading is already the exact day and repeating it read as a
             // second, contradictory date.
-            time: relativeDayLabel(daysDiff),
+            time: relativeDayLabel(daysDiff, t),
             unread: isDue(zone),
             // The same badge every other reminder surface in the app uses —
             // colour and circle both, not just the glyph — so a row reads as
@@ -104,5 +106,5 @@ export function useNotificationFeed(notes: Note[], clients: { id: string; name: 
       notificationRows: rows,
       notificationTargets: targets,
     };
-  }, [notes, clients, todayKey]);
+  }, [notes, clients, todayKey, t]);
 }

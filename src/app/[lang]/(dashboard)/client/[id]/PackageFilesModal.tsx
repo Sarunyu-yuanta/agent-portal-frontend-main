@@ -3,6 +3,8 @@
 import { BottomSheet, Modal, useIsMobile } from "@sarunyu/system-one";
 import { DownloadSimpleIcon, FilePdfIcon, FileXlsIcon } from "@phosphor-icons/react";
 import type { StructuredProduct } from "./structured-product-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 type PackageFile = {
   name: string;
@@ -11,14 +13,15 @@ type PackageFile = {
   size: string;
 };
 
-function getPackageFiles(slug: string): PackageFile[] {
+function getPackageFiles(slug: string, t: Dictionary): PackageFile[] {
+  const docs = t.products.packageFiles.docs;
   return [
-    { name: `FCN_Presentation_${slug}.pdf`, type: "pdf", description: "เอกสารนำเสนอ FCN", size: "1.2 MB" },
-    { name: `Term_Sheet_${slug}.pdf`, type: "pdf", description: "Term Sheet", size: "0.8 MB" },
-    { name: `Prospectus_${slug}.pdf`, type: "pdf", description: "หนังสือชี้ชวน", size: "3.4 MB" },
-    { name: `Risk_Disclosure_${slug}.pdf`, type: "pdf", description: "เอกสารเปิดเผยความเสี่ยง", size: "0.5 MB" },
-    { name: `KFS_${slug}.pdf`, type: "pdf", description: "Key Fact Statement (KFS)", size: "0.3 MB" },
-    { name: `Subscription_Form_${slug}.xlsx`, type: "xlsx", description: "แบบฟอร์มสมัครลงทุน", size: "0.1 MB" },
+    { name: `FCN_Presentation_${slug}.pdf`, type: "pdf", description: docs.presentation, size: "1.2 MB" },
+    { name: `Term_Sheet_${slug}.pdf`, type: "pdf", description: docs.termSheet, size: "0.8 MB" },
+    { name: `Prospectus_${slug}.pdf`, type: "pdf", description: docs.prospectus, size: "3.4 MB" },
+    { name: `Risk_Disclosure_${slug}.pdf`, type: "pdf", description: docs.riskDisclosure, size: "0.5 MB" },
+    { name: `KFS_${slug}.pdf`, type: "pdf", description: docs.kfs, size: "0.3 MB" },
+    { name: `Subscription_Form_${slug}.xlsx`, type: "xlsx", description: docs.subscriptionForm, size: "0.1 MB" },
   ];
 }
 
@@ -38,11 +41,11 @@ function FileIcon({ type }: { type: PackageFile["type"] }) {
 }
 
 function FileList({ files, slug }: { files: PackageFile[]; slug: string }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-0">
       <p className="text-xs text-[#6a7282] mb-3">
-        {files.length} ไฟล์ · จะถูกรวมใน{" "}
-        <strong className="text-[#4a5565]">{slug}_Package.zip</strong>
+        {t.products.packageFiles.summary(files.length, (s) => <strong className="text-[#4a5565]">{s}</strong>, `${slug}_Package.zip`)}
       </p>
       <div className="flex flex-col gap-1">
         {files.map((file, i) => (
@@ -71,13 +74,15 @@ type PackageFilesModalProps = {
 };
 
 export function PackageFilesModal({ product, open, onClose }: PackageFilesModalProps) {
+  const t = useT();
+  const labels = t.products.packageFiles;
   const isMobile = useIsMobile();
   const slug = product.underlying.replace(/ - /g, "-");
-  const files = getPackageFiles(slug);
+  const files = getPackageFiles(slug, t);
 
   const handleDownload = () => {
     onClose();
-    alert(`กำลังดาวน์โหลด ${slug}_Package.zip\n(${files.length} ไฟล์)`);
+    alert(labels.downloading(`${slug}_Package.zip`, files.length));
   };
 
   if (isMobile) {
@@ -87,9 +92,9 @@ export function PackageFilesModal({ product, open, onClose }: PackageFilesModalP
         onOpenChange={(next) => { if (!next) onClose(); }}
         headerType="icon"
         leftIcon={<DownloadSimpleIcon size={20} color="#0a6ee7" />}
-        title="ชุดเอกสารครบชุด"
+        title={labels.title}
         rightSide="action"
-        actionLabel="ดาวน์โหลด .zip"
+        actionLabel={labels.downloadZip}
         onActionClick={handleDownload}
         showHandle
         contentClassName="flex flex-col gap-0 overflow-y-auto pb-4 px-2"
@@ -111,11 +116,11 @@ export function PackageFilesModal({ product, open, onClose }: PackageFilesModalP
       <div onClick={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title="ชุดเอกสารครบชุด"
+          title={labels.title}
           showClose
           onClose={onClose}
           actionLayout="single"
-          primaryLabel="ดาวน์โหลดทั้งหมด (.zip)"
+          primaryLabel={labels.downloadAll}
           onPrimaryClick={handleDownload}
           className="w-[calc(var(--vw)*100-2rem)] max-w-[480px]"
         >

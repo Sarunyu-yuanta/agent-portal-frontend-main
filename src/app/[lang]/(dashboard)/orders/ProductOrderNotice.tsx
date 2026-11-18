@@ -12,8 +12,10 @@
 import { Alert } from "@sarunyu/system-one";
 import type { OrderBook } from "@/types/domain";
 import { isBookingOpen } from "./order-book";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ProductOrderNotice({ book }: { book: OrderBook | null | undefined }) {
+  const t = useT();
   if (!book || isBookingOpen(book)) return null;
   const order = book.submissions[0];
 
@@ -21,8 +23,8 @@ export function ProductOrderNotice({ book }: { book: OrderBook | null | undefine
     return (
       <Alert
         status="information"
-        title="กำลังดำเนินการสั่งซื้อ"
-        message={`คำสั่งซื้อ ${order.backendRef} อยู่ระหว่างดำเนินการที่ระบบหลังบ้าน — ปิดรับจองเพิ่ม`}
+        title={t.orders.notice.processingTitle}
+        message={t.orders.notice.processing(order.backendRef)}
         multiline
       />
     );
@@ -31,8 +33,8 @@ export function ProductOrderNotice({ book }: { book: OrderBook | null | undefine
     return (
       <Alert
         status="success"
-        title="รับคำสั่งซื้อสำเร็จ"
-        message={`คำสั่งซื้อ ${order.backendRef} สำเร็จแล้ว — สินค้านี้ปิดรับจอง`}
+        title={t.orders.notice.completedTitle}
+        message={t.orders.notice.completed(order.backendRef)}
         multiline
       />
     );
@@ -40,8 +42,8 @@ export function ProductOrderNotice({ book }: { book: OrderBook | null | undefine
   return (
     <Alert
       status="critical"
-      title="คำสั่งซื้อถูกยกเลิก"
-      message={`ระบบหลังบ้านปฏิเสธคำสั่งซื้อ ${order.backendRef} — สินค้านี้ปิดรับจอง`}
+      title={t.orders.notice.rejectedTitle}
+      message={t.orders.notice.rejected(order.backendRef)}
       multiline
     />
   );

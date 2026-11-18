@@ -9,23 +9,20 @@ import {
   LockSimpleIcon,
   PaperPlaneRightIcon,
 } from "@phosphor-icons/react";
-
-const GUIDE_STEPS = [
-  { n: 1, text: "Review client transaction history for anomalies" },
-  { n: 2, text: "Cross-reference sanctions & adverse media databases" },
-  { n: 3, text: "Prepare & upload documentation checklist" },
-  { n: 4, text: "Escalate to compliance officer with full report" },
-];
+import { useT } from "@/i18n/I18nProvider";
 
 export function AiGuide() {
+  const t = useT();
   const [question, setQuestion] = useState("");
+  const guide = t.compliance.guide;
+  const steps = guide.steps.map((text, i) => ({ n: i + 1, text }));
 
   return (
     <div className="rounded-2xl p-5 flex flex-col gap-5 sticky top-6" style={{ background: "#1e2337" }}>
       {/* Header */}
       <div className="flex items-center gap-2">
         <SparkleIcon size={14} weight="fill" style={{ color: "var(--text-brand-primary)" }} />
-        <p className="text-body-sm font-semibold text-white">AI Compliance Guide</p>
+        <p className="text-body-sm font-semibold text-white">{guide.title}</p>
       </div>
 
       {/* Active alert context */}
@@ -33,15 +30,15 @@ export function AiGuide() {
         className="rounded-xl px-4 py-3 flex flex-col gap-1"
         style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)" }}
       >
-        <p className="text-micro font-bold uppercase tracking-widest" style={{ color: "var(--text-danger-primary)" }}>Active Alert</p>
-        <p className="text-label font-semibold text-white leading-snug">Unsuitable Trade Blocked</p>
-        <p className="text-meta leading-snug" style={{ color: "rgba(255,255,255,0.45)" }}>Malee Pongpipat · Risk mismatch</p>
+        <p className="text-micro font-bold uppercase tracking-widest" style={{ color: "var(--text-danger-primary)" }}>{guide.activeAlert}</p>
+        <p className="text-label font-semibold text-white leading-snug">{guide.activeAlertTitle}</p>
+        <p className="text-meta leading-snug" style={{ color: "rgba(255,255,255,0.45)" }}>Malee Pongpipat · {guide.riskMismatch}</p>
       </div>
 
       {/* Resolution steps */}
       <div className="flex flex-col gap-1" style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "16px" }}>
-        <p className="text-meta font-semibold text-white mb-2">Resolution Steps</p>
-        {GUIDE_STEPS.map((s) => (
+        <p className="text-meta font-semibold text-white mb-2">{guide.resolutionSteps}</p>
+        {steps.map((s) => (
           <div key={s.n} className="flex gap-3 py-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
             <div
               className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
@@ -57,9 +54,9 @@ export function AiGuide() {
       {/* Quick links */}
       <div className="flex flex-col gap-2">
         {[
-          { icon: LockSimpleIcon, label: "Sanctions Database", sub: "Search adverse media" },
-          { icon: FileTextIcon,   label: "Doc Checklist",      sub: "KYC requirements" },
-          { icon: ShieldCheckIcon, label: "Escalation Form",   sub: "Compliance officer" },
+          { icon: LockSimpleIcon, ...guide.links.sanctions },
+          { icon: FileTextIcon,   ...guide.links.docs },
+          { icon: ShieldCheckIcon, ...guide.links.escalation },
         ].map((l) => {
           const Icon = l.icon;
           return (
@@ -88,7 +85,7 @@ export function AiGuide() {
       >
         <input
           type="text"
-          placeholder="Ask compliance AI…"
+          placeholder={guide.askPlaceholder}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           className="flex-1 bg-transparent text-label text-white placeholder:text-white/30 outline-none"

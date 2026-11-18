@@ -18,7 +18,8 @@
 import { useEffect, useRef, useState } from "react";
 import { CaretRightIcon, CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import { Avatar, type TagVariant } from "@sarunyu/system-one";
-import Link from "next/link";
+import { useT } from "@/i18n/I18nProvider";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { getInitial } from "@/lib/client-utils";
 
 /** How long a copied row claims it copied. */
@@ -198,6 +199,7 @@ export function SheetRow({
  * icon is 14px, and it is there to say the row *can* be pressed.
  */
 export function CopyRow({ label, value }: { label: string; value: string }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -233,7 +235,7 @@ export function CopyRow({ label, value }: { label: string; value: string }) {
             copied ? "text-[var(--fill-green-700)]" : "text-foreground"
           }`}
         >
-          {copied ? "คัดลอกแล้ว" : value}
+          {copied ? t.orders.sheet.copied : value}
         </span>
         {copied ? (
           <CheckIcon size={14} weight="bold" className="shrink-0 text-[var(--fill-green-700)]" />
@@ -256,8 +258,9 @@ export function CopyRow({ label, value }: { label: string; value: string }) {
  * pressed.
  */
 export function ClientRow({ clientId, name }: { clientId: string; name: string }) {
+  const t = useT();
   return (
-    <SheetRow label="ลูกค้า">
+    <SheetRow label={t.orders.sheet.client}>
       <Link
         href={`/client/${clientId}`}
         className={`-mr-2 flex min-w-0 items-center gap-2 px-2 py-0.5 no-underline ${SHEET_PRESSABLE}`}

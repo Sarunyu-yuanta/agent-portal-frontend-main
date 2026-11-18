@@ -9,6 +9,7 @@ import {
   TableCell,
 } from "@sarunyu/system-one";
 import {
+  ChartBarIcon,
   PhoneIcon,
   PhoneIncomingIcon,
   PhoneOutgoingIcon,
@@ -17,6 +18,7 @@ import { relativeCallDate, type CallLogEntry } from "@/data/call-log-data";
 import { type SortDir } from "./client-detail-data";
 import { AllocationDonutWithTiles } from "@/components/allocation-donut";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useT } from "@/i18n/I18nProvider";
 
 export function CurrentAllocationSection({ slices }: { slices: { label: string; percent: number }[] }) {
   return <AllocationDonutWithTiles slices={slices} donutSize={180} />;
@@ -33,6 +35,16 @@ export function TopHoldingsSection({
   sortDir: SortDir;
   onSort: (key: "value" | "pnlPct" | "pct", dir: SortDir) => void;
 }) {
+  const t = useT();
+  if (holdings.length === 0) {
+    return (
+      <EmptyState
+        size="compact"
+        icon={<ChartBarIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        title={t.client.overview.noHoldings}
+      />
+    );
+  }
   const parseVal = (s: string) => parseFloat(s.replace(/[฿%+,M\s]/g, "")) || 0;
   const sorted = [...holdings].sort((a, b) => {
     if (!sortKey || sortDir === "none") return 0;
@@ -50,22 +62,22 @@ export function TopHoldingsSection({
       </colgroup>
       <TableHead>
         <TableRow>
-          <TableHeaderCell sortable={false} className="min-w-0 max-w-[160px]">Asset</TableHeaderCell>
+          <TableHeaderCell sortable={false} className="min-w-0 max-w-[160px]">{t.client.holdings.asset}</TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "value" ? sortDir : "none"}
             onSortChange={(d) => onSort("value", d)}
-          >Market Value</TableHeaderCell>
+          >{t.client.holdings.marketValue}</TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "pnlPct" ? sortDir : "none"}
             onSortChange={(d) => onSort("pnlPct", d)}
-          >Unrealized P&L</TableHeaderCell>
+          >{t.client.holdings.unrealizedPl}</TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "pct" ? sortDir : "none"}
             onSortChange={(d) => onSort("pct", d)}
-          >% Portfolio</TableHeaderCell>
+          >{t.client.holdings.portfolioPct}</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -88,12 +100,13 @@ export function TopHoldingsSection({
 }
 
 export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
+  const t = useT();
   if (callLogs.length === 0) {
     return (
       <EmptyState
         icon={<PhoneIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-        title="No call history yet"
-        body="Call logs for this client will appear here."
+        title={t.client.callLog.emptyTitle}
+        body={t.client.callLog.emptyBody}
       />
     );
   }
@@ -111,11 +124,11 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
                 ) : (
                   <PhoneIncomingIcon size={14} className="text-[var(--icon-success)]" />
                 )}
-                <span className="type-caption">{log.direction === "outbound" ? "Outbound" : "Inbound"}</span>
+                <span className="type-caption">{log.direction === "outbound" ? t.client.callLog.outbound : t.client.callLog.inbound}</span>
               </div>
             </div>
             <p className="type-caption text-muted-foreground">
-              {relativeCallDate(log.date)} · {log.duration}
+              {relativeCallDate(log.date, t)} · {log.duration}
             </p>
             <p className="type-body-2 text-foreground mt-1">{log.summary}</p>
           </div>
@@ -127,10 +140,10 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Date</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Direction</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">Duration</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0">Summary</TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.date}</TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.direction}</TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.duration}</TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0">{t.client.callLog.summary}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -139,7 +152,7 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
                 <TableCell className="min-w-0 whitespace-nowrap">
                   <div className="flex flex-col">
                     <span className="type-body-2 text-foreground font-medium">{log.date} · {log.time}</span>
-                    <span className="type-caption text-muted-foreground">{relativeCallDate(log.date)}</span>
+                    <span className="type-caption text-muted-foreground">{relativeCallDate(log.date, t)}</span>
                   </div>
                 </TableCell>
                 <TableCell className="min-w-0 whitespace-nowrap">
@@ -149,7 +162,7 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
                     ) : (
                       <PhoneIncomingIcon size={16} className="text-[var(--icon-success)]" />
                     )}
-                    <span className="type-body-2 text-foreground">{log.direction === "outbound" ? "Outbound" : "Inbound"}</span>
+                    <span className="type-body-2 text-foreground">{log.direction === "outbound" ? t.client.callLog.outbound : t.client.callLog.inbound}</span>
                   </div>
                 </TableCell>
                 <TableCell className="min-w-0 whitespace-nowrap"><span className="type-body-2 text-foreground">{log.duration}</span></TableCell>

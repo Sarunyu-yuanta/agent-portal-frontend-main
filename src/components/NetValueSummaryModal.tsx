@@ -4,8 +4,11 @@ import { InfoIcon } from "@phosphor-icons/react";
 import { BottomSheet, useIsMobile } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { DashedDivider } from "@/components/ui/finance-ui";
+import { useT } from "@/i18n/I18nProvider";
 
 function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
+  const t = useT();
+  const m = t.client.netValueInfo;
   const titleClass = mobile
     ? "type-subtitle-1 font-bold text-[var(--text-default-primary)] leading-6"
     : "type-subtitle-1 font-bold text-[rgba(0,0,0,0.75)] leading-6";
@@ -22,25 +25,18 @@ function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
   return (
     <div className={`flex flex-col ${mobile ? "gap-4" : "gap-4"} w-full`}>
       <div className="flex flex-col gap-1 w-full">
-        <p className={titleClass}>มูลค่าความมั่งคั่งสุทธิ (THB)</p>
+        <p className={titleClass}>{m.heading}</p>
         <p className={descriptionClass}>
-          มูลค่าความมั่งคั่งสุทธิคือ มูลค่าคงเหลือของ{" "}
-          <span className={boldClass}>สินทรัพย์ทั้งหมด</span> (THB) หักลบ{" "}
-          <span className={boldClass}>ภาระหนี้ทั้งหมด</span> (THB)
+          {m.description((text) => (
+            <span key={text} className={boldClass}>{text}</span>
+          ))}
         </p>
         <DashedDivider />
-        <p className={bodyClass}>หมายเหตุ:</p>
+        <p className={bodyClass}>{m.notesLabel}</p>
         <ul className={`list-disc ps-[21px] ${bodyClass}`}>
-          <li>ไม่รวมกำไร-ขาดทุนของ TFEX, หุ้นกู้ที่มีอนุพันธ์แฝง และตราสารหนี้</li>
-          <li>
-            กองทุนรวม หุ้นกู้ที่มีอนุพันธ์แฝง และตราสารหนี้
-            จะแสดงเป็นมูลค่าล่าสุดของวันทำการก่อนหน้า (T-1)
-          </li>
-          <li>
-            ข้อมูลทั้งหมดเป็นผลรวมจากหลายหน่วยงาน
-            ซึ่งอาจมีการเปลี่ยนแปลงไปแล้ว
-            ทำให้ข้อมูลเชิงจำนวนนี้ไม่ตรงกับในหน้าหน่วยงานอื่น
-          </li>
+          {m.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
         </ul>
       </div>
 
@@ -51,7 +47,7 @@ function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
           className="text-[var(--fill-blue-700)] shrink-0 mt-0.5"
         />
         <p className="type-body-2 text-[var(--fill-blue-700)] leading-5 flex-1 min-w-0">
-          สินทรัพย์ต่างประเทศคำนวนจากอัตราแลกเปลี่ยน ณ วันที่ 22 มิ.ย. 67
+          {m.fxNote}
         </p>
       </div>
     </div>
@@ -65,6 +61,7 @@ export function NetValueSummaryModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -76,10 +73,10 @@ export function NetValueSummaryModal({
         }}
         headerType="icon"
         leftIcon={<InfoIcon size={22} className="text-[var(--text-default-primary)] shrink-0" />}
-        title="รายละเอียด"
+        title={t.client.netValueInfo.title}
         showHandle
         rightSide="action"
-        actionLabel="ปิด"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         contentClassName="flex min-h-0 max-h-[calc(var(--dvh)*100-10rem)] flex-col overflow-y-auto pt-0"
       >
@@ -94,7 +91,7 @@ export function NetValueSummaryModal({
     <ResponsiveBottomSheetModal
       open={open}
       onClose={onClose}
-      title="รายละเอียด"
+      title={t.client.netValueInfo.title}
       titleId="net-value-info-title"
       desktopMaxWidth="max-w-[380px]"
       desktopRoundedClassName="rounded-[24px]"

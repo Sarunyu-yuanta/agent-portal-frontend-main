@@ -2,8 +2,11 @@
 
 import { NotesTabSkeleton } from "./ClientProfileSkeleton";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button, Toaster } from "@sarunyu/system-one";
+import { NotePencilIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { useNotes } from "@/contexts/notes-context";
@@ -13,6 +16,7 @@ import { NOTE_AUTHOR } from "../../notes/note-constants";
 import { NotesGallery } from "../../notes/NotesGallery";
 import { NoteDetailPane } from "../../notes/NoteDetailPane";
 import { NoteModalShell, NoteDeleteConfirmModal } from "../../notes/note-modal-shell";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Notes tab on a client's Full Profile — a wall of cards rather than the Notes
@@ -24,7 +28,8 @@ import { NoteModalShell, NoteDeleteConfirmModal } from "../../notes/note-modal-s
  * note you're after — which cards do better than rows.
  */
 export function ClientNotesTab({ clientId }: { clientId: string }) {
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
   const searchParams = useSearchParams();
   const clients = useClients();
   const { notes, isLoading, addNote, editNote, removeNote } = useNotes();
@@ -90,6 +95,22 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
 
   const pushedPanelRef = useRef(false);
 
+  // A `?note=` that is none of this client's notes (a stale link, a note since
+  // deleted elsewhere) used to open nothing and say nothing. Checked when the
+  // param or the load changes — not on every notes update, so deleting the
+  // open note (which drops it from `clientNotes` a beat before the URL closes)
+  // isn't mistaken for a bad link.
+  const unknownNoteParam = !isLoading && noteParam && !openNote ? noteParam : null;
+  useEffect(() => {
+    if (!unknownNoteParam) return;
+    setQueryState(
+      withQuery(`/client/${clientId}`, searchParams, { tab: "notes", note: null }),
+      "replace",
+    );
+    addToast({ status: "warning", message: t.client.notes.notFound });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+  }, [noteParam, isLoading]);
+
   const hrefFor = (noteId: string | null) =>
     withQuery(`/client/${clientId}`, searchParams, { tab: "notes", note: noteId });
 
@@ -103,7 +124,11 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
   };
 
   const pruneIfBlank = (note: Note | null) => {
-    if (note && draftBlank) void removeNote(note.id);
+    // Housekeeping for a note left blank; nothing the IC asked for, so a
+    // failure is logged rather than toasted.
+    if (note && draftBlank) {
+      removeNote(note.id).catch((err: unknown) => console.warn("[ClientNotesTab] prune failed", err));
+    }
   };
 
   const openNoteId = (noteId: string) => {
@@ -139,10 +164,10 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
   const handleModalSave = async () => {
     const values = modalValuesRef.current ?? { title: "", body: "" };
 
-    if (createOpen) {
-      if (saving) return;
-      setSaving(true);
-      try {
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (createOpen) {
         await addNote({
           clientIds: draftAttrs.clientIds,
           title: values.title.trim() || null,
@@ -151,24 +176,43 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
           reminderAt: draftAttrs.reminderAt,
           reminderDone: draftAttrs.reminderDone,
         });
-        addToast({ status: "success", message: "Note added" });
-      } finally {
-        setSaving(false);
+      } else if (panelNote) {
+        // Awaited before the toast: it used to report "saved" before the
+        // write had even returned, failed or not.
+        await editNote({ ...panelNote, title: values.title.trim() || null, body: values.body });
+      } else {
+        return;
       }
+    } catch (err) {
+      // The modal stays open with what was typed.
+      console.warn("[ClientNotesTab] save failed", err);
+      addToast({ status: "critical", message: t.client.notes.saveFailed });
+      return;
+    } finally {
+      setSaving(false);
+    }
+    if (createOpen) {
+      addToast({ status: "success", message: t.client.notes.added });
       setCreateOpen(false);
-    } else if (panelNote) {
-      editNote({ ...panelNote, title: values.title.trim() || null, body: values.body });
-      addToast({ status: "success", message: "Note saved" });
+    } else {
+      addToast({ status: "success", message: t.client.notes.saved });
       navigateClosed();
     }
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    const wasOpen = deleteTarget.id === openNote?.id;
-    await removeNote(deleteTarget.id);
-    addToast({ status: "success", message: "Note deleted" });
+    const target = deleteTarget;
+    const wasOpen = target.id === openNote?.id;
     setDeleteTarget(null);
+    try {
+      await removeNote(target.id);
+    } catch (err) {
+      console.warn("[ClientNotesTab] delete failed", err);
+      addToast({ status: "critical", message: t.client.notes.deleteFailed });
+      return;
+    }
+    addToast({ status: "success", message: t.client.notes.deleted });
     if (wasOpen) navigateClosed();
   };
 
@@ -188,6 +232,13 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
         onAdd={handleAdd}
         addDisabled={createOpen}
       />
+      {clientNotes.length === 0 && (
+        <EmptyState
+          size="compact"
+          icon={<NotePencilIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          title={t.client.notes.noneForClient}
+        />
+      )}
 
       <NoteModalShell
         open={modalOpen}
@@ -198,7 +249,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
         footer={
           <>
             <Button variant="outline" size="sm" onClick={closeModal}>
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               variant="primary"
@@ -206,7 +257,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
               onClick={handleModalSave}
               disabled={draftBlank || saving}
             >
-              {createOpen ? "Add note" : "Save"}
+              {createOpen ? t.client.notes.addNote : t.common.save}
             </Button>
           </>
         }
@@ -245,7 +296,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
 
       <NoteDeleteConfirmModal
         open={deleteTarget !== null}
-        title="Delete note?"
+        title={t.client.notes.deleteConfirm}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
       />

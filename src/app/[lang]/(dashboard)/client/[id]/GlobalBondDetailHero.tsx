@@ -6,6 +6,8 @@ import type {
   MaturityFilter,
   YieldFilter,
 } from "./global-bond-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 const HERO_GRADIENT =
   "linear-gradient(90deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.85) 60.096%, rgba(255,255,255,0.72) 84.135%, rgba(255,255,255,0.6) 100%)";
@@ -16,19 +18,23 @@ const ASSET_TAG_ICONS = {
   rating: "/products/global-bond/global-bond-tag-shield.svg",
 } as const;
 
-export const YIELD_FILTERS: { id: YieldFilter; label: string }[] = [
-  { id: "all", label: "ทั้งหมด" },
-  { id: "lt2", label: "< 2%" },
-  { id: "2-3", label: "2–3%" },
-  { id: "3-4", label: "3–4%" },
-  { id: "gt4", label: "> 4%" },
-];
+function yieldFilters(t: Dictionary): { id: YieldFilter; label: string }[] {
+  return [
+    { id: "all", label: t.products.common.all },
+    { id: "lt2", label: "< 2%" },
+    { id: "2-3", label: "2–3%" },
+    { id: "3-4", label: "3–4%" },
+    { id: "gt4", label: "> 4%" },
+  ];
+}
 
-export const MATURITY_FILTERS: { id: MaturityFilter; label: string }[] = [
-  { id: "all", label: "ทั้งหมด" },
-  { id: "short", label: "ระยะสั้น (≤3 ปี)" },
-  { id: "long", label: "ระยะยาว (> 3ปี)" },
-];
+function maturityFilters(t: Dictionary): { id: MaturityFilter; label: string }[] {
+  return [
+    { id: "all", label: t.products.common.all },
+    { id: "short", label: t.products.globalBond.filter.short },
+    { id: "long", label: t.products.globalBond.filter.long },
+  ];
+}
 
 function AssetTag({
   iconSrc,
@@ -130,6 +136,8 @@ export function GlobalBondDetailHero({
    */
   showFilters?: boolean;
 }) {
+  const t = useT();
+  const labels = t.products.globalBond.hero;
   const heroImage = issuer.heroImage ?? "/products/global-bond/global-bond-apple-hero.webp";
   return (
     <div className="relative flex flex-col gap-6 px-4 py-6 md:p-8 rounded-xl overflow-hidden">
@@ -174,11 +182,11 @@ export function GlobalBondDetailHero({
             <div className="hidden lg:flex flex-wrap gap-[7px] items-center">
               <AssetTag
                 iconSrc={ASSET_TAG_ICONS.ticker}
-                label={`Ticker : ${issuer.ticker}`}
+                label={labels.ticker(issuer.ticker)}
               />
               <AssetTag
                 iconSrc={ASSET_TAG_ICONS.currency}
-                label={`Currency : ${issuer.currency}`}
+                label={labels.currency(issuer.currency)}
               />
               <AssetTag
                 iconSrc={ASSET_TAG_ICONS.rating}
@@ -190,12 +198,12 @@ export function GlobalBondDetailHero({
             <AssetTag
               compact
               iconSrc={ASSET_TAG_ICONS.ticker}
-              label={`Ticker : ${issuer.ticker}`}
+              label={labels.ticker(issuer.ticker)}
             />
             <AssetTag
               compact
               iconSrc={ASSET_TAG_ICONS.currency}
-              label={`Currency : ${issuer.currency}`}
+              label={labels.currency(issuer.currency)}
             />
             <AssetTag
               compact
@@ -221,22 +229,22 @@ export function GlobalBondDetailHero({
         >
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-xs leading-[22px] text-[rgba(0,0,0,0.75)] md:text-sm md:leading-[26px] whitespace-nowrap">
-              ผลตอบแทนโดยประมาณ :
+              {labels.estimatedYield}
             </span>
             <FilterPillGroup
               scrollable
-              options={YIELD_FILTERS}
+              options={yieldFilters(t)}
               value={yieldFilter}
               onChange={onYieldChange}
             />
           </div>
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-sm leading-[26px] text-[rgba(0,0,0,0.75)] whitespace-nowrap">
-              ระยะเวลาครบกำหนด :
+              {labels.timeToMaturity}
             </span>
             <FilterPillGroup
               scrollable
-              options={MATURITY_FILTERS}
+              options={maturityFilters(t)}
               value={maturityFilter}
               onChange={onMaturityChange}
             />

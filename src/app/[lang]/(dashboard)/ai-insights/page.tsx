@@ -9,15 +9,17 @@ import { InsightRow } from "./InsightRow";
 import { InsightDrawerPanel } from "./InsightDrawerPanel";
 import { LogicRulesSidebar } from "./LogicRulesSidebar";
 import type { SortOption, TabId } from "./insight-config";
+import { useT } from "@/i18n/I18nProvider";
 
 function KpiBar() {
+  const k = useT().research.aiInsights.kpi;
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
       {[
-        { label: "High Priority Actions", tag: "Urgent",   tagV: "red"    as const, value: "3",       sub: "Requires action today" },
-        { label: "Est. Revenue Impact",   tag: "+฿ 9.5M", tagV: "green"  as const, value: "฿ 9.5M",  sub: "Across 8 insights" },
-        { label: "Critical Risk Alerts",  tag: "2 New",    tagV: "red"    as const, value: "2",       sub: "Portfolio concentration" },
-        { label: "Engagement Drops",      tag: "Watch",    tagV: "yellow" as const, value: "1",       sub: "Avg 14 days silent" },
+        { label: k.highPriority,    tag: k.highPriorityTag,    tagV: "red"    as const, value: "3",       sub: k.highPrioritySub },
+        { label: k.revenueImpact,   tag: "+฿ 9.5M",            tagV: "green"  as const, value: "฿ 9.5M",  sub: k.revenueImpactSub(8) },
+        { label: k.riskAlerts,      tag: k.riskAlertsTag(2),   tagV: "red"    as const, value: "2",       sub: k.riskAlertsSub },
+        { label: k.engagementDrops, tag: k.engagementDropsTag, tagV: "yellow" as const, value: "1",       sub: k.engagementDropsSub(14) },
       ].map((k) => (
         <Card key={k.label} variant="default" className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
@@ -35,11 +37,12 @@ function KpiBar() {
 }
 
 function AiSummaryCard() {
+  const s = useT().research.aiInsights.summary;
   return (
     <Card variant="default" className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <SparkleIcon size={16} weight="duotone" className="text-foreground" />
-        <p className="type-subtitle-1 text-foreground">Today&apos;s AI Summary</p>
+        <p className="type-subtitle-1 text-foreground">{s.title}</p>
       </div>
       <p className="text-label text-muted-foreground leading-relaxed">
         8 active insights across your book. Focus on{" "}
@@ -48,15 +51,15 @@ function AiSummaryCard() {
       </p>
       <div className="flex flex-col gap-2 pt-1 border-t border-border">
         <div className="flex items-center justify-between">
-          <span className="text-meta text-muted-foreground">Model updated</span>
-          <span className="text-meta font-medium text-foreground">Today, 08:30</span>
+          <span className="text-meta text-muted-foreground">{s.modelUpdated}</span>
+          <span className="text-meta font-medium text-foreground">{s.todayAt("08:30")}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-meta text-muted-foreground">Avg confidence</span>
+          <span className="text-meta text-muted-foreground">{s.avgConfidence}</span>
           <span className="text-meta font-semibold text-success">83%</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-meta text-muted-foreground">Clients analyzed</span>
+          <span className="text-meta text-muted-foreground">{s.clientsAnalyzed}</span>
           <span className="text-meta font-medium text-foreground">24</span>
         </div>
       </div>
@@ -65,18 +68,19 @@ function AiSummaryCard() {
 }
 
 function AiModelStats() {
+  const ai = useT().research.aiInsights;
   const stats = [
-    { label: "Product Match", count: 3, color: "var(--text-brand-primary)" },
-    { label: "Risk Alert", count: 2, color: "var(--text-danger-primary)" },
-    { label: "Engagement", count: 2, color: "var(--text-warning-primary)" },
-    { label: "Portfolio", count: 1, color: "var(--text-brand-secondary)" },
+    { label: ai.category["Product Match"], count: 3, color: "var(--text-brand-primary)" },
+    { label: ai.category["Risk Alert"], count: 2, color: "var(--text-danger-primary)" },
+    { label: ai.category["Engagement"], count: 2, color: "var(--text-warning-primary)" },
+    { label: ai.category["Portfolio"], count: 1, color: "var(--text-brand-secondary)" },
   ];
 
   return (
     <Card variant="default" className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <BrainIcon size={15} className="text-muted-foreground" />
-        <p className="type-subtitle-1 text-foreground">Breakdown</p>
+        <p className="type-subtitle-1 text-foreground">{ai.breakdown}</p>
       </div>
       <div className="flex flex-col gap-2">
         {stats.map((s) => (
@@ -91,12 +95,13 @@ function AiModelStats() {
   );
 }
 
-const TAB_ITEMS = [
-  { id: "all", title: "All" },
-  { id: "product", title: "Product Match", notification: 4 },
-  { id: "risk", title: "Risk Alert", notification: 2 },
-  { id: "engagement", title: "Engagement", notification: 1 },
-  { id: "portfolio", title: "Portfolio", notification: 1 },
+/** Tab titles come from the dictionary at render. */
+const TAB_ITEMS: { id: TabId; notification?: number }[] = [
+  { id: "all" },
+  { id: "product", notification: 4 },
+  { id: "risk", notification: 2 },
+  { id: "engagement", notification: 1 },
+  { id: "portfolio", notification: 1 },
 ];
 
 const TAB_TYPE_FILTER: Record<Exclude<TabId, "all">, string> = {
@@ -107,6 +112,12 @@ const TAB_TYPE_FILTER: Record<Exclude<TabId, "all">, string> = {
 };
 
 export default function AiInsightsPage() {
+  const t = useT();
+  const ai = t.research.aiInsights;
+  const tabItems = TAB_ITEMS.map((tab) => ({
+    ...tab,
+    title: tab.id === "all" ? ai.tabs.all : ai.category[TAB_TYPE_FILTER[tab.id]],
+  }));
   const [activeTab, setActiveTab] = useState<TabId>("all");
   const [sortBy, setSortBy] = useState<SortOption>("priority");
   const [selectedInsightId, setSelectedInsightId] = useState<string | null>(null);
@@ -141,7 +152,7 @@ export default function AiInsightsPage() {
           <div className="w-full lg:flex-1 min-w-0 flex flex-col gap-4">
             <div className="scrollable-tabs transparent-tabs">
               <TabGroup
-                items={TAB_ITEMS}
+                items={tabItems}
                 activeId={activeTab}
                 onChange={(id) => setActiveTab(id as TabId)}
                 size="md"
@@ -150,16 +161,16 @@ export default function AiInsightsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="type-caption text-muted-foreground">Sort:</span>
+                <span className="type-caption text-muted-foreground">{ai.sort}</span>
                 <Chip
-                  label="AI Priority"
+                  label={ai.sortPriority}
                   type="single"
                   size="small"
                   selected={sortBy === "priority"}
                   onClick={() => setSortBy("priority")}
                 />
                 <Chip
-                  label="Most Recent"
+                  label={ai.sortRecent}
                   type="single"
                   size="small"
                   selected={sortBy === "recent"}
@@ -167,7 +178,7 @@ export default function AiInsightsPage() {
                 />
               </div>
               <span className="type-caption text-muted-foreground">
-                {sortedInsights.length} insights
+                {ai.count(sortedInsights.length)}
               </span>
             </div>
 
@@ -175,7 +186,7 @@ export default function AiInsightsPage() {
             <div className="rounded-2xl border border-border bg-card overflow-hidden w-full max-w-full">
               {sortedInsights.length === 0 ? (
                 <div className="flex items-center justify-center py-16">
-                  <p className="type-body-2 text-muted-foreground">No insights in this category</p>
+                  <p className="type-body-2 text-muted-foreground">{ai.empty}</p>
                 </div>
               ) : (
                 sortedInsights.map((insight, i) => (

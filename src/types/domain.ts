@@ -15,7 +15,7 @@
 
 import type { mockClients, mockClientDetails } from "@/lib/mock-data";
 import type { AssetAllocationSlice, AssetHeroSummary } from "@/components/AssetSummarySection";
-import type { NotificationZone } from "@/app/(dashboard)/notification-zones";
+import type { NotificationZone } from "@/app/[lang]/(dashboard)/notification-zones";
 
 /** A wealth-management client row as consumed by the UI. */
 export type Client = (typeof mockClients)[number];
@@ -115,9 +115,22 @@ export type RequirementItem = {
    * `requestableKeys`.
    */
   selfService: boolean;
-  /** What the status alone doesn't say, e.g. "หมดอายุแล้ว 3 วัน". */
-  detail: string | null;
+  /**
+   * What the status alone doesn't say ("expired 3 days ago"). A code with its
+   * values, not a sentence: this is stored on the booking as a snapshot, and a
+   * stored sentence would be in whatever language the IC happened to be using.
+   * Rendered by `requirementDetailText`.
+   */
+  detail: RequirementDetail | null;
 };
+
+export type RequirementDetail =
+  | { code: "declaration-expired" }
+  | { code: "no-kyc" }
+  | { code: "kyc-unreadable"; date: string }
+  | { code: "kyc-expired-today"; date: string }
+  | { code: "kyc-expired"; days: number; date: string }
+  | { code: "risk-below"; required: string };
 
 export type ClientReadiness = {
   clientId: string;

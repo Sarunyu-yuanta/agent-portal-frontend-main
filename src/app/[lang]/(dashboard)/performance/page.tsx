@@ -2,6 +2,7 @@
 
 import { ChartLineUpIcon } from "@phosphor-icons/react";
 import { ComingSoonPage } from "../coming-soon-page";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The full dashboard (`KpiRow`, `MainColumn`, `DarkSidebar`) is built and still
@@ -10,11 +11,12 @@ import { ComingSoonPage } from "../coming-soon-page";
  * once Performance is ready to ship.
  */
 export default function PerformancePage() {
+  const t = useT();
   return (
     <ComingSoonPage
       icon={<ChartLineUpIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-      title="Performance"
-      body="Income, pipeline coverage, and target tracking will live here. Not built yet — check back soon."
+      title={t.performance.comingSoon.title}
+      body={t.performance.comingSoon.body}
     />
   );
 }

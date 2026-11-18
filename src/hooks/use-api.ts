@@ -29,19 +29,50 @@ import {
 } from "@/lib/mock-data";
 
 /**
- * What every screen in this app reads data through: the value, plus whether it
- * is still on its way.
+ * What every screen in this app reads data through: the value, whether it is
+ * still on its way, and whether getting it failed.
  *
  * The point of naming it is that a component never has to care which half of
- * the app it is in. It reads `isLoading` and renders its skeleton; whether that
- * flag comes from {@link useResource} (a real request) or {@link useStatic}
- * (data already in the bundle) is the data layer's business, not the view's.
+ * the app it is in. It reads `isLoading` / `error` and renders its skeleton or
+ * its error state; whether those come from {@link useResource} (a real request)
+ * or {@link useStatic} (data already in the bundle) is the data layer's
+ * business, not the view's.
+ *
+ * ─── The order every screen checks ───────────────────────────────────────────
+ *   isLoading → error → not-found → empty → data
+ * `ResourceView` in `@/components/ui/empty-state` enforces it.
+ *
+ * - `error` — the FIRST load failed, so `data` is only the fallback and must
+ *   not be shown as if it were real. Render `ErrorState` with `retry`.
+ * - `isStale` — a LATER poll failed. `data` is the last good value; show it,
+ *   with `StaleBanner` if the screen cares how fresh it is.
+ *
+ * Like loading, an error is a property of the data and never of the screen:
+ * nothing in the app may simulate one with a flag or a timer.
  */
-export type Resource<T> = { data: T; isLoading: boolean };
+export type Resource<T> = {
+  data: T;
+  isLoading: boolean;
+  error: Error | null;
+  isStale: boolean;
+  retry: () => void;
+};
+
+const NOOP = () => {};
+
+/**
+ * A resource that is already settled: no request, no error. For stores that
+ * hold their own state (`OrdersProvider`, `NotesProvider`, …) and for hooks
+ * that assemble one resource out of others.
+ */
+export function staticResource<T>(data: T, isLoading = false): Resource<T> {
+  return { data, isLoading, error: null, isStale: false, retry: NOOP };
+}
 
 /**
  * Data that ships in the bundle, wearing the same shape as a fetched resource.
- * `isLoading` is `false` because there is genuinely nothing to wait for.
+ * `isLoading` is `false` because there is genuinely nothing to wait for, and
+ * `error` is `null` because nothing can fail.
  *
  * ─── This is the backend seam ────────────────────────────────────────────────
  * Screens that have no endpoint yet still consume a {@link Resource}, so giving
@@ -53,36 +84,39 @@ export type Resource<T> = { data: T; isLoading: boolean };
  * - }
  * + export function useClientsResource() {
  * +   const fetcher = useCallback(() => fetchClients(), []);
- * +   return useResource("useClients", fetcher, mockClients);
+ * +   return useResource("useClients", fetcher, []);
  * + }
  * ```
  *
  * The moment that swap happens `isLoading` starts going `true` on the first
  * render and the skeleton already wired to it appears — no component edited, no
- * switch to remember to flip. That is the whole reason this returns a resource
- * instead of the bare value: it costs one line of indirection now and saves
- * having to re-plumb every screen later.
+ * switch to remember to flip. A failed request lights up the error state the
+ * same way.
  */
 export function useStatic<T>(data: T): Resource<T> {
-  return { data, isLoading: false };
+  return staticResource(data);
 }
 
-/** How often {@link useResource} re-fetches once it is given a real fetcher. */
+/** How often {@link useResource} re-fetches by default. Pass `pollMs` for data
+ *  that must be fresher (see "ความถี่การอัปเดตข้อมูล" in docs/api-by-page.md). */
 const POLL_MS = 300_000;
 
-/** A stalled request must not outlive the UI's patience — every caller passes a
- *  fallback, so giving up beats hanging. */
+/** A stalled request must not outlive the UI's patience. */
 export const REQUEST_TIMEOUT_MS = 8_000;
 
 /**
- * Polls `fetcher` every {@link POLL_MS} and returns the latest value,
- * falling back to `fallback` until the first fetch resolves.
- * Rejections are logged (label) but don't reset the state.
+ * Polls `fetcher` every `pollMs` (default {@link POLL_MS}) and returns the
+ * latest value.
  *
- * `isLoading` is only true up to the *first* fetch attempt settling — later
- * background polls swap `data` in silently rather than re-triggering a
- * loading state. A rejection still clears it: `fallback` is already valid
- * data to show, so there's nothing left to block the skeleton on.
+ * - `isLoading` is true only until the FIRST attempt settles — later polls swap
+ *   `data` in silently rather than re-triggering a skeleton.
+ * - If the first attempt fails, `error` is set and `data` stays `fallback`.
+ *   **Pass an empty value as `fallback`, never mock data:** a screen must not
+ *   show invented figures as real when the API is down. The error state is what
+ *   the user should see.
+ * - If a later poll fails, `data` keeps the last good value and `isStale` goes
+ *   true. Any success clears both.
+ * - `retry()` fetches again immediately.
  *
  * Unused for now — it is the other half of the seam described on
  * {@link useStatic}, kept ready (and generic over its `fetcher`, so it needs no
@@ -92,37 +126,41 @@ export function useResource<T>(
   label: string,
   fetcher: () => Promise<T>,
   fallback: T,
+  { pollMs = POLL_MS }: { pollMs?: number } = {},
 ): Resource<T> {
   const [data, setData] = useState<T>(fallback);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [isStale, setIsStale] = useState(false);
   const resolvedOnce = useRef(false);
-
-  const settleOnce = useCallback(() => {
-    if (!resolvedOnce.current) {
-      resolvedOnce.current = true;
-      setIsLoading(false);
-    }
-  }, []);
 
   const load = useCallback(() => {
     fetcher()
       .then((next) => {
+        resolvedOnce.current = true;
         setData(next);
-        settleOnce();
+        setError(null);
+        setIsStale(false);
+        setIsLoading(false);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.warn(`[${label}]`, err);
-        settleOnce();
+        if (resolvedOnce.current) {
+          setIsStale(true);
+        } else {
+          setError(err instanceof Error ? err : new Error(String(err)));
+        }
+        setIsLoading(false);
       });
-  }, [fetcher, label, settleOnce]);
+  }, [fetcher, label]);
 
   useEffect(() => {
     load();
-    const id = setInterval(load, POLL_MS);
+    const id = setInterval(load, pollMs);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, pollMs]);
 
-  return { data, isLoading };
+  return { data, isLoading, error, isStale, retry: load };
 }
 
 /** The client list, plus whether it is still loading. */
@@ -136,11 +174,11 @@ export function useClients() {
 }
 
 export function useNBAActions() {
-  return useStatic(mockNBAActions).data;
+  return useStatic(mockNBAActions);
 }
 
 export function usePipelineDeals() {
-  return useStatic(mockPipelineDeals).data;
+  return useStatic(mockPipelineDeals);
 }
 
 export function useMiniKanban() {
@@ -167,7 +205,8 @@ export function useHasLoaded(isLoading: boolean): boolean {
 // so switching to a tab whose data is slow shows a skeleton in that tab only.
 
 /** KYC tab: the client's KYC profile. */
-export function useClientProfile(clientId: string): Resource<ClientProfile> {
+/** `undefined` once loaded means the client has no profile on file. */
+export function useClientProfile(clientId: string): Resource<ClientProfile | undefined> {
   const profile = useMemo(() => getClientProfile(clientId), [clientId]);
   return useStatic(profile);
 }

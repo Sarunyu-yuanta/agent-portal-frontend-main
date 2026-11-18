@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
 /**
  * Shared chrome for the login / forgot-password / reset-password screens: the
  * full-bleed background with one centred white card on top.
@@ -14,7 +15,9 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         style={{ backgroundImage: "url(/auth/login-bg.webp)" }}
       >
         <div className="flex w-full max-w-[495px] bg-white rounded-3xl p-2 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)]">
-          <div className="flex-1 flex flex-col justify-center gap-[18px] px-6 sm:px-12 lg:px-20 py-12">
+          <div className="relative flex-1 flex flex-col justify-center gap-[18px] px-6 sm:px-12 lg:px-20 py-12">
+            {/* Before sign-in is the first place a non-Thai reader needs it. */}
+            <LanguageSwitcher className="absolute right-4 top-4" />
             {children}
           </div>
         </div>

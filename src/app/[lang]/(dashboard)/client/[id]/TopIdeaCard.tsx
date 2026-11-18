@@ -7,6 +7,7 @@ import {
   ShirtFoldedIcon,
 } from "@phosphor-icons/react";
 import { TOP_IDEA_THEMES, type TopIdeaSector } from "./top-idea-data";
+import { useT } from "@/i18n/I18nProvider";
 
 const ASSETS = {
   vector: "/products/top-idea/top-idea-wave.svg",
@@ -64,6 +65,7 @@ export function TopIdeaCard({
   fullWidth?: boolean;
   onClick?: () => void;
 }) {
+  const t = useT();
   const theme = TOP_IDEA_THEMES[sector];
 
   return (
@@ -204,7 +206,7 @@ export function TopIdeaCard({
           {theme}
         </p>
         <div className="flex items-baseline gap-0.5 justify-end whitespace-nowrap">
-          <span style={{ color: "#4a5565", fontSize: 14, lineHeight: "20px" }}>up to</span>
+          <span style={{ color: "#4a5565", fontSize: 14, lineHeight: "20px" }}>{t.products.topIdea.upTo}</span>
           <span className="font-bold" style={{ color: "#008236", fontSize: 20, lineHeight: "28px" }}>
             30.5%
           </span>

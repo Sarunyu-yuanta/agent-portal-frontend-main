@@ -6,7 +6,7 @@
 
 import { Avatar } from "@sarunyu/system-one";
 import { maskName } from "@/lib/mask-name";
-import { getInitials, formatThbAmount, formatPlYtdPct, LIABILITIES_MULTIPLIER } from "@/lib/client-utils";
+import { getInitials, formatThbAmount, formatPlYtdPct, LIABILITIES_MULTIPLIER, ASSET_CLASS } from "@/lib/client-utils";
 import { getClientSliceAmount } from "./client-hub-data";
 import type { ColumnId, SortKey } from "./types";
 import type { Client } from "@/types/domain";
@@ -81,13 +81,13 @@ export const CUSTOMER_COLUMNS: CustomerColumn[] = [
     sortKey: "aum",
     render: (client) => money(client.aum),
   },
-  sliceColumn("thaiStock", "thaiStock", "หุ้นไทย (บาท)", "หุ้นไทย", 150),
-  sliceColumn("foreignStock", "foreignStock", "หุ้นต่างประเทศ (บาท)", "หุ้นต่างประเทศ", 170),
-  sliceColumn("derivatives", "derivatives", "TFEX (บาท)", "อนุพันธ์", 140),
-  sliceColumn("mutualFund", "mutualFund", "กองทุนรวม (บาท)", "กองทุนรวม", 150),
-  sliceColumn("bond", "bond", "ตราสารหนี้ (บาท)", "ตราสารหนี้", 150),
-  sliceColumn("foreignBond", "foreignBond", "ตราสารหนี้ต่างประเทศ (บาท)", "ตราสารหนี้ต่างประเทศ", 200),
-  sliceColumn("structuredBond", "structuredBond", "หุ้นกู้ที่มีอนุพันธ์แฝง (บาท)", "หุ้นกู้ที่มีอนุพันธ์แฝง", 210),
+  sliceColumn("thaiStock", "thaiStock", "หุ้นไทย (บาท)", ASSET_CLASS.thaiStock, 150),
+  sliceColumn("foreignStock", "foreignStock", "หุ้นต่างประเทศ (บาท)", ASSET_CLASS.foreignStock, 170),
+  sliceColumn("derivatives", "derivatives", "TFEX (บาท)", ASSET_CLASS.derivatives, 140),
+  sliceColumn("mutualFund", "mutualFund", "กองทุนรวม (บาท)", ASSET_CLASS.mutualFund, 150),
+  sliceColumn("bond", "bond", "ตราสารหนี้ (บาท)", ASSET_CLASS.bond, 150),
+  sliceColumn("foreignBond", "foreignBond", "ตราสารหนี้ต่างประเทศ (บาท)", ASSET_CLASS.foreignBond, 200),
+  sliceColumn("structuredBond", "structuredBond", "หุ้นกู้ที่มีอนุพันธ์แฝง (บาท)", ASSET_CLASS.structuredBond, 210),
   {
     id: "cashIdle",
     label: "เงินสด (บาท)",

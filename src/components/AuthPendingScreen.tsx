@@ -1,3 +1,7 @@
+"use client";
+
+import { useT } from "@/i18n/I18nProvider";
+
 /**
  * Full-bleed brand splash covering the auth screens while a sign-in attempt is
  * in flight (Figma `Desktop - 1`, node `30:66`). The gradient angle/stops come
@@ -13,7 +17,8 @@
  * survive a navigation that never lands, and it fades in at the same 200ms as
  * `FadeIn` so an instant client-side push doesn't strobe the screen blue.
  */
-export function AuthPendingScreen({ label = "กำลังเข้าสู่ระบบ" }: { label?: string }) {
+export function AuthPendingScreen({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div
       role="status"
@@ -36,7 +41,7 @@ export function AuthPendingScreen({ label = "กำลังเข้าสู�
         className="w-[220px] sm:w-[320px] max-w-[calc(var(--vw)*100-3rem)] animate-breathe motion-reduce:animate-none"
       />
 
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{label ?? t.auth.signingIn}</span>
     </div>
   );
 }

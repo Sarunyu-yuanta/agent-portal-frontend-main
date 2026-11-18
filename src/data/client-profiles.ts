@@ -197,26 +197,28 @@ export const OTHER_DESK_CLIENT_NAMES: Record<string, string> = {
   "330203": "Kittipong Saelim",
 };
 
-const DEFAULT_PROFILE: ClientProfile = {
-  accountNo: "—",
-  nameTh: "—",
-  phone: "+66 80 000 0000",
-  email: "client@example.com",
-  birthday: "1 Jan 1980",
-  age: 46,
-  nationality: "Thai",
-  address: "Bangkok, Thailand",
-  occupation: "—",
-  company: "—",
-  riskProfile: "Moderate",
-  relationshipSince: "2020",
-};
+/**
+ * The client's profile, or `undefined` when there is none on file.
+ *
+ * There used to be a `DEFAULT_PROFILE` here — a made-up phone number, email,
+ * age and a "Moderate" risk profile — returned for any id without a record.
+ * Screens then showed an IC a plausible way to call a client that wasn't
+ * theirs, and a risk rating nobody had assessed. Callers now show "ไม่มีข้อมูล"
+ * instead.
+ */
+export function getClientProfile(clientId: string): ClientProfile | undefined {
+  return PROFILES[clientId];
+}
 
-export function getClientProfile(clientId: string): ClientProfile {
+/**
+ * Just the account number and Thai name — what the order screens print beside
+ * a booking. Unlike {@link getClientProfile} this also answers for another
+ * desk's client, whose bookings share a basket with this IC's, because a
+ * shared book prints that much of them and no more. "—" when neither has it.
+ */
+export function getAccountIdentity(clientId: string): { accountNo: string; nameTh: string } {
   const own = PROFILES[clientId];
-  if (own) return own;
-  // Another desk's client — the little of them a shared book prints, over the
-  // default for everything this app does not and should not hold.
+  if (own) return { accountNo: own.accountNo, nameTh: own.nameTh };
   const other = OTHER_DESK_PROFILES[clientId];
-  return other ? { ...DEFAULT_PROFILE, ...other } : DEFAULT_PROFILE;
+  return { accountNo: other?.accountNo ?? "—", nameTh: other?.nameTh ?? "—" };
 }

@@ -18,7 +18,9 @@
  * is sending them into the system that owns the record.
  */
 
-import { kycExpiry } from "../client/[id]/client-detail-data";
+import { formatKycDate, kycExpiry } from "../client/[id]/client-detail-data";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import { mockClientRequirements } from "@/lib/order-mock-data";
 import { bookingModeFor, type BookableProduct } from "./bookable-products";
 import type {
@@ -129,7 +131,7 @@ function storedItem(key: "wealth" | "acknowledge", status: RequirementStatus): R
     status,
     // What the icon cannot say: a cross means "not on file", a warning means
     // "was on file", and only the second one needs a sentence.
-    detail: status === "expired" ? "แบบแจ้งหมดอายุ ต้องยื่นใหม่" : null,
+    detail: status === "expired" ? { code: "declaration-expired" } : null,
   };
 }
 
@@ -144,7 +146,7 @@ function kycItem(clientId: string): RequirementItem {
       ...base,
       value: null,
       status: "missing",
-      detail: "ยังไม่มีข้อมูล KYC ในระบบ",
+      detail: { code: "no-kyc" },
     };
   }
   // An unparseable review date is not a pass and not a lapse — it is a record
@@ -155,7 +157,7 @@ function kycItem(clientId: string): RequirementItem {
       ...base,
       value: null,
       status: "pending",
-      detail: `รอตรวจสอบวันหมดอายุ (${expiry.date})`,
+      detail: { code: "kyc-unreadable", date: expiry.date },
     };
   }
   if (expiry.daysLeft <= 0) {
@@ -165,8 +167,8 @@ function kycItem(clientId: string): RequirementItem {
       status: "expired",
       detail:
         expiry.daysLeft === 0
-          ? `หมดอายุวันนี้ (${expiry.date})`
-          : `หมดอายุแล้ว ${Math.abs(expiry.daysLeft)} วัน (${expiry.date})`,
+          ? { code: "kyc-expired-today", date: expiry.date }
+          : { code: "kyc-expired", days: Math.abs(expiry.daysLeft), date: expiry.date },
     };
   }
   return {
@@ -210,7 +212,7 @@ function riskItem(client: Client, product: BookableProduct): RequirementItem {
       status: "failed",
       // Kept, unlike the passing case below: a rating on its own does not say
       // why it is not enough, and that is the whole of what is wrong here.
-      detail: `ต่ำกว่าระดับ ${required} ที่ผลิตภัณฑ์ต้องการ`,
+      detail: { code: "risk-below", required },
     };
   }
   return {
@@ -296,4 +298,29 @@ export function requestableKeys(readiness: ClientReadiness): RequirementKey[] {
   return readiness.outstanding
     .filter((i) => i.selfService && i.status !== "pending" && i.status !== "failed")
     .map((i) => i.key);
+}
+
+/** A requirement's explanatory line, in the reader's language. */
+export function requirementDetailText(
+  detail: RequirementItem["detail"],
+  t: Dictionary,
+  locale: Locale,
+): string | null {
+  if (!detail) return null;
+  const m = t.orders.requirementDetail;
+  const day = (date: string) => formatKycDate(date, locale);
+  switch (detail.code) {
+    case "declaration-expired":
+      return m.expired;
+    case "no-kyc":
+      return m.noKyc;
+    case "kyc-unreadable":
+      return m.kycUnreadable(day(detail.date));
+    case "kyc-expired-today":
+      return m.kycExpiredToday(day(detail.date));
+    case "kyc-expired":
+      return m.kycExpired(detail.days, day(detail.date));
+    case "risk-below":
+      return m.riskBelow(detail.required);
+  }
 }

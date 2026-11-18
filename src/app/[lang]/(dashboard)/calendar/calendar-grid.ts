@@ -1,9 +1,12 @@
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatDate, weekdayNames } from "@/i18n/format";
+
 const WEEKDAYS_PER_WEEK = 7;
 /** Six rows covers every month (a 31-day month starting on Saturday needs it),
  * so paging between months always renders the same grid height. */
 export const WEEKS_SHOWN = 6;
 
-export const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export type DayRelation = "past" | "today" | "future";
 
@@ -66,19 +69,19 @@ export function weeksOf(days: Date[]): Date[][] {
   return weeks;
 }
 
-export function monthLabel(date: Date): string {
-  return date.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+export function monthLabel(date: Date, locale: Locale): string {
+  return formatDate(locale, date, "monthYear");
 }
 
 /** A day popover's title line — "27 August 2026". */
-export function dayLabel(date: Date): string {
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+export function dayLabel(date: Date, locale: Locale): string {
+  return formatDate(locale, date, "long");
 }
 
 /** Its subtitle's first half — "Thursday". Split from `dayLabel` because the two
  * are set at different sizes and the weekday shares its line with the count. */
-export function weekdayLabel(date: Date): string {
-  return date.toLocaleDateString("en-GB", { weekday: "long" });
+export function weekdayLabel(date: Date, locale: Locale): string {
+  return weekdayNames(locale, "long")[date.getDay()];
 }
 
 /** Groups notes by the calendar day their reminder falls on — notes with no reminder are dropped. */
@@ -113,9 +116,8 @@ export function dayOffset(day: Date, today: Date): number {
 }
 
 /** "In 5 days" / "3 days overdue" / "Today". */
-export function relativeDayLabel(diff: number): string {
-  if (diff === 0) return "Today";
-  const n = Math.abs(diff);
-  const noun = `day${n === 1 ? "" : "s"}`;
-  return diff > 0 ? `In ${n} ${noun}` : `${n} ${noun} overdue`;
+export function relativeDayLabel(diff: number, t: Dictionary): string {
+  const m = t.dates.relativeDay;
+  if (diff === 0) return m.today;
+  return diff > 0 ? m.inDays(diff) : m.overdue(-diff);
 }

@@ -16,6 +16,7 @@ import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import type { CampaignMaterial } from "@/types/domain";
 import type { CampaignClientRow } from "../campaign-data";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Pick who one piece of material goes to.
@@ -52,9 +53,13 @@ export function ShareDialog({
   mode?: "share" | "invite";
   /** An online event's link, shown with a copy button above the list. */
   joinUrl?: string;
-  onConfirm: (clientIds: string[]) => void;
+  /** Resolves `true` once sent; `false` keeps the dialog open with the picks intact. */
+  onConfirm: (clientIds: string[]) => Promise<boolean>;
 }) {
-  const verb = mode === "invite" ? "ชวนลูกค้า" : "แชร์ให้ลูกค้า";
+  const t = useT();
+  const s = t.campaigns.share;
+  const verb = mode === "invite" ? t.campaigns.detail.invite : t.campaigns.detail.share;
+  const verbCount = mode === "invite" ? s.inviteCount : s.shareCount;
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -76,6 +81,7 @@ export function ShareDialog({
 
   const { isPrivate } = usePrivacy();
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [sending, setSending] = useState(false);
 
   /**
    * Closing clears the ticks, so the next material never inherits them.
@@ -123,7 +129,7 @@ export function ShareDialog({
           <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 py-1.5 pl-3 pr-1.5">
             <LinkSimpleIcon size={16} weight="bold" className="shrink-0 text-primary-action" />
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-meta text-muted-foreground">ลิงก์เข้าร่วมงาน</span>
+              <span className="text-meta text-muted-foreground">{s.joinLink}</span>
               <span className="truncate text-label font-medium text-foreground">
                 {joinUrl}
               </span>
@@ -131,8 +137,8 @@ export function ShareDialog({
             <Button
               variant="plain"
               size="icon-sm"
-              aria-label={copied ? "คัดลอกแล้ว" : "คัดลอกลิงก์"}
-              title={copied ? "คัดลอกแล้ว" : "คัดลอกลิงก์"}
+              aria-label={copied ? s.copied : s.copyLink}
+              title={copied ? s.copied : s.copyLink}
               onClick={() => void copyLink()}
               className="shrink-0"
             >
@@ -148,7 +154,7 @@ export function ShareDialog({
         {selectable.length > 0 && (
           <div className="-mb-1 flex items-center justify-between pl-1">
             <span className="text-label font-semibold text-muted-foreground">
-              รายชื่อลูกค้า
+              {s.clientList}
             </span>
             <Button
               variant="plain"
@@ -157,7 +163,7 @@ export function ShareDialog({
                 setPicked(allPicked ? new Set() : new Set(selectable))
               }
             >
-              {allPicked ? "ล้างที่เลือก" : "เลือกทั้งหมด"}
+              {allPicked ? s.clearPicked : s.pickAll}
             </Button>
           </div>
         )}
@@ -165,7 +171,7 @@ export function ShareDialog({
         <div className="-mx-1 flex max-h-[calc(var(--vh)*46)] flex-col gap-2 overflow-y-auto px-1 py-0.5">
           {eligibleRows.length === 0 && (
             <p className="rounded-xl bg-muted/40 px-4 py-6 text-center text-label text-muted-foreground">
-              ไม่มีลูกค้าที่ส่งได้ในแคมเปญนี้
+              {s.noneEligible}
             </p>
           )}
           {eligibleRows.map((row) => {
@@ -200,20 +206,26 @@ export function ShareDialog({
               the mail is not sent. */}
           <p className="flex items-start gap-1.5 text-label leading-snug text-muted-foreground">
             <EnvelopeSimpleIcon size={14} className="mt-0.5 shrink-0" />
-            ระบบหลังบ้านจะส่งอีเมลให้ลูกค้าที่เลือก และบันทึกการส่งไว้เพื่อการตรวจสอบ
+            {s.backendNote}
           </p>
           <Button
             variant="primary"
             size="lg"
             className="w-full"
             leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
-            disabled={picked.size === 0}
-            onClick={() => {
-              onConfirm([...picked]);
-              setOpen(false);
+            disabled={picked.size === 0 || sending}
+            onClick={async () => {
+              // Closed only once it has gone through — closing first lost the
+              // IC's picks whenever the send failed.
+              setSending(true);
+              try {
+                if (await onConfirm([...picked])) setOpen(false);
+              } finally {
+                setSending(false);
+              }
             }}
           >
-            {picked.size > 1 ? `${verb} ${picked.size} คน` : verb}
+            {sending ? s.sending : picked.size > 1 ? verbCount(picked.size) : verb}
           </Button>
         </div>
       </div>

@@ -1,7 +1,10 @@
 "use client";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { ChartPieSliceIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { displayAssetLabel } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Donut + legend palette, in slice order. Taken from the "Allocation
@@ -54,8 +57,9 @@ export function AllocationDonut({
   size?: number;
   className?: string;
 }) {
+  const t = useT();
   const data = slices.map((s, i) => ({
-    name: displayAssetLabel(s.label),
+    name: displayAssetLabel(s.label, t),
     value: s.percent,
     color: s.color ?? ALLOCATION_COLORS[i % ALLOCATION_COLORS.length],
   }));
@@ -112,6 +116,7 @@ export function AllocationTiles({
   slices: AllocationDonutSlice[];
   columnsClassName?: string;
 }) {
+  const t = useT();
   return (
     <div className={`grid gap-2 flex-1 min-w-0 ${columnsClassName}`}>
       {slices.map((s, i) => (
@@ -122,13 +127,31 @@ export function AllocationTiles({
               style={{ backgroundColor: s.color ?? ALLOCATION_COLORS[i % ALLOCATION_COLORS.length] }}
             />
             <p className="text-meta font-semibold text-muted-foreground truncate">
-              {displayAssetLabel(s.label)}
+              {displayAssetLabel(s.label, t)}
             </p>
           </div>
           <p className="type-subtitle-1 font-bold leading-none text-foreground">{s.percent}%</p>
         </div>
       ))}
     </div>
+  );
+}
+
+/** Whether there is anything to draw — a donut of no slices (or all zeros) is a
+ *  blank box, which reads as "still loading" rather than "nothing here". */
+export function hasAllocation(slices: { percent: number }[]): boolean {
+  return slices.some((s) => s.percent > 0);
+}
+
+/** What an allocation card shows in place of an empty donut. */
+export function AllocationEmptyState() {
+  const t = useT();
+  return (
+    <EmptyState
+      size="compact"
+      icon={<ChartPieSliceIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      title={t.client.assets.noAllocation}
+    />
   );
 }
 
@@ -146,6 +169,7 @@ export function AllocationDonutWithTiles({
   donutSize?: number;
   donutClassName?: string;
 }) {
+  if (!hasAllocation(slices)) return <AllocationEmptyState />;
   return (
     <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:items-center w-full">
       <div className="mx-auto sm:mx-0">

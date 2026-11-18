@@ -15,8 +15,8 @@
  * has gone away simply closes the sheet.
  */
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { ArrowRightIcon, CaretRightIcon, CheckIcon, XIcon } from "@phosphor-icons/react";
 import { Avatar, Button } from "@sarunyu/system-one";
 import { getInitial } from "@/lib/client-utils";
@@ -37,6 +37,9 @@ import {
 } from "./detail-sheet-ui";
 import { formatLogTime, formatOrderAmount } from "./order-book";
 import { useOrderBooks } from "./use-order-books";
+import { NotFoundState } from "@/components/ui/empty-state";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 export type OrderSubmissionRef = { productId: string; submissionId: string };
 
@@ -48,20 +51,31 @@ export function OrderSubmissionDetailModal({
   target: OrderSubmissionRef | null;
   onClose: () => void;
 }) {
-  const { data: books } = useOrderBooks();
+  const { data: books, isLoading } = useOrderBooks();
+  const t = useT();
   const book = target ? books.find((b) => b.productId === target.productId) : undefined;
   const submission = book?.submissions.find((s) => s.id === target?.submissionId);
 
+  // Opens on the click, whatever the lookup finds. It used to open only when
+  // both resolved, so a bell row pointing at an order that had gone did nothing
+  // at all — indistinguishable from a click that didn't register.
   return (
     <ResponsiveBottomSheetModal
-      open={!!book && !!submission}
+      open={target !== null}
       onClose={onClose}
-      title="รายละเอียดคำสั่งซื้อ"
+      title={t.orders.submission.title}
       titleId="order-submission-detail-title"
       desktopTitleHidden
       desktopMaxWidth="max-w-[520px]"
     >
-      {book && submission && <Body book={book} submission={submission} onClose={onClose} />}
+      {target !== null &&
+        (isLoading ? (
+          <p className="px-6 py-16 text-center type-body-2 text-muted-foreground">{t.common.loading}</p>
+        ) : book && submission ? (
+          <Body book={book} submission={submission} onClose={onClose} />
+        ) : (
+          <NotFoundState message={t.states.notFoundOrder} onBack={onClose} backLabel={t.common.close} />
+        ))}
     </ResponsiveBottomSheetModal>
   );
 }
@@ -75,17 +89,19 @@ function Body({
   submission: OrderSubmission;
   onClose: () => void;
 }) {
-  const router = useRouter();
+  const locale = useLocale();
+  const t = useT();
+  const router = useLocalizedRouter();
   const { isPrivate } = usePrivacy();
 
   const ok = submission.status === "completed";
   const rejected = submission.status === "rejected";
   const tone = ok ? "green" : rejected ? "red" : "primary";
   const heading = ok
-    ? "คำสั่งซื้อสำเร็จ"
+    ? t.orders.submission.completed
     : rejected
-      ? "คำสั่งซื้อถูกปฏิเสธ"
-      : "กำลังดำเนินการรับคำสั่งซื้อ";
+      ? t.orders.submission.rejected
+      : t.orders.submission.processing;
 
   // `allBookings`, not `bookings`: what the order carried is history, and a
   // booking's later state should not drop it from the order that took it.
@@ -123,14 +139,14 @@ function Body({
 
         <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
-            <SheetBlock title="รายละเอียดคำสั่งซื้อ">
-              <CopyRow label="เลขที่คำสั่งซื้อ" value={submission.backendRef} />
-              <SheetRow label="ส่งเมื่อ" value={formatLogTime(submission.submittedAt)} />
-              <SheetRow label="ส่งโดย" value={submission.submittedBy} />
+            <SheetBlock title={t.orders.submission.title}>
+              <CopyRow label={t.orders.orderRef} value={submission.backendRef} />
+              <SheetRow label={t.orders.submission.sentAt} value={formatLogTime(submission.submittedAt, locale)} />
+              <SheetRow label={t.orders.submission.sentBy} value={submission.submittedBy} />
               {submission.settledAt && (
                 <SheetRow
-                  label={rejected ? "ปฏิเสธเมื่อ" : "สำเร็จเมื่อ"}
-                  value={formatLogTime(submission.settledAt)}
+                  label={rejected ? t.orders.submission.rejectedAt : t.orders.submission.completedAt}
+                  value={formatLogTime(submission.settledAt, locale)}
                 />
               )}
             </SheetBlock>
@@ -138,7 +154,7 @@ function Body({
             {carried.length > 0 && (
               <>
                 <div className={SHEET_DASHED} />
-                <SheetBlock title={`ลูกค้าในคำสั่งซื้อนี้ (${carried.length})`}>
+                <SheetBlock title={t.orders.submission.clients(carried.length)}>
                   {/* One line per client — the name to their profile on the
                       left, what they put in on the right. */}
                   {carried.map((b) => (
@@ -169,7 +185,7 @@ function Body({
               rejected ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">Notional Amount</p>
+            <p className="text-body-sm font-bold text-foreground">{t.orders.field.notionalAmount}</p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 rejected ? "text-muted-foreground line-through" : "text-primary-action"
@@ -186,7 +202,7 @@ function Body({
               onClick={goToOrders}
               rightIcon={<ArrowRightIcon size={16} />}
             >
-              ดูใน Order Management
+              {t.orders.submission.viewInOrders}
             </Button>
           </div>
         </div>

@@ -19,6 +19,8 @@ import {
   type StockCrossSellDetailConfig,
   type StockCrossSellKind,
 } from "./stock-data";
+import { StockSectionEmpty } from "./stock-ui";
+import { useT } from "@/i18n/I18nProvider";
 
 // Same 996px column every other product-catalog drill-in page uses (SET
 // Industry Sector, mutual-fund theme detail, …) — not this page's own
@@ -47,16 +49,20 @@ export function StockCrossSellDetail({
 
   // Keyed so the filter state below is seeded from this kind's loaded config,
   // not from whatever was on hand before it arrived.
-  return <StockCrossSellDetailBody key={kind} config={config} onBack={onBack} />;
+  return <StockCrossSellDetailBody key={kind} kind={kind} config={config} onBack={onBack} />;
 }
 
 function StockCrossSellDetailBody({
+  kind,
   config,
   onBack,
 }: {
+  kind: StockCrossSellKind;
   config: StockCrossSellDetailConfig;
   onBack: () => void;
 }) {
+  const t = useT();
+  const copy = t.stock.crossSell.kinds[kind];
   const rows = STOCK_CROSS_SELL_DETAIL_ROWS;
 
   const [filterOpen, setFilterOpen] = useState(false);
@@ -71,7 +77,7 @@ function StockCrossSellDetailBody({
     // apply that spacing *below* the hero too — leaving a white strip between
     // the banner and the list panel, which is meant to sit flush against it.
     <div className="flex w-full flex-col bg-white">
-      <CatalogDetailBackHeader title={config.title} onBack={onBack} className="!pt-8 !pb-4" />
+      <CatalogDetailBackHeader title={copy.title} onBack={onBack} className="!pt-8 !pb-4" />
 
       <div className="relative w-full overflow-hidden" style={{ background: config.gradient }}>
         <div className={`relative flex items-center gap-6 py-10 ${NARROW}`}>
@@ -83,9 +89,9 @@ function StockCrossSellDetailBody({
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <p className="text-2xl font-bold leading-9 text-white [text-shadow:0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.1)]">
-              {config.title}
+              {copy.title}
             </p>
-            <p className="whitespace-pre-line text-base leading-[24px] text-white">{config.description}</p>
+            <p className="whitespace-pre-line text-base leading-[24px] text-white">{copy.description}</p>
           </div>
           <div
             className="pointer-events-none absolute right-0 top-[18px] hidden size-[237px] rounded-full bg-white/20 md:block"
@@ -109,7 +115,8 @@ function StockCrossSellDetailBody({
         <div className={`flex flex-col gap-4 ${NARROW}`}>
           <div className="flex w-full items-center gap-2 border-b border-black/10 py-3">
             <p className="flex-1 text-base" style={{ color: "#4a5565" }}>
-              100 Lists
+              {/* The figure is the design's placeholder; an empty list must not claim 100. */}
+              {t.stock.detailList.count(rows.length === 0 ? 0 : 100)}
             </p>
             <button
               type="button"
@@ -122,7 +129,7 @@ function StockCrossSellDetailBody({
             >
               <FunnelSimpleIcon size={20} style={{ color: "#0a6ee7" }} />
               <span className="text-sm font-semibold" style={{ color: "#0a6ee7" }}>
-                Filter
+                {t.stock.crossSell.filter}
               </span>
               {filterCount > 0 && (
                 <span className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-[#0a6ee7] text-meta font-medium text-white">
@@ -132,8 +139,11 @@ function StockCrossSellDetailBody({
             </button>
           </div>
           <p className="w-full text-xs" style={{ color: "#6a7282" }}>
-            {MARKET_LATEST_UPDATE}
+            {t.stock.latestUpdate(MARKET_LATEST_UPDATE)}
           </p>
+          {rows.length === 0 ? (
+            <StockSectionEmpty title={t.stock.empty.crossSell} />
+          ) : (
           <div className="grid w-full grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
             {[...rows, ...rows].map((row, i) => (
               <StockLargeAssetCard
@@ -149,6 +159,7 @@ function StockCrossSellDetailBody({
               />
             ))}
           </div>
+          )}
         </div>
       </div>
 

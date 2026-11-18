@@ -5,6 +5,8 @@ import { mockHouseViewStrategies } from "@/lib/mock-data";
 import { mockCampaigns } from "@/lib/campaign-mock-data";
 import { maskName } from "@/lib/mask-name";
 import type { Client } from "@/types/domain";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { useT } from "@/i18n/I18nProvider";
 import {
   crossSectionTrail,
   navVisitSnapshot,
@@ -50,23 +52,30 @@ import {
 export type Crumb = { label: string; href?: string };
 export type BreadcrumbContext = { clients: Client[]; isPrivate: boolean };
 
-const SECTION_ROOT: Record<NavSectionKey, { path: string; label: string }> = {
-  "command-center": { path: "/command-center", label: "Command Center" },
-  "client-hub": { path: "/client-hub", label: "Client 360" },
-  "product-catalog": { path: "/product-catalog", label: "Product Catalog" },
+/** Labels live in the dictionary, keyed by the same section. */
+type LabelContext = BreadcrumbContext & { t: Dictionary };
+
+const SECTION_ROOT: Record<NavSectionKey, { path: string }> = {
+  "command-center": { path: "/command-center" },
+  "client-hub": { path: "/client-hub" },
+  "product-catalog": { path: "/product-catalog" },
   // Insight articles all come from the House View tab, which is what this
   // breadcrumb has always called the level above them.
-  insights: { path: "/insights", label: "House View" },
-  promotions: { path: "/promotions", label: "Promotion/Events" },
-  orders: { path: "/orders", label: "Order Management" },
+  insights: { path: "/insights" },
+  promotions: { path: "/promotions" },
+  orders: { path: "/orders" },
   // Matches the header title in `page-chrome.ts` — the two are allowed to
   // differ from the sidebar's own label, but not from each other.
-  performance: { path: "/performance", label: "Performance" },
-  "ic-learning": { path: "/ic-learning", label: "IC Learning" },
-  "yaa-team-head": { path: "/yaa-team-head", label: "YAA/Team Head" },
-  notes: { path: "/notes", label: "Notes" },
-  calendar: { path: "/calendar", label: "Calendar" },
+  performance: { path: "/performance" },
+  "ic-learning": { path: "/ic-learning" },
+  "yaa-team-head": { path: "/yaa-team-head" },
+  notes: { path: "/notes" },
+  calendar: { path: "/calendar" },
+  reminders: { path: "/reminders" },
 };
+
+const sectionLabel = (section: NavSectionKey, t: Dictionary) =>
+  t.shell.breadcrumb.sections[section];
 
 /**
  * Page breadcrumb, built from the **navigation trail** — the pages the user
@@ -92,7 +101,8 @@ export function usePageBreadcrumb(
   // Re-read session trail once recordVisit lands — otherwise the first paint
   // after a cross-section jump can stick on the route fallback (House View).
   useSyncExternalStore(subscribeNavVisits, navVisitSnapshot, () => "");
-  return breadcrumbFor(pathname, ctx, hydrated);
+  const t = useT();
+  return breadcrumbFor(pathname, { ...ctx, t }, hydrated);
 }
 
 /**
@@ -101,7 +111,7 @@ export function usePageBreadcrumb(
  */
 export function breadcrumbFor(
   pathname: string,
-  ctx: BreadcrumbContext,
+  ctx: LabelContext,
   fromTrail: boolean,
 ): Crumb[] | null {
   const route = routeBreadcrumb(pathname, ctx);
@@ -120,7 +130,7 @@ const onServer = () => false;
 
 function trailBreadcrumb(
   pathname: string,
-  ctx: BreadcrumbContext,
+  ctx: LabelContext,
 ): Crumb[] | null {
   const section = sectionForPath(pathname);
   if (!section || pathname === SECTION_ROOT[section].path) return null;
@@ -139,7 +149,7 @@ function trailBreadcrumb(
     // normalize rather than treating a missing param as "tab unknown".
     if (!isCurrent && isCatalogList(urlPathname(url))) {
       rungs.push(
-        ...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url)), url),
+        ...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url)), ctx.t, url),
       );
       continue;
     }
@@ -160,9 +170,9 @@ function trailBreadcrumb(
   // keep "Stock" in the crumb, not jump to that product's native catalog tab.
   if (
     !crossTrail &&
-    rungs[0].label !== SECTION_ROOT[section].label
+    rungs[0].label !== sectionLabel(section, ctx.t)
   ) {
-    rungs.unshift(...rootCrumbs(section, urlPathname(trail[0])));
+    rungs.unshift(...rootCrumbs(section, urlPathname(trail[0]), ctx.t));
   }
   return rungs.length > 1 ? finish(rungs) : null;
 }
@@ -170,13 +180,13 @@ function trailBreadcrumb(
 /** Section root + this page. Deterministic, so it is safe to server-render. */
 function routeBreadcrumb(
   pathname: string,
-  ctx: BreadcrumbContext,
+  ctx: LabelContext,
 ): Crumb[] | null {
   const section = sectionForPath(pathname);
   if (!section || pathname === SECTION_ROOT[section].path) return null;
   const leaf = labelFor(pathname, ctx);
   return leaf
-    ? finish([...rootCrumbs(section, pathname), { label: leaf }])
+    ? finish([...rootCrumbs(section, pathname, ctx.t), { label: leaf }])
     : null;
 }
 
@@ -189,9 +199,13 @@ const isCatalogList = (pathname: string) => pathname === CATALOG_PATH;
  * has one, so the rung carries the tab's own view state (Stock's `?market=`)
  * and not just which tab it was. Without a trail the category is all we know.
  */
-function catalogRootCrumbs(category: string | null, tabUrl?: string): Crumb[] {
+function catalogRootCrumbs(
+  category: string | null,
+  t: Dictionary,
+  tabUrl?: string,
+): Crumb[] {
   const root: Crumb = {
-    label: SECTION_ROOT["product-catalog"].label,
+    label: sectionLabel("product-catalog", t),
     href: CATALOG_PATH,
   };
   const tab = productCategoryTitle(category);
@@ -205,12 +219,15 @@ function catalogRootCrumbs(category: string | null, tabUrl?: string): Crumb[] {
  * session restore. Only the catalog routes that belong to exactly one tab can
  * name it; the rest fall back to the section alone.
  */
-function rootCrumbs(section: NavSectionKey, pathname: string): Crumb[] {
+function rootCrumbs(
+  section: NavSectionKey,
+  pathname: string,
+  t: Dictionary,
+): Crumb[] {
   if (section === "product-catalog") {
-    return catalogRootCrumbs(catalogCategoryForPath(pathname));
+    return catalogRootCrumbs(catalogCategoryForPath(pathname), t);
   }
-  const { path, label } = SECTION_ROOT[section];
-  return [{ label, href: path }];
+  return [{ label: sectionLabel(section, t), href: SECTION_ROOT[section].path }];
 }
 
 /** Intermediate rungs are context, so they get less room than the leaf. */
@@ -269,32 +286,38 @@ const truncate = (label: string, max: number) =>
  * section, so naming the leaf here is the whole of what a breadcrumb needs:
  * the rung above comes from `SECTION_ROOT["command-center"]`.
  */
-const COMMAND_CENTER_SUBPAGE_LABEL: Record<string, string> = {
-  "/command-center/call-log": "Call Log",
-  "/command-center/next-best-actions": "Next Best Actions",
+const COMMAND_CENTER_SUBPAGE: Record<
+  string,
+  keyof Dictionary["shell"]["breadcrumb"]["commandCenter"]
+> = {
+  "/command-center/call-log": "callLog",
+  "/command-center/next-best-actions": "nextBestActions",
   // 27 characters, inside the 28 a leaf rung gets before `truncate` bites.
-  "/command-center/risk-alerts": "Proactive Compliance Alerts",
+  "/command-center/risk-alerts": "riskAlerts",
 };
 
-function labelFor(pathname: string, ctx: BreadcrumbContext): string | null {
+function labelFor(pathname: string, ctx: LabelContext): string | null {
+  const { t } = ctx;
   const section = sectionForPath(pathname);
   if (section && pathname === SECTION_ROOT[section].path) {
-    return SECTION_ROOT[section].label;
+    return sectionLabel(section, t);
   }
 
-  const commandCenterSubpage = COMMAND_CENTER_SUBPAGE_LABEL[pathname];
-  if (commandCenterSubpage) return commandCenterSubpage;
+  const commandCenterSubpage = COMMAND_CENTER_SUBPAGE[pathname];
+  if (commandCenterSubpage) {
+    return t.shell.breadcrumb.commandCenter[commandCenterSubpage];
+  }
 
   const client = /^\/client\/([^/]+)/.exec(pathname);
   if (client) {
     const found = ctx.clients.find((c) => c.id === client[1]);
-    return maskName(found?.name ?? "Client", ctx.isPrivate);
+    return maskName(found?.name ?? t.shell.breadcrumb.fallback.client, ctx.isPrivate);
   }
 
   const insight = /^\/insights\/([^/]+)/.exec(pathname);
   if (insight) {
     const strategy = mockHouseViewStrategies.find((s) => s.id === insight[1]);
-    return strategy?.name ?? "Insight";
+    return strategy?.name ?? t.shell.breadcrumb.fallback.insight;
   }
 
   // A campaign is named by its title, not by its id — the rung has to read
@@ -304,10 +327,10 @@ function labelFor(pathname: string, ctx: BreadcrumbContext): string | null {
     const found = mockCampaigns.find(
       (c) => c.id === decodeURIComponent(campaign[1]),
     );
-    return found?.title ?? "แคมเปญ";
+    return found?.title ?? t.shell.breadcrumb.fallback.campaign;
   }
 
-  return catalogLabel(pathname);
+  return catalogLabel(pathname, t);
 }
 
 const PRODUCT = /^\/product-catalog\/product\/(.+)$/;
@@ -324,35 +347,36 @@ const STOCK_SECTOR = /^\/product-catalog\/stock\/([^/]+)$/;
 const STOCK_SECTOR_STATIC = new Set(["dr", "etf"]);
 const TRENDING_GROUP = /^\/product-catalog\/product-trending\/(.+)$/;
 
-function catalogLabel(pathname: string): string | null {
+function catalogLabel(pathname: string, t: Dictionary): string | null {
+  const fallback = t.shell.breadcrumb.fallback;
   const segment = (re: RegExp) => {
     const found = re.exec(pathname);
     return found ? decodeURIComponent(found[1]) : null;
   };
 
   const trendingGroupId = segment(TRENDING_GROUP);
-  if (trendingGroupId) return getTrendingGroup(trendingGroupId)?.title ?? "Product Trending";
+  if (trendingGroupId) return getTrendingGroup(trendingGroupId)?.title ?? fallback.productTrending;
 
   const productId = segment(PRODUCT);
   if (productId) {
-    return findProductById(productId)?.underlying ?? "Structured Product";
+    return findProductById(productId)?.underlying ?? fallback.structuredProduct;
   }
   if (pathname === "/product-catalog/product") {
-    return "Structured Products ทั้งหมด";
+    return t.shell.breadcrumb.allStructuredProducts;
   }
 
   const sector = segment(TOP_IDEA);
   if (sector) return TOP_IDEA_THEMES[sector as TopIdeaSector] ?? sector;
-  if (pathname === "/product-catalog/top-idea") return "Top idea";
+  if (pathname === "/product-catalog/top-idea") return t.shell.breadcrumb.topIdea;
 
   const solutionId = segment(SOLUTION);
   if (solutionId) {
     const solution = getInvestmentSolution(solutionId as InvestmentSolutionId);
-    return solution?.name ?? "Investment Solution";
+    return solution?.name ?? fallback.investmentSolution;
   }
 
   const bondId = segment(FI_BOND);
-  if (bondId) return getFixedIncomeBond(bondId)?.symbol ?? "Fixed Income";
+  if (bondId) return getFixedIncomeBond(bondId)?.symbol ?? fallback.fixedIncome;
 
   const companyId = segment(FI_COMPANY);
   if (companyId) {
@@ -360,8 +384,8 @@ function catalogLabel(pathname: string): string | null {
   }
 
   const issuerId = segment(GLOBAL_BOND);
-  if (issuerId) return getGlobalBondIssuer(issuerId)?.title ?? "Global Bond";
-  if (pathname === "/product-catalog/global-bond") return "All Overseas Bonds";
+  if (issuerId) return getGlobalBondIssuer(issuerId)?.title ?? fallback.globalBond;
+  if (pathname === "/product-catalog/global-bond") return t.shell.breadcrumb.allOverseasBonds;
 
   const theme = segment(THAI);
   if (theme) {
@@ -375,13 +399,13 @@ function catalogLabel(pathname: string): string | null {
   const performersCategory = segment(MUTUAL_FUND_TOP_PERFORMERS);
   if (performersCategory) {
     const id = normalizeMutualFundCategoryId(decodeURIComponent(performersCategory));
-    return MUTUAL_FUND_CATEGORIES.find((c) => c.id === id)?.label ?? "กองทุนผลตอบแทนเด่น";
+    return MUTUAL_FUND_CATEGORIES.find((c) => c.id === id)?.label ?? fallback.topPerformers;
   }
 
-  if (MUTUAL_FUND_INSIGHTS.test(pathname)) return "บทวิเคราะห์ทั้งหมด";
+  if (MUTUAL_FUND_INSIGHTS.test(pathname)) return t.insights.allResearch;
 
   const fundId = segment(MUTUAL_FUND);
-  if (fundId) return getMutualFundSymbol(fundId) ?? "Mutual Fund";
+  if (fundId) return getMutualFundSymbol(fundId) ?? fallback.mutualFund;
 
   const stockSectorId = segment(STOCK_SECTOR);
   if (stockSectorId && !STOCK_SECTOR_STATIC.has(stockSectorId)) {
@@ -390,12 +414,12 @@ function catalogLabel(pathname: string): string | null {
       getMarketIndexPage(decoded)?.index.code ??
       getIndustrySectorPage(decoded)?.sector.name ??
       getStockProductDetail(decoded)?.symbol ??
-      "SET Industry Sector"
+      fallback.industrySector
     );
   }
 
-  if (pathname === "/product-catalog/stock/dr") return "DR (Depositary Receipt)";
-  if (pathname === "/product-catalog/stock/etf") return "ETF (Exchange Traded Fund)";
+  if (pathname === "/product-catalog/stock/dr") return t.shell.breadcrumb.dr;
+  if (pathname === "/product-catalog/stock/etf") return t.shell.breadcrumb.etf;
 
   if (pathname === "/product-catalog/robo-advisory") return "Robo Advisory";
   if (pathname === "/product-catalog/definit") return "Definit x Yuanta";

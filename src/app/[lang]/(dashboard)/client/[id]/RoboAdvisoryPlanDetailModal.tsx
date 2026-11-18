@@ -17,6 +17,7 @@ import {
 import { ROBO_ASSETS } from "./robo-advisory-assets";
 import type { RoboAdvisoryPlan } from "./robo-advisory-plan-data";
 import { RoboRiskLevel } from "./RoboRiskLevel";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Figma 33787:150208 / 34315:86459 — desktop body px-36; cancel library Modal body px-4 (16px). */
 const MODAL_BODY_BLEED = "-mx-4";
@@ -80,6 +81,7 @@ function ModalBodyPadding({ isMobile, children }: { isMobile: boolean; children:
 }
 
 function DownloadDocumentsButton({ className }: { className?: string }) {
+  const t = useT();
   return (
     <Button
       variant="outline"
@@ -87,7 +89,7 @@ function DownloadDocumentsButton({ className }: { className?: string }) {
       leftIcon={<DownloadSimpleIcon size={20} />}
       className={className ?? "shrink-0"}
     >
-      ดาวน์โหลดเอกสารเพิ่มเติม
+      {t.products.advisory.detail.downloadDocuments}
     </Button>
   );
 }
@@ -120,6 +122,9 @@ function PlanDetailContent({
   isMobile: boolean;
   suitability?: PlanSuitability;
 }) {
+  const t = useT();
+  const labels = t.products.advisory.detail;
+  const stats = t.products.advisory.stats;
   const { detail, presentation } = plan;
   const drawdownColor = presentation.showDividendStat ? "text-[#c10007]" : "text-[#fb2c36]";
 
@@ -147,15 +152,15 @@ function PlanDetailContent({
       </div>
 
       <div className="flex w-full items-end">
-        <StatItem iconSrc={ROBO_ASSETS.iconMoney} labelLines={["เงินตั้งต้น", "ขั้นต่ำ (บาท)"]} value={plan.minInvestment} />
+        <StatItem iconSrc={ROBO_ASSETS.iconMoney} labelLines={stats.minInvestmentLines} value={plan.minInvestment} />
         <div className="h-[58px] w-px shrink-0 bg-black/10" />
-        <StatItem iconSrc={ROBO_ASSETS.iconClock} labelLines={["ระยะเวลา", "ถือครอง"]} value={plan.holdingPeriod} />
+        <StatItem iconSrc={ROBO_ASSETS.iconClock} labelLines={stats.holdingPeriodLines} value={plan.holdingPeriod} />
         {presentation.showDividendStat && plan.dividendPerYear ? (
           <>
             <div className="h-[58px] w-px shrink-0 bg-black/10" />
             <StatItem
               iconSrc={ROBO_ASSETS.iconHandCoins}
-              labelLines={["เงินปันผล", "ต่อปี"]}
+              labelLines={stats.dividendLines}
               value={plan.dividendPerYear}
               labelWidth={50}
             />
@@ -182,7 +187,7 @@ function PlanDetailContent({
         <DetailRow iconSrc={ROBO_ASSETS.modalIconTimer} title="Timing">
           <p className="text-sm leading-[24px] text-[#4a5565]">{detail.timing}</p>
         </DetailRow>
-        <DetailRow iconSrc={ROBO_ASSETS.modalIconMoneyWavy} title="ยอดขั้นต่ำสำหรับการเพิ่มทุน (ต่อครั้ง)">
+        <DetailRow iconSrc={ROBO_ASSETS.modalIconMoneyWavy} title={labels.topUpMin}>
           <p className="text-sm leading-[24px] text-[#4a5565]">{detail.topUpMin}</p>
         </DetailRow>
         <DetailRow iconSrc={ROBO_ASSETS.modalIconBrain} title="Knowledge style:">
@@ -192,7 +197,7 @@ function PlanDetailContent({
             ))}
           </ul>
         </DetailRow>
-        <DetailRow iconSrc={ROBO_ASSETS.modalIconSealCheck} title="แผนที่เหมาะกับนักลงทุนแบบไหน:">
+        <DetailRow iconSrc={ROBO_ASSETS.modalIconSealCheck} title={labels.targetInvestors}>
           <ul className="list-disc pl-5 text-sm leading-[24px] text-[#4a5565]">
             {detail.targetInvestors.map((item) => (
               <li key={item}>{item}</li>
@@ -208,10 +213,10 @@ function PlanDetailContent({
           }}
         >
           <div className="bg-[#f3f4f6] px-3 py-2">
-            <p className="text-sm font-bold leading-[24px] text-[#101828]">สัดส่วนการลงทุน</p>
+            <p className="text-sm font-bold leading-[24px] text-[#101828]">{labels.allocation}</p>
           </div>
           <div className="flex flex-col items-center gap-3 px-3 pb-4 pt-3">
-            <p className="w-full text-xs leading-[20px] text-[#4a5565]">การลงทุนทั้งหมด = 100%</p>
+            <p className="w-full text-xs leading-[20px] text-[#4a5565]">{labels.allocationTotal}</p>
             <div className="flex w-full items-center justify-between px-2 max-sm:flex-col max-sm:gap-4">
               <AllocationDonut slices={detail.allocation} className="size-[120px]" />
               <div className="flex flex-col gap-2">
@@ -232,7 +237,7 @@ function PlanDetailContent({
 
       <div className="flex w-full flex-col gap-2">
         <div className="flex items-center gap-1">
-          <p className="text-sm font-bold leading-[24px] text-[#101828]">ค่าธรรมเนียม</p>
+          <p className="text-sm font-bold leading-[24px] text-[#101828]">{labels.fees}</p>
           <Image src={ROBO_ASSETS.modalIconInfo} alt="" width={16} height={16} className="size-4 shrink-0" />
         </div>
         <div className="flex w-full flex-col gap-1">
@@ -285,6 +290,7 @@ export function PortfolioAdvisoryPlanDetailModal({
   cta?: AdvisoryCta;
   suitability?: PlanSuitability;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   if (!plan) return null;
@@ -302,10 +308,10 @@ export function PortfolioAdvisoryPlanDetailModal({
         onOpenChange={(next) => {
           if (!next) onClose();
         }}
-        title="รายละเอียด"
+        title={t.products.common.details}
         showHandle
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         contentClassName={`flex max-h-[calc(var(--dvh)*100-10rem)] flex-col overflow-hidden ${MODAL_BODY_BLEED} pt-0`}
       >
@@ -328,7 +334,7 @@ export function PortfolioAdvisoryPlanDetailModal({
       <div className="max-h-[calc(var(--vh)*100-8rem)] w-full max-w-[720px] overflow-hidden" onMouseDown={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title="รายละเอียด"
+          title={t.products.common.details}
           showClose
           onClose={onClose}
           actionLayout="none"

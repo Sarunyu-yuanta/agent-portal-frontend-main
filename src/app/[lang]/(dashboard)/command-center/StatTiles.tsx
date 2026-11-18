@@ -10,6 +10,7 @@ import {
   WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useCountUp } from "@/hooks/use-count-up";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The three numbers the top of the work column is for.
@@ -127,6 +128,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
     : String(Math.round(animated));
 
   const interactive = Boolean(tile.onClick);
+  const t = useT();
 
   return (
     <div
@@ -192,7 +194,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
       {interactive ? (
         <button
           type="button"
-          aria-label={`${tile.label} — ดูรายการทั้งหมด`}
+          aria-label={t.commandCenter.statTiles.viewAllAria(tile.label)}
           onClick={(e) => {
             e.stopPropagation();
             tile.onClick?.();

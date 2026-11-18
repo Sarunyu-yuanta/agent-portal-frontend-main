@@ -49,12 +49,15 @@ export function useRiskAlertRows(): {
    */
   acknowledgedRows: RiskAlertRow[];
   isLoading: boolean;
+  /** The feed's first load failed — show `ErrorState`, not an empty card. */
+  error: Error | null;
+  retry: () => void;
   /** A no-op on a finding the IC may not close — see `RiskAlert.dismissible`. */
   acknowledge: (alert: RiskAlert) => void;
   /** The way back. Also unused at the moment — see `acknowledgedRows`. */
   unacknowledge: (alert: RiskAlert) => void;
 } {
-  const { data: alerts, isLoading } = useRiskAlertsResource();
+  const { data: alerts, isLoading, error, retry } = useRiskAlertsResource();
   const { isPrivate } = usePrivacy();
   const [ackIds, setAckIds] = useStoredIds<string>(
     RISK_ACK_IDS_PREF,
@@ -96,5 +99,5 @@ export function useRiskAlertRows(): {
     [ackIds, setAckIds],
   );
 
-  return { rows, acknowledgedRows, isLoading, acknowledge, unacknowledge };
+  return { rows, acknowledgedRows, isLoading, error, retry, acknowledge, unacknowledge };
 }

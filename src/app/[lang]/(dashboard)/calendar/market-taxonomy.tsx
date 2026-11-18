@@ -6,6 +6,7 @@ import {
   MegaphoneIcon,
   StarIcon,
 } from "@phosphor-icons/react";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /**
  * How the Calendar draws a taxonomy code it was handed.
@@ -59,18 +60,18 @@ function ramp(hue: string): MarketPalette {
  * codes a reader has to tell apart inside a 14px pill, in the same colour. XM
  * blue and XN violet also match the day card this was drawn from.
  */
-export const ACTION_KINDS: { kind: string; name: string; hue: string }[] = [
-  { kind: "XD", name: "Excluding Dividend", hue: "green" },
-  { kind: "XR", name: "Excluding Right", hue: "rose" },
-  { kind: "XW", name: "Excluding Warrant", hue: "cyan" },
-  { kind: "XI", name: "Excluding Interest", hue: "teal" },
-  { kind: "XP", name: "Excluding Principal", hue: "amber" },
-  { kind: "XA", name: "Excluding All Benefits", hue: "fuchsia" },
-  { kind: "XB", name: "Excluding Other Benefits", hue: "stone" },
-  { kind: "XE", name: "Excluding Exercise", hue: "lime" },
-  { kind: "XM", name: "Excluding Meeting", hue: "blue" },
-  { kind: "XN", name: "Excluding Capital Return", hue: "violet" },
-  { kind: "XT", name: "Excluding Transferable Subscription Right", hue: "orange" },
+export const ACTION_KINDS: { kind: string; hue: string }[] = [
+  { kind: "XD", hue: "green" },
+  { kind: "XR", hue: "rose" },
+  { kind: "XW", hue: "cyan" },
+  { kind: "XI", hue: "teal" },
+  { kind: "XP", hue: "amber" },
+  { kind: "XA", hue: "fuchsia" },
+  { kind: "XB", hue: "stone" },
+  { kind: "XE", hue: "lime" },
+  { kind: "XM", hue: "blue" },
+  { kind: "XN", hue: "violet" },
+  { kind: "XT", hue: "orange" },
 ];
 
 /**
@@ -84,7 +85,6 @@ export const ACTION_KINDS: { kind: string; name: string; hue: string }[] = [
 const FALLBACK_HUES = ["sky", "emerald", "pink", "indigo", "purple", "yellow", "slate", "camel"];
 
 const ACTION_KIND_ORDER = new Map(ACTION_KINDS.map((entry, i) => [entry.kind, i]));
-const ACTION_KIND_NAME = new Map(ACTION_KINDS.map((entry) => [entry.kind, entry.name]));
 const ACTION_KIND_HUE = new Map(ACTION_KINDS.map((entry) => [entry.kind, entry.hue]));
 
 /**
@@ -129,8 +129,8 @@ export function actionPalette(kind: string): MarketPalette {
  *  otherwise — a tooltip that repeats the pill is still better than an empty
  *  one, and inventing an expansion for an unknown code would be worse than
  *  both. */
-export function actionKindName(kind: string): string {
-  return ACTION_KIND_NAME.get(kind) ?? kind;
+export function actionKindName(kind: string, t: Dictionary): string {
+  return t.planner.actionKinds[kind]?.name ?? kind;
 }
 
 /**
@@ -146,10 +146,8 @@ export function actionKindName(kind: string): string {
  * Returns `null` where there is nothing to add — an unnamed code, whose "name"
  * is the code itself and would print twice.
  */
-export function actionKindShortName(kind: string): string | null {
-  const name = ACTION_KIND_NAME.get(kind);
-  if (!name) return null;
-  return name.startsWith("Excluding ") ? name.slice("Excluding ".length) : name;
+export function actionKindShortName(kind: string, t: Dictionary): string | null {
+  return t.planner.actionKinds[kind]?.short ?? null;
 }
 
 /** Sort position: the exchange's own order first, then anything new,
@@ -183,33 +181,31 @@ export type EventCategoryMeta = MarketPalette & {
  * carries a glyph and a sentence, an action pill a two-letter code and an accent
  * bar — they are never mistaken for each other on shape alone.
  */
-const EVENT_CATEGORIES: Record<string, EventCategoryMeta> = {
+const EVENT_CATEGORIES: Record<string, Omit<EventCategoryMeta, "label">> = {
   seminar: {
     ...ramp("violet"),
-    label: "Seminar",
     icon: <ChalkboardTeacherIcon size={15} />,
   },
   promotion: {
     ...ramp("pink"),
-    label: "Promotion",
     icon: <MegaphoneIcon size={15} />,
   },
   /** The desk's own dated obligations that aren't an exchange fact — a fund's
    *  subscription window closing, an IPO book opening. */
   deadline: {
     ...ramp("amber"),
-    label: "Deadline",
     icon: <CoinsIcon size={15} />,
   },
   other: {
     ...ramp("slate"),
-    label: "Other",
     icon: <StarIcon size={15} />,
   },
 };
 
-export function eventCategory(category: string): EventCategoryMeta {
-  return EVENT_CATEGORIES[category] ?? {
+export function eventCategory(category: string, t: Dictionary): EventCategoryMeta {
+  const known = EVENT_CATEGORIES[category];
+  if (known) return { ...known, label: t.planner.eventCategories[category] ?? category };
+  return {
     ...ramp(hueFor(category)),
     // Title-cased rather than passed through raw: the feed sends a slug and a
     // badge reading "quarterly_briefing" is a leak of the wire format.
@@ -217,7 +213,7 @@ export function eventCategory(category: string): EventCategoryMeta {
       .split(/[-_\s]+/)
       .filter(Boolean)
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ") || EVENT_CATEGORIES.other.label,
+      .join(" ") || t.planner.eventCategories.other,
     icon: EVENT_CATEGORIES.other.icon,
   };
 }

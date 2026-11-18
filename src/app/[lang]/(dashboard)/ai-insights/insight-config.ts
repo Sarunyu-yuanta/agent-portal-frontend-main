@@ -10,38 +10,31 @@ export type SortOption = "priority" | "recent";
 export type TabId = "all" | "product" | "risk" | "engagement" | "portfolio";
 export type Insight = (typeof mockInsights)[number];
 
+/** Labels: `t.research.aiInsights.category[type]` / `.primaryAction[type]`. */
 export const CATEGORY_CONFIG = {
   "Product Match": {
     color: "var(--text-brand-primary)",
     bg: "var(--bg-brand-light)",
     Icon: SparkleIcon,
     tagVariant: "green" as const,
-    tagText: "Product Match",
-    primaryAction: "Draft Proposal",
   },
   "Risk Alert": {
     color: "var(--text-danger-primary)",
     bg: "var(--bg-danger-light)",
     Icon: WarningIcon,
     tagVariant: "red" as const,
-    tagText: "Risk Alert",
-    primaryAction: "View Allocation",
   },
   "Engagement": {
     color: "var(--text-warning-primary)",
     bg: "var(--bg-warning-light)",
     Icon: UsersIcon,
     tagVariant: "yellow" as const,
-    tagText: "Engagement",
-    primaryAction: "Call Now",
   },
   "Portfolio": {
     color: "var(--text-brand-secondary)",
     bg: "var(--bg-brand-light)",
     Icon: ChartBarIcon,
     tagVariant: "blue" as const,
-    tagText: "Portfolio",
-    primaryAction: "Review Portfolio",
   },
 } as const;
 

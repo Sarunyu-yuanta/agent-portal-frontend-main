@@ -11,10 +11,12 @@ import {
 import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 import { STAGE_META, STAGE_ADVANCE, columnTotal, type Deal, type Stage } from "./pipeline-data";
 
 function DealCard({ deal, onAdvanceRequest }: { deal: Deal; onAdvanceRequest: (id: string, next: Stage) => void }) {
   const { isPrivate } = usePrivacy();
+  const t = useT();
   const maskedClient = maskName(deal.client, isPrivate);
   const isClosedWon = deal.stage === "Closed Won";
   const isClosedLost = deal.stage === "Closed Lost";
@@ -49,13 +51,13 @@ function DealCard({ deal, onAdvanceRequest }: { deal: Deal; onAdvanceRequest: (i
       {/* Days / status */}
       <div className="flex items-center gap-2">
         {deal.stalled ? (
-          <span className="text-meta font-semibold text-[var(--text-warning-primary)]">Stalled · {deal.daysInStage}d</span>
+          <span className="text-meta font-semibold text-[var(--text-warning-primary)]">{t.pipeline.card.stalled(deal.daysInStage)}</span>
         ) : isClosedWon ? (
-          <span className="text-meta font-semibold text-[var(--text-success-primary)]">Won</span>
+          <span className="text-meta font-semibold text-[var(--text-success-primary)]">{t.pipeline.card.won}</span>
         ) : isClosedLost ? (
-          <span className="text-meta text-muted-foreground">Lost</span>
+          <span className="text-meta text-muted-foreground">{t.pipeline.card.lost}</span>
         ) : deal.daysInStage > 0 ? (
-          <span className="text-meta text-muted-foreground">{deal.daysInStage}d in stage</span>
+          <span className="text-meta text-muted-foreground">{t.pipeline.card.daysInStage(deal.daysInStage)}</span>
         ) : null}
       </div>
 
@@ -68,11 +70,11 @@ function DealCard({ deal, onAdvanceRequest }: { deal: Deal; onAdvanceRequest: (i
           rightIcon={<ArrowRightIcon size={13} weight="bold" />}
           onClick={(e) => { e.stopPropagation(); onAdvanceRequest(deal.id, advance.next); }}
         >
-          {advance.label}
+          {t.pipeline.advance[deal.stage as keyof typeof t.pipeline.advance]}
         </Button>
       ) : isClosedLost ? (
         <Button variant="outline" size="sm" className="w-full" onClick={(e) => e.stopPropagation()}>
-          Reopen
+          {t.pipeline.card.reopen}
         </Button>
       ) : null}
     </div>
@@ -85,6 +87,7 @@ export function KanbanColumn({ stage, deals, dimmed = false, onAdvanceRequest }:
   dimmed?: boolean;
   onAdvanceRequest: (id: string, next: Stage) => void;
 }) {
+  const t = useT();
   const meta = STAGE_META[stage];
 
   return (
@@ -94,7 +97,7 @@ export function KanbanColumn({ stage, deals, dimmed = false, onAdvanceRequest }:
         <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: meta.dot }} />
-            <p className="text-body-sm font-semibold text-foreground">{meta.label}</p>
+            <p className="text-body-sm font-semibold text-foreground">{t.pipeline.stage[stage]}</p>
             <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-muted flex items-center justify-center">
               <span className="text-meta font-bold text-muted-foreground tabular-nums leading-none">
                 {deals.length}
@@ -111,7 +114,7 @@ export function KanbanColumn({ stage, deals, dimmed = false, onAdvanceRequest }:
           ))}
           {deals.length === 0 && (
             <div className="border-2 border-dashed border-border rounded-xl py-10 flex items-center justify-center">
-              <p className="text-label text-muted-foreground/60">No deals</p>
+              <p className="text-label text-muted-foreground/60">{t.pipeline.card.noDeals}</p>
             </div>
           )}
         </div>

@@ -4,8 +4,7 @@ import Image from "next/image";
 import { BottomSheet, Modal } from "@sarunyu/system-one";
 import { XIcon } from "@phosphor-icons/react";
 import { MF_ASSETS } from "./mutual-fund-assets";
-
-const LEGEND_TITLE = "คำอธิบายสถานะการแนะนำกองทุน";
+import { useT } from "@/i18n/I18nProvider";
 
 function LegendRow({
   icon,
@@ -35,21 +34,22 @@ function LegendRow({
 }
 
 function MutualFundLegendContent() {
+  const t = useT();
   return (
     <div className="flex w-full flex-col gap-4">
       <LegendRow
         icon={MF_ASSETS.performersTagView}
-        label="View"
+        label={t.fund.tags.view}
         tagClassName="bg-[#f6f3ef]"
         tagTextClassName="text-[#935737]"
-        description="แสดงกองทุนแนะนำตามมุมมองของ CIO Office ที่วิเคราะห์จากแนวโน้มเศรษฐกิจและทิศทางสินทรัพย์"
+        description={t.fund.legend.viewDescription}
       />
       <LegendRow
         icon={MF_ASSETS.performersTagHighlight}
-        label="Highlight"
+        label={t.fund.tags.highlight}
         tagClassName="bg-[#eff6ff]"
         tagTextClassName="text-[#0a6ee7]"
-        description="แสดงกองทุนแนะนำตามทีมผลิตภัณฑ์กองทุนของ Yuanta"
+        description={t.fund.legend.highlightDescription}
       />
     </div>
   );
@@ -63,11 +63,12 @@ export function MutualFundLegendBottomSheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const t = useT();
   return (
     <BottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={LEGEND_TITLE}
+      title={t.fund.legend.title}
       showHandle
       showHeader
       rightSide="icon"
@@ -87,6 +88,7 @@ export function MutualFundLegendModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useT();
   if (!open) return null;
 
   return (
@@ -100,7 +102,7 @@ export function MutualFundLegendModal({
       <div onMouseDown={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title={LEGEND_TITLE}
+          title={t.fund.legend.title}
           showClose
           onClose={onClose}
           className="!max-w-[440px] w-[calc(var(--vw)*100-3rem)]"

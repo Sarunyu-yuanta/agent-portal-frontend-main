@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@sarunyu/system-one";
 import { FunnelSimpleIcon, XIcon } from "@phosphor-icons/react";
 import type { FilterChipOption } from "./stock-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function FilterChip({
   option,
@@ -67,6 +68,7 @@ export function StockCrossSellFilterModal({
   onClose: () => void;
   onConfirm: (issuerIds: string[], countryIds: string[]) => void;
 }) {
+  const t = useT();
   const [draftIssuers, setDraftIssuers] = useState<Set<string>>(() => new Set(initialIssuerIds));
   const [draftCountries, setDraftCountries] = useState<Set<string>>(() => new Set(initialCountryIds));
 
@@ -92,7 +94,7 @@ export function StockCrossSellFilterModal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t.stock.crossSell.close}
           className="absolute right-3 top-3 flex size-6 cursor-pointer items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/40!"
         >
           <XIcon size={14} weight="bold" />
@@ -102,14 +104,14 @@ export function StockCrossSellFilterModal({
           <div className="flex items-center gap-2">
             <FunnelSimpleIcon size={20} style={{ color: "#101828" }} />
             <p className="font-bold text-lg" style={{ color: "#101828" }}>
-              Filter ({count})
+              {t.stock.crossSell.filterTitle(count)}
             </p>
           </div>
 
           {showIssuerFilter && (
             <div className="flex flex-col gap-4">
               <p className="font-bold text-base" style={{ color: "#101828" }}>
-                Issuer
+                {t.stock.crossSell.issuer}
               </p>
               <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                 {issuers.map((opt) => (
@@ -126,13 +128,13 @@ export function StockCrossSellFilterModal({
 
           <div className="flex flex-col gap-4">
             <p className="font-bold text-base" style={{ color: "#101828" }}>
-              Region / Country
+              {t.stock.crossSell.region}
             </p>
             <div className="grid grid-cols-3 gap-x-4 gap-y-3">
               {countries.map((opt) => (
                 <FilterChip
                   key={opt.id}
-                  option={opt}
+                  option={{ ...opt, label: t.stock.crossSell.countries[opt.id] ?? opt.label }}
                   selected={draftCountries.has(opt.id)}
                   onToggle={() => toggle(draftCountries, setDraftCountries, opt.id)}
                 />
@@ -150,14 +152,14 @@ export function StockCrossSellFilterModal({
               setDraftCountries(new Set());
             }}
           >
-            Clear All
+            {t.stock.crossSell.clearAll}
           </Button>
           <Button
             variant="primary"
             className="flex-1"
             onClick={() => onConfirm([...draftIssuers], [...draftCountries])}
           >
-            Confirm
+            {t.stock.crossSell.confirm}
           </Button>
         </div>
       </div>

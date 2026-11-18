@@ -1,7 +1,8 @@
 "use client";
 
 import { use } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import {
   ProductTrendingAllTable,
   ProductTrendingAllTableSkeleton,
@@ -17,18 +18,20 @@ import {
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { CatalogNotFound } from "../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function ProductTrendingGroupPage({
   params,
 }: {
   params: Promise<{ groupId: string }>;
 }) {
+  const t = useT();
   const { groupId } = use(params);
   const { data: groups, isLoading } = useProductTrendingGroups();
   const id = decodeURIComponent(groupId);
   const group = groups.find((g) => g.id === id);
-  const router = useRouter();
-  const pathname = usePathname();
+  const router = useLocalizedRouter();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   // Arrives in the order the card was showing; changing it here stays here.
   const sort = normalizeTrendingSort(searchParams.get(TRENDING_SORT_PARAM));
@@ -48,13 +51,13 @@ export default function ProductTrendingGroupPage({
   if (isLoading) return <ProductTrendingAllTableSkeleton />;
 
   if (!group) {
-    return <CatalogNotFound message="ไม่พบหมวดสินค้านี้" onBack={goBack} />;
+    return <CatalogNotFound message={t.products.notFound.productGroup} onBack={goBack} />;
   }
 
   return (
     <ProductTrendingAllTable
       group={group}
-      updatedAt={trendingUpdatedAt(group.measure)}
+      updatedAt={trendingUpdatedAt(group.measure, t)}
       sort={sort}
       onSortChange={(next) =>
         setQueryState(

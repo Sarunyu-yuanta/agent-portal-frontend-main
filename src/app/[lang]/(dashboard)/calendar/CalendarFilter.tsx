@@ -12,6 +12,7 @@ import {
   eventCategory,
 } from "./market-taxonomy";
 import { KeyPill } from "./CalendarLegend";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Which of the Calendar's layers are switched off, and which codes inside them.
@@ -58,11 +59,11 @@ export type CalendarLayerKey = DayItemSource | "holiday";
  * nothing else had one. The names carry it; the colours are decoded by the
  * codes inside the two layers that have them.
  */
-const LAYERS: { key: CalendarLayerKey; label: string }[] = [
-  { key: "corporate-action", label: "Company events" },
-  { key: "event", label: "Events" },
-  { key: "holiday", label: "Holidays" },
-  { key: "note", label: "Reminders" },
+const LAYERS: { key: CalendarLayerKey }[] = [
+  { key: "corporate-action" },
+  { key: "event" },
+  { key: "holiday" },
+  { key: "note" },
 ];
 
 /** Does this row survive the filter? Applied before the grid so a hidden row
@@ -184,6 +185,7 @@ export function CalendarFilterMenu({
   categories: string[];
   onChange: (next: CalendarFilterState) => void;
 }) {
+  const t = useT();
   const hidden = hiddenCount(state);
   /** Which layers are showing their codes. Starts empty — see the note above. */
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(
@@ -194,7 +196,7 @@ export function CalendarFilterMenu({
     (a, b) => actionKindRank(a) - actionKindRank(b) || a.localeCompare(b),
   );
   const sortedCategories = [...categories].sort((a, b) =>
-    eventCategory(a).label.localeCompare(eventCategory(b).label),
+    eventCategory(a, t).label.localeCompare(eventCategory(b, t).label),
   );
 
   const childrenOf = (key: CalendarLayerKey) =>
@@ -243,6 +245,7 @@ export function CalendarFilterMenu({
     // under the final row that reads as a gap nobody put there.
     <div className="flex w-[352px] max-w-[calc(var(--vw)*100-2rem)] flex-col overflow-x-hidden">
       {LAYERS.map((layer) => {
+        const layerLabel = t.planner.calendar.filter.layers[layer.key];
         const layerShown = !state.hiddenLayers.has(layer.key);
         const child = childrenOf(layer.key);
         const hiddenHere = child
@@ -272,7 +275,7 @@ export function CalendarFilterMenu({
                   onChange={(next) => setLayer(layer.key, next)}
                   label={
                     <span className="type-body-2 font-medium text-foreground">
-                      {layer.label}
+                      {layerLabel}
                     </span>
                   }
                 />
@@ -294,7 +297,7 @@ export function CalendarFilterMenu({
                     })
                   }
                   aria-expanded={isOpen}
-                  aria-label={`${isOpen ? "Hide" : "Show"} the ${child.all.length} ${layer.label.toLowerCase()} types`}
+                  aria-label={t.planner.calendar.filter.toggleTypes(isOpen, child.all.length, layerLabel)}
                   className="flex shrink-0 items-center gap-1 rounded-lg px-1.5 py-1 type-caption font-medium text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
                 >
                   <span className="tabular-nums">
@@ -334,8 +337,8 @@ export function CalendarFilterMenu({
                             color: palette.text,
                             borderLeft: `2px solid ${palette.accent}`,
                           }}
-                          name={actionKindShortName(kind)}
-                          fullName={actionKindName(kind)}
+                          name={actionKindShortName(kind, t)}
+                          fullName={actionKindName(kind, t)}
                           checked={!state.hiddenKinds.has(kind)}
                           onChange={(next) =>
                             onChange({
@@ -351,7 +354,7 @@ export function CalendarFilterMenu({
                       );
                     })
                   : sortedCategories.map((category) => {
-                      const meta = eventCategory(category);
+                      const meta = eventCategory(category, t);
                       return (
                         <ChildRow
                           key={category}
@@ -394,7 +397,7 @@ export function CalendarFilterMenu({
           onClick={() => onChange(SHOW_EVERYTHING)}
           className="shrink-0 border-t border-border/60 px-3 py-2 text-left type-body-2 font-medium text-primary-action transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]!"
         >
-          Show everything
+          {t.planner.calendar.filter.showEverything}
         </button>
       )}
     </div>
@@ -416,12 +419,12 @@ export function CalendarFilterMenu({
           leftIcon={<FunnelSimpleIcon size={15} />}
           rightIcon={<CaretDownIcon size={12} weight="bold" />}
         >
-          {hidden > 0 ? `Filter · ${hidden}` : "Filter"}
+          {hidden > 0 ? t.planner.calendar.filter.filterCount(hidden) : t.planner.calendar.filter.filter}
         </Button>
         <Button
           variant="outline"
           size="icon-md"
-          aria-label={hidden > 0 ? `Filter · ${hidden} hidden` : "Filter"}
+          aria-label={hidden > 0 ? t.planner.calendar.filter.filterHidden(hidden) : t.planner.calendar.filter.filter}
           className="sm:hidden!"
         >
           <FunnelSimpleIcon size={16} />

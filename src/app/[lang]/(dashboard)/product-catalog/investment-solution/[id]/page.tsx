@@ -1,31 +1,35 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { InvestmentSolutionDetail } from "../../../client/[id]/InvestmentSolutionDetail";
 import { InvestmentSolutionDetailSkeleton } from "../../../client/[id]/ProductDetailSkeletons";
-import { type InvestmentSolutionId } from "../../../client/[id]/investment-solution-data";
+import { CatalogNotFound } from "../../CatalogNotFound";
 import type { StructuredProduct } from "../../../client/[id]/structured-product-data";
 import { useInvestmentSolution } from "@/hooks/use-catalog";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Loading lives with the lookup — see the note in `product/[id]/page.tsx`.
- * No not-found branch here: `getInvestmentSolution` falls back to a default
- * solution rather than returning nothing.
+ * Loading is checked before not-found, so a slow fetch never flashes it.
  */
 export default function InvestmentSolutionDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useT();
   const { id } = use(params);
-  const router = useRouter();
-  const { data: solution, isLoading } = useInvestmentSolution(id as InvestmentSolutionId);
+  const router = useLocalizedRouter();
+  const { data: solution, isLoading } = useInvestmentSolution(id);
   const goBack = useSectionBack();
 
   if (isLoading) {
     return <InvestmentSolutionDetailSkeleton />;
+  }
+  if (!solution) {
+    return <CatalogNotFound message={t.products.notFound.investmentSolution} onBack={goBack} />;
   }
 
   return (

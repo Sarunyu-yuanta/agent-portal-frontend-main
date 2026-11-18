@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import {
   NavHeaderIconButton,
   type NotificationItem,
@@ -9,7 +9,8 @@ import {
 import { ListIcon } from "@phosphor-icons/react";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NotificationBell } from "@/components/layout/NotificationBell";
-import { notificationStampEn, pastBucketTh, PAST_BUCKETS_TH } from "./notification-zones";
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
+import { notificationStamp, pastBucket, PAST_BUCKETS } from "./notification-zones";
 import { FadeIn } from "@/components/ui/fade-in";
 import { NavStateMemory } from "@/components/layout/NavStateMemory";
 import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
@@ -36,10 +37,14 @@ import {
   type OrderSubmissionRef,
 } from "./orders/OrderSubmissionDetailModal";
 import { useDayItemModals } from "./calendar/use-day-item-modals";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const router = useRouter();
+  const locale = useLocale();
+  const pathname = useAppPathname();
+  const t = useT();
+  const router = useLocalizedRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const {
@@ -50,12 +55,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     isFullWidth,
     isMobileFullBleed,
     isFullHeight,
+    isEdgeToEdge,
     ownsMobileBreadcrumb,
     contentTopIsWhite,
   } = usePageChrome();
   const headerSlot = useHeaderSlot();
 
-  const { notes } = useNotes();
+  const { notes, isLoading: notesLoading } = useNotes();
   const { data: clients, isLoading: clientsLoading } = useClientsResource();
 
   // Clicking a bell row opens the reminder itself — the same two modals
@@ -75,7 +81,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   // The bell's rows are derived from clients (KYC, reminder holders) and
   // orders; until both have arrived it shows skeleton rows, not a guess.
   const { isLoading: ordersLoading } = useOrders();
-  const notificationsLoading = clientsLoading || ordersLoading;
+  // Notes too: the bell's reminder rows come from them.
+  const notificationsLoading = clientsLoading || ordersLoading || notesLoading;
   const [openSubmission, setOpenSubmission] = useState<OrderSubmissionRef | null>(null);
 
   /**
@@ -104,15 +111,15 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       (a, b) =>
         b.daysLeft - a.daysLeft || (b.at?.getTime() ?? 0) - (a.at?.getTime() ?? 0),
     );
-    return PAST_BUCKETS_TH.map((label) => ({
-      label,
+    return PAST_BUCKETS.map((bucket) => ({
+      label: t.buckets.past[bucket],
       items: sorted
-        .filter((r) => pastBucketTh(-r.daysLeft) === label)
+        .filter((r) => pastBucket(-r.daysLeft) === bucket)
         // Every row's `time` is set here, overriding whatever a feed put
         // there, so all three feeds stamp the same way.
-        .map((r) => ({ ...r.item, time: notificationStampEn(-r.daysLeft, r.at) })),
+        .map((r) => ({ ...r.item, time: notificationStamp(-r.daysLeft, locale, r.at) })),
     })).filter((g) => g.items.length > 0);
-  }, [notificationRows, kycNotificationRows, orderNotificationRows]);
+  }, [notificationRows, kycNotificationRows, orderNotificationRows, t, locale]);
 
   const handleNotificationClick = (notifItem: NotificationItem) => {
     // An answered order opens its receipt over whatever page is underneath —
@@ -218,22 +225,25 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             )}
 
             <div className={`flex items-center gap-4 ${headerSlot ? "xl:justify-self-end" : ""}`}>
+              <LanguageSwitcher />
               {/* The bell carries whichever feeds are in phase — KYC expiries
                   today, reminders alongside them once that flag flips. It only
                   disappears if every feed is off, rather than sitting there
-                  permanently empty. */}
-              {(notificationsLoading || notificationGroups.length > 0) && (
+                  permanently empty. With a feed on and nothing due, it stays
+                  and opens onto "ไม่มีการแจ้งเตือน" — a bell that vanishes when
+                  the list is clear reads as a broken header, not a clear desk. */}
+              {(REMINDERS_ENABLED || KYC_ALERTS_ENABLED || ORDER_BOOKING_ENABLED) && (
                 <NotificationBell
                   isLoading={notificationsLoading}
                   groups={notificationGroups}
-                  emptyText="ไม่มีการแจ้งเตือน"
+                  emptyText={t.nav.noNotifications}
                   onItemClick={handleNotificationClick}
                 />
               )}
 
               <div className="xl:hidden">
                 <NavHeaderIconButton
-                  aria-label="Open navigation"
+                  aria-label={t.nav.openNavigation}
                   onClick={() => setSidebarOpen(true)}
                 >
                   <ListIcon weight="regular" size={24} />
@@ -244,7 +254,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
           <main
             className={`flex-1 overflow-x-clip bg-[var(--bg-default-secondary)] ${
-              isFullWidth ? "" : isMobileFullBleed ? "xl:p-6" : "p-4 xl:p-6"
+              isFullWidth || isEdgeToEdge ? "" : isMobileFullBleed ? "xl:p-6" : "p-4 xl:p-6"
             } ${
               isFullHeight
                 ? "flex flex-col min-h-0 overflow-y-hidden"
@@ -275,7 +285,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               className={`${
                 isFullWidth
                   ? "w-full min-h-full"
-                  : "max-w-[1280px] mx-auto"
+                  : isEdgeToEdge
+                    ? "w-full"
+                    : "max-w-[1280px] mx-auto"
               } flex flex-col gap-3 xl:gap-6 ${isFullHeight ? "w-full flex-1 min-h-0" : ""}`}
             >
               {!breadcrumb &&

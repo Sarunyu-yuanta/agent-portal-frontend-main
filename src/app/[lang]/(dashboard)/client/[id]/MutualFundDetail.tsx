@@ -18,11 +18,15 @@ import {
 import { AllocationDonut } from "@/components/allocation-donut";
 import { FundTagBadges } from "./MutualFundCard";
 import { NoDividendIllustration } from "./NoDividendIllustration";
-import { SendProposalButton } from "@/app/(dashboard)/orders/SendProposalButton";
-import { offeredProductId } from "@/app/(dashboard)/orders/offered-products";
+import { MutualFundSectionEmpty } from "./mutual-fund-ui";
+import { SendProposalButton } from "@/app/[lang]/(dashboard)/orders/SendProposalButton";
+import { offeredProductId } from "@/app/[lang]/(dashboard)/orders/offered-products";
 import { pageZoom } from "@/lib/page-zoom";
+import { useT } from "@/i18n/I18nProvider";
 
-const DETAIL_TABS = ["ภาพรวม", "ผลตอบแทน", "สัดส่วนการลงทุน", "ข้อมูลกองทุน"] as const;
+// Ids, not the Thai titles they used to be — the titles are per language
+// (`t.catalog.fundDetailTabs`), and an id is what the switch below compares.
+const DETAIL_TABS = ["overview", "returns", "allocation", "info"] as const;
 
 const CHART_RANGES = NAV_RANGES;
 
@@ -30,6 +34,7 @@ type DetailTab = (typeof DETAIL_TABS)[number];
 type ChartRange = NavRange;
 
 function RiskTag({ risk }: { risk: number }) {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-1 rounded-2xl border border-black/10 bg-white px-2 py-0.5">
       <span className="relative size-5 shrink-0 overflow-clip">
@@ -43,7 +48,7 @@ function RiskTag({ risk }: { risk: number }) {
         </span>
       </span>
       <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">
-        risk: {risk}
+        {t.fund.tags.risk(risk)}
       </span>
     </span>
   );
@@ -59,6 +64,7 @@ function FxRiskTag({ label }: { label: string }) {
 }
 
 function CreditCardTag() {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-1 rounded-2xl border border-black/10 bg-white px-2 py-0.5">
       <span className="relative size-5 shrink-0 overflow-clip">
@@ -71,7 +77,7 @@ function CreditCardTag() {
           />
         </span>
       </span>
-      <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">Credit Card</span>
+      <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">{t.fund.tags.creditCard}</span>
     </span>
   );
 }
@@ -156,6 +162,7 @@ function ChartRangeSelector({
 }
 
 function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
+  const t = useT();
   const [chartRange, setChartRange] = useState<ChartRange>("YTD");
   const navHistory = getNavHistory(fund.id);
   const [policyModalOpen, setPolicyModalOpen] = useState(false);
@@ -184,7 +191,10 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       )}
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base font-bold leading-[28px] text-black">ผลตอบแทนย้อนหลัง</h2>
+        <h2 className="text-base font-bold leading-[28px] text-black">{t.fund.detail.historicalReturns}</h2>
+        {fund.historicalReturns.length === 0 ? (
+          <MutualFundSectionEmpty title={t.states.empty} />
+        ) : (
         <div className="flex flex-col gap-2">
           {returnRows.map((row, rowIndex) => (
             <div key={rowIndex} className="flex gap-2">
@@ -194,10 +204,11 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
             </div>
           ))}
         </div>
+        )}
       </section>
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base font-bold leading-[28px] text-[#101828]">นโยบายการลงทุน</h2>
+        <h2 className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.detail.investmentPolicy}</h2>
         <div className="flex flex-col items-end gap-2.5 rounded-lg border border-black/10 p-3">
           <p className="w-full text-sm leading-[24px] text-[#101828] line-clamp-4">{fund.investmentPolicy}</p>
           <button
@@ -205,7 +216,7 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
             className="border-none bg-transparent p-0 text-sm leading-[24px] text-[#2b7fff] cursor-pointer"
             onClick={() => setPolicyModalOpen(true)}
           >
-            อ่านเพิ่มเติม
+            {t.fund.detail.readMore}
           </button>
         </div>
       </section>
@@ -217,29 +228,29 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       />
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base font-bold leading-[28px] text-[#101828]">ค่าธรรมเนียม</h2>
+        <h2 className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.detail.fees}</h2>
         <div className="flex gap-2.5 rounded-lg border border-black/10 p-3">
-          <FeeCell label="ซื้อ" sublabel="(Front-end Fee)" value={fund.fees.frontEnd} />
-          <FeeCell label="ขาย" sublabel="(Front-end Fee)" value={fund.fees.backEnd} />
-          <FeeCell label="จัดการ" sublabel="(Front-end Fee)" value={fund.fees.management} />
+          <FeeCell label={t.fund.detail.feeBuy} sublabel={t.fund.detail.frontEndFee} value={fund.fees.frontEnd} />
+          <FeeCell label={t.fund.detail.feeSell} sublabel={t.fund.detail.frontEndFee} value={fund.fees.backEnd} />
+          <FeeCell label={t.fund.detail.feeManagement} sublabel={t.fund.detail.frontEndFee} value={fund.fees.management} />
         </div>
       </section>
 
       {fund.dividend && (
         <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-          <h2 className="text-base font-bold leading-[28px] text-[#101828]">การจ่ายปันผลครั้งล่าสุด</h2>
+          <h2 className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.detail.lastDividend}</h2>
           <div className="rounded-lg border border-black/10 p-3">
             <div className="flex gap-2.5">
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-xs leading-[20px] text-[#4a5565] text-center">วันที่ปิดสมุด</span>
+                <span className="text-xs leading-[20px] text-[#4a5565] text-center">{t.fund.dividend.bookCloseDate}</span>
                 <span className="text-sm font-bold leading-[24px] text-[#101828]">{fund.dividend.bookCloseDate}</span>
               </div>
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-xs leading-[20px] text-[#4a5565] text-center">วันที่จ่าย</span>
+                <span className="text-xs leading-[20px] text-[#4a5565] text-center">{t.fund.detail.lastDividendPaymentDate}</span>
                 <span className="text-sm font-bold leading-[24px] text-[#101828]">{fund.dividend.paymentDate}</span>
               </div>
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-xs leading-[20px] text-[#4a5565] text-center">บาท/หน่วย</span>
+                <span className="text-xs leading-[20px] text-[#4a5565] text-center">{t.fund.dividend.perUnit}</span>
                 <span className="text-sm font-bold leading-[24px] text-[#101828]">{fund.dividend.amountPerUnit}</span>
               </div>
             </div>
@@ -248,31 +259,31 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       )}
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base font-bold leading-[28px] text-[#101828]">รายละเอียดกองทุน</h2>
+        <h2 className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.detail.fundDetails}</h2>
         <div className="overflow-hidden rounded-lg border border-black/10">
           <FundInfoRow
-            label="หนังสือชี้ชวน"
+            label={t.fund.detail.info.prospectus}
             link
             value={
               <span className="inline-flex items-center gap-0.5">
                 <Image src={MF_ASSETS.filePdfIcon} alt="" width={20} height={20} className="size-5 shrink-0" />
-                ดูหนังสือชี้ชวน
+                {t.fund.detail.info.viewProspectus}
               </span>
             }
           />
-          <FundInfoRow label="ชื่อกองทุน" value={fund.name} />
-          <FundInfoRow label="บลจ." value={fund.fundInfo.managementCompany} />
-          <FundInfoRow label="ประเภทกอง" value={fund.fundInfo.fundType} />
-          <FundInfoRow label="สิทธิประโยชน์ทางภาษี" value={fund.fundInfo.taxBenefit} />
-          <FundInfoRow label="ลงทุนในต่างประเทศ" value={fund.fundInfo.foreignInvestment} />
-          <FundInfoRow label="ความเสี่ยงอัตราแลก เปลี่ยน" value={fund.fundInfo.fxRiskPolicy} />
-          <FundInfoRow label="ค่าความเสี่ยง" value={String(fund.fundInfo.riskScore)} />
-          <FundInfoRow label="นโยบายการจ่ายปันผล" value={fund.fundInfo.dividendPolicy} />
-          <FundInfoRow label="นโยบายค่าเงิน" value={fund.fundInfo.currencyPolicy} />
-          <FundInfoRow label="ค่าธรรมเนียมการจัดการ" value={fund.fundInfo.managementFee} />
-          <FundInfoRow label="ขั้นต่ำการลงทุน" value={fund.fundInfo.minimumInvestment} />
-          <FundInfoRow label="วันที่จดทะเบียนกองทุน" value={fund.fundInfo.registrationDate} />
-          <FundInfoRow label="มูลค่าทรัพย์สินสุทธิ" value={fund.fundInfo.netAssetValue} />
+          <FundInfoRow label={t.fund.detail.info.name} value={fund.name} />
+          <FundInfoRow label={t.fund.detail.info.managementCompany} value={fund.fundInfo.managementCompany} />
+          <FundInfoRow label={t.fund.detail.info.fundType} value={fund.fundInfo.fundType} />
+          <FundInfoRow label={t.fund.detail.info.taxBenefit} value={fund.fundInfo.taxBenefit} />
+          <FundInfoRow label={t.fund.detail.info.foreignInvestment} value={fund.fundInfo.foreignInvestment} />
+          <FundInfoRow label={t.fund.detail.info.fxRisk} value={fund.fundInfo.fxRiskPolicy} />
+          <FundInfoRow label={t.fund.detail.info.riskScore} value={String(fund.fundInfo.riskScore)} />
+          <FundInfoRow label={t.fund.detail.info.dividendPolicy} value={fund.fundInfo.dividendPolicy} />
+          <FundInfoRow label={t.fund.detail.info.currencyPolicy} value={fund.fundInfo.currencyPolicy} />
+          <FundInfoRow label={t.fund.detail.info.managementFee} value={fund.fundInfo.managementFee} />
+          <FundInfoRow label={t.fund.detail.info.minimumInvestment} value={fund.fundInfo.minimumInvestment} />
+          <FundInfoRow label={t.fund.detail.info.registrationDate} value={fund.fundInfo.registrationDate} />
+          <FundInfoRow label={t.fund.detail.info.netAssetValue} value={fund.fundInfo.netAssetValue} />
         </div>
       </section>
     </>
@@ -345,17 +356,18 @@ function KeyValueBox({ rows }: { rows: { label: string; value: string }[] }) {
 
 /** Figma 39824:512312 — fee table with fixed value column widths on mobile */
 function FeeDetailsTable({ rows }: { rows: { label: string; actual: string; maximum: string }[] }) {
+  const t = useT();
   return (
     <div className="w-full overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full">
         <div className="flex h-12 min-w-0 flex-1 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">รายการค่าธรรมเนียม</span>
+          <span className="text-sm leading-[24px] text-[#4a5565]">{t.fund.detail.feeTable.item}</span>
         </div>
         <div className="flex h-12 w-20 shrink-0 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">เก็บจริง</span>
+          <span className="text-sm leading-[24px] text-[#4a5565]">{t.fund.detail.feeTable.actual}</span>
         </div>
         <div className="flex h-12 w-[81px] shrink-0 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">ไม่เกิน</span>
+          <span className="text-sm leading-[24px] text-[#4a5565]">{t.fund.detail.feeTable.maximum}</span>
         </div>
       </div>
       {rows.map((row, index) => {
@@ -389,11 +401,12 @@ function AllocationSection({
   title: string;
   slices: { label: string; percent: number; color?: string }[];
 }) {
+  const t = useT();
   if (slices.length === 0) {
     return (
       <section className="flex w-full flex-col gap-3 bg-white py-4 lg:bg-transparent">
         <SectionTitle className="lg:px-0">{title}</SectionTitle>
-        <p className="text-sm leading-[24px] text-[#6a7282] lg:px-0">ไม่มีข้อมูล</p>
+        <p className="text-sm leading-[24px] text-[#6a7282] lg:px-0">{t.common.noData}</p>
       </section>
     );
   }
@@ -428,20 +441,24 @@ function AllocationSection({
 }
 
 function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
+  const t = useT();
   const [dividendModalOpen, setDividendModalOpen] = useState(false);
 
   return (
     <>
       <section className="flex w-full flex-col gap-3 py-4 lg:px-0">
-        <SectionTitle>ผลตอบแทนย้อนหลัง</SectionTitle>
+        <SectionTitle>{t.fund.detail.historicalReturns}</SectionTitle>
+        {fund.performanceReturns.length === 0 ? (
+          <MutualFundSectionEmpty title={t.states.empty} />
+        ) : (
         <div className="overflow-x-auto md:overflow-visible">
         <div className="min-w-[520px] overflow-hidden rounded-lg border border-black/10 md:min-w-0">
           <DataTableHeader
             columns={[
-              { label: "ช่วงเวลา" },
-              { label: "ผลตอบแทน" },
-              { label: "ความผันผวนกองทุน" },
-              { label: "Maximum Drawdown" },
+              { label: t.fund.detail.returnsTable.period },
+              { label: t.fund.detail.returnsTable.return },
+              { label: t.fund.detail.returnsTable.volatility },
+              { label: t.fund.detail.returnsTable.maxDrawdown },
             ]}
           />
           {fund.performanceReturns.map((row, index) => (
@@ -454,12 +471,13 @@ function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
           ))}
         </div>
         </div>
+        )}
       </section>
 
       {/* Figma 360:64004 — the section always shows; a fund that pays nothing
           gets the empty state (360:64499) instead of losing the section. */}
       <section className="flex w-full flex-col gap-3 py-4 lg:px-0">
-        <SectionTitle>ประวัติการจ่ายปันผล</SectionTitle>
+        <SectionTitle>{t.fund.dividend.historyTitle}</SectionTitle>
         {fund.dividendHistory.length > 0 ? (
           <DividendHistoryPreview
             rows={fund.dividendHistory}
@@ -468,7 +486,7 @@ function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
         ) : (
           <div className="flex w-full items-center gap-[15px]">
             <NoDividendIllustration />
-            <p className="text-center text-sm leading-[24px] text-[#4a5565]">กองทุนนี้ไม่มีการจ่ายปันผล</p>
+            <p className="text-center text-sm leading-[24px] text-[#4a5565]">{t.fund.dividend.none}</p>
           </div>
         )}
       </section>
@@ -483,53 +501,59 @@ function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
 }
 
 function AllocationContent({ fund }: { fund: MutualFundDetailData }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2.5 bg-[#f9fafb] lg:bg-transparent">
-      <AllocationSection title="หลักทรัพย์ 5 อันดับแรก" slices={fund.topHoldings} />
-      <AllocationSection title="สัดส่วนการลงทุน" slices={fund.assetAllocation} />
+      <AllocationSection title={t.fund.detail.topHoldings} slices={fund.topHoldings} />
+      <AllocationSection title={t.fund.detail.assetAllocation} slices={fund.assetAllocation} />
     </div>
   );
 }
 
 function FundInfoContent({ fund }: { fund: MutualFundDetailData }) {
+  const t = useT();
   const { tradingInfo } = fund;
 
   return (
     <>
       <section className="flex w-full flex-col gap-3 py-4 lg:px-0">
-        <SectionTitle>มูลค่าขั้นต่ำในการซื้อขาย</SectionTitle>
+        <SectionTitle>{t.fund.detail.minimumTrade}</SectionTitle>
         <KeyValueBox
           rows={[
-            { label: "มูลค่าขั้นต่ำของการซื้อครั้งแรก", value: tradingInfo.minInitialPurchase },
-            { label: "มูลค่าขั้นต่ำของการซื้อครั้งถัดไป", value: tradingInfo.minSubsequentPurchase },
-            { label: "มูลค่าขายขั้นต่ำ", value: tradingInfo.minRedemption },
+            { label: t.fund.detail.minInitialPurchase, value: tradingInfo.minInitialPurchase },
+            { label: t.fund.detail.minSubsequentPurchase, value: tradingInfo.minSubsequentPurchase },
+            { label: t.fund.detail.minRedemption, value: tradingInfo.minRedemption },
           ]}
         />
       </section>
 
       <section className="flex w-full flex-col gap-3 py-4 lg:px-0">
-        <SectionTitle>เวลาทำรายการ</SectionTitle>
+        <SectionTitle>{t.fund.detail.tradingHours}</SectionTitle>
         <KeyValueBox
           rows={[
-            { label: "เวลาปิดรับคำสั่งซื้อ", value: tradingInfo.purchaseCutoff },
-            { label: "เวลาปิดรับคำสั่งขาย", value: tradingInfo.redemptionCutoff },
-            { label: "วันที่จะได้รับเงิน", value: tradingInfo.settlementDays },
+            { label: t.fund.detail.purchaseCutoff, value: tradingInfo.purchaseCutoff },
+            { label: t.fund.detail.redemptionCutoff, value: tradingInfo.redemptionCutoff },
+            { label: t.fund.detail.settlement, value: tradingInfo.settlementDays },
           ]}
         />
       </section>
 
       <section className="flex w-full flex-col gap-3 py-4 lg:px-0">
-        <SectionTitle>ค่าธรรมเนียม</SectionTitle>
-        <FeeDetailsTable rows={fund.feeDetails} />
+        <SectionTitle>{t.fund.detail.fees}</SectionTitle>
+        {fund.feeDetails.length === 0 ? (
+          <MutualFundSectionEmpty title={t.states.empty} />
+        ) : (
+          <FeeDetailsTable rows={fund.feeDetails} />
+        )}
       </section>
     </>
   );
 }
 
 function DetailBody({ fund, activeTab }: { fund: MutualFundDetailData; activeTab: DetailTab }) {
-  if (activeTab === "ภาพรวม") return <OverviewContent fund={fund} />;
-  if (activeTab === "ผลตอบแทน") return <PerformanceContent fund={fund} />;
-  if (activeTab === "สัดส่วนการลงทุน") return <AllocationContent fund={fund} />;
+  if (activeTab === "overview") return <OverviewContent fund={fund} />;
+  if (activeTab === "returns") return <PerformanceContent fund={fund} />;
+  if (activeTab === "allocation") return <AllocationContent fund={fund} />;
   return <FundInfoContent fund={fund} />;
 }
 
@@ -540,7 +564,8 @@ export function MutualFundDetail({
   fund: MutualFundDetailData;
   onBack: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<DetailTab>("ภาพรวม");
+  const t = useT();
+  const [activeTab, setActiveTab] = useState<DetailTab>("overview");
 
   // The tab bar parks directly under the identity block, so its sticky offset
   // is that block's height — measured rather than hardcoded, since the block
@@ -639,7 +664,7 @@ export function MutualFundDetail({
             unlayered `.flex` that outranks any `max-lg:hidden` in Tailwind's
             utilities layer, so the bar would show at every width. */}
         <div className="hidden min-h-[46px] items-center gap-2 py-2 pr-2 lg:flex">
-          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.common.back} className="shrink-0">
             <ArrowLeftIcon size={18} />
           </Button>
           <div className="flex min-w-0 flex-1 items-center gap-1">
@@ -664,7 +689,7 @@ export function MutualFundDetail({
               variant="plain"
               size="icon-sm"
               onClick={onBack}
-              aria-label="กลับ"
+              aria-label={t.common.back}
               className="shrink-0 lg:hidden"
             >
               <ArrowLeftIcon size={18} />
@@ -731,7 +756,7 @@ export function MutualFundDetail({
                       : "border-black/10 text-black/60"
                   }`}
                 >
-                  {tab}
+                  {t.catalog.fundDetailTabs[tab]}
                 </button>
               );
             })}

@@ -1,7 +1,8 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import Image from "next/image";
 import { Button, Chip } from "@sarunyu/system-one";
 import {
@@ -33,10 +34,11 @@ import {
 import { stockProductHref } from "./stock-product-detail-data";
 import { marketIndexHref } from "./stock-index-data";
 import { SetIndustrySectorSection } from "./IndustrySectorSection";
-import { CARD_SHADOW, PercentPill, TREND_TEXT } from "./stock-ui";
+import { CARD_SHADOW, PercentPill, StockSectionEmpty, TREND_TEXT } from "./stock-ui";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { useMarketCatalog } from "@/hooks/use-catalog";
 import { StockTabSkeleton } from "./StockTabSkeleton";
+import { useT } from "@/i18n/I18nProvider";
 
 function TrendCaret({ trend, size = 16 }: { trend: Trend; size?: number }) {
   if (trend === "up")
@@ -61,6 +63,7 @@ function TrendCaret({ trend, size = 16 }: { trend: Trend; size?: number }) {
 /** Figma "Market_status" tag (node 35283:560342) — all 9 status permutations
  *  (Pre-Open/Open/Pre-Close/Closed/Suspend/Halt/Expired/Intermission/Break). */
 function MarketStatusTag({ status }: { status: MarketStatusValue }) {
+  const t = useT();
   const s = MARKET_STATUS_STYLE[status];
   return (
     <span
@@ -68,7 +71,7 @@ function MarketStatusTag({ status }: { status: MarketStatusValue }) {
       style={{ backgroundColor: s.bg, color: s.text }}
     >
       <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: s.dot }} aria-hidden />
-      {status}
+      {t.stock.marketStatus[status] ?? status}
     </span>
   );
 }
@@ -108,6 +111,7 @@ function MarketWatchlistRow({
   activeId: MarketId;
   onChange: (id: MarketId) => void;
 }) {
+  const t = useT();
   return (
     <div className="w-full" style={{ backgroundColor: "white" }}>
       <div
@@ -118,7 +122,7 @@ function MarketWatchlistRow({
           <Chip
             key={m.id}
             size="medium"
-            label={`${m.flag} ${m.label}`}
+            label={`${m.flag} ${t.stock.markets[m.id] ?? m.id}`}
             selected={activeId === m.id}
             onClick={() => onChange(m.id as MarketId)}
           />
@@ -179,13 +183,17 @@ function MarketStatusSection({
   market: MarketId;
   updatedAt: string;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   return (
     <div className="w-full" style={{ backgroundColor: "white" }}>
       <div className="flex flex-col gap-4 max-w-[1280px] mx-auto px-4 lg:px-6" style={{ paddingBottom: 16 }}>
         <MarketStatusTag status={MARKET_STATUS} />
         {/* `py-1 -my-1` costs no layout but stops the scroller clipping the
             cards' hover shadow. */}
+        {indices.length === 0 ? (
+          <StockSectionEmpty title={t.stock.empty.indices} />
+        ) : (
         <div
           className="flex gap-3 items-start overflow-x-auto hide-scrollbar py-1 -my-1"
           style={{ scrollbarWidth: "none" }}
@@ -198,13 +206,14 @@ function MarketStatusSection({
             />
           ))}
         </div>
+        )}
         <div className="flex gap-2 items-center justify-center w-full">
           <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
-            30-Day Data Chart
+            {t.stock.chart30Day}
           </p>
           <span className="h-3 w-px bg-black/10" aria-hidden />
           <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
-            {updatedAt}
+            {t.stock.latestUpdate(updatedAt)}
           </p>
         </div>
       </div>
@@ -310,7 +319,8 @@ function RecommendationCard({
   rows: StockRow[];
   currency: string;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   return (
     <div className={`flex-1 flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
       <div className="flex gap-2 items-center px-6 py-3 shrink-0" style={{ backgroundColor: "#f9f9f9" }}>
@@ -319,6 +329,9 @@ function RecommendationCard({
           {title}
         </p>
       </div>
+      {rows.length === 0 ? (
+        <StockSectionEmpty title={t.stock.empty.stocks} />
+      ) : (
       <div className="flex flex-col p-3 w-full">
         {rows.map((row, i) => (
           <InstrumentRow
@@ -338,6 +351,7 @@ function RecommendationCard({
           />
         ))}
       </div>
+      )}
     </div>
   );
 }
@@ -355,6 +369,7 @@ function StockRecommendationSection({
   currency: string;
   updatedAt: string;
 }) {
+  const t = useT();
   return (
     <div className="relative w-full overflow-hidden" style={{ paddingTop: 40, paddingBottom: 40 }}>
       {/* Figma "Recommend" frame background (asset 86090.png) + white→transparent
@@ -375,26 +390,26 @@ function StockRecommendationSection({
       <div className="relative z-10 flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
         <SectionHeading
           icon={<Image src="/products/stock/thumbs-up-gradient.svg" alt="" width={20} height={20} />}
-          title="Stock Recommendation"
-          desc="Stay on top of all the movements in the capital market."
+          title={t.stock.tab.recommendationTitle}
+          desc={t.stock.tab.recommendationDesc}
         />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
           <RecommendationCard
-            title="Top Gain"
+            title={t.stock.tab.topGain}
             icon={<TrendUpIcon size={24} weight="fill" />}
             iconColor="#0092b8"
             rows={topGain}
             currency={currency}
           />
           <RecommendationCard
-            title="Top Loss"
+            title={t.stock.tab.topLoss}
             icon={<TrendDownIcon size={24} weight="fill" />}
             iconColor="#fb2c36"
             rows={topLoss}
             currency={currency}
           />
           <RecommendationCard
-            title="Top Pick"
+            title={t.stock.tab.topPick}
             icon={<Image src="/products/stock/sparkle-gradient-lg.svg" alt="" width={24} height={24} />}
             iconColor="transparent"
             rows={topPick}
@@ -402,9 +417,9 @@ function StockRecommendationSection({
           />
         </div>
         <div className="flex gap-2 items-center justify-center w-full">
-          <p className="text-xs text-white">30-Day Data Chart</p>
+          <p className="text-xs text-white">{t.stock.chart30Day}</p>
           <span className="h-3 w-px bg-white" aria-hidden />
-          <p className="text-xs text-white">{updatedAt}</p>
+          <p className="text-xs text-white">{t.stock.latestUpdate(updatedAt)}</p>
         </div>
       </div>
     </div>
@@ -504,7 +519,10 @@ function CrossSellCard({
    *  label. */
   onNavigate?: () => void;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
+  // Nothing to list, nothing to open: the header stays a plain label.
+  const canNavigate = !!onNavigate && rows.length > 0;
   const header = (
     <div
       className="flex gap-2 items-center justify-between px-6 py-4"
@@ -516,18 +534,21 @@ function CrossSellCard({
           {title}
         </p>
       </div>
-      <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />
+      {canNavigate && <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />}
     </div>
   );
   return (
     <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
-      {onNavigate ? (
+      {canNavigate ? (
         <button type="button" onClick={onNavigate} className="text-left w-full cursor-pointer hover:brightness-[0.98] transition-[filter]">
           {header}
         </button>
       ) : (
         header
       )}
+      {rows.length === 0 ? (
+        <StockSectionEmpty title={t.stock.empty.crossSell} />
+      ) : (
       <div className="flex flex-col px-6">
         {rows.map((row, i) => (
           <CrossSellInstrumentRow
@@ -545,18 +566,20 @@ function CrossSellCard({
           />
         ))}
       </div>
+      )}
       <div className="flex gap-2 items-center justify-center px-3 py-4 text-xs" style={{ color: "#6a7282" }}>
-        <span>30-Day Data Chart</span>
+        <span>{t.stock.chart30Day}</span>
         <span className="h-3 w-px bg-black/10" aria-hidden />
-        <span>{MARKET_LATEST_UPDATE}</span>
+        <span>{t.stock.latestUpdate(MARKET_LATEST_UPDATE)}</span>
       </div>
     </div>
   );
 }
 
 function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
+  const t = useT();
   const isUsEtf = catalog.crossSell === "etf-gain-loss";
-  const router = useRouter();
+  const router = useLocalizedRouter();
   return (
     <div className="relative w-full overflow-hidden" style={{ paddingTop: 24, paddingBottom: 24 }}>
       <Image
@@ -572,17 +595,17 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
           <div className="flex gap-2 items-center w-full">
             <div className="flex flex-col gap-2 flex-1 min-w-0">
               <p className="font-bold text-title leading-[28px]" style={{ color: "rgba(0,0,0,0.75)" }}>
-                ETF (Exchange Traded Fund)
+                {t.stock.tab.etfTitle}
               </p>
               <p className="text-sm" style={{ color: "rgba(0,0,0,0.6)" }}>
-                Index funds can be traded in the same way as stocks
+                {t.stock.tab.etfDesc}
               </p>
             </div>
             <Button
               variant="plain"
               size="icon-sm"
               onClick={() => router.push("/product-catalog/stock/etf")}
-              aria-label="ดูทั้งหมด"
+              aria-label={t.stock.tab.viewAll}
               className="shrink-0"
             >
               <ArrowRightIcon size={20} style={{ color: "#4a5565" }} />
@@ -590,8 +613,8 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
           </div>
         ) : (
           <SectionHeading
-            title="Open up opportunities in other assets through the Thai market."
-            desc="Accessing other investments has become more convenient."
+            title={t.stock.tab.crossSellTitle}
+            desc={t.stock.tab.crossSellDesc}
           />
         )}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
@@ -601,9 +624,12 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
                 <div className="flex gap-2 items-center px-6 py-3" style={{ backgroundColor: "#f9f9f9" }}>
                   <TrendUpIcon size={24} weight="fill" className="text-[#0092b8]" />
                   <p className="font-bold text-base" style={{ color: "rgba(0,0,0,0.75)" }}>
-                    Top Gain
+                    {t.stock.tab.topGain}
                   </p>
                 </div>
+                {catalog.etfGain.length === 0 ? (
+                  <StockSectionEmpty title={t.stock.empty.crossSell} />
+                ) : (
                 <div className="flex flex-col">
                   {catalog.etfGain.map((row, i) => (
                     <CrossSellInstrumentRow
@@ -621,14 +647,18 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
                     />
                   ))}
                 </div>
+                )}
               </div>
               <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
                 <div className="flex gap-2 items-center px-6 py-3" style={{ backgroundColor: "#f9f9f9" }}>
                   <TrendDownIcon size={24} weight="fill" className="text-[#fb2c36]" />
                   <p className="font-bold text-base" style={{ color: "rgba(0,0,0,0.75)" }}>
-                    Top Loss
+                    {t.stock.tab.topLoss}
                   </p>
                 </div>
+                {catalog.etfLoss.length === 0 ? (
+                  <StockSectionEmpty title={t.stock.empty.crossSell} />
+                ) : (
                 <div className="flex flex-col">
                   {catalog.etfLoss.map((row, i) => (
                     <CrossSellInstrumentRow
@@ -646,19 +676,20 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
                     />
                   ))}
                 </div>
+                )}
               </div>
             </>
           ) : (
             <>
               <CrossSellCard
-                title="DR (Depositary Receipt)"
+                title={t.stock.tab.drTitle}
                 icon={<PaperPlaneTiltIcon size={24} className="text-[#0084d1]" />}
                 headerFrom="#e7f3fb"
                 rows={STOCK_DR_ROWS}
                 onNavigate={() => router.push("/product-catalog/stock/dr")}
               />
               <CrossSellCard
-                title="ETF (Exchange Traded Fund)"
+                title={t.stock.tab.etfTitle}
                 icon={<GlobeIcon size={24} className="text-[#d08700]" />}
                 headerFrom="#faf3e5"
                 rows={STOCK_ETF_ROWS}
@@ -670,11 +701,11 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
         <div className="flex flex-col gap-3 items-center w-full">
           <div className="flex gap-2 items-center justify-center">
             <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
-              30-Day Data Chart
+              {t.stock.chart30Day}
             </p>
             <span className="h-3 w-px bg-black/10" aria-hidden />
             <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
-              {MARKET_LATEST_UPDATE}
+              {t.stock.latestUpdate(MARKET_LATEST_UPDATE)}
             </p>
           </div>
         </div>
@@ -692,7 +723,7 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
  * in `ProductCatalogTab` already renders.
  */
 export function StockTab() {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   // The market chip is view state, so it lives in the URL like the category tab
   // above it — that's what lets the breadcrumb trail (which stores whole URLs)
@@ -731,7 +762,6 @@ export function StockTab() {
       <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 24 }}>
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <SetIndustrySectorSection
-            title={catalog.sectorsTitle}
             sectors={catalog.sectors}
             layout={catalog.heatmapLayout}
             sectorsMarket={catalog.sectorsMarket}

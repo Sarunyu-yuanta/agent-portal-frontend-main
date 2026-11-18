@@ -6,6 +6,7 @@ import { Button, Modal, Tooltip } from "@sarunyu/system-one";
 import { MinusIcon } from "@phosphor-icons/react";
 import { NoteAttributesControl } from "./NoteAttributesControl";
 import { NoteEditorFields } from "./NoteEditorFields";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Everything being written, before it's a note. */
 export type ComposerDraft = {
@@ -57,6 +58,7 @@ export function NoteComposer({
   lockedClientId,
   clients,
   saving = false,
+  error = null,
   onSubmit,
   onDiscard,
   onMinimize,
@@ -67,11 +69,14 @@ export function NoteComposer({
   lockedClientId?: string | null;
   clients: { id: string; name: string }[];
   saving?: boolean;
+  /** Why the last submit failed. Shown above the buttons; the draft is kept. */
+  error?: string | null;
   onSubmit: () => void;
   onDiscard: () => void;
   /** Put the panel away and keep the draft. */
   onMinimize: () => void;
 }) {
+  const t = useT();
   // Controlled so the trigger can show an active state while its panel is up.
   // Starts closed even when the draft already carries a client or a reminder —
   // the trigger reads those out on its own, and a popover that opens itself on
@@ -119,18 +124,18 @@ export function NoteComposer({
     // around by collision detection.
     <div className="flex w-[min(var(--vw)*88,26rem)] flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
-        <p className="type-subtitle-1 font-semibold text-foreground">New note</p>
+        <p className="type-subtitle-1 font-semibold text-foreground">{t.planner.notes.newNote}</p>
         {/* The way out, now that clicking away deliberately doesn't close this.
             "Minimize" rather than "close": the draft is kept and the button it
             folds back into starts blinking, so nothing is being dismissed.
 
             `aria-label` stays alongside the tooltip: the tooltip is a hover
             affordance, not the button's accessible name. */}
-        <Tooltip content="Minimize" side="left">
+        <Tooltip content={t.planner.notes.composer.minimize} side="left">
           <button
             type="button"
             onClick={onMinimize}
-            aria-label="Minimize"
+            aria-label={t.planner.notes.composer.minimize}
             // A step darker than the attributes pill's gray-50 — this one is the
             // way out of the panel, so it holds its own rather than blending
             // into the header.
@@ -172,9 +177,14 @@ export function NoteComposer({
         />
 
         <div className="flex shrink-0 items-center gap-2">
+          {error && (
+            <p role="alert" className="type-caption text-[var(--text-danger-primary)]">
+              {error}
+            </p>
+          )}
           {draftHasContent(draft) && (
             <Button variant="plain" size="sm" onClick={() => setConfirmDiscard(true)}>
-              Discard
+              {t.planner.notes.composer.discard}
             </Button>
           )}
           <Button
@@ -183,7 +193,7 @@ export function NoteComposer({
             disabled={!canSubmit || saving}
             onClick={onSubmit}
           >
-            {saving ? "Saving…" : "Add note"}
+            {saving ? t.common.saving : t.planner.addNote}
           </Button>
         </div>
       </div>
@@ -208,11 +218,11 @@ export function NoteComposer({
             <Modal
               variant="alert"
               alertStatus="danger"
-              title="Discard this note?"
-              description="What you've written will be lost."
+              title={t.planner.notes.composer.discardTitle}
+              description={t.planner.notes.composer.discardBody}
               actionLayout="double"
-              primaryLabel="Discard"
-              secondaryLabel="Keep writing"
+              primaryLabel={t.planner.notes.composer.discard}
+              secondaryLabel={t.planner.notes.composer.keepWriting}
               onPrimaryClick={onDiscard}
               onSecondaryClick={() => setConfirmDiscard(false)}
               onClose={() => setConfirmDiscard(false)}

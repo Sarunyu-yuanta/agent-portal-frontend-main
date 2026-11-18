@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { useIsMobile } from "@sarunyu/system-one";
 import { MF_ASSETS } from "./mutual-fund-assets";
 import {
@@ -13,6 +13,7 @@ import {
   type MutualFundFilterState,
 } from "./MutualFundFilterPanel";
 import { navWrite } from "@/lib/nav-session";
+import { useT } from "@/i18n/I18nProvider";
 
 export const MUTUAL_FUND_FILTER_STATE_KEY = "nav:mutual-fund-filter-state";
 
@@ -116,7 +117,8 @@ function QuickActionCard({
 
 /** Opens the filter panel in place; only navigates to the results page once "ตกลง" is pressed. */
 function FilterEntryTile() {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   const isPhone = useIsMobile();
   const [open, setOpen] = useState(false);
 
@@ -129,7 +131,7 @@ function FilterEntryTile() {
     <>
       <QuickActionCard
         variant="search"
-        title={["ค้นหากองทุน", "ที่คุณสนใจ"]}
+        title={[t.fund.quickActions.searchLine1, t.fund.quickActions.searchLine2]}
         onClick={() => setOpen(true)}
       />
       {isPhone ? (
@@ -153,12 +155,13 @@ function FilterEntryTile() {
 
 /** Figma 40135:224276 (mobile) / 40118:77384 (desktop) */
 export function MutualFundQuickActions({ className = "" }: { className?: string }) {
+  const t = useT();
   return (
     <div className={`flex w-full gap-2.5 lg:justify-center lg:gap-8 ${className}`.trim()}>
       <FilterEntryTile />
       <QuickActionCard
         variant="tax"
-        title={["แนะนำกองทุน", "ลดหย่อนภาษี"]}
+        title={[t.fund.quickActions.taxLine1, t.fund.quickActions.taxLine2]}
         href="/product-catalog/mutual-fund/tools/tax-planning"
       />
     </div>

@@ -14,10 +14,11 @@ export type KycRow = (typeof mockKYCData)[number];
 export type SortKey = "client" | "riskRating" | "nextReview" | "daysUntilExpiry";
 export type SortDir = "none" | "asc" | "desc";
 
+/** Labels live in `t.compliance.table.filters[id]`. */
 export const kycFilterOpts = [
-  { value: "", label: "All Statuses" },
-  { value: "success",    label: "Verified" },
-  { value: "processing", label: "Processing" },
-  { value: "hold",       label: "On Hold" },
-  { value: "error",      label: "Expired" },
-];
+  { value: "",           id: "all" },
+  { value: "success",    id: "success" },
+  { value: "processing", id: "processing" },
+  { value: "hold",       id: "hold" },
+  { value: "error",      id: "error" },
+] as const;

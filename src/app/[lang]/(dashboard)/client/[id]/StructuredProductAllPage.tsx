@@ -13,16 +13,13 @@ import {
 } from "./structured-product-data";
 import { useStructuredProducts } from "@/hooks/use-catalog";
 import { StructuredProductAllPageSkeleton } from "./ProductDetailSkeletons";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
-const COUPON_FILTERS = [
-  { key: "all", label: "ALL" },
-  { key: "low", label: "Low Coupon [0-15%]" },
-  { key: "medium", label: "Medium Coupon [15-30%]" },
-  { key: "high", label: "High Coupon [30-40%]" },
-  { key: "ultra", label: "Ultra High Coupon [40% ++]" },
-] as const;
+/** Labelled at render from `t.products.structured.couponFilter`. */
+const COUPON_FILTERS = ["all", "low", "medium", "high", "ultra"] as const;
 
-type CouponFilter = typeof COUPON_FILTERS[number]["key"];
+type CouponFilter = typeof COUPON_FILTERS[number];
 
 export function StructuredProductAllPage({
   onBack,
@@ -31,6 +28,8 @@ export function StructuredProductAllPage({
   onBack: () => void;
   onProductSelect: (product: StructuredProduct) => void;
 }) {
+  const t = useT();
+  const labels = t.products.structured.all;
   const { data: allProducts, isLoading } = useStructuredProducts();
   const [couponFilter, setCouponFilter] = useState<CouponFilter>("all");
 
@@ -59,11 +58,11 @@ export function StructuredProductAllPage({
       <div className="flex flex-col gap-4 lg:gap-6 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
         {/* Header */}
         <div className="flex gap-2 items-center h-[46px] py-2">
-          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
             <ArrowLeftIcon size={20} />
           </Button>
           <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
-            Structured Products ทั้งหมด
+            {labels.title}
           </h1>
         </div>
 
@@ -80,10 +79,10 @@ export function StructuredProductAllPage({
           />
           <div className="relative z-[1] flex max-w-[220px] flex-col gap-2 md:max-w-none">
             <p className="text-2xl font-bold leading-9 text-[#101828] lg:text-[32px] lg:leading-[48px] lg:text-[rgba(0,0,0,0.85)]">
-              All Structured Products
+              {labels.title}
             </p>
             <p className="text-sm font-bold leading-[24px] text-[#4a5565] lg:text-base lg:leading-[28px] lg:text-[rgba(0,0,0,0.75)]">
-              รวม Structured Products ทั้งหมด ที่สามารถทำการซื้อขายได้
+              {labels.subtitle}
             </p>
           </div>
         </div>
@@ -91,10 +90,10 @@ export function StructuredProductAllPage({
         {/* Filter chips */}
         <div className="-mx-4 md:-mx-8 lg:mx-0 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           <div className="flex gap-2 min-w-max pl-4 md:pl-8 lg:pl-0 pr-4 md:pr-8 lg:pr-0">
-            {COUPON_FILTERS.map(({ key, label }) => (
+            {COUPON_FILTERS.map((key) => (
               <Chip
                 key={key}
-                label={label}
+                label={t.products.structured.couponFilter[key]}
                 size="medium"
                 selected={couponFilter === key}
                 onClick={() => setCouponFilter(key)}
@@ -106,13 +105,28 @@ export function StructuredProductAllPage({
         {/* Product list — mobile/tablet: single-col vertical cards; desktop: 3-col grid */}
         <div className="flex flex-col gap-3 lg:gap-4 w-full">
           <div className="flex items-center justify-between w-full text-xs leading-[20px] lg:text-sm lg:leading-[24px] text-[#6a7282]">
-            <span>จำนวน {ALL_STRUCTURED_PRODUCTS_COUNT} รายการ</span>
+            {/* The feed's total unfiltered; what the chip left once one is picked. */}
+            <span>
+              {t.products.common.itemCount(
+                couponFilter === "all" ? ALL_STRUCTURED_PRODUCTS_COUNT : filteredProducts.length,
+              )}
+            </span>
             <span className="text-right shrink-0 ml-2">
-              <span className="lg:hidden">อัปเดตล่าสุด {ALL_STRUCTURED_PRODUCTS_UPDATED_AT_TABLET}</span>
-              <span className="hidden lg:inline">อัปเดตล่าสุด {ALL_STRUCTURED_PRODUCTS_UPDATED_AT}</span>
+              <span className="lg:hidden">{t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT_TABLET)}</span>
+              <span className="hidden lg:inline">{t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT)}</span>
             </span>
           </div>
 
+          {filteredProducts.length === 0 ? (
+            <CatalogSectionEmpty
+              title={t.products.states.noOpenProducts}
+              onClearFilters={
+                allProducts.length > 0 && couponFilter !== "all"
+                  ? () => setCouponFilter("all")
+                  : undefined
+              }
+            />
+          ) : (
           <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-4 w-full">
             {filteredProducts.map((product) => (
               <StructuredProductCard
@@ -123,6 +137,7 @@ export function StructuredProductAllPage({
               />
             ))}
           </div>
+          )}
 
         </div>
       </div>

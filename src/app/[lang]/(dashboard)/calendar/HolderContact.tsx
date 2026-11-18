@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Avatar, BottomSheet } from "@sarunyu/system-one";
 import {
   ArrowLeftIcon,
@@ -17,6 +17,7 @@ import {
 import { getInitial } from "@/lib/client-utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { getClientProfile } from "@/data/client-profiles";
+import { useT } from "@/i18n/I18nProvider";
 
 /** How long the tick stays after a copy. Long enough to be seen if you glanced
  * away, short enough that the row is back to normal before you need it again. */
@@ -53,7 +54,13 @@ export function ContactChips({
    *  paint. Nothing else needs it. */
   scrollerRef?: React.Ref<HTMLDivElement>;
 }) {
+  const t = useT();
   const profile = getClientProfile(clientId);
+  if (!profile) {
+    return (
+      <p className={`type-caption text-muted-foreground ${className ?? ""}`}>{t.planner.calendar.contact.none}</p>
+    );
+  }
 
   /** Only `lineId` is optional on the profile; phone and email are always on
    *  file. A channel the client has not given is dropped rather than shown as
@@ -117,6 +124,7 @@ function CopyField({
   label: string;
   value: string;
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -163,7 +171,7 @@ function CopyField({
         }`}
       >
         {copied ? <CheckIcon size={14} weight="bold" /> : <CopyIcon size={14} />}
-        {copied ? "Copied" : ""}
+        {copied ? t.planner.calendar.contact.copied : ""}
       </span>
     </button>
   );
@@ -186,18 +194,27 @@ function CopyField({
  * ones under a call summary cannot drift apart.
  */
 export function ContactFields({ clientId }: { clientId: string }) {
+  const t = useT();
   const profile = getClientProfile(clientId);
+  // No profile on file: say so rather than offering a number to call.
+  if (!profile) {
+    return (
+      <p className="rounded-xl bg-[var(--bg-default-secondary)] px-4 py-3 type-body-2 text-muted-foreground">
+        {t.planner.calendar.contact.noneForClient}
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
       <CopyField
         icon={<PhoneIcon size={14} weight="fill" />}
-        label="Phone"
+        label={t.planner.calendar.contact.phone}
         value={profile.phone}
       />
       <CopyField
         icon={<EnvelopeSimpleIcon size={14} weight="fill" />}
-        label="Email"
+        label={t.planner.calendar.contact.email}
         value={profile.email}
       />
       {/* Optional on the profile type, so it only appears for a client who has
@@ -205,7 +222,7 @@ export function ContactFields({ clientId }: { clientId: string }) {
       {profile.lineId && (
         <CopyField
           icon={<ChatCircleTextIcon size={14} weight="fill" />}
-          label="LINE ID"
+          label={t.planner.calendar.contact.lineId}
           value={profile.lineId}
         />
       )}
@@ -239,6 +256,7 @@ export function HolderContact({
   onClose: () => void;
   variant?: "modal" | "sheet";
 }) {
+  const t = useT();
   const isSheet = variant === "sheet";
 
   return (
@@ -250,7 +268,7 @@ export function HolderContact({
           <button
             type="button"
             onClick={onBack}
-            aria-label="Back to the alert"
+            aria-label={t.planner.calendar.contact.backToAlert}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <ArrowLeftIcon size={16} />
@@ -262,7 +280,7 @@ export function HolderContact({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <XIcon size={16} />
@@ -303,7 +321,7 @@ export function HolderContact({
           onClick={onClose}
           className="flex h-9 w-full items-center justify-center rounded-lg border border-transparent bg-transparent type-body-2 font-medium text-primary-action transition-colors hover:bg-[var(--bg-default-secondary)]!"
         >
-          View full profile
+          {t.planner.calendar.contact.viewProfile}
         </Link>
       </div>
     </div>

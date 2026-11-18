@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, Suspense, useCallback, useMemo, useState } from "react";
-import Link from "next/link";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import {
   ArrowLeftIcon,
   CalendarBlankIcon,
@@ -17,24 +17,26 @@ import { useSectionBack } from "@/hooks/use-section-back";
 import { useToasts } from "@/hooks/use-toasts";
 import { useClients } from "@/hooks/use-api";
 import { useCampaign } from "@/hooks/use-campaigns";
-import { useCampaignStore } from "@/contexts/campaigns-context";
+import { CampaignRuleError, campaignRuleMessage, useCampaignStore } from "@/contexts/campaigns-context";
+import { useT } from "@/i18n/I18nProvider";
+import { NotFoundState } from "@/components/ui/empty-state";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import { todayDateKey } from "../../calendar/calendar-grid";
 import {
   campaignClientRows,
   campaignDateLine,
+  campaignDay,
   campaignStatus,
   countdownLabel,
   daysUntil,
-  FORMAT_LABEL,
   isPastEvent,
-  PRODUCT_LABEL,
-  SEGMENT_LABEL,
-  thaiDay,
 } from "../campaign-data";
 import { CampaignDetailSkeleton } from "./CampaignDetailSkeleton";
 import { EventBody } from "./EventBody";
 import { PromotionBody } from "./PromotionBody";
 import { ShareDialog } from "./ShareDialog";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * One campaign, in full.
@@ -58,6 +60,7 @@ export function CampaignDetail({ id }: { id: string }) {
 }
 
 function CampaignDetailInner({ id }: { id: string }) {
+  const locale = useLocale();
   const { data: campaign, isLoading } = useCampaign(id);
   const clients = useClients();
   const {
@@ -67,10 +70,12 @@ function CampaignDetailInner({ id }: { id: string }) {
     seatsLeft,
   } = useCampaignStore();
   const { toasts, addToast, removeToast } = useToasts();
+  const t = useT();
   // Called before any early return — a missing campaign must not skip a hook.
   // No fallback override: `/promotions/` is registered in `sectionRoot`, so a
   // cold entry already lands on the list.
   const goBack = useSectionBack();
+  const router = useLocalizedRouter();
 
   const todayKey = todayDateKey();
   const today = useMemo(() => new Date(todayKey), [todayKey]);
@@ -118,8 +123,8 @@ function CampaignDetailInner({ id }: { id: string }) {
 
   /** Confirmed from the share dialog: this material, to these clients. */
   const share = useCallback(
-    async (materialId: string, clientIds: string[]) => {
-      if (!campaign || clientIds.length === 0) return;
+    async (materialId: string, clientIds: string[]): Promise<boolean> => {
+      if (!campaign || clientIds.length === 0) return false;
       try {
         const written = await shareMaterial({
           campaignId: campaign.id,
@@ -130,39 +135,37 @@ function CampaignDetailInner({ id }: { id: string }) {
           status: written.length > 0 ? "success" : "warning",
           message:
             written.length > 0
-              ? `ส่งให้ลูกค้า ${written.length} รายแล้ว และบันทึกการส่งเรียบร้อย`
-              : "ไม่มีลูกค้าที่ส่งได้ในรายการที่เลือก",
+              ? t.campaigns.detail.sent(written.length)
+              : t.campaigns.detail.noneSendable,
         });
+        return written.length > 0;
       } catch (error) {
+        // A rule refusal carries copy written for the IC; anything else is a
+        // transport failure and gets the generic line — never a raw English
+        // `Error.message`.
+        console.warn("[shareMaterial]", error);
         addToast({
           status: "critical",
           message:
-            error instanceof Error ? error.message : "ส่งไม่สำเร็จ กรุณาลองใหม่",
+            error instanceof CampaignRuleError ? campaignRuleMessage(error, t) : t.states.sendError,
         });
+        return false;
       }
     },
-    [campaign, shareMaterial, addToast],
+    [campaign, shareMaterial, addToast, t],
   );
 
   if (isLoading) return <CampaignDetailSkeleton />;
 
   if (!campaign) {
     return (
-      <div className="flex flex-col items-center gap-3 py-24 text-center">
-        <p className="type-subtitle-1 text-foreground">ไม่พบแคมเปญนี้</p>
-        <Link
-          href="/promotions"
-          className="text-body-sm text-primary-action hover:underline"
-        >
-          กลับไปหน้า Promotion/Events
-        </Link>
-      </div>
+      <NotFoundState message={t.campaigns.detail.notFound} onBack={() => router.push("/promotions")} backLabel={t.campaigns.detail.backToList} />
     );
   }
 
   const status = campaignStatus(campaign, today);
   const ended = status === "ended";
-  const countdown = countdownLabel(campaign, today);
+  const countdown = countdownLabel(campaign, today, t);
   const isEvent = campaign.type === "event";
   const past = isPastEvent(campaign, today);
   /** Only an online event still to come has a link worth handing out. */
@@ -175,20 +178,20 @@ function CampaignDetailInner({ id }: { id: string }) {
   const metaItems: MetaItem[] = [
     {
       icon: <CalendarBlankIcon size={17} weight="fill" />,
-      label: isEvent ? "วันจัดงาน" : "ระยะเวลาแคมเปญ",
+      label: isEvent ? t.campaigns.detail.eventDate : t.campaigns.detail.campaignPeriod,
       labelHint: countdown ?? undefined,
       value:
         isEvent && campaign.eventDate
-          ? thaiDay(campaign.eventDate)
-          : campaignDateLine(campaign),
+          ? campaignDay(campaign.eventDate, locale)
+          : campaignDateLine(campaign, t, locale),
     },
     {
       icon: <ClockIcon size={17} weight="fill" />,
-      label: isEvent ? "ปิดรับลงทะเบียน" : "สถานะ",
+      label: isEvent ? t.campaigns.detail.registrationCloses : t.campaigns.detail.status,
       // An event always carries both dates — see `Campaign.startDate`.
       value: isEvent
-        ? thaiDay(campaign.endDate!)
-        : statusLine(status, campaign.endDate, today),
+        ? campaign.endDate ? campaignDay(campaign.endDate, locale) : t.common.notSpecified
+        : statusLine(status, campaign.endDate, today, t, locale),
     },
     isEvent
       ? {
@@ -198,24 +201,24 @@ function CampaignDetailInner({ id }: { id: string }) {
             ) : (
               <MapPinIcon size={17} weight="fill" />
             ),
-          label: campaign.format ? FORMAT_LABEL[campaign.format] : "สถานที่",
+          label: campaign.format ? t.promotions.format[campaign.format] : t.campaigns.detail.venue,
           value: campaign.venue ?? "—",
         }
       : {
           icon: <UsersThreeIcon size={17} weight="fill" />,
-          label: "กลุ่มลูกค้า",
-          value: campaign.segments.map((s) => SEGMENT_LABEL[s]).join(" · "),
+          label: t.campaigns.detail.segment,
+          value: campaign.segments.map((s) => t.promotions.segment[s]).join(" · "),
         },
     {
       icon: <UsersThreeIcon size={17} weight="fill" />,
-      label: isEvent ? "ที่นั่ง" : "สินทรัพย์",
+      label: isEvent ? t.campaigns.detail.seats : t.campaigns.detail.product,
       value: isEvent
         ? campaign.seatsTotal
           ? full
-            ? `เต็มแล้ว (${campaign.seatsTotal} ที่นั่ง)`
-            : `เหลือ ${open ?? 0} จาก ${campaign.seatsTotal} ที่นั่ง`
-          : "ไม่จำกัดที่นั่ง"
-        : campaign.products.map((p) => PRODUCT_LABEL[p]).join(" · "),
+            ? t.campaigns.detail.seatsFull(campaign.seatsTotal)
+            : t.campaigns.detail.seatsLeft(open ?? 0, campaign.seatsTotal)
+          : t.campaigns.detail.seatsUnlimited
+        : campaign.products.map((p) => t.promotions.product[p]).join(" · "),
       critical: full,
     },
   ];
@@ -231,7 +234,7 @@ function CampaignDetailInner({ id }: { id: string }) {
           onClick={goBack}
           className="hidden self-start rounded-full xl:inline-flex"
         >
-          กลับ
+          {t.common.back}
         </Button>
 
         {/* Banner + meta share one frame — flush join, radius from the strip below. */}
@@ -263,9 +266,9 @@ function CampaignDetailInner({ id }: { id: string }) {
               {(ended || status === "upcoming") && (
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
                   {ended ? (
-                    <Tag text="หมดเขต" variant="gray" size="large" />
+                    <Tag text={t.promotions.status.ended} variant="gray" size="large" />
                   ) : (
-                    <Tag text="เร็ว ๆ นี้" variant="gray" size="large" />
+                    <Tag text={t.promotions.status.upcoming} variant="gray" size="large" />
                   )}
                 </div>
               )}
@@ -297,12 +300,12 @@ function CampaignDetailInner({ id }: { id: string }) {
                       onClick={() => setShareOpen(true)}
                     >
                       {full
-                        ? "เต็มแล้ว"
+                        ? t.campaigns.detail.full
                         : shareable === null
-                          ? "ยังไม่มีสื่อที่อนุมัติ"
+                          ? t.campaigns.detail.noApprovedMaterial
                           : isEvent
-                            ? "ชวนลูกค้า"
-                            : "แชร์ให้ลูกค้า"}
+                            ? t.campaigns.detail.invite
+                            : t.campaigns.detail.share}
                     </Button>
                     {!isEvent && (
                       <Button
@@ -313,7 +316,7 @@ function CampaignDetailInner({ id }: { id: string }) {
                         onClick={download}
                         className="w-full border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
                       >
-                        ดาวน์โหลดเอกสาร
+                        {t.campaigns.detail.download}
                       </Button>
                     )}
                   </div>
@@ -347,9 +350,9 @@ function CampaignDetailInner({ id }: { id: string }) {
         rows={rows}
         mode={isEvent ? "invite" : "share"}
         joinUrl={joinUrl}
-        onConfirm={(clientIds) => {
-          if (shareable) void share(shareable.id, clientIds);
-        }}
+        onConfirm={(clientIds) =>
+          shareable ? share(shareable.id, clientIds) : Promise.resolve(false)
+        }
       />
 
       <Toaster items={toasts} onRemove={removeToast} />
@@ -419,14 +422,17 @@ function statusLine(
   status: ReturnType<typeof campaignStatus>,
   endDate: string | null,
   today: Date,
+  t: Dictionary,
+  locale: Locale,
 ): string {
   // No closing date: the status *is* the whole answer, and a countdown would
   // have to invent the day it counts to. See `Campaign.startDate`.
-  if (endDate === null) return "กำลังดำเนินการ";
-  if (status === "ended") return `หมดเขตเมื่อ ${thaiDay(endDate)}`;
-  if (status === "upcoming") return "ยังไม่เริ่ม";
+  const m = t.promotions.statusLine;
+  if (endDate === null) return m.running;
+  if (status === "ended") return m.endedOn(campaignDay(endDate, locale));
+  if (status === "upcoming") return m.notStarted;
   const left = Math.max(0, daysUntil(endDate, today));
-  return left === 0 ? "วันสุดท้ายวันนี้" : `เหลืออีก ${left} วัน`;
+  return left === 0 ? m.lastDayToday : m.daysLeft(left);
 }
 
 function MetaCell({

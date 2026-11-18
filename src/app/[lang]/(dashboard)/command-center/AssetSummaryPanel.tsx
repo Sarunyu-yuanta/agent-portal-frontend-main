@@ -1,12 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
+import { ChartPieSliceIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ALLOCATION_SLICES } from "@/components/AssetSummarySection";
 import { ALLOCATION_COLORS, AllocationDonut, AllocationTiles } from "@/components/allocation-donut";
 import { buildProductRows, getClientTotals } from "../client-hub/client-hub-data";
 import { formatAumThb } from "@/lib/client-utils";
 import { useCountUp } from "@/hooks/use-count-up";
 import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * What the desk's book is made of.
@@ -63,6 +66,20 @@ export function AssetSummaryPanel({ clients }: { clients: Client[] }) {
   }, [clients]);
 
   const animatedAum = useCountUp(totalAum);
+  const t = useT();
+
+  // No holdings to break down: an empty ring and "จาก 0 ลูกค้า" reads as a
+  // broken chart, not as an empty book.
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        size="compact"
+        icon={<ChartPieSliceIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        title={t.commandCenter.assetSummary.emptyTitle}
+        body={t.commandCenter.assetSummary.emptyBody}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -76,7 +93,7 @@ export function AssetSummaryPanel({ clients }: { clients: Client[] }) {
             {formatAumThb(animatedAum)}
           </p>
           <p className="text-label leading-tight text-muted-foreground">
-            จาก {clients.length} ลูกค้า · {rows.length} ประเภทสินทรัพย์
+            {t.commandCenter.assetSummary.caption(clients.length, rows.length)}
           </p>
         </div>
       </div>

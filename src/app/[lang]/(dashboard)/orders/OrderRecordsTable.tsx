@@ -35,7 +35,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import {
   Pagination,
@@ -54,7 +55,8 @@ import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
 import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
-import { getClientProfile } from "@/data/client-profiles";
+import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { IC_NAME } from "@/lib/current-ic";
 import { maskName } from "@/lib/mask-name";
 import type { Booking, OrderBook, ProposalLog } from "@/types/domain";
@@ -77,7 +79,10 @@ import {
   type BookableProduct,
   type BookingMode,
 } from "./bookable-products";
-import { useRosterReadiness } from "./use-order-books";
+import { useOrderBook, useRosterReadiness } from "./use-order-books";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { useLocale } from "@/i18n/I18nProvider";
 
 const COLUMNS = 5;
 const PAGE_SIZE = 12;
@@ -178,16 +183,16 @@ function sortValue(row: OrderRow, key: SortKey): string | number {
 }
 
 /** The book's own fill, in the terms that book has — one line under the product. */
-function fillLine(book: OrderBook, mode: BookingMode): string {
+function fillLine(book: OrderBook, mode: BookingMode, t: Dictionary): string {
   const target = book.targetAmount.toLocaleString("en-US");
   if (mode === "quota") {
-    return `โควตาใช้ไป ${book.quotaUsed.toLocaleString("en-US")} / ${target} · ${Math.round(quotaUsedPct(book))}%`;
+    return t.orders.records.quotaFill(book.quotaUsed.toLocaleString("en-US"), target, Math.round(quotaUsedPct(book)));
   }
   // `headlineRound`, not `bookedAmount`: that counts only bookings no order has
   // carried yet, so a basket the back office has already collected reads
   // "0 / 100,000" — it filled, which is precisely why it is gone.
   const round = headlineRound(book);
-  return `ตะกร้า ${round.amount.toLocaleString("en-US")} / ${target} · ${Math.round(round.pct)}%`;
+  return t.orders.records.basketFill(round.amount.toLocaleString("en-US"), target, Math.round(round.pct));
 }
 
 export function OrderRecordsTable({
@@ -207,8 +212,10 @@ export function OrderRecordsTable({
   step: OrderStepFilter;
   isLoading?: boolean;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
-  const { proposals } = useOrders();
+  const { proposals, bookings: allBookings } = useOrders();
   const clients = useClients();
 
   // Local, like the other order tables': the page has no use for the sort, and
@@ -229,6 +236,16 @@ export function OrderRecordsTable({
   // mounted around it — the panels above are a search box and a chip row.
   const { toasts, addToast, removeToast } = useToasts();
   const notice = (message: string, status: ToastStatus) => addToast({ message, status });
+  // The receipt reads the LIVE book and booking, not the snapshot taken when
+  // the row was clicked. A snapshot kept "ยกเลิก" on offer after the back office
+  // had already picked the order up, because it never saw the change.
+  const { data: liveBook } = useOrderBook(opened?.book.productId ?? "");
+  const live = opened
+    ? {
+        book: liveBook ?? opened.book,
+        booking: allBookings.find((b) => b.id === opened.booking.id) ?? opened.booking,
+      }
+    : null;
   const openedProduct = opened ? findBookableProduct(opened.book.productId) : undefined;
   const offerProduct = openedOffer ? findBookableProduct(openedOffer.book.productId) : undefined;
   const readiness = useRosterReadiness(clients, openedProduct ?? FALLBACK_PRODUCT);
@@ -244,13 +261,10 @@ export function OrderRecordsTable({
    * the skeleton is a different instance from the real table, and consuming
    * the param there would leave the real one nothing to read.
    */
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const [flashId] = useState(() => searchParams.get("flash"));
-  useEffect(() => {
-    if (isLoading || !searchParams.get("flash")) return;
-    setQueryState(withQuery(pathname, searchParams, { flash: null }), "replace");
-  }, [isLoading, pathname, searchParams]);
+
   const flashBookingIds = useMemo(() => {
     if (!flashId) return new Set<string>();
     for (const book of books) {
@@ -259,6 +273,15 @@ export function OrderRecordsTable({
     }
     return new Set<string>();
   }, [books, flashId]);
+  const flashFound = flashBookingIds.size > 0;
+  useEffect(() => {
+    if (isLoading || !searchParams.get("flash")) return;
+    // An id that matches no order here (stale bell row, hand-edited link)
+    // would otherwise just show the plain list — say why nothing is pointed at.
+    if (!flashFound) addToast({ message: t.states.notFoundOrder, status: "warning" });
+    setQueryState(withQuery(pathname, searchParams, { flash: null }), "replace");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, as the param is consumed
+  }, [isLoading, pathname, searchParams]);
   const flashRowRef = useRef<HTMLTableRowElement | null>(null);
 
   const rows = useMemo(() => {
@@ -285,6 +308,13 @@ export function OrderRecordsTable({
     }
   }
 
+  const isEmpty = !isLoading && rows.length === 0;
+  /** A receipt needs its product; one that is gone gets a toast, not a dead click. */
+  const openIfProduct = (book: OrderBook, open: () => void) => {
+    if (findBookableProduct(book.productId)) open();
+    else notice(t.states.notFoundProduct, "warning");
+  };
+
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   // Clamped rather than reset: a filter that shortens the list past the current
   // page should land on the last one, not silently on an empty table.
@@ -302,7 +332,7 @@ export function OrderRecordsTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
+      <div className={`relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
         <Table className="table-fixed min-w-[880px]">
           <TableHead>
             <TableRow>
@@ -311,30 +341,30 @@ export function OrderRecordsTable({
                 sortDirection={dirFor("at")}
                 onSortChange={onSort("at")}
               >
-                วันเวลา
+                {t.orders.list.col.time}
               </TableHeaderCell>
               <TableHeaderCell
                 className="w-[24%]"
                 sortDirection={dirFor("client")}
                 onSortChange={onSort("client")}
               >
-                ลูกค้า
+                {t.orders.list.col.client}
               </TableHeaderCell>
               <TableHeaderCell
                 className="w-[30%] whitespace-nowrap"
                 sortDirection={dirFor("product")}
                 onSortChange={onSort("product")}
               >
-                สินค้า
+                {t.orders.list.col.product}
               </TableHeaderCell>
               <TableHeaderCell
                 className="w-[15%] whitespace-nowrap text-right"
                 sortDirection={dirFor("amount")}
                 onSortChange={onSort("amount")}
               >
-                จำนวน
+                {t.orders.list.col.quantity}
               </TableHeaderCell>
-              <TableHeaderCell className="w-[16%] whitespace-nowrap">สถานะ</TableHeaderCell>
+              <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.list.col.status}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -342,15 +372,15 @@ export function OrderRecordsTable({
               <TableRowsSkeleton columns={COLUMNS} />
             ) : (
               visible.map((row) => {
-                const profile = getClientProfile(row.clientId);
+                const profile = getAccountIdentity(row.clientId);
                 const booking = row.booking;
                 const offer = row.offer;
-                const deal = booking ? dealStatus(booking, row.book) : null;
+                const deal = booking ? dealStatus(booking, row.book, t) : null;
                 // Each kind opens its own receipt — see the module note.
                 const open = booking
-                  ? () => setOpened({ book: row.book, booking })
+                  ? () => openIfProduct(row.book, () => setOpened({ book: row.book, booking }))
                   : offer
-                    ? () => setOpenedOffer({ book: row.book, offer })
+                    ? () => openIfProduct(row.book, () => setOpenedOffer({ book: row.book, offer }))
                     : undefined;
                 return (
                   <TableRow
@@ -358,7 +388,7 @@ export function OrderRecordsTable({
                     hoverable={Boolean(open)}
                     tabIndex={open ? 0 : undefined}
                     aria-label={
-                      open ? `ดูรายละเอียด ${row.book.productName} ของ ${row.clientName}` : undefined
+                      open ? t.orders.list.openRowAria(row.book.productName, row.clientName) : undefined
                     }
                     onClick={open}
                     onKeyDown={
@@ -383,7 +413,7 @@ export function OrderRecordsTable({
                   >
                     <TableCell>
                       <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-                        {formatLogTime(row.at)}
+                        {formatLogTime(row.at, locale)}
                       </p>
                     </TableCell>
 
@@ -393,7 +423,7 @@ export function OrderRecordsTable({
                           {row.clientName}
                         </p>
                         <p className="type-caption truncate text-muted-foreground">
-                          {row.clientId} · บัญชี {profile.accountNo}
+                          {t.orders.list.clientAccount(row.clientId, profile.accountNo)}
                         </p>
                       </div>
                     </TableCell>
@@ -407,7 +437,7 @@ export function OrderRecordsTable({
                             so a figure about the deal never sits in a column
                             about the record. */}
                         <p className="type-caption truncate tabular-nums text-muted-foreground">
-                          {row.book.productType} · {fillLine(row.book, mode)}
+                          {row.book.productType} · {fillLine(row.book, mode, t)}
                         </p>
                       </div>
                     </TableCell>
@@ -449,11 +479,15 @@ export function OrderRecordsTable({
             )}
           </TableBody>
         </Table>
+        {/* The panels catch an empty desk before mounting this, but a client
+            scope is applied in here — a client with nothing on the desk would
+            otherwise get a bare header row. */}
+        {isEmpty && <TableEmptyOverlay variant="empty" title={t.orders.list.emptyTitle} />}
       </div>
 
-      {!isLoading && (
+      {!isLoading && !isEmpty && (
         <div className="flex items-center justify-between gap-3">
-          <span className="type-body-2 text-muted-foreground">ทั้งหมด {rows.length} รายการ</span>
+          <span className="type-body-2 text-muted-foreground">{t.orders.list.totalRows(rows.length)}</span>
           {totalPages > 1 && (
             <Pagination totalPages={totalPages} currentPage={current} onPageChange={setPage} />
           )}
@@ -461,18 +495,18 @@ export function OrderRecordsTable({
       )}
 
       {/* Rendered whether or not one is open, so it can animate out. */}
-      {openedProduct && opened && (
+      {openedProduct && live && (
         <BookingDetailModal
-          booking={opened.booking}
-          book={opened.book}
+          booking={live.booking}
+          book={live.book}
           product={openedProduct}
           checks={checksAtBooking(
-            opened.booking,
-            readiness.get(opened.booking.clientId)?.items ?? [],
+            live.booking,
+            readiness.get(live.booking.clientId)?.items ?? [],
           )}
-          deal={dealStatus(opened.booking, opened.book)}
-          payment={paymentStatus(opened.booking, opened.book)}
-          email={emailStatus(opened.booking, opened.book)}
+          deal={dealStatus(live.booking, live.book, t)}
+          payment={paymentStatus(live.booking, live.book, t)}
+          email={emailStatus(live.booking, live.book, t)}
           onClose={() => setOpened(null)}
           onNotice={notice}
         />

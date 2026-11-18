@@ -23,6 +23,7 @@
  * `fi-`, `gb-` — which is what {@link findBookableProduct} splits on.
  */
 
+import th from "@/i18n/dictionaries/th";
 import {
   allStructuredProducts,
   findProductById,
@@ -64,8 +65,11 @@ const ORDER_TAB_BY_DESK: Record<Desk, string> = {
   "Global Bond": "global-bond",
 };
 
+// Built once, at module load, so it has no reader's language to use. The Thai
+// dictionary stands in: the fields it touches (the tenor's "N เดือน") are what
+// the Thai desk's feed sends, and the API will send them localized.
 const THAI_BY_ID = new Map<string, StructuredProduct>(
-  THAI_STRUCTURED_PRODUCTS.map((p) => [thaiBookableId(p.theme), toBookableProduct(p)]),
+  THAI_STRUCTURED_PRODUCTS.map((p) => [thaiBookableId(p.theme), toBookableProduct(p, th)]),
 );
 
 /**

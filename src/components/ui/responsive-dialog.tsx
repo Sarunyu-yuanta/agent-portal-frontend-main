@@ -3,6 +3,7 @@
 import { BottomSheet, Button, Modal } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * One content, two containers: a bottom sheet on mobile and a centered modal on
@@ -49,6 +50,7 @@ export function ResponsiveDialog({
   children: React.ReactNode;
 }) {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const t = useT();
 
   /** The action itself, identical on both halves. */
   const actionButton = headerAction ? (
@@ -71,8 +73,8 @@ export function ResponsiveDialog({
       size="icon-sm"
       className="-ml-1 shrink-0"
       onClick={onBack}
-      aria-label="ย้อนกลับ"
-      title="ย้อนกลับ"
+      aria-label={t.shell.dialog.back}
+      title={t.shell.dialog.back}
     >
       <ArrowLeftIcon size={20} />
     </Button>

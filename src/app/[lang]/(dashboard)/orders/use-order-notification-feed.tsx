@@ -35,6 +35,7 @@ import { zoneForDays } from "../notification-zones";
 import { formatOrderAmount, isBookFull } from "./order-book";
 import { useOrderBooks } from "./use-order-books";
 import type { OrderSubmissionRef } from "./OrderSubmissionDetailModal";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Whole days since `iso`, counted in calendar days rather than hours. */
 function daysSince(iso: string): number {
@@ -46,7 +47,7 @@ function daysSince(iso: string): number {
   return Math.max(0, Math.round((today - start) / 86_400_000));
 }
 
-function iconFor(tone: "green" | "blue" | "red" | "yellow", glyph: React.ReactNode) {
+function iconFor(tone: "green" | "blue" | "red" | "yellow", glyph: React.ReactNode, label: string) {
   const fill = {
     green: "bg-[var(--fill-green-100)] text-[var(--fill-green-600)]",
     blue: "bg-[var(--fill-blue-100)] text-[var(--fill-blue-600)]",
@@ -56,7 +57,7 @@ function iconFor(tone: "green" | "blue" | "red" | "yellow", glyph: React.ReactNo
   return (
     <span
       role="img"
-      aria-label="Order"
+      aria-label={label}
       className={`flex size-6 shrink-0 items-center justify-center rounded-full ${fill}`}
     >
       {glyph}
@@ -65,10 +66,12 @@ function iconFor(tone: "green" | "blue" | "red" | "yellow", glyph: React.ReactNo
 }
 
 export function useOrderNotificationFeed() {
+  const t = useT();
   const { requirementRequests } = useOrders();
   const { data: books } = useOrderBooks();
 
   return useMemo(() => {
+    const n = t.orders.notification;
     // `onItemClick` hands back only the `NotificationItem`, which has nowhere
     // to carry a destination — so this is the side table the click reads. Same
     // arrangement the KYC feed uses.
@@ -114,9 +117,9 @@ export function useOrderNotificationFeed() {
           // that were asked for, and a client can still be blocked by something
           // no form covers — a risk rating below the product's. Promising the
           // booking here would be promising an outcome this row can't see.
-          description: `กรอกข้อมูลครบแล้ว ${request.keys.length} รายการ — กลับไปตรวจสอบได้`,
+          description: n.requirementCompleted(request.keys.length),
           time: "",
-          icon: iconFor("green", <IdentificationCardIcon size={15} weight="fill" />),
+          icon: iconFor("green", <IdentificationCardIcon size={15} weight="fill" />, n.iconLabel),
         },
         request.completedAt,
       );
@@ -140,12 +143,12 @@ export function useOrderNotificationFeed() {
           daysSince(submission.settledAt),
           ordersListHref(book.productId),
           {
-            title: ok ? "คำสั่งซื้อสำเร็จ" : "คำสั่งซื้อถูกปฏิเสธ",
+            title: ok ? t.orders.submission.completed : t.orders.submission.rejected,
             description: `${book.productName} · ${submission.backendRef}`,
             time: "",
             icon: ok
-              ? iconFor("green", <CheckCircleIcon size={15} weight="fill" />)
-              : iconFor("red", <WarningCircleIcon size={15} weight="fill" />),
+              ? iconFor("green", <CheckCircleIcon size={15} weight="fill" />, n.iconLabel)
+              : iconFor("red", <WarningCircleIcon size={15} weight="fill" />, n.iconLabel),
           },
           submission.settledAt,
         );
@@ -173,10 +176,10 @@ export function useOrderNotificationFeed() {
         0,
         ordersListHref(book.productId),
         {
-          title: `${book.productName} ครบยอดแล้ว`,
-          description: `จองครบ ${formatOrderAmount(book.bookedAmount, book.currency)} — รอระบบหลังบ้านมารับคำสั่งซื้อ`,
+          title: n.bookFullTitle(book.productName),
+          description: n.bookFull(formatOrderAmount(book.bookedAmount, book.currency)),
           time: "",
-          icon: iconFor("yellow", <PaperPlaneTiltIcon size={15} weight="fill" />),
+          icon: iconFor("yellow", <PaperPlaneTiltIcon size={15} weight="fill" />, n.iconLabel),
         },
       );
     }
@@ -186,5 +189,5 @@ export function useOrderNotificationFeed() {
       orderNotificationTargets: targets,
       orderSubmissionTargets: submissionTargets,
     };
-  }, [requirementRequests, books]);
+  }, [requirementRequests, books, t]);
 }

@@ -5,6 +5,7 @@
  */
 
 import type { TagVariant } from "@sarunyu/system-one";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import type { Booking, OrderBook, RequirementItem, RequirementKey } from "@/types/domain";
 import { REQUIREMENT_CATALOG } from "./order-requirements";
 import { submissionFor } from "./order-book";
@@ -25,20 +26,20 @@ export const CLOSED_TAG = { text: "", variant: "gray" } as const;
  * downstream the order has got — and on a bond that starts the moment the
  * booking does, because creating one sends it.
  */
-export function dealStatus(booking: Booking, book: OrderBook): BookingStatusTag {
-  if (booking.status === "cancelled") return { text: "ยกเลิกแล้ว", variant: "gray" };
+export function dealStatus(booking: Booking, book: OrderBook, t: Dictionary): BookingStatusTag {
+  if (booking.status === "cancelled") return { text: t.orders.deal.cancelled, variant: "gray" };
   const submission = submissionFor(booking, book);
   if (submission?.status === "completed")
-    return { text: "รับคำสั่งซื้อสำเร็จ", variant: "green" };
-  if (submission?.status === "rejected") return { text: "ถูกปฏิเสธ", variant: "red" };
+    return { text: t.orders.deal.completed, variant: "green" };
+  if (submission?.status === "rejected") return { text: t.orders.deal.rejected, variant: "red" };
   // `sent` reads the same as `processing` — see `BookingPhase`. The difference
   // between them is whether the IC can still pull it, and the cancel button's
   // presence is where that is said.
-  if (submission) return { text: "กำลังดำเนินการรับคำสั่งซื้อ", variant: "yellow" };
+  if (submission) return { text: t.orders.deal.processing, variant: "yellow" };
   // No order carries it, which on a basket is the normal first step and on a
   // bond cannot happen — `placeOrder` creates the two together. `lime` to
   // match `BOOKING_PHASE_VARIANT.pending`, which is where the choice is made.
-  return { text: "จองแล้ว", variant: "lime" };
+  return { text: t.orders.deal.booked, variant: "lime" };
 }
 
 /**
@@ -96,13 +97,13 @@ export function checksAtBooking(booking: Booking, live: RequirementItem[]): Requ
  * let it through otherwise — so it reads as held, not as "ยังไม่ถึงกำหนด".
  * Settlement proper happens when the back office accepts the order.
  */
-export function paymentStatus(booking: Booking, book: OrderBook): BookingStatusTag {
+export function paymentStatus(booking: Booking, book: OrderBook, t: Dictionary): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = submissionFor(booking, book);
-  if (submission?.status === "completed") return { text: "ชำระแล้ว", variant: "green" };
-  if (submission?.status === "processing") return { text: "รอชำระ", variant: "yellow" };
-  if (submission?.status === "rejected") return { text: "ไม่ต้องชำระ", variant: "gray" };
-  return { text: "กันเงินแล้ว", variant: "lime" };
+  if (submission?.status === "completed") return { text: t.orders.payment.paid, variant: "green" };
+  if (submission?.status === "processing") return { text: t.orders.payment.awaiting, variant: "yellow" };
+  if (submission?.status === "rejected") return { text: t.orders.payment.notRequired, variant: "gray" };
+  return { text: t.orders.payment.reserved, variant: "lime" };
 }
 
 /**
@@ -111,10 +112,10 @@ export function paymentStatus(booking: Booking, book: OrderBook): BookingStatusT
  * Sent when the booking is placed — that is the thing being confirmed to the
  * client — and confirmed back when the order completes.
  */
-export function emailStatus(booking: Booking, book: OrderBook): BookingStatusTag {
+export function emailStatus(booking: Booking, book: OrderBook, t: Dictionary): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = submissionFor(booking, book);
-  if (submission?.status === "completed") return { text: "ยืนยันแล้ว", variant: "green" };
-  if (submission?.status === "rejected") return { text: "ยกเลิก", variant: "gray" };
-  return { text: "ส่งแล้ว", variant: "blue" };
+  if (submission?.status === "completed") return { text: t.orders.email.confirmed, variant: "green" };
+  if (submission?.status === "rejected") return { text: t.orders.email.cancelled, variant: "gray" };
+  return { text: t.orders.email.sent, variant: "blue" };
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatDateWith } from "@/i18n/format";
+
 import { useMemo } from "react";
 import {
   Area,
@@ -10,7 +13,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { NavPoint } from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+import type { NavPoint } from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
+import { useLocale } from "@/i18n/I18nProvider";
 
 export const NAV_RANGES = ["YTD", "1W", "1M", "3M", "6M", "1Y", "5Y", "MAX"] as const;
 
@@ -84,24 +88,17 @@ function axisTicks(range: NavRange, from: number, to: number): number[] {
 
 /**
  * Tick text per range: a week needs the day, a five-year span only needs the
- * year. Kept in English to match the tooltip and the period labels under the
- * chart ("1W", "3M", "YTD").
+ * year. In the reader's language, like the tooltip; the period chips under the
+ * chart ("1W", "3M", "YTD") are codes and stay as they are.
  */
-function tickFormatter(range: NavRange) {
+function tickFormatter(range: NavRange, locale: Locale) {
   const opts: Intl.DateTimeFormatOptions = DAY_TICK_RANGES.includes(range)
     ? { day: "numeric", month: "short" }
     : YEAR_TICK_RANGES.includes(range)
       ? { year: "numeric" }
       : { month: "short", year: "2-digit" };
-  return (value: number) => new Date(value).toLocaleDateString("en-GB", opts);
+  return (value: number) => formatDateWith(locale, value, opts);
 }
-
-const fullDate = (value: number) =>
-  new Date(value).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 
 function NavTooltip({
   active,
@@ -112,11 +109,12 @@ function NavTooltip({
   payload?: { payload: { t: number; nav: number } }[];
   currency: string;
 }) {
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const { t, nav } = payload[0].payload;
   return (
     <div className="min-w-[48px] rounded-2xl bg-white p-1.5 text-center shadow-[0px_0px_1px_rgba(102,102,102,0.16),0px_4px_4px_rgba(102,102,102,0.12)]">
-      <p className="text-xs leading-[20px] text-black/40">{fullDate(t)}</p>
+      <p className="text-xs leading-[20px] text-black/40">{formatDate(locale, t, "short")}</p>
       <p className="text-sm leading-[24px] text-black/75">
         {nav.toFixed(4)} <span className="text-black/40">{currency}</span>
       </p>
@@ -147,6 +145,7 @@ export function NavHistoryChart({
   currency: string;
   className?: string;
 }) {
+  const locale = useLocale();
   const data = useMemo(() => {
     const all = points.map((p) => ({ t: Date.parse(p.date), nav: p.nav }));
     if (!all.length) return all;
@@ -193,7 +192,7 @@ export function NavHistoryChart({
             scale="time"
             domain={["dataMin", "dataMax"]}
             ticks={ticks}
-            tickFormatter={tickFormatter(range)}
+            tickFormatter={tickFormatter(range, locale)}
             tickLine={false}
             axisLine={false}
             minTickGap={24}

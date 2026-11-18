@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Button } from "@sarunyu/system-one";
 import { ArrowRightIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 export type CropTransform = { scaleX: number; scaleY: number; tx: number; ty: number };
 
@@ -41,6 +42,7 @@ export function InvestmentCard({
   crop?: CropTransform;
   onClick?: () => void;
 }) {
+  const t = useT();
   const isHighConviction = !!highConviction;
   return (
     <div
@@ -146,7 +148,7 @@ export function InvestmentCard({
           <Button
             variant="outline"
             size="icon-xs"
-            aria-label="ดูรายละเอียด"
+            aria-label={t.products.common.viewDetails}
             className="md:hidden lg:flex"
             onClick={(e) => {
               e.stopPropagation();
@@ -201,7 +203,7 @@ export function InvestmentCard({
         <Button
           variant="outline"
           size="icon-xs"
-          aria-label="ดูรายละเอียด"
+          aria-label={t.products.common.viewDetails}
           className="hidden md:flex lg:hidden shrink-0"
           onClick={(e) => {
             e.stopPropagation();

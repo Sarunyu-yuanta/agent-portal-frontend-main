@@ -16,16 +16,16 @@
  */
 
 import { useRef, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import { useToasts } from "@/hooks/use-toasts";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import type { Booking } from "@/types/domain";
 import { ordersListHref, type BookableProduct } from "./bookable-products";
 import { isBookingOpen } from "./order-book";
-import { ORDER_WORDS } from "./order-words";
 import { OrderBookingModal } from "./OrderBookingModal";
 import { useOrderBook } from "./use-order-books";
+import { useT } from "@/i18n/I18nProvider";
 
 export function useQuotaBooking(options?: {
   /**
@@ -60,7 +60,8 @@ export function useQuotaBooking(options?: {
   /** The modal and its toasts — render once, anywhere on the page. */
   ui: ReactNode;
 } {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   const { toasts, addToast, removeToast } = useToasts();
   const [product, setProduct] = useState<BookableProduct | null>(null);
   const [onBack, setOnBack] = useState<(() => void) | null>(null);
@@ -76,7 +77,7 @@ export function useQuotaBooking(options?: {
       message,
       status,
       ...(id
-        ? { actionLabel: "ดูคำสั่งซื้อ", onActionClick: () => router.push(ordersListHref(id)) }
+        ? { actionLabel: t.orders.viewOrder, onActionClick: () => router.push(ordersListHref(id)) }
         : {}),
     });
   };
@@ -132,7 +133,7 @@ export function QuotaBookButton({
   onBook,
   size = "xs",
   className,
-  label = ORDER_WORDS.quota.cta,
+  label,
 }: {
   product: BookableProduct;
   onBook: (product: BookableProduct) => void;
@@ -140,6 +141,8 @@ export function QuotaBookButton({
   className?: string;
   label?: string;
 }) {
+  const t = useT();
+  label ??= t.orders.words.quota.cta;
   const { data: book } = useOrderBook(product.id);
   const open = !book || isBookingOpen(book);
   return (
@@ -154,7 +157,7 @@ export function QuotaBookButton({
         onBook(product);
       }}
     >
-      {open ? label : "เต็มโควตา"}
+      {open ? label : t.orders.quotaFull}
     </Button>
   );
 }

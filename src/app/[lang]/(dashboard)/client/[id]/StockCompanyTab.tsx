@@ -28,7 +28,6 @@ import {
   monthGrid,
   weekdayLabel,
   weeksOf,
-  WEEKDAY_LABELS,
   WEEKS_SHOWN,
 } from "../../calendar/calendar-grid";
 import { useStockCompanyInfo } from "@/hooks/use-catalog";
@@ -40,6 +39,8 @@ import {
   type CorporateCalendarMarker,
   type StockCompanyEvents,
 } from "./stock-company-data";
+import { useLocale, useT } from "@/i18n/I18nProvider";
+import { weekdayNames } from "@/i18n/format";
 
 /**
  * Fills come from `calendar/market-taxonomy`, which the Calendar page's grid
@@ -73,11 +74,12 @@ function ActionBadge({
   kind: CorporateActionKind;
   size?: "small" | "default";
 }) {
+  const t = useT();
   const palette = actionPalette(kind);
   return (
     <span
       role="img"
-      aria-label={actionKindName(kind)}
+      aria-label={actionKindName(kind, t)}
       className={`flex shrink-0 self-center items-center justify-center rounded-full text-meta font-semibold leading-none ${
         size === "small" ? "size-7" : "size-8"
       }`}
@@ -89,9 +91,10 @@ function ActionBadge({
 }
 
 function CompanySubTabPlaceholder({ label }: { label: string }) {
+  const t = useT();
   return (
     <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
-      {label} will be available soon.
+      {t.stock.company.comingSoon(label)}
     </div>
   );
 }
@@ -200,6 +203,8 @@ function CompanyDayPanel({
   isToday: boolean;
   onOpenDetail: (marker: CorporateCalendarMarker) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const isSheet = variant === "sheet";
 
   return (
@@ -210,15 +215,15 @@ function CompanyDayPanel({
         }`}
       >
         <div className="min-w-0">
-          <p className="type-body-1 font-semibold text-foreground">{dayLabel(day)}</p>
+          <p className="type-body-1 font-semibold text-foreground">{dayLabel(day, locale)}</p>
           {/* Weekday and count share a line, as on the Calendar page: both are
               context for the list below, and stacking them would push the first
               card out of view. No count when there is nothing — "Nothing
               scheduled" is about to say so in bigger type. */}
           <p className="type-caption text-muted-foreground">
-            {weekdayLabel(day)}
+            {weekdayLabel(day, locale)}
             {markers.length > 0 &&
-              ` · ${markers.length} action${markers.length > 1 ? "s" : ""}`}
+              ` · ${t.stock.company.actionCount(markers.length)}`}
           </p>
         </div>
         {/* Only "Today" earns a badge here. The Calendar page's other one,
@@ -226,7 +231,7 @@ function CompanyDayPanel({
             is settled fact, not a slipped deadline. */}
         {isToday && (
           <span className="shrink-0 rounded-full bg-primary-action px-2 py-0.5 type-caption font-medium text-white">
-            Today
+            {t.stock.company.today}
           </span>
         )}
       </header>
@@ -236,7 +241,7 @@ function CompanyDayPanel({
         // number of rules depending on which branch rendered.
         <div className="flex flex-col items-center gap-2 border-y border-border/60 px-3.5 py-8 text-center">
           <CalendarBlankIcon size={28} className="text-muted-foreground/40" />
-          <p className="type-body-2 text-muted-foreground">Nothing scheduled</p>
+          <p className="type-body-2 text-muted-foreground">{t.stock.company.nothingScheduled}</p>
         </div>
       ) : (
         <ul
@@ -321,6 +326,8 @@ function CompanyDayCell({
    *  dialog, and a cell is one square of a grid that re-renders under it. */
   onOpenDetail: (marker: CorporateCalendarMarker) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
   const inMonth = isSameMonth(day, viewMonth);
@@ -419,7 +426,7 @@ function CompanyDayCell({
             ))}
             {overflow > 0 && (
               <span className="shrink-0 truncate px-1 py-0.5 type-caption leading-tight font-medium text-muted-foreground">
-                +{overflow} more
+                {t.stock.company.more(overflow)}
               </span>
             )}
           </div>
@@ -434,7 +441,7 @@ function CompanyDayCell({
           open={open}
           onOpenChange={setOpen}
           showHeader={false}
-          title={dayLabel(day)}
+          title={dayLabel(day, locale)}
           className="px-0 pb-0"
           contentClassName="flex min-h-0 flex-col pt-0"
         >
@@ -454,6 +461,8 @@ function CompanyEventsSection({
   symbol: string;
   companyName: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
   /** The mock feed hangs off April 2026, so "today" is pinned there too —
    *  otherwise the grid would open on a real month with nothing in it. */
   const today = useMemo(() => new Date(2026, 3, 30), []);
@@ -499,7 +508,7 @@ function CompanyEventsSection({
             `globals.css`, so it wins the tie against a Tailwind variant. */}
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2">
           <div className="flex min-w-0 flex-1 items-center gap-1 max-sm:gap-2.5!">
-            <Tooltip content={`Go to today · ${dayLabel(today)}`} side="bottom">
+            <Tooltip content={t.stock.company.goToToday(dayLabel(today, locale))} side="bottom">
               <Button
                 variant="plain"
                 size="sm"
@@ -507,13 +516,13 @@ function CompanyEventsSection({
                 leftIcon={<CalendarDotIcon size={15} />}
                 onClick={() => setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))}
               >
-                Today
+                {t.stock.company.today}
               </Button>
             </Tooltip>
             <div className="flex shrink-0 items-center gap-1">
               <button
                 type="button"
-                aria-label="Previous month"
+                aria-label={t.stock.company.previousMonth}
                 onClick={() => setViewDate((d) => addMonths(d, -1))}
                 className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
@@ -521,7 +530,7 @@ function CompanyEventsSection({
               </button>
               <button
                 type="button"
-                aria-label="Next month"
+                aria-label={t.stock.company.nextMonth}
                 onClick={() => setViewDate((d) => addMonths(d, 1))}
                 className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
@@ -563,7 +572,7 @@ function CompanyEventsSection({
           >
             <button
               type="button"
-              aria-label="Filter corporate actions"
+              aria-label={t.stock.company.filterActions}
               className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
             >
               <GearSixIcon size={18} />
@@ -572,7 +581,7 @@ function CompanyEventsSection({
         </div>
 
         <div className="grid shrink-0 grid-cols-7 border-b border-[rgba(0,0,0,0.12)]">
-          {WEEKDAY_LABELS.map((label) => (
+          {weekdayNames(locale, "short").map((label) => (
             <div key={label} className="px-2 py-2 type-caption text-center text-muted-foreground">
               {label}
             </div>
@@ -634,12 +643,21 @@ export function StockCompanyTab({
   /** The issuer's legal name — the detail sheet prints it beside the symbol. */
   companyName: string;
 }) {
-  const [subTab, setSubTab] = useState<CompanySubTab>("Company Events");
+  const t = useT();
+  const [subTab, setSubTab] = useState<CompanySubTab>("events");
   // The tab's own resource: while it loads, only this body is a skeleton —
   // the ticker header, quote and detail tab strip stay up around it.
   const { data, isLoading } = useStockCompanyInfo(symbol);
 
-  if (isLoading || !data) return <StockTabBodySkeleton />;
+  if (isLoading) return <StockTabBodySkeleton />;
+  // Loaded with nothing: say so, rather than a skeleton that never resolves.
+  if (!data) {
+    return (
+      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+        {t.stock.company.noData}
+      </div>
+    );
+  }
 
   return (
     <section className="flex w-full flex-col gap-6">
@@ -649,17 +667,17 @@ export function StockCompanyTab({
             key={tab}
             type="single"
             size="small"
-            label={tab}
+            label={t.stock.company.subTabs[tab] ?? tab}
             selected={subTab === tab}
             onClick={() => setSubTab(tab)}
           />
         ))}
       </div>
 
-      {subTab === "Company Events" ? (
+      {subTab === "events" ? (
         <CompanyEventsSection data={data} symbol={symbol} companyName={companyName} />
       ) : (
-        <CompanySubTabPlaceholder label={subTab} />
+        <CompanySubTabPlaceholder label={t.stock.company.subTabs[subTab] ?? subTab} />
       )}
     </section>
   );

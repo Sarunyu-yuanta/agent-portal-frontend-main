@@ -35,6 +35,7 @@ import {
   thaiBookableId,
   type ThaiStructuredProduct,
 } from "./thai-structured-data";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /** Where a trending row goes when clicked. Mirrors `CatalogNavigation`'s
  *  callbacks so the tab can hand each kind to the handler that already knows
@@ -119,8 +120,13 @@ function measureOf(groupId: string): TrendingMeasure {
 /** How many of a group's rows its card shows before "ดูทั้งหมด". */
 export const TRENDING_CARD_ROWS = 5;
 
-export const PRODUCT_TRENDING_UPDATED_AT =
-  "ยอดขาย 7 วันล่าสุด | Latest update: 30 Apr 2025 - 09:22";
+/** When the weekly sales figures were last refreshed — the feed's own stamp. */
+const PRODUCT_TRENDING_UPDATED_STAMP = "30 Apr 2025 - 09:22";
+
+/** The sales line above the cards and on a sales group's page. */
+export function productTrendingUpdatedAt(t: Dictionary): string {
+  return t.products.trending.salesUpdatedAt(PRODUCT_TRENDING_UPDATED_STAMP);
+}
 
 /**
  * The same line for a single group's page, in terms that group can stand
@@ -131,10 +137,8 @@ export const PRODUCT_TRENDING_UPDATED_AT =
  * sales line over a table of basket fills was quoting a date for figures that
  * do not have one.
  */
-export function trendingUpdatedAt(measure: TrendingMeasure): string {
-  return measure === "sales"
-    ? PRODUCT_TRENDING_UPDATED_AT
-    : "ยอดจองในตะกร้าตามเวลาจริง — แสดงเฉพาะตะกร้าที่ยังเปิดให้จอง";
+export function trendingUpdatedAt(measure: TrendingMeasure, t: Dictionary): string {
+  return measure === "sales" ? productTrendingUpdatedAt(t) : t.products.trending.liveFill;
 }
 
 /**
@@ -391,14 +395,11 @@ export type TrendingSort = "best-seller" | "highlight" | "cio-view";
 
 export const DEFAULT_TRENDING_SORT: TrendingSort = "best-seller";
 
-export const TRENDING_SORTS: { id: TrendingSort; label: string }[] = [
-  { id: "best-seller", label: "รายการขายดี" },
-  { id: "highlight", label: "Yuanta Highlight" },
-  { id: "cio-view", label: "CIO View" },
-];
+/** In chip order; labelled by `t.products.trending.sorts`. */
+export const TRENDING_SORTS: TrendingSort[] = ["best-seller", "highlight", "cio-view"];
 
 export function normalizeTrendingSort(value: string | null | undefined): TrendingSort {
-  return TRENDING_SORTS.some((f) => f.id === value)
+  return TRENDING_SORTS.some((id) => id === value)
     ? (value as TrendingSort)
     : DEFAULT_TRENDING_SORT;
 }
@@ -432,10 +433,10 @@ export function sortTrendingItems(items: TrendingItem[], sort: TrendingSort): Tr
 }
 
 /** What an empty card or table says under `sort` — only the curated views can be empty by choice. */
-export function emptyTrendingMessage(sort: TrendingSort): string {
-  if (sort === "best-seller") return "ยังไม่มีสินค้าที่เปิดขายในกลุ่มนี้";
-  const label = TRENDING_SORTS.find((f) => f.id === sort)?.label;
-  return `${label} ยังไม่ได้เลือกสินค้าในกลุ่มนี้`;
+export function emptyTrendingMessage(sort: TrendingSort, t: Dictionary): string {
+  const labels = t.products.trending;
+  if (sort === "best-seller") return labels.emptyBestSeller;
+  return labels.emptyCurated(labels.sorts[sort]);
 }
 
 /** A group's full ranking — the sub-page its card's "ดูทั้งหมด" opens. */

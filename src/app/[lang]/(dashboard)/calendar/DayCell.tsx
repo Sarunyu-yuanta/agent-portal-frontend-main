@@ -21,6 +21,7 @@ import {
   WEEKS_SHOWN,
   type DayRelation,
 } from "./calendar-grid";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * Pill fill by how the day reads against today — one primary ramp rather than
@@ -120,6 +121,8 @@ export function DayCell({
   /** Week 0 … 5. Decides which of the cell's edges the popover aligns to. */
   rowIndex: number;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const [open, setOpen] = useState(false);
   // The same breakpoint the Notes split view drills in at, so "phone" means one
   // thing across the app.
@@ -237,7 +240,7 @@ export function DayCell({
           color: palette.text,
           borderLeft: `2px solid ${palette.accent}`,
         },
-        title: `${actionKindName(row.group.kind)} · ${symbols.join(", ")}`,
+        title: `${actionKindName(row.group.kind, t)} · ${symbols.join(", ")}`,
         onOpen: undefined,
         body: (
           <>
@@ -257,7 +260,7 @@ export function DayCell({
 
     const { item } = row;
     if (item.source === "event") {
-      const category = eventCategory(item.kind);
+      const category = eventCategory(item.kind, t);
       return {
         style: { backgroundColor: category.tint, color: category.text },
         title: `${category.label} · ${item.title}`,
@@ -388,8 +391,8 @@ export function DayCell({
           {holiday && (
             <span
               role="img"
-              aria-label={`${holiday.name} · ${holiday.market} closed`}
-              title={`${holiday.name} · ${holiday.market} closed`}
+              aria-label={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
+              title={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
               className="flex shrink-0"
               // `-800`: a step darker than the date beside it, so the mark
               // holds its own on the rose cell rather than melting into it.
@@ -472,7 +475,7 @@ export function DayCell({
           {overflow > 0 &&
             (isMobile ? (
               <span className="shrink-0 truncate px-1 py-0.5 type-caption leading-tight font-medium text-muted-foreground">
-                +{overflow} more
+                {t.planner.calendar.day.more(overflow)}
               </span>
             ) : (
               <button
@@ -485,7 +488,7 @@ export function DayCell({
                 onKeyDown={(e) => e.stopPropagation()}
                 className="shrink-0 truncate rounded-[3px] px-1 py-0.5 type-caption leading-tight text-left font-medium text-muted-foreground cursor-pointer transition-colors hover:bg-[var(--fill-gray-200)]! hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-blue-500)]"
               >
-                +{overflow} more
+                {t.planner.calendar.day.more(overflow)}
               </button>
             ))}
         </div>
@@ -511,7 +514,7 @@ export function DayCell({
         showHeader={false}
         // Not rendered — it goes to the drawer's `sr-only` title, which vaul
         // requires and screen readers announce on open.
-        title={dayLabel(day)}
+        title={dayLabel(day, locale)}
         className="px-0 pb-0"
         contentClassName="flex min-h-0 flex-col pt-0"
       >

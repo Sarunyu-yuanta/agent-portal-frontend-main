@@ -24,6 +24,8 @@ import {
 } from "./top-idea-data";
 import { useTopIdeaProducts } from "@/hooks/use-catalog";
 import { TopIdeaDetailSkeleton } from "./ProductDetailSkeletons";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const ASSETS = {
   detailWave: "/products/top-idea/top-idea-detail-wave.svg",
@@ -153,6 +155,7 @@ function DetailHeroWave() {
 }
 
 function TopIdeaHeroBanner({ sector }: { sector: TopIdeaSector }) {
+  const t = useT();
   const theme = TOP_IDEA_THEMES[sector];
   const subtitle = TOP_IDEA_SUBTITLES[sector];
 
@@ -228,7 +231,7 @@ function TopIdeaHeroBanner({ sector }: { sector: TopIdeaSector }) {
         </div>
         <div className="relative flex flex-col gap-0.5 lg:gap-2 items-end justify-center shrink-0">
           <div className="flex items-center gap-0.5 lg:gap-1 px-1 rounded-md bg-white">
-            <span className="text-xs leading-[20px] lg:text-sm lg:leading-[24px] text-[#6a7282]">up to</span>
+            <span className="text-xs leading-[20px] lg:text-sm lg:leading-[24px] text-[#6a7282]">{t.products.topIdea.upTo}</span>
             <span className="font-bold text-lg leading-[28px] lg:text-xl lg:leading-[34px] text-[#008236]">
               {TOP_IDEA_MAX_COUPON}
             </span>
@@ -249,6 +252,7 @@ export function TopIdeaDetail({
   onBack: () => void;
   onProductSelect: (product: StructuredProduct) => void;
 }) {
+  const t = useT();
   const { data: products, isLoading } = useTopIdeaProducts(sector);
   const theme = TOP_IDEA_THEMES[sector];
 
@@ -266,7 +270,7 @@ export function TopIdeaDetail({
   return (
     <div className="flex flex-col gap-2 w-full bg-white pt-4 md:pt-6">
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-base font-bold leading-[28px] text-[#101828] truncate lg:text-lg lg:leading-[30px]">
@@ -280,12 +284,12 @@ export function TopIdeaDetail({
         <div className="flex flex-col gap-2 items-center w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
           <div className="flex gap-3 items-center w-full">
             <p className="flex-1 min-w-0 text-sm leading-[24px] lg:text-base lg:leading-[24px] text-[#4a5565]">
-              {products.length} รายการ
+              {t.products.common.items(products.length)}
             </p>
             <Button
               variant="outline-black"
               size="icon-sm"
-              aria-label="ตัวกรอง"
+              aria-label={t.products.common.filter}
               className="shrink-0 md:hidden"
             >
               <FunnelSimpleIcon size={18} />
@@ -296,15 +300,18 @@ export function TopIdeaDetail({
               leftIcon={<FunnelSimpleIcon size={18} />}
               className="shrink-0 hidden md:inline-flex"
             >
-              ตัวกรอง
+              {t.products.common.filter}
             </Button>
           </div>
           <p className="w-full text-micro leading-[18px] lg:text-xs lg:leading-[20px] text-[#6a7282]">
-            <span className="lg:hidden">อัปเดตล่าสุด {TOP_IDEA_UPDATED_AT_MOBILE}</span>
-            <span className="hidden lg:inline">อัปเดตล่าสุด {TOP_IDEA_UPDATED_AT}</span>
+            <span className="lg:hidden">{t.products.common.updatedAt(TOP_IDEA_UPDATED_AT_MOBILE)}</span>
+            <span className="hidden lg:inline">{t.products.common.updatedAt(TOP_IDEA_UPDATED_AT)}</span>
           </p>
 
           {/* mobile/tablet: single-col horizontal cards; desktop: 3-col vertical grid cards */}
+          {products.length === 0 ? (
+            <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+          ) : (
           <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-3 w-full">
             {products.map((product) => (
               <StructuredProductCard
@@ -315,6 +322,7 @@ export function TopIdeaDetail({
               />
             ))}
           </div>
+          )}
         </div>
       </div>
     </div>

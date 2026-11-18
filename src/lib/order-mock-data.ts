@@ -33,10 +33,10 @@ import type {
 import { mockClients } from "@/lib/mock-data";
 import { getCallLogs } from "@/data/call-log-data";
 import { OTHER_DESK_CLIENT_NAMES } from "@/data/client-profiles";
-import { NOTE_AUTHOR } from "@/app/(dashboard)/notes/note-constants";
-import { offeredProductId } from "@/app/(dashboard)/orders/offered-products";
-import { STOCK_TOP_PICK } from "@/app/(dashboard)/client/[id]/stock-data";
-import { getTopPerformers } from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+import { NOTE_AUTHOR } from "@/app/[lang]/(dashboard)/notes/note-constants";
+import { offeredProductId } from "@/app/[lang]/(dashboard)/orders/offered-products";
+import { STOCK_TOP_PICK } from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
+import { getTopPerformers } from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
 
 /**
  * Who every booking, request and submission is attributed to.

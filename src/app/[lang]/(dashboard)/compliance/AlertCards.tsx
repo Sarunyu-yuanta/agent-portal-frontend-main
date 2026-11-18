@@ -1,30 +1,48 @@
 "use client";
 
 import { Tag, Button } from "@sarunyu/system-one";
-import { WarningCircleIcon, XCircleIcon } from "@phosphor-icons/react";
+import { ShieldCheckIcon, WarningCircleIcon, XCircleIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { mockComplianceAlerts } from "@/lib/mock-data";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
+import { useT } from "@/i18n/I18nProvider";
 
 const ALERT_META = {
-  critical: { label: "Critical", variant: "red"    as const, color: "var(--text-danger-primary)", accentColor: "var(--text-danger-primary)", bg: "var(--bg-danger-light)", Icon: XCircleIcon },
-  warning:  { label: "Warning",  variant: "yellow" as const, color: "var(--text-warning-primary)", accentColor: "var(--text-warning-primary)", bg: "var(--bg-warning-light)", Icon: WarningCircleIcon },
+  critical: { variant: "red"    as const, color: "var(--text-danger-primary)", accentColor: "var(--text-danger-primary)", bg: "var(--bg-danger-light)", Icon: XCircleIcon },
+  warning:  { variant: "yellow" as const, color: "var(--text-warning-primary)", accentColor: "var(--text-warning-primary)", bg: "var(--bg-warning-light)", Icon: WarningCircleIcon },
 };
 
-const ALERT_TIMESTAMPS = ["2 hrs ago", "3 hrs ago", "5 hrs ago", "Today"];
+/** Hours ago per row — `null` reads as "today". Hard-coded; see compliance-data.ts. */
+const ALERT_HOURS_AGO: (number | null)[] = [2, 3, 5, null];
 
 export function AlertCards() {
   const { isPrivate } = usePrivacy();
+  const t = useT();
+  const timestamp = (i: number) => {
+    const h = ALERT_HOURS_AGO[i];
+    return h == null ? t.compliance.alerts.today : t.compliance.alerts.hoursAgo(h);
+  };
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Section header — inside the card */}
         <div className="flex items-center justify-between gap-2 px-5 py-4 border-b border-border">
-          <p className="type-subtitle-1 text-foreground">Active Compliance Alerts</p>
-          <Tag text="4 open" variant="red" size="small" />
+          <p className="type-subtitle-1 text-foreground">{t.compliance.alerts.title}</p>
+          {mockComplianceAlerts.length > 0 && (
+            <Tag text={t.compliance.alerts.openCount(4)} variant="red" size="small" />
+          )}
         </div>
+        {mockComplianceAlerts.length === 0 && (
+          <EmptyState
+            size="compact"
+            icon={<ShieldCheckIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+            title={t.compliance.alerts.empty}
+          />
+        )}
         {mockComplianceAlerts.map((alert, i) => {
           const meta = ALERT_META[alert.type as keyof typeof ALERT_META] ?? ALERT_META.warning;
+          const severityLabel = t.compliance.alerts.severity[alert.type === "critical" ? "critical" : "warning"];
           const Icon = meta.Icon;
           const isPrimary = alert.action1 === "Escalate to Compliance" || alert.action1 === "Maintain Block";
           const isLast = i === mockComplianceAlerts.length - 1;
@@ -41,10 +59,10 @@ export function AlertCards() {
                     <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: meta.bg }}>
                       <Icon size={13} weight="fill" style={{ color: meta.color }} />
                     </div>
-                    <Tag text={meta.label} variant={meta.variant} size="small" />
+                    <Tag text={severityLabel} variant={meta.variant} size="small" />
                     <span className="type-caption text-muted-foreground">{maskName(alert.client, isPrivate)}</span>
                   </div>
-                  <span className="type-caption text-muted-foreground shrink-0">{ALERT_TIMESTAMPS[i]}</span>
+                  <span className="type-caption text-muted-foreground shrink-0">{timestamp(i)}</span>
                 </div>
                 <p className="text-body font-semibold text-foreground leading-snug">{alert.title}</p>
                 <p className="type-body-2 text-muted-foreground leading-snug">{alert.message}</p>
@@ -64,10 +82,10 @@ export function AlertCards() {
                   <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-body font-semibold text-foreground leading-snug">{alert.title}</p>
-                      <span className="type-caption text-muted-foreground shrink-0">{ALERT_TIMESTAMPS[i]}</span>
+                      <span className="type-caption text-muted-foreground shrink-0">{timestamp(i)}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Tag text={meta.label} variant={meta.variant} size="small" />
+                      <Tag text={severityLabel} variant={meta.variant} size="small" />
                       <span className="type-caption text-muted-foreground">{maskName(alert.client, isPrivate)}</span>
                     </div>
                     <p className="type-body-2 text-muted-foreground leading-snug">{alert.message}</p>

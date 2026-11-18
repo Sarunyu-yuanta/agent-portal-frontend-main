@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Breadcrumb } from "@sarunyu/system-one";
-import { crumbVariants, type Crumb } from "@/app/(dashboard)/page-breadcrumbs";
+import { crumbVariants, type Crumb } from "@/app/[lang]/(dashboard)/page-breadcrumbs";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/i18n/I18nProvider";
+import { localizePath } from "@/i18n/locale-path";
 
 /**
  * A breadcrumb that fits the width it actually has.
@@ -31,7 +33,17 @@ export function ResponsiveBreadcrumb({
   const probeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [level, setLevel] = useState(0);
 
-  const variants = useMemo(() => crumbVariants(items), [items]);
+  // Crumbs are built from unprefixed paths (so the trail stays the same in
+  // both languages); the design system renders plain anchors, so the prefix
+  // goes on here, at the last moment.
+  const locale = useLocale();
+  const variants = useMemo(
+    () =>
+      crumbVariants(items).map((variant) =>
+        variant.map((c) => (c.href ? { ...c, href: localizePath(c.href, locale) } : c)),
+      ),
+    [items, locale],
+  );
 
   useEffect(() => {
     const box = boxRef.current;

@@ -10,12 +10,11 @@ import type {
   ClientSegment,
 } from "@/types/domain";
 import {
-  FORMAT_LABEL,
-  PRODUCT_LABEL,
-  SEGMENT_LABEL,
   type CampaignFilters as Filters,
   type CampaignTab,
 } from "./campaign-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /**
  * Search in the open, the four narrowing axes behind a button.
@@ -52,9 +51,6 @@ function chipOptions<T extends string>(
   }));
 }
 
-const PRODUCT_OPTIONS = chipOptions(PRODUCT_LABEL);
-const SEGMENT_OPTIONS = chipOptions(SEGMENT_LABEL);
-const FORMAT_OPTIONS = chipOptions(FORMAT_LABEL);
 
 const NO_DROPDOWNS: DropdownFilters = {
   product: null,
@@ -87,12 +83,13 @@ function ChipGroup<T extends string>({
   value: T | null;
   onChange: (next: T | null) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2">
       <p className="text-label font-semibold text-foreground">{label}</p>
       <div className="flex flex-wrap gap-2">
         <Chip
-          label="ทั้งหมด"
+          label={t.campaigns.filters.all}
           type="single"
           size="medium"
           selected={value === null}
@@ -114,19 +111,19 @@ function ChipGroup<T extends string>({
 }
 
 /** The chips under the row — one per applied dropdown, in dialog order. */
-function activeChips(filters: Filters): {
+function activeChips(filters: Filters, t: Dictionary): {
   key: keyof DropdownFilters;
   label: string;
 }[] {
   const chips: { key: keyof DropdownFilters; label: string }[] = [];
   if (filters.product) {
-    chips.push({ key: "product", label: PRODUCT_LABEL[filters.product] });
+    chips.push({ key: "product", label: t.promotions.product[filters.product] });
   }
   if (filters.segment) {
-    chips.push({ key: "segment", label: SEGMENT_LABEL[filters.segment] });
+    chips.push({ key: "segment", label: t.promotions.segment[filters.segment] });
   }
   if (filters.format) {
-    chips.push({ key: "format", label: FORMAT_LABEL[filters.format] });
+    chips.push({ key: "format", label: t.promotions.format[filters.format] });
   }
   return chips;
 }
@@ -160,10 +157,14 @@ export function CampaignFilters({
   /** How many campaigns a draft would leave, for the dialog's primary action. */
   previewCount: (draft: DropdownFilters) => number;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<DropdownFilters>(NO_DROPDOWNS);
 
-  const chips = activeChips(filters);
+  const chips = activeChips(filters, t);
+  const PRODUCT_OPTIONS = chipOptions(t.promotions.product as Record<CampaignProduct, string>);
+  const SEGMENT_OPTIONS = chipOptions(t.promotions.segment as Record<ClientSegment, string>);
+  const FORMAT_OPTIONS = chipOptions(t.promotions.format as Record<CampaignFormat, string>);
 
   // Seeded on open rather than kept in sync: the dialog is a scratch copy, and
   // a chip removed behind it must not rewrite a draft being edited.
@@ -203,7 +204,7 @@ export function CampaignFilters({
             small search box is 38px and the button 36px. */}
         <div className="flex items-center gap-2.5 md:ml-auto md:shrink-0">
           <SearchInput
-            placeholder="ค้นหาชื่อแคมเปญ"
+            placeholder={t.campaigns.filters.searchPlaceholder}
             value={filters.search}
             onChange={(search) => onChange({ search })}
             onClear={() => onChange({ search: "" })}
@@ -219,7 +220,7 @@ export function CampaignFilters({
             leftIcon={<FunnelSimpleIcon size={16} weight="bold" />}
             onClick={openDialog}
           >
-            ตัวกรอง
+            {t.campaigns.filters.button}
             {chips.length > 0 && (
               <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
                 {chips.length}
@@ -236,7 +237,7 @@ export function CampaignFilters({
               key={chip.key}
               type="button"
               onClick={() => onChange({ [chip.key]: null } as Partial<Filters>)}
-              aria-label={`เอาตัวกรอง ${chip.label} ออก`}
+              aria-label={t.campaigns.filters.removeChip(chip.label)}
               className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-card py-1 pl-2.5 pr-1.5 text-label font-medium text-foreground transition-colors hover:bg-muted"
             >
               {chip.label}
@@ -248,7 +249,7 @@ export function CampaignFilters({
             onClick={onClear}
             className="cursor-pointer px-1 text-label font-medium text-primary-action hover:underline"
           >
-            ล้างทั้งหมด
+            {t.campaigns.filters.clearAll}
           </button>
         </div>
       )}
@@ -256,12 +257,12 @@ export function CampaignFilters({
       <ResponsiveDialog
         open={open}
         onOpenChange={setOpen}
-        title="ตัวกรอง"
+        title={t.campaigns.filters.title}
         // On the title row rather than beside the primary action: it undoes
         // the whole dialog, so pairing it with "ดูผลลัพธ์" read as the other
         // half of one decision when it is really the opposite of all of them.
         headerAction={{
-          label: "ล้างทั้งหมด",
+          label: t.campaigns.filters.clearAll,
           // The status chip lives outside the dialog; keep it.
           onClick: () => setDraft((d) => ({ ...NO_DROPDOWNS, status: d.status })),
         }}
@@ -270,7 +271,7 @@ export function CampaignFilters({
       >
         <div className="flex flex-col gap-4 pt-1">
           <ChipGroup
-            label="สินทรัพย์"
+            label={t.campaigns.filters.product}
             options={PRODUCT_OPTIONS}
             value={draft.product}
             onChange={(product: CampaignProduct | null) =>
@@ -278,7 +279,7 @@ export function CampaignFilters({
             }
           />
           <ChipGroup
-            label="กลุ่มลูกค้า"
+            label={t.campaigns.filters.segment}
             options={SEGMENT_OPTIONS}
             value={draft.segment}
             onChange={(segment: ClientSegment | null) =>
@@ -287,7 +288,7 @@ export function CampaignFilters({
           />
           {tab === "event" && (
             <ChipGroup
-              label="รูปแบบงาน"
+              label={t.campaigns.filters.format}
               options={FORMAT_OPTIONS}
               value={draft.format}
               onChange={(format: CampaignFormat | null) =>
@@ -302,7 +303,7 @@ export function CampaignFilters({
               has moved up to the title. */}
           <div className="mt-1 border-t border-border pt-4">
             <Button variant="primary" size="lg" className="w-full" onClick={apply}>
-              ดูผลลัพธ์ ({previewed})
+              {t.campaigns.filters.showResults(previewed)}
             </Button>
           </div>
         </div>

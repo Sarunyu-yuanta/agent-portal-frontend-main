@@ -4,10 +4,13 @@ import {
   ROBO_RISK_TRACK_COLOR,
   type RoboRiskTier,
 } from "./robo-risk-level";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Figma 33787:149969 — label + 5-segment risk bar. */
 export function RoboRiskLevel({ tier }: { tier: RoboRiskTier }) {
-  const { label, filledSegments, color } = ROBO_RISK_CONFIG[tier];
+  const t = useT();
+  const { filledSegments, color } = ROBO_RISK_CONFIG[tier];
+  const label = t.products.advisory.riskTier[tier];
 
   return (
     <div className="flex shrink-0 items-center gap-2">

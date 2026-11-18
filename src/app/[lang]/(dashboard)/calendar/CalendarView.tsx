@@ -8,8 +8,10 @@ import {
   CalendarDotIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  FunnelIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useNotes } from "@/contexts/notes-context";
 import { useToasts } from "@/hooks/use-toasts";
 import type { Note } from "@/types/domain";
@@ -23,11 +25,11 @@ import {
   monthGrid,
   todayDateKey,
   weeksOf,
-  WEEKDAY_LABELS,
 } from "./calendar-grid";
 import { AlertOverlay, type AlertTarget } from "./AlertOverlay";
 import {
   CalendarFilterMenu,
+  hiddenCount,
   holidaysVisible,
   itemVisible,
   SHOW_EVERYTHING,
@@ -39,6 +41,8 @@ import { holidaysByDay } from "./mock-market-feed";
 import { NoteDetailPane } from "../notes/NoteDetailPane";
 import { NOTE_AUTHOR } from "../notes/note-constants";
 import { reminderAtFromDate } from "../notes/note-format";
+import { useLocale, useT } from "@/i18n/I18nProvider";
+import { weekdayNames } from "@/i18n/format";
 
 export function CalendarView({
   notes,
@@ -47,6 +51,8 @@ export function CalendarView({
   notes: Note[];
   clients: { id: string; name: string }[];
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { addNote, editNote, removeNote } = useNotes();
   const isHydrated = useSyncExternalStore(
     () => () => {},
@@ -113,10 +119,15 @@ export function CalendarView({
         reminderAt: draftAttrs.reminderAt,
         reminderDone: draftAttrs.reminderDone,
       });
-      addToast({ status: "success", message: "Reminder added" });
+    } catch (err) {
+      // The modal stays open with what was typed.
+      console.warn("[CalendarView] create failed", err);
+      addToast({ status: "critical", message: t.planner.calendar.reminderAddFailed });
+      return;
     } finally {
       setSaving(false);
     }
+    addToast({ status: "success", message: t.planner.calendar.reminderAdded });
     setCreateOpen(false);
   };
 
@@ -133,21 +144,37 @@ export function CalendarView({
     setEditNoteId(noteId);
   };
 
-  const handleEditSave = () => {
+  // Awaited before the toast — it used to say "saved" whether or not it was.
+  const handleEditSave = async () => {
+    if (!panelNote || saving) return;
     const values = modalValuesRef.current;
-    if (panelNote) {
-      editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+    setSaving(true);
+    try {
+      await editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+    } catch (err) {
+      console.warn("[CalendarView] save failed", err);
+      addToast({ status: "critical", message: t.planner.saveFailedKept });
+      return;
+    } finally {
+      setSaving(false);
     }
-    addToast({ status: "success", message: "Note saved" });
+    addToast({ status: "success", message: t.planner.saved });
     setEditNoteId(null);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    await removeNote(deleteTarget.id);
-    addToast({ status: "success", message: "Note deleted" });
+    const target = deleteTarget;
     setDeleteTarget(null);
-    if (deleteTarget.id === editNoteId) setEditNoteId(null);
+    try {
+      await removeNote(target.id);
+    } catch (err) {
+      console.warn("[CalendarView] delete failed", err);
+      addToast({ status: "critical", message: t.states.deleteError });
+      return;
+    }
+    addToast({ status: "success", message: t.planner.deleted });
+    if (target.id === editNoteId) setEditNoteId(null);
   };
 
   /**
@@ -176,8 +203,8 @@ export function CalendarView({
    * before hydration has picked a month.
    */
   const itemsByDay = useMemo(
-    () => groupDayItems(notes, viewDate ?? new Date(todayKey)),
-    [notes, viewDate, todayKey],
+    () => groupDayItems(notes, viewDate ?? new Date(todayKey), t),
+    [notes, viewDate, todayKey, t],
   );
 
   /** Real dates, not generated ones — so unlike the feeds above this is keyed
@@ -230,7 +257,7 @@ export function CalendarView({
   const showHolidays = holidaysVisible(filter);
 
   if (!viewDate) {
-    return <p className="type-body-2 text-muted-foreground text-center py-10">Loading calendar…</p>;
+    return <p className="type-body-2 text-muted-foreground text-center py-10">{t.planner.calendar.loading}</p>;
   }
 
   const today = new Date();
@@ -244,6 +271,22 @@ export function CalendarView({
   const TodayIcon =
     monthOffset > 0 ? ArrowLeftIcon : monthOffset < 0 ? ArrowRightIcon : CalendarDotIcon;
   const days = monthGrid(viewDate);
+
+  /**
+   * The filter hid everything this grid had to show. Different from a quiet
+   * month — that grid is empty with nothing hidden and is an honest answer — so
+   * only a month that *had* something, all of it filtered out, says so.
+   */
+  const filteredToNothing =
+    hiddenCount(filter) > 0 &&
+    days.every((day) => {
+      const key = dayKey(day);
+      return !visibleByDay.get(key)?.length && !(showHolidays && holidayByDay.has(key));
+    }) &&
+    days.some((day) => {
+      const key = dayKey(day);
+      return (itemsByDay.get(key)?.length ?? 0) > 0 || holidayByDay.has(key);
+    });
 
   /**
    * The day the toolbar's "New" starts a reminder on. Clicking a cell says which
@@ -264,15 +307,10 @@ export function CalendarView({
     <>
       <Toaster items={toasts} onRemove={removeToast} />
 
-      {/* `max-xl:` overrides with `!`, not `rounded-none xl:rounded-xl`: the two
-          tie on specificity and `@sarunyu/system-one`, which ships a plain
-          `.rounded-none` and loads after `globals.css`, takes the tie — the
-          corners would stay square at every width. Same trap `SELECTED_ROW` in
-          `NotesSidebarList` documents. Below `xl` the shell drops its padding
-          and page title for this route (`isMobileFullBleed` in `page-chrome`),
-          so a border pressed against the screen edge would read as a rendering
-          fault rather than a card. */}
-      <div className="flex shrink-0 flex-col rounded-xl border border-border bg-card overflow-hidden max-xl:rounded-none! max-xl:border-0!">
+      {/* No card frame: the page is `isEdgeToEdge` in `page-chrome`, so the grid
+          runs to the edges of the content area at every size and a border or
+          rounded corner pressed against them would read as a rendering fault. */}
+      <div className="flex min-h-0 flex-1 flex-col bg-card overflow-hidden">
         {/* Navigation left, action right — the toolbar arrangement Outlook and
             Google Calendar both use. Today / ‹ / › sit together because they are
             one control (move the view) and the month label reads as their
@@ -294,7 +332,7 @@ export function CalendarView({
                 `shrink-0` on all three controls: they are already at their
                 minimum, so the month label beside them is what gives when the
                 bar runs out of room. */}
-            <Tooltip content={`Go to today · ${dayLabel(today)}`} side="bottom">
+            <Tooltip content={t.planner.calendar.goToToday(dayLabel(today, locale))} side="bottom">
               <Button
                 variant="plain"
                 size="sm"
@@ -302,14 +340,14 @@ export function CalendarView({
                 leftIcon={<TodayIcon size={15} />}
                 onClick={() => setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))}
               >
-                Today
+                {t.planner.calendar.today}
               </Button>
             </Tooltip>
             <div className="flex shrink-0 items-center gap-1">
               <button
                 type="button"
                 onClick={() => setViewDate((d) => addMonths(d ?? today, -1))}
-                aria-label="Previous month"
+                aria-label={t.planner.calendar.previousMonth}
                 className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
                 <CaretLeftIcon size={16} />
@@ -317,7 +355,7 @@ export function CalendarView({
               <button
                 type="button"
                 onClick={() => setViewDate((d) => addMonths(d ?? today, 1))}
-                aria-label="Next month"
+                aria-label={t.planner.calendar.nextMonth}
                 className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
                 <CaretRightIcon size={16} />
@@ -363,12 +401,12 @@ export function CalendarView({
             leftIcon={<PlusIcon size={15} weight="bold" />}
             onClick={() => handleNewReminder(defaultNewReminderDay())}
           >
-            New reminder
+            {t.planner.newReminder}
           </Button>
           <Button
             variant="primary"
             size="icon-md"
-            aria-label="New reminder"
+            aria-label={t.planner.newReminder}
             className="shrink-0 sm:hidden!"
             onClick={() => handleNewReminder(defaultNewReminderDay())}
           >
@@ -377,7 +415,7 @@ export function CalendarView({
         </div>
 
         <div className="grid shrink-0 grid-cols-7 border-b border-[rgba(0,0,0,0.12)]">
-          {WEEKDAY_LABELS.map((label) => (
+          {weekdayNames(locale, "short").map((label) => (
             <div key={label} className="px-2 py-2 type-caption text-center text-muted-foreground">
               {label}
             </div>
@@ -388,18 +426,28 @@ export function CalendarView({
             own `border` already draws those edges, and stacking a grid line on
             top of it reads as a double-thick rule on three sides. Same reason
             `DayCell` drops its `border-r` in the last column. */}
-        {/* A fixed row height, not six rows splitting the viewport.
-            The card used to be `h-full` inside a 100vh shell, which made the
-            month's height a function of the window — the same grid showed three
-            pills on a laptop and one on a short one, and there was nowhere under
-            it to put a legend. The six rows are 112px each now, about what that
-            split came to on a full-height desktop, and the page scrolls if that
-            plus the legend runs past the fold.
-            Each cell still clips its own overflow and counts its own "+N more",
-            so a busy day cannot stretch its row and leave the grid uneven. */}
-        <div className="flex flex-col">
+        {/* Six rows splitting whatever height the viewport leaves (the page is
+            `isFullHeight`, so it never scrolls). Each cell measures how many
+            pills fit (`useVisibleRows`) and counts the rest as "+N more", so a
+            busy day cannot stretch its row and leave the grid uneven — and a
+            tall screen simply shows more pills per day. The legend below stays
+            its natural height. */}
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          {filteredToNothing && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-4">
+              <div className="pointer-events-auto rounded-xl border border-border bg-card px-6 shadow-lg">
+                <EmptyState
+                  size="compact"
+                  icon={<FunnelIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                  title={t.states.noFilterResultTitle}
+                  body={t.planner.calendar.filter.noResultBody}
+                  action={{ label: t.states.clearFilters, onClick: () => setFilter(SHOW_EVERYTHING) }}
+                />
+              </div>
+            </div>
+          )}
           {weeksOf(days).map((week, i) => (
-            <div key={i} className="grid h-28 grid-cols-7 border-b border-[rgba(0,0,0,0.12)] last:border-b-0">
+            <div key={i} className="grid min-h-0 flex-1 grid-cols-7 border-b border-[rgba(0,0,0,0.12)] last:border-b-0">
               {week.map((day, dayIndex) => (
                 <DayCell
                   key={day.toISOString()}
@@ -455,7 +503,7 @@ export function CalendarView({
             </div>
             <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
               <Button variant="outline" size="sm" onClick={() => setCreateOpen(false)}>
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 variant="primary"
@@ -463,7 +511,7 @@ export function CalendarView({
                 onClick={handleCreateSave}
                 disabled={blank || saving}
               >
-                Add note
+                {t.planner.addNote}
               </Button>
             </div>
           </div>
@@ -500,15 +548,15 @@ export function CalendarView({
             </div>
             <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
               <Button variant="outline" size="sm" onClick={() => setEditNoteId(null)}>
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 variant="primary"
                 size="sm"
                 onClick={handleEditSave}
-                disabled={blank}
+                disabled={blank || saving}
               >
-                Save
+                {saving ? t.common.saving : t.common.save}
               </Button>
             </div>
           </div>
@@ -520,11 +568,11 @@ export function CalendarView({
           <Modal
             variant="alert"
             alertStatus="danger"
-            title="Delete reminder?"
-            description="This note will be permanently removed."
+            title={t.planner.deleteReminderTitle}
+            description={t.planner.deleteNoteBody}
             actionLayout="double"
-            primaryLabel="Delete"
-            secondaryLabel="Cancel"
+            primaryLabel={t.planner.delete}
+            secondaryLabel={t.common.cancel}
             onPrimaryClick={confirmDelete}
             onSecondaryClick={() => setDeleteTarget(null)}
             onClose={() => setDeleteTarget(null)}

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { Button, Popover } from "@sarunyu/system-one";
 import { NotePencilIcon } from "@phosphor-icons/react";
 import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
 import { NOTE_AUTHOR } from "./note-constants";
+import { useT } from "@/i18n/I18nProvider";
 import {
   NoteComposer,
   draftHasContent,
@@ -39,11 +40,13 @@ const CLIENT_PAGE = /^\/client\/([^/]+)/;
  * does to you.
  */
 export function FloatingNoteButton() {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useAppPathname();
   const clients = useClients();
   const { addNote } = useNotes();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const clientIdFromPath = CLIENT_PAGE.exec(pathname)?.[1] ?? null;
   const [draft, setDraft] = useState<ComposerDraft>(() => emptyDraft(clientIdFromPath));
@@ -75,6 +78,7 @@ export function FloatingNoteButton() {
 
   const handleSubmit = async () => {
     setSaving(true);
+    setSubmitError(null);
     try {
       await addNote({
         clientIds: draft.clientIds,
@@ -86,6 +90,10 @@ export function FloatingNoteButton() {
       });
       setDraft(emptyDraft(clientIdFromPath));
       setOpen(false);
+    } catch (err) {
+      // The panel stays open with the draft, and says so.
+      console.warn("[FloatingNoteButton] create failed", err);
+      setSubmitError(t.planner.notes.saveFailedRetry);
     } finally {
       setSaving(false);
     }
@@ -119,6 +127,7 @@ export function FloatingNoteButton() {
               onDraftChange={setDraft}
               clients={clients}
               saving={saving}
+              error={submitError}
               onSubmit={handleSubmit}
               onDiscard={handleDiscard}
               onMinimize={() => setOpen(false)}
@@ -133,7 +142,7 @@ export function FloatingNoteButton() {
           variant="primary"
           size="icon-xl"
           className="rounded-full shadow-lg"
-          aria-label={unfinished ? "New note — draft in progress" : "New note"}
+          aria-label={unfinished ? t.planner.notes.newNoteDraft : t.planner.notes.newNote}
         >
           <NotePencilIcon size={22} weight="bold" />
         </Button>

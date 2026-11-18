@@ -6,12 +6,14 @@ import { MutualFundDetailSkeleton } from "../../../client/[id]/ProductDetailSkel
 import { useMutualFund } from "@/hooks/use-catalog";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { CatalogNotFound } from "../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundDetailPage({
   params,
 }: {
   params: Promise<{ fundId: string }>;
 }) {
+  const t = useT();
   const { fundId } = use(params);
   const decodedId = decodeURIComponent(fundId);
   const { data: fund, isLoading } = useMutualFund(decodedId);
@@ -22,7 +24,7 @@ export default function MutualFundDetailPage({
   }
 
   if (!fund) {
-    return <CatalogNotFound message="ไม่พบกองทุนนี้" onBack={goBack} />;
+    return <CatalogNotFound message={t.products.notFound.fund} onBack={goBack} />;
   }
 
   return <MutualFundDetail fund={fund} onBack={goBack} />;

@@ -59,12 +59,6 @@ export function proposalOutcome(proposal: ProposalLog, book: OrderBook): Proposa
   return isBookClosed(book) ? "lost" : "open";
 }
 
-export const PROPOSAL_OUTCOME_LABEL: Record<ProposalOutcome, string> = {
-  open: "รอลูกค้าตัดสินใจ",
-  won: "จองแล้ว",
-  lost: "ไม่ได้จอง",
-};
-
 /**
  * The tag colour per outcome — for the two that mirror a booking's.
  *

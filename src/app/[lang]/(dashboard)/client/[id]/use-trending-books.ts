@@ -21,8 +21,8 @@
 
 import { useMemo } from "react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import { bookFillThb, isBookingOpen } from "@/app/(dashboard)/orders/order-book";
-import { useBooksByIds } from "@/app/(dashboard)/orders/use-order-books";
+import { bookFillThb, isBookingOpen } from "@/app/[lang]/(dashboard)/orders/order-book";
+import { useBooksByIds } from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import type { OrderBook } from "@/types/domain";
 import {
   isRankedSort,

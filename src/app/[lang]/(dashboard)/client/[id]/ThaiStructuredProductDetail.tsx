@@ -9,18 +9,19 @@ import {
 } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
-import { OrderBookingModal } from "@/app/(dashboard)/orders/OrderBookingModal";
-import { ProductOrderNotice } from "@/app/(dashboard)/orders/ProductOrderNotice";
-import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
-import { DealProgress } from "@/app/(dashboard)/orders/DealProgress";
-import { ProposalTallyLine } from "@/app/(dashboard)/orders/ProposalTallyLine";
-import { useSendProposal } from "@/app/(dashboard)/orders/useSendProposal";
-import { useOrderBook } from "@/app/(dashboard)/orders/use-order-books";
-import { isBookingOpen } from "@/app/(dashboard)/orders/order-book";
+import { OrderBookingModal } from "@/app/[lang]/(dashboard)/orders/OrderBookingModal";
+import { ProductOrderNotice } from "@/app/[lang]/(dashboard)/orders/ProductOrderNotice";
+import { ProductOrderSection } from "@/app/[lang]/(dashboard)/orders/ProductOrderSection";
+import { DealProgress } from "@/app/[lang]/(dashboard)/orders/DealProgress";
+import { ProposalTallyLine } from "@/app/[lang]/(dashboard)/orders/ProposalTallyLine";
+import { useSendProposal } from "@/app/[lang]/(dashboard)/orders/useSendProposal";
+import { useOrderBook } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { isBookingOpen } from "@/app/[lang]/(dashboard)/orders/order-book";
 import { toBookableProduct, type ThaiStructuredProduct } from "./thai-structured-data";
 import { ProductDocumentActions } from "./ProductDocumentActions";
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "./PackageFilesModal";
+import { useT } from "@/i18n/I18nProvider";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 const INVEST_URL = "https://placeholder.example.com/create-order";
@@ -70,6 +71,7 @@ export function ThaiStructuredProductDetail({
   product: ThaiStructuredProduct;
   onBack: () => void;
 }) {
+  const t = useT();
   const [fcnModalOpen, setFcnModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -95,7 +97,7 @@ export function ThaiStructuredProductDetail({
   // Memoised because it is a fresh object every call and feeds a hook's
   // dependency list — recomputing it each render would re-run the readiness
   // derivation behind the booking modal on every keystroke in its search box.
-  const adapted = useMemo(() => toBookableProduct(product), [product]);
+  const adapted = useMemo(() => toBookableProduct(product, t), [product, t]);
   const { data: book } = useOrderBook(adapted.id);
   const canBook = !book || isBookingOpen(book);
 
@@ -109,7 +111,7 @@ export function ThaiStructuredProductDetail({
     >
       {/* Header */}
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
@@ -144,8 +146,8 @@ export function ThaiStructuredProductDetail({
           {ORDER_BOOKING_ENABLED && (
             <TabGroup
               items={[
-                { id: "detail", title: "Detail" },
-                { id: "orders", title: "Order" },
+                { id: "detail", title: t.products.common.detailTabs.detail },
+                { id: "orders", title: t.products.common.detailTabs.orders },
               ]}
               activeId={tab}
               onChange={(id) => setTab(id as "detail" | "orders")}
@@ -194,7 +196,7 @@ export function ThaiStructuredProductDetail({
                 style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
               >
                 <UserPlusIcon size={16} />
-                <span>จองซื้อให้ลูกค้า</span>
+                <span>{t.products.common.bookForClient}</span>
               </button>
             ) : null
           ) : (
@@ -205,7 +207,7 @@ export function ThaiStructuredProductDetail({
               className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
               style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
             >
-              <span>สร้างคำสั่งซื้อ</span>
+              <span>{t.products.common.createOrder}</span>
               <ArrowSquareOutIcon size={16} />
             </a>
           )}

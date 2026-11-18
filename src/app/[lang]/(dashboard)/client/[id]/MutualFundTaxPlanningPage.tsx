@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button, Input } from "@sarunyu/system-one";
 import { ArrowLeftIcon, ArrowRightIcon, InfoIcon } from "@phosphor-icons/react";
 import { navRead, navRemove, navWrite } from "@/lib/nav-session";
 import { mutualFundDetailHref, RiskBadge } from "./MutualFundCard";
 import { MF_ASSETS } from "./mutual-fund-assets";
 import { MutualFundTaxPlanningSkeleton } from "./MutualFundListPageSkeletons";
+import { MutualFundSectionEmpty } from "./mutual-fund-ui";
 import { useMutualFundUniverse } from "@/hooks/use-catalog";
+import { useT } from "@/i18n/I18nProvider";
 import {
   TAX_SAVING_FUND_TYPES,
   getTaxSavingFunds,
@@ -18,8 +20,8 @@ import {
   type TaxSavingFundType,
 } from "./mutual-fund-data";
 
-function formatThb(value: number): string {
-  return `${Math.round(value).toLocaleString("th-TH")} THB`;
+function formatThb(value: number, unit: string): string {
+  return `${Math.round(value).toLocaleString("th-TH")} ${unit}`;
 }
 
 /**
@@ -54,18 +56,20 @@ function taxPlanningResultsHref(fundType: TaxSavingFundType): string {
 }
 
 function TaxCardViewTag() {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5 overflow-hidden rounded bg-[#f6f3ef] px-1 py-0.5">
       <span className="relative size-3.5 shrink-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={MF_ASSETS.performersTagView} alt="" className="absolute inset-0 block size-full max-w-none" />
       </span>
-      <span className="text-micro leading-[18px] font-normal whitespace-nowrap text-[#935737]">View</span>
+      <span className="text-micro leading-[18px] font-normal whitespace-nowrap text-[#935737]">{t.fund.tags.view}</span>
     </span>
   );
 }
 
 function TaxCardHighlightTag() {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5 overflow-hidden rounded bg-[#eff6ff] px-1 py-0.5">
       <span className="relative size-3.5 shrink-0">
@@ -73,7 +77,7 @@ function TaxCardHighlightTag() {
         <img src={MF_ASSETS.performersTagHighlight} alt="" className="absolute inset-0 block size-full max-w-none" />
       </span>
       <span className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-micro leading-[18px] font-normal whitespace-nowrap text-transparent">
-        Highlight
+        {t.fund.tags.highlight}
       </span>
     </span>
   );
@@ -163,18 +167,19 @@ function TaxSavingFundCard({
   funds: MutualFund[];
   onFundSelect?: (fundId: string) => void;
 }) {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
 
   return (
     <div className="flex w-full flex-col overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full items-center justify-between gap-2 p-4">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">ประเภทกองทุน</span>
+          <span className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.fundType}</span>
           <span className="text-base font-bold leading-[28px] text-[#101828]">{fundType}</span>
         </div>
         <div className="flex flex-col items-end gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">ลงทุนได้สูงสุด</span>
-          <span className="text-base font-bold leading-[28px] text-[#101828]">{formatThb(maxInvestment)}</span>
+          <span className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.maxInvestment}</span>
+          <span className="text-base font-bold leading-[28px] text-[#101828]">{formatThb(maxInvestment, t.fund.taxPlanning.unitThb)}</span>
         </div>
       </div>
 
@@ -182,7 +187,8 @@ function TaxSavingFundCard({
 
       <div className="flex w-full flex-col gap-2 bg-[#f9fafb] p-4">
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="text-sm leading-[24px] text-[#6a7282]">กองทุนแนะนำ</span>
+          <span className="text-sm leading-[24px] text-[#6a7282]">{t.fund.list.recommendedFunds}</span>
+          {funds.length > 0 && (
           <Button
             variant="plain"
             size="xs"
@@ -190,9 +196,13 @@ function TaxSavingFundCard({
             className="shrink-0 !px-0"
             onClick={() => router.push(taxPlanningResultsHref(fundType))}
           >
-            ดูทั้งหมด
+            {t.fund.list.viewAll}
           </Button>
+          )}
         </div>
+        {funds.length === 0 ? (
+          <MutualFundSectionEmpty title={t.fund.empty.recommendedFunds} />
+        ) : (
         <div className="flex w-full gap-2 overflow-x-auto pb-1">
           {funds.map((fund, index) => (
             <TaxFundPreviewCard
@@ -204,6 +214,7 @@ function TaxSavingFundCard({
             />
           ))}
         </div>
+        )}
       </div>
     </div>
   );
@@ -217,6 +228,7 @@ export function MutualFundTaxPlanningPage({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [incomeInput, setIncomeInput] = useState(() => readStoredIncomeState().incomeInput);
   const [hasInvalidChar, setHasInvalidChar] = useState(false);
   const [calculatedIncome, setCalculatedIncome] = useState<number | null>(
@@ -270,12 +282,12 @@ export function MutualFundTaxPlanningPage({
           variant="plain"
           size="icon-sm"
           onClick={handleBack}
-          aria-label="กลับ"
+          aria-label={t.common.back}
           className="size-[30px] shrink-0 rounded-md p-[5px]"
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">วางแผนภาษี</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">{t.fund.taxPlanning.title}</h1>
       </div>
 
       <div className="mx-auto w-full max-w-[996px] px-4 py-4 md:px-8 lg:px-0">
@@ -288,8 +300,8 @@ export function MutualFundTaxPlanningPage({
         >
           <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-[#f9fafb] p-4">
             <div className="flex flex-col gap-0.5">
-              <p className="text-sm font-bold leading-[24px] text-[#101828]">รายได้ของคุณ</p>
-              <p className="text-xs leading-[20px] text-[#6a7282]">รวมรายได้ทั้งหมดที่ได้รับในปี</p>
+              <p className="text-sm font-bold leading-[24px] text-[#101828]">{t.fund.taxPlanning.incomeTitle}</p>
+              <p className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.incomeHint}</p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
               <div className="min-w-0 flex-1">
@@ -300,10 +312,10 @@ export function MutualFundTaxPlanningPage({
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && incomeInput.trim()) handleCalculate();
                   }}
-                  placeholder="รายได้ต่อปี"
-                  unit="THB"
+                  placeholder={t.fund.taxPlanning.incomePlaceholder}
+                  unit={t.fund.taxPlanning.unitThb}
                   forceState={hasInvalidChar ? "error" : undefined}
-                  errorMessage="กรุณากรอกเฉพาะตัวเลข"
+                  errorMessage={t.fund.taxPlanning.digitsOnly}
                 />
               </div>
               <Button
@@ -313,22 +325,20 @@ export function MutualFundTaxPlanningPage({
                 disabled={!incomeInput.trim()}
                 onClick={handleCalculate}
               >
-                คำนวณ
+                {t.fund.taxPlanning.calculate}
               </Button>
             </div>
             <div className="flex w-full items-start gap-1.5 rounded bg-[#f9fafb] px-2 py-2">
               <InfoIcon size={16} className="mt-0.5 shrink-0 text-[#4a5565]" />
               <p className="min-w-0 flex-1 text-sm leading-[24px] text-[#4a5565]">
-                เครื่องมือวางแผนภาษีนี้เป็นเพียงการประมาณการสิทธิลดหย่อนภาษีเบื้องต้นจากรายได้ที่ระบุและเป็นไปตามหลักเกณฑ์ทั่วไป
-                โดยยังไม่รวมสิทธิลดหย่อนอื่น และมิใช่คำแนะนำภาษีเฉพาะบุคคลหรือการรับรองสิทธิ
-                โปรดตรวจสอบเกณฑ์สรรพากรและเงื่อนไขล่าสุดก่อนตัดสินใจลงทุน
+                {t.fund.taxPlanning.disclaimer}
               </p>
             </div>
           </div>
 
           {calculatedIncome !== null ? (
             <div className="flex w-full flex-col gap-3">
-              <p className="text-base font-bold leading-[28px] text-[#101828]">วางแผนภาษี</p>
+              <p className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.taxPlanning.title}</p>
               {TAX_SAVING_FUND_TYPES.map((fundType) => (
                 <TaxSavingFundCard
                   key={fundType}

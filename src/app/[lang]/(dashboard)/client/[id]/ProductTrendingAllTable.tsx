@@ -5,7 +5,7 @@ import { Button, LinearProgress, Pagination } from "@sarunyu/system-one";
 import { ArrowLeftIcon, FireIcon } from "@phosphor-icons/react";
 import { formatAumThb } from "@/lib/client-utils";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import { bookFill } from "@/app/(dashboard)/orders/order-book";
+import { bookFill } from "@/app/[lang]/(dashboard)/orders/order-book";
 import type { OrderBook } from "@/types/domain";
 import { bookForItem, trendingRows, useTrendingBooks } from "./use-trending-books";
 import { PercentPill } from "./stock-ui";
@@ -29,6 +29,7 @@ import {
   type TrendingItem,
   type TrendingTarget,
 } from "./product-trending-data";
+import { useT } from "@/i18n/I18nProvider";
 
 const MIN_WIDTH = "min-w-[760px]";
 
@@ -114,18 +115,19 @@ export function TrendingSortChips({
   value: TrendingSort;
   onChange: (sort: TrendingSort) => void;
 }) {
+  const t = useT();
   return (
     <div role="group" aria-labelledby="trending-sort-label" className="flex flex-wrap items-center gap-2">
       <span id="trending-sort-label" className="text-sm text-muted-foreground whitespace-nowrap">
-        เรียงตาม
+        {t.products.trending.sortBy}
       </span>
-      {TRENDING_SORTS.map((f) => (
+      {TRENDING_SORTS.map((id) => (
         <TagFilterChip
-          key={f.id}
-          icon={SORT_ICON[f.id]}
-          label={f.label}
-          active={value === f.id}
-          onClick={() => onChange(f.id)}
+          key={id}
+          icon={SORT_ICON[id]}
+          label={t.products.trending.sorts[id]}
+          active={value === id}
+          onClick={() => onChange(id)}
           selectedBadge={false}
         />
       ))}
@@ -134,19 +136,19 @@ export function TrendingSortChips({
 }
 
 type ColDef = {
+  /** Also the column's header key in `t.products.trending.columns`. */
   key: "rank" | "product" | "fill" | "sales" | "orders" | "change";
-  label: string;
   width: string;
   align: string;
 };
 
 const COLS: ColDef[] = [
-  { key: "rank",    label: "อันดับ",       width: "w-[80px]",              align: "justify-center" },
-  { key: "product", label: "สินค้า",       width: "flex-1 min-w-[300px]",  align: "" },
-  { key: "fill",    label: "ยอดจองในตะกร้า", width: "w-[280px]",          align: "" },
-  { key: "sales",   label: "ยอดขาย",      width: "w-[140px]",             align: "justify-end" },
-  { key: "orders",  label: "ออเดอร์",      width: "w-[120px]",             align: "justify-end" },
-  { key: "change",  label: "เทียบสัปดาห์ก่อน", width: "w-[150px]",        align: "justify-end" },
+  { key: "rank",    width: "w-[80px]",              align: "justify-center" },
+  { key: "product", width: "flex-1 min-w-[300px]",  align: "" },
+  { key: "fill",    width: "w-[280px]",             align: "" },
+  { key: "sales",   width: "w-[140px]",             align: "justify-end" },
+  { key: "orders",  width: "w-[120px]",             align: "justify-end" },
+  { key: "change",  width: "w-[150px]",             align: "justify-end" },
 ];
 
 function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: OrderBook | null }) {
@@ -211,6 +213,7 @@ export function ProductTrendingAllTable({
   onBack: () => void;
   onSelect: (target: TrendingTarget) => void;
 }) {
+  const t = useT();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
 
@@ -245,7 +248,7 @@ export function ProductTrendingAllTable({
       <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-2">
-            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
               <ArrowLeftIcon size={20} />
             </Button>
             <p className="flex-1 min-w-0 font-bold text-title leading-[28px] truncate" style={{ color: "rgba(0,0,0,0.75)" }}>
@@ -276,14 +279,14 @@ export function ProductTrendingAllTable({
                     className={`flex ${col.width} shrink-0 items-center ${col.align} px-3`}
                     style={headerBorderStyle(i === cols.length - 1 ? { right: false } : undefined)}
                   >
-                    <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{col.label}</span>
+                    <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{t.products.trending.columns[col.key]}</span>
                   </div>
                 ))}
               </div>
               <div className={`flex flex-col ${minWidth}`}>
                 {paged.length === 0 && (
                   <p className="type-caption text-muted-foreground text-center py-10">
-                    {emptyTrendingMessage(sort)}
+                    {emptyTrendingMessage(sort, t)}
                   </p>
                 )}
                 {paged.map((item, i) => (
@@ -308,9 +311,11 @@ export function ProductTrendingAllTable({
             </div>
           </div>
 
+          {/* Hidden with no rows, as on GlobalBondAllPage */}
+          {total > 0 && (
           <div className="flex flex-wrap-reverse items-center justify-end gap-3">
             <div className="flex items-center gap-2">
-              <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+              <p className="text-label text-muted-foreground whitespace-nowrap">{t.products.pagination.perPage}</p>
               <select
                 value={pageSize}
                 onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
@@ -321,17 +326,15 @@ export function ProductTrendingAllTable({
             </div>
             <div className="flex items-center gap-3">
               <p className="text-label text-muted-foreground">
-                Showing{" "}
-                <span className="font-medium text-foreground">{(safePage - 1) * pageSize + 1}</span>
-                {" – "}
-                <span className="font-medium text-foreground">{Math.min(safePage * pageSize, total)}</span>
-                {" of "}
-                <span className="font-medium text-foreground">{total}</span>{" "}
-                items
+                {t.products.pagination.showing(
+                  { from: (safePage - 1) * pageSize + 1, to: Math.min(safePage * pageSize, total), total },
+                  (n) => <span className="font-medium text-foreground">{n}</span>,
+                )}
               </p>
               <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setCurrentPage} />
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

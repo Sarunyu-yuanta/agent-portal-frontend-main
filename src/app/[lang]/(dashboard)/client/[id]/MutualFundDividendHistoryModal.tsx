@@ -2,15 +2,17 @@
 
 import { BottomSheet, Modal, useIsMobile } from "@sarunyu/system-one";
 import type { MutualFundDividend } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function DividendHistoryTable({ rows }: { rows: MutualFundDividend[] }) {
+  const t = useT();
   return (
     <div className="overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full border-b border-black/10">
         {[
-          { label: "วันที่ปิดสมุด", align: "left" as const },
-          { label: "วันที่จ่ายปันผล", align: "center" as const },
-          { label: "บาท/หน่วย", align: "right" as const },
+          { label: t.fund.dividend.bookCloseDate, align: "left" as const },
+          { label: t.fund.dividend.paymentDate, align: "center" as const },
+          { label: t.fund.dividend.perUnit, align: "right" as const },
         ].map((col) => (
           <div
             key={col.label}
@@ -54,6 +56,7 @@ export function MutualFundDividendHistoryModal({
   rows: MutualFundDividend[];
   onClose: () => void;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -63,10 +66,10 @@ export function MutualFundDividendHistoryModal({
         onOpenChange={(next) => {
           if (!next) onClose();
         }}
-        title="ประวัติการจ่ายปันผล"
+        title={t.fund.dividend.historyTitle}
         showHandle
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         contentClassName="flex max-h-[calc(var(--dvh)*100-10rem)] flex-col overflow-y-auto pt-0 pb-10"
       >
@@ -88,7 +91,7 @@ export function MutualFundDividendHistoryModal({
       <div onMouseDown={(e) => e.stopPropagation()}>
         <Modal
           variant="content"
-          title="ประวัติการจ่ายปันผล"
+          title={t.fund.dividend.historyTitle}
           showClose
           onClose={onClose}
           actionLayout="none"
@@ -110,6 +113,7 @@ export function DividendHistoryPreview({
   rows: MutualFundDividend[];
   onViewAll: () => void;
 }) {
+  const t = useT();
   const previewRows = rows.slice(0, 5);
   const showViewAll = rows.length > 5;
 
@@ -117,9 +121,9 @@ export function DividendHistoryPreview({
     <div className="overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full border-b border-black/10">
         {[
-          { label: "วันที่ปิดสมุด", align: "left" as const },
-          { label: "วันที่จ่ายปันผล", align: "center" as const },
-          { label: "บาท/หน่วย", align: "right" as const },
+          { label: t.fund.dividend.bookCloseDate, align: "left" as const },
+          { label: t.fund.dividend.paymentDate, align: "center" as const },
+          { label: t.fund.dividend.perUnit, align: "right" as const },
         ].map((col) => (
           <div
             key={col.label}
@@ -155,7 +159,7 @@ export function DividendHistoryPreview({
           onClick={onViewAll}
           className="flex h-[38px] w-full items-center justify-center border-none bg-white px-4 py-3.5 text-sm leading-[24px] text-[#0a6ee7] cursor-pointer"
         >
-          ดูทั้งหมด
+          {t.fund.list.viewAll}
         </button>
       )}
     </div>

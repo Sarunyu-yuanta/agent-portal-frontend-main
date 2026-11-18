@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { TopIdeaAllPage } from "../../client/[id]/TopIdeaAllPage";
 import { useSectionBack } from "@/hooks/use-section-back";
 
 export default function TopIdeaAllPageRoute() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
 
   return (

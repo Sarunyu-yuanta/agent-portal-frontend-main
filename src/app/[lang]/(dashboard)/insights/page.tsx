@@ -18,6 +18,7 @@ import {
 } from "./StrategyPlaybooks";
 import { AIRecommendCard } from "./AIRecommendCard";
 import { Research } from "./Research";
+import { useT } from "@/i18n/I18nProvider";
 
 /** The Insights tab's "playbooks + sidebar" two-column split. */
 function InsightsLayout({ children }: { children: React.ReactNode }) {
@@ -61,6 +62,7 @@ const FILTER_KEY = INSIGHTS_FILTER_KEY;
 
 function InsightsPageInner() {
   const searchParams = useSearchParams();
+  const t = useT();
   // First load: the tab strip is bars until the open tab's data arrives.
   // After that the tabs stay live and each tab's body skeletons on its own.
   const { isLoading: strategiesLoading } = useInsightStrategies();
@@ -101,8 +103,8 @@ function InsightsPageInner() {
       <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
         <TabGroup
           items={[
-            { id: "insights", title: "House View" },
-            { id: "research", title: "Research" },
+            { id: "insights", title: t.research.tabs.houseView },
+            { id: "research", title: t.research.tabs.research },
           ]}
           activeId={activeTab}
           onChange={(id) =>

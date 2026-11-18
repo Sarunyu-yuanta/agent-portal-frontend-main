@@ -32,6 +32,7 @@ import {
   PackageIcon,
   PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ProductDocumentActions({
   onSendProposal,
@@ -45,6 +46,8 @@ export function ProductDocumentActions({
   onPackage: () => void;
   className?: string;
 }) {
+  const t = useT();
+  const labels = t.products.documentActions;
   const [open, setOpen] = useState(false);
 
   return (
@@ -59,7 +62,7 @@ export function ProductDocumentActions({
           className="flex flex-1 items-center justify-center gap-2 px-4 font-medium text-sm cursor-pointer transition-opacity hover:opacity-90"
         >
           <PaperPlaneTiltIcon size={16} weight="fill" />
-          <span>ส่ง Proposal ให้ลูกค้า</span>
+          <span>{t.products.common.sendProposalToClient}</span>
         </button>
         {/* Divided, so the caret reads as a second control rather than as
             decoration on the first — pressing it must not send anything. */}
@@ -68,8 +71,8 @@ export function ProductDocumentActions({
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          aria-label="ดาวน์โหลดเอกสาร"
-          title="ดาวน์โหลดเอกสาร"
+          aria-label={labels.download}
+          title={labels.download}
           className="flex shrink-0 items-center justify-center px-3.5 cursor-pointer transition-opacity hover:opacity-90"
         >
           <CaretDownIcon
@@ -103,8 +106,8 @@ export function ProductDocumentActions({
                 <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <div>
-                <p className="font-medium text-sm text-[#101828]">Presentation PDF</p>
-                <p className="text-xs text-[#6a7282] mt-0.5">สำหรับนำเสนอลูกค้า</p>
+                <p className="font-medium text-sm text-[#101828]">{labels.presentation}</p>
+                <p className="text-xs text-[#6a7282] mt-0.5">{labels.presentationHint}</p>
               </div>
             </button>
             <button
@@ -122,8 +125,8 @@ export function ProductDocumentActions({
                 <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <div>
-                <p className="font-medium text-sm text-[#101828]">ชุดเอกสารครบชุด</p>
-                <p className="text-xs text-[#6a7282] mt-0.5">สำหรับปิดการขาย (.zip)</p>
+                <p className="font-medium text-sm text-[#101828]">{t.products.packageFiles.title}</p>
+                <p className="text-xs text-[#6a7282] mt-0.5">{labels.packageHint}</p>
               </div>
             </button>
           </div>

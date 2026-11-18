@@ -26,7 +26,7 @@
 import riskAlertsRaw from "@/data/risk-alerts.json";
 import { mockClients } from "@/lib/mock-data";
 import { formatThbWhole } from "@/lib/client-utils";
-import { zoneForDays } from "@/app/(dashboard)/notification-zones";
+import { zoneForDays } from "@/app/[lang]/(dashboard)/notification-zones";
 import type {
   RiskAlert,
   RiskAlertCategory,

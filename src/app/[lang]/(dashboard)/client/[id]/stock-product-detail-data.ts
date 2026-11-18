@@ -18,6 +18,7 @@ import { FIXED_INCOME_BONDS, type FixedIncomeBond } from "./fixed-income-data";
 import { TOP_PICK_ROWS, type GlobalBondRow } from "./global-bond-data";
 import { getTopPerformers, type MutualFund } from "./mutual-fund-data";
 
+/** Tab ids (also the `?tab=` source) — labels are `t.stock.detail.tabs[id]`. */
 export const STOCK_DETAIL_TABS = [
   "Market Info",
   "Related Product",
@@ -37,10 +38,11 @@ export type StockNoticeTab = Extract<StockDetailTab, "Research" | "Technical" | 
  * only copy, but it is served per ticker like the real feed will be, so the
  * tab already has its own resource — and its own loading state — to replace.
  */
-export type StockTabNotice = { symbol: string; tab: StockNoticeTab; message: string };
+export type StockTabNotice = { symbol: string; tab: StockNoticeTab };
 
+/** The line itself is UI copy — `t.stock.detail.tabNotice`. */
 export function getStockTabNotice(symbol: string, tab: StockNoticeTab): StockTabNotice {
-  return { symbol, tab, message: `${tab} details will be available soon.` };
+  return { symbol, tab };
 }
 
 export const STOCK_CHART_RANGES = ["1D", "5D", "1M", "6M", "YTD", "1Y", "5Y"] as const;
@@ -90,7 +92,8 @@ export type VolumeAnalysisData = {
   rows: VolumeAnalysisRow[];
 };
 
-export type AdvanceStat = { label: string; value: string };
+/** `key` names the label in `t.stock.detail.advance.stats`. */
+export type AdvanceStat = { key: string; value: string };
 
 /** Figma node 23933:37281 — "Advance Data" modal opened from the quote stats pill. */
 export type StockAdvanceData = {
@@ -145,16 +148,6 @@ export const RELATED_PRODUCT_KINDS = [
 ] as const;
 
 export type RelatedProductKind = (typeof RELATED_PRODUCT_KINDS)[number];
-
-export const RELATED_PRODUCT_CHIP_LABEL: Record<RelatedProductKind, string> = {
-  dr: "DR",
-  derivative: "Derivative",
-  structured: "Global Structured Product",
-  "thai-structured": "Thai Structured Product",
-  "fixed-income": "Fixed Income",
-  "global-bond": "Global Bond",
-  "mutual-fund": "Mutual Fund",
-};
 
 const DEPTH_VOLUME = "3,129,800";
 const DEPTH_PRICE = "49.50";
@@ -265,7 +258,7 @@ export const CPALL_PRODUCT_DETAIL: StockProductDetail = {
   changeAmount: "-0.50",
   changePercent: "0.98%",
   trend: "down",
-  lastUpdated: "Last updated: 30 April 2026 - 09:22",
+  lastUpdated: "30 April 2026 - 09:22",
   volume: "31.10M",
   value: "1.57B",
   marketCap: "458.13B",
@@ -287,29 +280,29 @@ export const CPALL_PRODUCT_DETAIL: StockProductDetail = {
     dayBarLeftPct: 17,
     dayBarWidthPct: 19.5,
     left: [
-      { label: "Volume", value: "38.97M" },
-      { label: "Open1", value: "50.25" },
-      { label: "Floor", value: "34.00" },
-      { label: "Avg Vol (10D)", value: "32.57M" },
-      { label: "52 Week Low", value: "49.75" },
-      { label: "Turnover Ratio", value: "0.73%" },
-      { label: "%Free Float", value: "57.18%" },
-      { label: "Lot Size", value: "100.00" },
-      { label: "P/E", value: "18.05" },
-      { label: "Dividend", value: "1.35" },
-      { label: "Margin Rate", value: "-" },
+      { key: "volume", value: "38.97M" },
+      { key: "open", value: "50.25" },
+      { key: "floor", value: "34.00" },
+      { key: "avgVol10d", value: "32.57M" },
+      { key: "week52Low", value: "49.75" },
+      { key: "turnoverRatio", value: "0.73%" },
+      { key: "freeFloatPct", value: "57.18%" },
+      { key: "lotSize", value: "100.00" },
+      { key: "pe", value: "18.05" },
+      { key: "dividend", value: "1.35" },
+      { key: "marginRate", value: "-" },
     ],
     right: [
-      { label: "Value", value: "2.02B" },
-      { label: "PreClose", value: "51.25" },
-      { label: "Ceilling", value: "69.50" },
-      { label: "Mkt Cap", value: "460.38B" },
-      { label: "52 Week High", value: "68.00" },
-      { label: "Turnover", value: "1.87B" },
-      { label: "Free Float", value: "5.14B" },
-      { label: "Total Shares", value: "8.98B" },
-      { label: "P/B", value: "3.84" },
-      { label: "Dividend Yield", value: "2.70%" },
+      { key: "value", value: "2.02B" },
+      { key: "preClose", value: "51.25" },
+      { key: "ceiling", value: "69.50" },
+      { key: "mktCap", value: "460.38B" },
+      { key: "week52High", value: "68.00" },
+      { key: "turnover", value: "1.87B" },
+      { key: "freeFloat", value: "5.14B" },
+      { key: "totalShares", value: "8.98B" },
+      { key: "pb", value: "3.84" },
+      { key: "dividendYield", value: "2.70%" },
     ],
   },
 };
@@ -665,7 +658,8 @@ export const RELATED_FUTURES_TOTALS = {
   openInterest: "17,840",
 } as const;
 
-export const RELATED_FUTURES_UPDATED = "Prices reflect only Auto-Matching trades. Last updated: 16 July2026 - 10:30";
+/** The feed's timestamp — the sentence around it is `t.stock.related.futuresUpdated`. */
+export const RELATED_FUTURES_UPDATED = "16 July2026 - 10:30";
 
 const RELATED_DERIVATIVE: RelatedDerivativeBundle = {
   contracts: RELATED_FUTURES,

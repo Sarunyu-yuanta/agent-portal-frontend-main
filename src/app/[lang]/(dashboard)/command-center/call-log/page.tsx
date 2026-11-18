@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import {
   Button,
   Card,
@@ -31,6 +31,7 @@ import { relativeCallDate } from "@/data/call-log-data";
 import { CardCount } from "../CardHeader";
 import { CallDetailModal } from "../CallLogPanel";
 import { buildCallLog, type CallLogRow } from "../call-log-feed";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Every logged call across the book, in full.
@@ -59,7 +60,8 @@ const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 export default function CallLogPage() {
   const { data: clients, isLoading } = useClientsResource();
   const { isPrivate } = usePrivacy();
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
   // Falls back to the Dashboard on a cold entry — a pasted link, or a session
   // restored straight onto this page, where there is no trail to walk up.
   const goBack = useSectionBack(() => "/command-center");
@@ -81,13 +83,13 @@ export default function CallLogPage() {
    */
   const options = useMemo(
     () => [
-      { value: ALL_CLIENTS, label: `ลูกค้าทั้งหมด (${rows.length})` },
+      { value: ALL_CLIENTS, label: t.commandCenter.callLog.allClients(rows.length) },
       ...(clients ?? []).map((client) => ({
         value: client.id,
         label: maskName(client.name, isPrivate),
       })),
     ],
-    [clients, rows.length, isPrivate],
+    [clients, rows.length, isPrivate, t],
   );
 
   const visible = useMemo(
@@ -122,12 +124,12 @@ export default function CallLogPage() {
           variant="plain"
           size="icon-sm"
           onClick={goBack}
-          aria-label="กลับไปหน้า Dashboard"
+          aria-label={t.commandCenter.backToDashboard}
           className="shrink-0"
         >
           <ArrowLeftIcon size={18} />
         </Button>
-        <h1 className="type-h6 text-foreground">Call Log</h1>
+        <h1 className="type-h6 text-foreground">{t.commandCenter.callLog.title}</h1>
         {/* The count follows the filter — a page showing four rows under a "13"
             reads as though nine went missing. */}
         {visible.length > 0 && <CardCount value={visible.length} />}
@@ -162,13 +164,24 @@ export default function CallLogPage() {
         ) : visible.length === 0 ? (
           <EmptyState
             icon={<PhoneIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-            title="ยังไม่มีบันทึกการโทร"
+            title={t.commandCenter.callLog.emptyTitle}
             // Whose log is empty is the useful half of the message, so the
             // filtered case says so rather than repeating the global copy.
             body={
               clientId === ALL_CLIENTS
-                ? "สายที่บันทึกไว้จากลูกค้าทุกรายจะมารวมกันที่นี่"
-                : "ยังไม่มีสายที่บันทึกไว้สำหรับลูกค้ารายนี้"
+                ? t.commandCenter.callLog.emptyBodyAll
+                : t.commandCenter.callLog.emptyBodyClient
+            }
+            action={
+              clientId === ALL_CLIENTS
+                ? undefined
+                : {
+                    label: t.states.clearFilters,
+                    onClick: () => {
+                      setClientId(ALL_CLIENTS);
+                      setCurrentPage(1);
+                    },
+                  }
             }
           />
         ) : (
@@ -181,7 +194,7 @@ export default function CallLogPage() {
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
                 <p className="whitespace-nowrap text-label text-muted-foreground">
-                  Show per page
+                  {t.commandCenter.callLog.perPage}
                 </p>
                 <select
                   value={pageSize}
@@ -200,16 +213,15 @@ export default function CallLogPage() {
               </div>
               <div className="flex items-center gap-3">
                 <p className="text-label text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-medium text-foreground">
-                    {(safePage - 1) * pageSize + 1}
-                  </span>
-                  {" – "}
-                  <span className="font-medium text-foreground">
-                    {Math.min(safePage * pageSize, visible.length)}
-                  </span>
-                  {" of "}
-                  <span className="font-medium text-foreground">{visible.length}</span> calls
+                  {t.commandCenter.callLog.showingRange(
+                    <span key="from" className="font-medium text-foreground">
+                      {(safePage - 1) * pageSize + 1}
+                    </span>,
+                    <span key="to" className="font-medium text-foreground">
+                      {Math.min(safePage * pageSize, visible.length)}
+                    </span>,
+                    <span key="total" className="font-medium text-foreground">{visible.length}</span>,
+                  )}
                 </p>
                 <Pagination
                   totalPages={totalPages}
@@ -235,6 +247,7 @@ export default function CallLogPage() {
 }
 
 function DirectionCell({ direction }: { direction: CallLogRow["entry"]["direction"] }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-1.5">
       {direction === "outbound" ? (
@@ -243,7 +256,7 @@ function DirectionCell({ direction }: { direction: CallLogRow["entry"]["directio
         <PhoneIncomingIcon size={16} className="text-[var(--icon-success)]" />
       )}
       <span className="type-body-2 text-foreground">
-        {direction === "outbound" ? "Outbound" : "Inbound"}
+        {t.commandCenter.callLog.direction[direction]}
       </span>
     </div>
   );
@@ -256,6 +269,7 @@ function CallLogBookTable({
   rows: CallLogRow[];
   onOpen: (row: CallLogRow) => void;
 }) {
+  const t = useT();
   return (
     <>
       {/* Mobile / tablet — stacked cards. A table's columns cannot shrink below
@@ -286,19 +300,19 @@ function CallLogBookTable({
           <TableHead>
             <TableRow>
               <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
-                Client
+                {t.commandCenter.callLog.columns.client}
               </TableHeaderCell>
               <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
-                Date
+                {t.commandCenter.callLog.columns.date}
               </TableHeaderCell>
               <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
-                Direction
+                {t.commandCenter.callLog.columns.direction}
               </TableHeaderCell>
               <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
-                Duration
+                {t.commandCenter.callLog.columns.duration}
               </TableHeaderCell>
               <TableHeaderCell sortable={false} className="min-w-0">
-                Summary
+                {t.commandCenter.callLog.columns.summary}
               </TableHeaderCell>
             </TableRow>
           </TableHead>
@@ -318,7 +332,7 @@ function CallLogBookTable({
                       {row.entry.date} · {row.entry.time}
                     </span>
                     <span className="type-caption text-muted-foreground">
-                      {relativeCallDate(row.entry.date)}
+                      {relativeCallDate(row.entry.date, t)}
                     </span>
                   </div>
                 </TableCell>

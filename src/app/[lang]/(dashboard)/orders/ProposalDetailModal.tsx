@@ -32,7 +32,7 @@ import { Tag } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import type { OrderBook, ProposalLog } from "@/types/domain";
 import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
@@ -50,12 +50,13 @@ import {
 import { formatLogTime } from "./order-book";
 import { ProposalChip, PROPOSAL_VARIANT } from "./ProposalChip";
 import {
-  PROPOSAL_OUTCOME_LABEL,
   PROPOSAL_OUTCOME_VARIANT,
   proposalOutcome,
   proposalsFor,
   type ProposalOutcome,
 } from "./order-proposals";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * The disc, by what came of the offer.
@@ -84,11 +85,12 @@ export function ProposalDetailModal({
   product: BookableProduct;
   onClose: () => void;
 }) {
+  const t = useT();
   return (
     <ResponsiveBottomSheetModal
       open={proposal !== null}
       onClose={onClose}
-      title={`รายละเอียด Proposal ${product.underlying} ${product.coupon}`}
+      title={t.orders.proposalDetail.title(product.underlying, product.coupon)}
       titleId="proposal-detail-title"
       // The sheet opens with its own heading — the outcome in colour, with the
       // product named under it. A second heading above said both again.
@@ -109,10 +111,12 @@ function Body({
   book: OrderBook;
   product: BookableProduct;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const { proposals } = useOrders();
 
-  const profile = getClientProfile(proposal.clientId);
+  const profile = getAccountIdentity(proposal.clientId);
   const name = maskName(proposal.clientName, isPrivate);
   const outcome = proposalOutcome(proposal, book);
   const disc = OUTCOME_DISC[outcome];
@@ -127,13 +131,13 @@ function Body({
         <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
           <StatusDisc variant={disc.tone}>{disc.glyph}</StatusDisc>
           <p className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[disc.tone].text}`}>
-            {PROPOSAL_OUTCOME_LABEL[outcome]}
+            {t.orders.proposalOutcome[outcome]}
           </p>
           <div className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 pt-4">
             {/* The proposal's own colour, where the booking sheet's badge is
                 blue — this names a different kind of record entirely. */}
             <span className="shrink-0 rounded-full bg-[var(--fill-blue-100)] px-2 py-0.5 text-meta font-semibold text-[var(--fill-blue-700)]">
-              Proposal
+              {t.orders.proposalDetail.badge}
             </span>
             <span className="text-title-sm leading-[28px] font-bold text-foreground">
               {product.underlying}
@@ -146,24 +150,24 @@ function Body({
 
         <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
-            <SheetBlock title="รายละเอียด Proposal">
+            <SheetBlock title={t.orders.proposalDetail.section}>
               <ClientRow clientId={proposal.clientId} name={name} />
-              <SheetRow label="Full Name (TH)" value={maskName(profile.nameTh, isPrivate)} />
-              <SheetRow label="Account No" value={profile.accountNo} />
-              <SheetRow label="IC Name" value={proposal.sentBy} />
-              <SheetRow label="ส่งเมื่อ" value={formatLogTime(proposal.sentAt)} />
-              <SheetRow label="ผลของ Proposal">
+              <SheetRow label={t.orders.field.fullNameTh} value={maskName(profile.nameTh, isPrivate)} />
+              <SheetRow label={t.orders.field.accountNo} value={profile.accountNo} />
+              <SheetRow label={t.orders.field.icName} value={proposal.sentBy} />
+              <SheetRow label={t.orders.proposalDetail.sentAt} value={formatLogTime(proposal.sentAt, locale)} />
+              <SheetRow label={t.orders.proposalDetail.outcome}>
                 {outcome === "open" ? (
-                  <ProposalChip label={PROPOSAL_OUTCOME_LABEL.open} size="lg" />
+                  <ProposalChip label={t.orders.proposalOutcome.open} size="lg" />
                 ) : (
                   <Tag
-                    text={PROPOSAL_OUTCOME_LABEL[outcome]}
+                    text={t.orders.proposalOutcome[outcome]}
                     variant={PROPOSAL_OUTCOME_VARIANT[outcome]}
                     size="large"
                   />
                 )}
               </SheetRow>
-              <SheetRow label="ช่องทางที่ส่ง">
+              <SheetRow label={t.orders.proposalDetail.channels}>
                 <div className="flex flex-wrap items-center justify-end gap-1">
                   {proposal.channels.map((c) => {
                     const { label, Icon } = PROPOSAL_CHANNEL_META[c];
@@ -186,12 +190,12 @@ function Body({
             {history.length > 1 && (
               <>
                 <div className={SHEET_DASHED} />
-                <SheetBlock title={`ส่งไปแล้ว ${history.length} ครั้ง`}>
+                <SheetBlock title={t.orders.proposalDetail.sentTimes(history.length)}>
                   {history.map((p, i) => (
                     <SheetRow
                       key={p.id}
-                      label={i === 0 ? "ครั้งล่าสุด" : `ครั้งที่ ${history.length - i}`}
-                      value={formatLogTime(p.sentAt)}
+                      label={i === 0 ? t.orders.proposalDetail.latest : t.orders.proposalDetail.nth(history.length - i)}
+                      value={formatLogTime(p.sentAt, locale)}
                     />
                   ))}
                 </SheetBlock>
@@ -203,10 +207,10 @@ function Body({
               is a commitment, and the next move is the client's. */}
           <p className="px-1 text-center text-label leading-snug text-muted-foreground">
             {outcome === "open"
-              ? "ยังไม่มีการจองจาก Proposal นี้ — ลูกค้าจองเองจากแอป หรือติดต่อให้ IC จองให้ก็ได้"
+              ? t.orders.proposalDetail.footOpen
               : outcome === "won"
-                ? "ลูกค้าจองหลังได้รับ Proposal นี้ — ดูรายละเอียดได้ที่รายการจองของลูกค้า"
-                : "สินค้าปิดรับไปแล้วโดยไม่มีการจองจาก Proposal นี้"}
+                ? t.orders.proposalDetail.footWon
+                : t.orders.proposalDetail.footLost}
           </p>
         </div>
       </div>

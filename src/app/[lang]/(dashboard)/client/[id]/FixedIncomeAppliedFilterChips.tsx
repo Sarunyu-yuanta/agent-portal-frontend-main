@@ -2,6 +2,7 @@
 
 import { XIcon } from "@phosphor-icons/react";
 import type { FixedIncomeFilterChip } from "./fixed-income-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function AppliedFilterChip({
   label,
@@ -10,12 +11,13 @@ function AppliedFilterChip({
   label: string;
   onRemove: () => void;
 }) {
+  const t = useT();
   return (
     <div className="inline-flex h-8 shrink-0 items-center gap-1 overflow-hidden rounded-full border border-primary-action bg-primary-action pl-3 pr-1.5">
       <span className="whitespace-nowrap text-sm leading-[24px] text-on-primary-action">{label}</span>
       <button
         type="button"
-        aria-label={`ลบ ${label}`}
+        aria-label={t.products.common.removeFilter(label)}
         onClick={onRemove}
         className="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0"
       >

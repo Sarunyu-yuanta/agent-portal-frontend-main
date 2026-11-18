@@ -9,6 +9,7 @@
  */
 
 import type { ElementType } from "react";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import {
   ChartLineDownIcon,
   EyeIcon,
@@ -18,6 +19,8 @@ import {
   XCircleIcon,
 } from "@phosphor-icons/react";
 import type { RiskAlertCategory, RiskSeverity } from "@/types/domain";
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatTime } from "@/i18n/format";
 
 /** Where "ดูทั้งหมด" lands. Exported from here rather than from the panel the
  *  way `CALL_LOG_PAGE` is: the sub page needs the string, and importing it out
@@ -56,7 +59,7 @@ export function parseRiskCategory(
 export const RISK_SEVERITY_META: Record<
   RiskSeverity,
   {
-    label: string;
+    /** Label: `t.risk.severity[severity]`. */
     variant: "red" | "yellow" | "blue";
     pill: string;
     text: string;
@@ -66,7 +69,6 @@ export const RISK_SEVERITY_META: Record<
   }
 > = {
   critical: {
-    label: "วิกฤต",
     variant: "red",
     pill: "bg-[var(--fill-red-100)] text-[var(--fill-red-600)]",
     text: "text-[var(--fill-red-600)]",
@@ -75,7 +77,6 @@ export const RISK_SEVERITY_META: Record<
     Icon: XCircleIcon,
   },
   warning: {
-    label: "เฝ้าระวัง",
     variant: "yellow",
     pill: "bg-[var(--fill-amber-100)] text-[var(--fill-amber-600)]",
     text: "text-[var(--fill-amber-600)]",
@@ -84,7 +85,6 @@ export const RISK_SEVERITY_META: Record<
     Icon: WarningCircleIcon,
   },
   watch: {
-    label: "ข้อสังเกต",
     variant: "blue",
     pill: "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]",
     text: "text-[var(--fill-p1-600)]",
@@ -110,26 +110,23 @@ export const RISK_SEVERITY_META: Record<
  */
 export const RISK_CATEGORY_META: Record<
   RiskAlertCategory,
-  { label: string; Icon: ElementType }
+  /** Label: `t.risk.category[category]`. */
+  { Icon: ElementType }
 > = {
-  margin: { label: "มาร์จิ้น/วงเงิน", Icon: ChartLineDownIcon },
-  suitability: { label: "ความเหมาะสมการลงทุน", Icon: UserFocusIcon },
-  conduct: { label: "พฤติกรรมการซื้อขาย", Icon: EyeIcon },
+  margin: { Icon: ChartLineDownIcon },
+  suitability: { Icon: UserFocusIcon },
+  conduct: { Icon: EyeIcon },
 };
 
 /** What the category strip is made of — "ทั้งหมด" and then the three families.
  *  Built here rather than in the component so the card and the sub page cannot
  *  end up offering different tabs. */
-export const RISK_CATEGORY_TABS: {
-  id: RiskAlertCategory | "all";
-  title: string;
-}[] = [
-  { id: "all", title: "ทั้งหมด" },
-  ...RISK_CATEGORY_ORDER.map((id) => ({
-    id,
-    title: RISK_CATEGORY_META[id].label,
-  })),
-];
+export function riskCategoryTabs(t: Dictionary): { id: RiskAlertCategory | "all"; title: string }[] {
+  return [
+    { id: "all", title: t.risk.all },
+    ...RISK_CATEGORY_ORDER.map((id) => ({ id, title: t.risk.category[id] })),
+  ];
+}
 
 /**
  * The label on a finding's one action — **a placeholder**.
@@ -162,10 +159,11 @@ export const RISK_CTA_LABEL = "Lorem ipsum";
  * Worded for an obligation rather than an expiry: a margin call is something to
  * *do*, where a KYC record is something that lapses.
  */
-export function deadlineLabel(daysLeft: number): string {
-  if (daysLeft === 0) return "ครบกำหนดวันนี้";
-  if (daysLeft < 0) return `เลยกำหนดมา ${Math.abs(daysLeft)} วัน`;
-  return `ต้องดำเนินการใน ${daysLeft} วัน`;
+export function deadlineLabel(daysLeft: number, t: Dictionary): string {
+  const m = t.dates.deadline;
+  if (daysLeft === 0) return m.dueToday;
+  if (daysLeft < 0) return m.overdue(Math.abs(daysLeft));
+  return m.actWithin(daysLeft);
 }
 
 /**
@@ -180,12 +178,9 @@ export function deadlineLabel(daysLeft: number): string {
  * พ.ศ. year on a margin call due Tuesday is three characters that never change
  * sitting where the eye wants the day.
  */
-export function dueDayLabel(dueDate: string): string {
+export function dueDayLabel(dueDate: string, locale: Locale): string {
   const [y, m, d] = dueDate.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("th-TH", {
-    day: "numeric",
-    month: "short",
-  });
+  return formatDate(locale, new Date(y, m - 1, d), "dayMonth");
 }
 
 /**
@@ -235,12 +230,15 @@ export function deadlineToneClass(daysLeft: number): string {
 export function deadlineDateLabel(
   daysLeft: number,
   dueDate: string | null,
+  t: Dictionary,
+  locale: Locale,
 ): string {
-  if (dueDate === null) return deadlineLabel(daysLeft);
-  const day = dueDayLabel(dueDate);
-  if (daysLeft === 0) return `ครบกำหนดวันนี้ ${day}`;
-  if (daysLeft < 0) return `เลยกำหนด ${day} · ${Math.abs(daysLeft)} วัน`;
-  return `ครบกำหนด ${day} · อีก ${daysLeft} วัน`;
+  if (dueDate === null) return deadlineLabel(daysLeft, t);
+  const day = dueDayLabel(dueDate, locale);
+  const m = t.dates.deadline;
+  if (daysLeft === 0) return m.dueTodayOn(day);
+  if (daysLeft < 0) return m.overdueOn(day, Math.abs(daysLeft));
+  return m.dueOn(day, daysLeft);
 }
 
 /**
@@ -257,36 +255,26 @@ export function deadlineDateLabel(
  * fire through the trading session, and "2 ชม." versus "8 ชม." is the
  * difference between this morning's problem and yesterday's.
  */
-export function detectedAgoLabel(detectedAt: string, now: Date): string {
+export function detectedAgoLabel(detectedAt: string, now: Date, t: Dictionary): string {
   const at = new Date(detectedAt);
 
-  /**
-   * Hours are only ever counted **within today**; the moment a finding is on an
-   * earlier calendar day it is named by the day.
-   *
-   * A pure elapsed count reads wrong in a list. Yesterday 16:45 came out as "23
-   * ชม. ที่แล้ว" while yesterday 08:05 — one row below it — came out as
-   * "เมื่อวาน": two findings from the same afternoon described two different
-   * ways, and the reader has to do arithmetic to notice they belong together.
-   * The calendar boundary is also what a desk actually says, and what
-   * `daysAgoLabelTh` already uses for the bell.
-   */
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfThatDay = new Date(at.getFullYear(), at.getMonth(), at.getDate());
   const daysAgo = Math.round(
     (startOfToday.getTime() - startOfThatDay.getTime()) / 86_400_000,
   );
+  const m = t.dates;
 
   if (daysAgo <= 0) {
     const minutes = Math.max(0, Math.floor((now.getTime() - at.getTime()) / 60_000));
-    if (minutes < 1) return "เมื่อสักครู่";
-    if (minutes < 60) return `${minutes} นาทีที่แล้ว`;
-    return `${Math.floor(minutes / 60)} ชม. ที่แล้ว`;
+    if (minutes < 1) return m.justNow;
+    if (minutes < 60) return m.minutesAgo(minutes);
+    return m.hoursAgo(Math.floor(minutes / 60));
   }
-  if (daysAgo === 1) return "เมื่อวาน";
-  if (daysAgo < 7) return `${daysAgo} วันก่อน`;
-  if (daysAgo < 30) return `${Math.floor(daysAgo / 7)} สัปดาห์ก่อน`;
-  return `${Math.floor(daysAgo / 30)} เดือนก่อน`;
+  if (daysAgo === 1) return m.yesterday;
+  if (daysAgo < 7) return m.daysAgo(daysAgo);
+  if (daysAgo < 30) return m.weeksAgo(Math.floor(daysAgo / 7));
+  return m.monthsAgo(Math.floor(daysAgo / 30));
 }
 
 /**
@@ -296,18 +284,32 @@ export function detectedAgoLabel(detectedAt: string, now: Date): string {
  * record, and a record says when, not how long ago. Past two days the date is
  * the clearer answer, the same cut `daysAgoLabelTh` makes for the bell.
  */
-export function detectedAtLabel(detectedAt: string, now: Date): string {
+export function detectedAtLabel(detectedAt: string, now: Date, t: Dictionary, locale: Locale): string {
   const at = new Date(detectedAt);
-  const time = at.toLocaleTimeString("th-TH", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = formatTime(locale, at);
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const day = new Date(at.getFullYear(), at.getMonth(), at.getDate());
   const daysAgo = Math.round((today.getTime() - day.getTime()) / 86_400_000);
 
-  if (daysAgo <= 0) return `วันนี้ ${time} น.`;
-  if (daysAgo === 1) return `เมื่อวาน ${time} น.`;
-  const date = at.toLocaleDateString("th-TH", { day: "numeric", month: "short" });
-  return `${date} ${time} น.`;
+  if (daysAgo <= 0) return t.dates.todayAt(time);
+  if (daysAgo === 1) return t.dates.yesterdayAt(time);
+  return t.dates.dayAt(formatDate(locale, at, "dayMonth"), time);
+}
+
+/**
+ * The meta for a severity, or the mildest one for a value this app doesn't
+ * know. The API may add a level before the frontend does; an unknown key used
+ * to crash the panel on `undefined.Icon`.
+ */
+export function severityMeta(severity: string, t: Dictionary) {
+  const key = (severity in RISK_SEVERITY_META ? severity : "watch") as RiskSeverity;
+  return { ...RISK_SEVERITY_META[key], label: t.risk.severity[key] };
+}
+
+/** The meta for a rule family, with a neutral fallback for one this app doesn't know. */
+export function categoryMeta(category: string, t: Dictionary): { label: string; Icon: ElementType } {
+  const meta = RISK_CATEGORY_META[category as RiskAlertCategory];
+  return meta
+    ? { ...meta, label: t.risk.category[category as RiskAlertCategory] }
+    : { label: t.risk.category.other, Icon: InfoIcon };
 }

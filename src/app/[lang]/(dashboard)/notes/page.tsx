@@ -1,11 +1,15 @@
 "use client";
 
+import { useLocale } from "@/i18n/I18nProvider";
+import { localizePath } from "@/i18n/locale-path";
+
 import { Suspense } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
 import { NOTES_ENABLED } from "@/lib/feature-flags";
 import { NotesSplitView } from "./NotesSplitView";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * The full note history — every note the RM has written, client-linked or
@@ -13,12 +17,13 @@ import { NotesSplitView } from "./NotesSplitView";
  * this page is where general (non-client) notes actually live.
  */
 export default function NotesPage() {
+  const locale = useLocale();
   // Out of the current delivery phase (see `lib/feature-flags`). The sidebar
   // entry is gone, so this only catches a pasted or bookmarked URL — and it
   // sends it somewhere real rather than showing a feature that isn't shipping
   // yet. `redirect` during a Client Component's render is supported and turns
   // into a server-side redirect on a cold load.
-  if (!NOTES_ENABLED) redirect("/client-hub");
+  if (!NOTES_ENABLED) redirect(localizePath("/client-hub", locale));
 
   return (
     <Suspense fallback={null}>
@@ -37,7 +42,7 @@ function NotesPageInner() {
   const initialSelectedId = useSearchParams().get("note");
 
   if (isLoading) {
-    return <p className="type-body-2 text-muted-foreground text-center py-10">Loading notes…</p>;
+    return <NotesPageSkeleton />;
   }
 
   // The dashboard shell hands `/notes` a flex-column content area sized to the
@@ -49,18 +54,53 @@ function NotesPageInner() {
       clients={clients}
       initialSelectedId={initialSelectedId}
       heightClassName="flex-1 min-h-0"
-      // Below `xl` the shell drops its padding and its page title for this
-      // route (`isMobileFullBleed` in `page-chrome`), so the frame has to go
-      // too: rounded corners and a border pressed against the screen edge read
-      // as a rendering fault rather than a card.
-      //
-      // Written as `max-xl:` overrides with `!`, not as `rounded-none
-      // xl:rounded-xl`. That form left the corners square at every width: both
-      // are 0-1-0 specificity, and `@sarunyu/system-one`'s stylesheet — which
-      // ships plain `.rounded-none` and loads after `globals.css` — wins the tie
-      // against a Tailwind responsive variant. Same cascade trap `SELECTED_ROW`
-      // in `NotesSidebarList` documents.
-      surfaceClassName="max-xl:rounded-none! max-xl:border-0!"
+      // The shell gives `/notes` no padding at any size (`isEdgeToEdge` in
+      // `page-chrome`), so the frame goes too: rounded corners and a border
+      // pressed against the content edge read as a rendering fault. `!` because
+      // `@sarunyu/system-one` ships plain `.rounded-xl`/`.border` that load
+      // after `globals.css` — see `SELECTED_ROW` in `NotesSidebarList`.
+      surfaceClassName="rounded-none! border-0!"
     />
+  );
+}
+
+/**
+ * Mirrors `NotesSplitView` at rest: the same framed box, the 280px sidebar
+ * (search, New Note, the All/Clients/Reminders switch, a few note rows) and the
+ * detail pane's centered empty state. Below md the split view shows only the
+ * sidebar, so the detail column drops out here too.
+ */
+function NotesPageSkeleton() {
+  return (
+    <div
+      aria-busy="true"
+      className="flex flex-1 min-h-0 overflow-hidden bg-card"
+    >
+      <div className="flex w-full md:w-[280px]! shrink-0 flex-col md:border-r md:border-border">
+        <div className="flex flex-col gap-2 p-3">
+          <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-10 w-full rounded-lg" />
+        </div>
+        <div className="px-3 pb-2">
+          <Skeleton className="h-8 w-full rounded-lg" />
+        </div>
+        <div className="flex flex-col gap-1 pt-3">
+          <Skeleton className="mx-4 mb-1 h-4 w-20" />
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="mx-2 flex flex-col gap-1.5 px-2.5 py-2">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="hidden md:flex flex-1 min-w-0 flex-col items-center justify-center gap-3">
+        <Skeleton className="size-8 rounded-md" />
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-64" />
+        <Skeleton className="h-4 w-48" />
+        <Skeleton className="mt-1 h-9 w-32 rounded-lg" />
+      </div>
+    </div>
   );
 }

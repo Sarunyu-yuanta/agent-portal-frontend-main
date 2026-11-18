@@ -29,7 +29,8 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Avatar, Button, Checkbox, Tag, useIsMobile } from "@sarunyu/system-one";
-import { CaretDownIcon, DevicesIcon, PaperPlaneTiltIcon, XIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, DevicesIcon, PaperPlaneTiltIcon, UsersIcon, XIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { SlideSteps } from "@/components/ui/slide-steps";
 import { TierBadge } from "@/components/ui/tier-badge";
@@ -47,11 +48,11 @@ import {
 import { BackButton } from "./BackButton";
 import { ProposalChip } from "./ProposalChip";
 import {
-  PROPOSAL_OUTCOME_LABEL,
   PROPOSAL_OUTCOME_VARIANT,
   latestProposalFor,
   proposalOutcome,
 } from "./order-proposals";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * What a Proposal can be about — any product the IC can put in front of a
@@ -91,8 +92,10 @@ export function SendProposalDialog({
   /** For reading each client's standing. `null` while the book loads, and
    *  always for a product that is offered but never booked. */
   book: OrderBook | null;
-  onConfirm: (clientIds: string[], channels: ProposalChannel[]) => void;
+  /** Resolves `true` once sent. `false` keeps the dialog open with the picks intact. */
+  onConfirm: (clientIds: string[], channels: ProposalChannel[]) => Promise<boolean>;
 }) {
+  const t = useT();
   const [step, setStep] = useState<ProposalStep>("clients");
   // Closing clears the step; the ticks go with the steps' remount below.
   const setOpen = (next: boolean) => {
@@ -104,7 +107,7 @@ export function SendProposalDialog({
     <ResponsiveDialog
       open={open}
       onOpenChange={setOpen}
-      title="ส่ง Proposal ให้ลูกค้า"
+      title={t.orders.proposal.sendToClients}
       onBack={step === "channels" ? () => setStep("clients") : undefined}
       closeOnBackdrop
       desktopContentClassName="w-[460px] max-w-full"
@@ -117,9 +120,12 @@ export function SendProposalDialog({
         book={book}
         step={step}
         onStepChange={setStep}
-        onConfirm={(clientIds, channels) => {
-          onConfirm(clientIds, channels);
-          setOpen(false);
+        // Closed only once the send has gone through: closing first threw the
+        // IC's picks away whenever the send failed.
+        onConfirm={async (clientIds, channels) => {
+          const ok = await onConfirm(clientIds, channels);
+          if (ok) setOpen(false);
+          return ok;
         }}
       />
     </ResponsiveDialog>
@@ -164,14 +170,18 @@ export function ProposalSteps({
   /** See `SlideSteps` — carried across the order / Proposal swap. */
   initialHeight?: number;
   onHeightChange?: (height: number) => void;
-  onConfirm: (clientIds: string[], channels: ProposalChannel[]) => void;
+  /** Resolves `true` once sent. `false` keeps the dialog open with the picks intact. */
+  onConfirm: (clientIds: string[], channels: ProposalChannel[]) => Promise<boolean>;
 }) {
+  const t = useT();
   const clients = useClients();
   const { proposals } = useOrders();
   const { isPrivate } = usePrivacy();
   const isMobile = useIsMobile();
   const [picked, setPicked] = useState<Set<string>>(() => new Set(initialPicked));
   const [showRecipients, setShowRecipients] = useState(false);
+  // While the send is in flight: the button can't be pressed twice.
+  const [sending, setSending] = useState(false);
   const [channels, setChannels] = useState<Set<ProposalChannel>>(
     () => new Set(DEFAULT_PROPOSAL_CHANNELS),
   );
@@ -246,7 +256,7 @@ export function ProposalSteps({
           {product.coupon ? ` ${product.coupon}` : ""}
         </span>
         <span className="text-meta leading-snug text-muted-foreground">
-          {product.documents ?? "Presentation PDF และชุดเอกสาร"}
+          {product.documents ?? t.orders.proposal.defaultDocuments}
         </span>
       </div>
     </div>
@@ -256,7 +266,7 @@ export function ProposalSteps({
     <div className="flex flex-col gap-4">
       {rows.length > 0 && (
         <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">รายชื่อลูกค้า</span>
+          <span className="text-label font-semibold text-muted-foreground">{t.orders.proposal.clientList}</span>
           <Button
             variant="plain"
             size="sm"
@@ -264,7 +274,7 @@ export function ProposalSteps({
               setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.client.id)))
             }
           >
-            {allPicked ? "ล้างที่เลือก" : "เลือกทั้งหมด"}
+            {allPicked ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
           </Button>
         </div>
       )}
@@ -275,6 +285,16 @@ export function ProposalSteps({
           sheet ? "" : "max-h-[calc(var(--vh)*46)] overflow-y-auto"
         }`}
       >
+        {/* An empty book says so — otherwise the pane is blank and the
+            disabled button never says why. Not before a product is chosen:
+            the rows are empty then by design. */}
+        {product && rows.length === 0 && (
+          <EmptyState
+            size="compact"
+            icon={<UsersIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+            title={t.orders.booking.noClients}
+          />
+        )}
         {rows.map(({ client, sent, outcome }) => {
           const name = maskName(client.name, isPrivate);
           const checked = picked.has(client.id);
@@ -300,10 +320,10 @@ export function ProposalSteps({
               {sent && !book ? (
                 <ProposalChip />
               ) : outcome === "open" ? (
-                <ProposalChip label={PROPOSAL_OUTCOME_LABEL.open} />
+                <ProposalChip label={t.orders.proposalOutcome.open} />
               ) : outcome ? (
                 <Tag
-                  text={PROPOSAL_OUTCOME_LABEL[outcome]}
+                  text={t.orders.proposalOutcome[outcome]}
                   variant={PROPOSAL_OUTCOME_VARIANT[outcome]}
                   size="small"
                 />
@@ -331,11 +351,12 @@ export function ProposalSteps({
             type="button"
             onClick={() => setShowRecipients((v) => !v)}
             aria-expanded={showRecipients}
-            aria-label={showRecipients ? "ซ่อนรายชื่อ" : `ดูรายชื่อทั้งหมด ${recipients.length} คน`}
+            aria-label={showRecipients ? t.orders.proposal.hideRecipients : t.orders.proposal.showRecipients(recipients.length)}
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-muted/40"
           >
             <span className="min-w-0 flex-1 text-label text-muted-foreground">
-              ส่งถึง <span className="font-semibold text-foreground">{recipients.length} คน</span>
+              {t.orders.proposal.sendingTo}{" "}
+              <span className="font-semibold text-foreground">{t.orders.proposal.people(recipients.length)}</span>
             </span>
             <CaretDownIcon
               size={14}
@@ -354,7 +375,7 @@ export function ProposalSteps({
                   <button
                     type="button"
                     onClick={() => removeRecipient(id)}
-                    aria-label={`เอา ${name} ออก`}
+                    aria-label={t.orders.proposal.removeRecipient(name)}
                     className="flex size-4 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-black/10 hover:text-foreground"
                   >
                     <XIcon size={10} weight="bold" />
@@ -368,7 +389,7 @@ export function ProposalSteps({
 
       <div className="flex flex-col gap-2">
         <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">ช่องทางการส่ง</span>
+          <span className="text-label font-semibold text-muted-foreground">{t.orders.proposal.channels}</span>
           <Button
             variant="plain"
             size="sm"
@@ -376,11 +397,12 @@ export function ProposalSteps({
               setChannels(new Set(allChannels ? DEFAULT_PROPOSAL_CHANNELS : PROPOSAL_CHANNEL_ORDER))
             }
           >
-            {allChannels ? "ล้างที่เลือก" : "เลือกทั้งหมด"}
+            {allChannels ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
           </Button>
         </div>
         {PROPOSAL_CHANNEL_ORDER.map((c) => {
-          const { label, hint, Icon, color, required } = PROPOSAL_CHANNEL_META[c];
+          const { label, Icon, color, required } = PROPOSAL_CHANNEL_META[c];
+          const hint = t.orders.proposalChannelHint[c];
           const checked = channels.has(c);
           return (
             <label
@@ -424,7 +446,7 @@ export function ProposalSteps({
         disabled={picked.size === 0}
         onClick={() => setStep("channels")}
       >
-        {picked.size > 0 ? `ถัดไป · เลือกแล้ว ${picked.size} คน` : "ถัดไป"}
+        {picked.size > 0 ? t.orders.proposal.nextPicked(picked.size) : t.orders.proposal.next}
       </Button>
     ) : (
       <>
@@ -432,22 +454,31 @@ export function ProposalSteps({
             nothing is delivered. Same wording bargain `ShareDialog` makes. */}
         <p className="flex items-start gap-1.5 text-label leading-snug text-muted-foreground">
           <PaperPlaneTiltIcon size={14} className="mt-0.5 shrink-0" />
-          ระบบหลังบ้านจะส่งเอกสารผ่านช่องทางที่เลือก และบันทึกการส่งไว้เพื่อวัดผล
+          {t.orders.proposal.backOfficeNote}
         </p>
         <Button
           variant="primary"
           size="lg"
           className="w-full"
-          disabled={picked.size === 0}
+          disabled={picked.size === 0 || sending}
           leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
-          onClick={() =>
-            onConfirm(
-              [...picked],
-              PROPOSAL_CHANNEL_ORDER.filter((c) => channels.has(c)),
-            )
-          }
+          onClick={async () => {
+            setSending(true);
+            try {
+              await onConfirm(
+                [...picked],
+                PROPOSAL_CHANNEL_ORDER.filter((c) => channels.has(c)),
+              );
+            } finally {
+              setSending(false);
+            }
+          }}
         >
-          {picked.size > 1 ? `ส่ง Proposal ${picked.size} คน` : "ส่ง Proposal"}
+          {sending
+            ? t.common.sending
+            : picked.size > 1
+              ? t.orders.proposal.sendToN(picked.size)
+              : t.orders.proposal.send}
         </Button>
       </>
     );
@@ -484,7 +515,7 @@ export function ProposalSteps({
                   {/* A phone's sheet has no arrow in its title row. */}
                   {isMobile && onListBack && (
                     <div>
-                      <BackButton label="ย้อนกลับ" onClick={onListBack} />
+                      <BackButton label={t.orders.back} onClick={onListBack} />
                     </div>
                   )}
                   {productBox}
@@ -497,7 +528,7 @@ export function ProposalSteps({
                 <>
                   {isMobile && (
                     <div>
-                      <BackButton label="ย้อนกลับ" onClick={() => setStep("clients")} />
+                      <BackButton label={t.orders.back} onClick={() => setStep("clients")} />
                     </div>
                   )}
                   {productBox}

@@ -1,7 +1,8 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { Button, Card, Toaster } from "@sarunyu/system-one";
 import { ArrowLeftIcon, ShieldCheckIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -12,7 +13,6 @@ import { useSectionBack } from "@/hooks/use-section-back";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import type { RiskSeverity } from "@/types/domain";
 import {
-  RISK_ALERTS_TITLE,
   RiskAlertRowItem,
   RiskCategoryTabs,
   RiskSeverityStrip,
@@ -26,6 +26,8 @@ import {
 } from "../risk-feed";
 import { useRiskAlertRows } from "../use-risk-alert-rows";
 import { useRiskCta } from "../use-risk-cta";
+import { ErrorState } from "@/components/ui/empty-state";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Every risk finding across the book, filtered.
@@ -55,9 +57,10 @@ export default function RiskAlertsPage() {
 }
 
 function RiskAlertsPageInner() {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
-  const { rows, isLoading, acknowledge } = useRiskAlertRows();
+  const t = useT();
+  const { rows, isLoading, error, retry, acknowledge } = useRiskAlertRows();
   // Falls back to the Command Center on a cold entry — a pasted link, or a
   // session restored straight onto this page with no trail to walk up.
   const goBack = useSectionBack(() => "/command-center");
@@ -117,6 +120,7 @@ function RiskAlertsPageInner() {
   // The whole page, not just the list: the category tabs and severity strip
   // carry counts from this feed, so they wait for it too.
   if (isLoading) return <RiskAlertsSkeleton />;
+  if (error) return <ErrorState onRetry={retry} />;
 
   return (
     /* `xl:pb-20` clears the floating "New note" button the shell pins at
@@ -127,7 +131,7 @@ function RiskAlertsPageInner() {
           variant="plain"
           size="icon-sm"
           onClick={goBack}
-          aria-label="กลับไปหน้า Dashboard"
+          aria-label={t.commandCenter.backToDashboard}
           className="shrink-0"
         >
           <ArrowLeftIcon size={18} />
@@ -139,7 +143,7 @@ function RiskAlertsPageInner() {
             from. The strip below already opens with "ทั้งหมด N" and breaks it
             down by severity; a badge up here was a second, thinner answer to
             the same question. */}
-        <h1 className="type-h6 text-foreground">{RISK_ALERTS_TITLE}</h1>
+        <h1 className="type-h6 text-foreground">{t.commandCenter.risk.title}</h1>
       </div>
 
       {/* Category first — it is the *kind of thing*, which is what a tab strip
@@ -188,18 +192,18 @@ function RiskAlertsPageInner() {
             }
             title={
               filtered
-                ? "ไม่พบรายการตามตัวกรอง"
-                : "ไม่มีรายการความเสี่ยงค้างอยู่"
+                ? t.commandCenter.risk.noFilterResultTitle
+                : t.commandCenter.risk.emptyTitle
             }
             body={
               filtered
-                ? "ลองเลือกหมวดหรือระดับความเสี่ยงอื่น หรือล้างตัวกรองเพื่อดูทั้งหมด"
-                : "ระบบจะแจ้งเตือนทันทีเมื่อพบความเสี่ยงด้านมาร์จิ้น ความเหมาะสมของการลงทุน หรือพฤติกรรมการซื้อขาย"
+                ? t.commandCenter.risk.noFilterResultBody
+                : t.commandCenter.risk.emptyBody
             }
             action={
               filtered
                 ? {
-                    label: "ล้างตัวกรอง",
+                    label: t.states.clearFilters,
                     onClick: () => update({ category: null, severity: null }),
                   }
                 : undefined

@@ -9,34 +9,37 @@ import {
   PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
 import { BOND_LOGOS, type FixedIncomeBond } from "./fixed-income-data";
-import { BORDER_COLOR, ACTION_LABELS, StatusTag, BondLogo } from "./fixed-income-shared";
+import { BORDER_COLOR, StatusTag, BondLogo } from "./fixed-income-shared";
 import { fixedIncomeToBookableProduct } from "./fixed-income-data";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import { ProductOrderSection } from "@/app/(dashboard)/orders/ProductOrderSection";
-import { DealProgress } from "@/app/(dashboard)/orders/DealProgress";
-import { ProposalTallyLine } from "@/app/(dashboard)/orders/ProposalTallyLine";
-import { useSendProposal } from "@/app/(dashboard)/orders/useSendProposal";
-import { QuotaBookButton, useQuotaBooking } from "@/app/(dashboard)/orders/useQuotaBooking";
+import { ProductOrderSection } from "@/app/[lang]/(dashboard)/orders/ProductOrderSection";
+import { DealProgress } from "@/app/[lang]/(dashboard)/orders/DealProgress";
+import { ProposalTallyLine } from "@/app/[lang]/(dashboard)/orders/ProposalTallyLine";
+import { useSendProposal } from "@/app/[lang]/(dashboard)/orders/useSendProposal";
+import { QuotaBookButton, useQuotaBooking } from "@/app/[lang]/(dashboard)/orders/useQuotaBooking";
+import { useT } from "@/i18n/I18nProvider";
 
 function DetailTable({ bond }: { bond: FixedIncomeBond }) {
+  const t = useT();
+  const labels = t.products.fixedIncome.detail;
   const rows: {
     label: string;
     value?: string;
     link?: boolean;
     documents?: { label: string; href?: string }[];
   }[] = [
-    { label: "อัตราผลตอบแทน (YTM)", value: bond.ytm },
-    { label: "อัตราดอกเบี้ย (Coupon)", value: bond.couponRate },
-    { label: "งวดดอกเบี้ย", value: bond.couponPeriod },
-    { label: "อายุ", value: bond.tenor },
-    { label: "วันครบกำหนด", value: bond.maturity },
-    { label: "Ratings บริษัท", value: bond.companyRating },
-    { label: "Ratings หุ้นกู้", value: bond.bondRating },
-    { label: "ความเสี่ยง", value: bond.risk },
-    { label: "การค้ำประกัน", value: bond.guarantee, link: true },
-    { label: "ประเภทเสนอขาย", value: bond.offerType },
-    { label: "เปิดขายวันที่", value: bond.subscriptionPeriod },
-    { label: "เอกสารที่เกี่ยวข้อง", documents: bond.documents },
+    { label: labels.ytm, value: bond.ytm },
+    { label: labels.couponRate, value: bond.couponRate },
+    { label: labels.couponPeriod, value: bond.couponPeriod },
+    { label: labels.tenor, value: bond.tenor },
+    { label: labels.maturity, value: bond.maturity },
+    { label: labels.companyRating, value: bond.companyRating },
+    { label: labels.bondRating, value: bond.bondRating },
+    { label: labels.risk, value: bond.risk },
+    { label: labels.guarantee, value: bond.guarantee, link: true },
+    { label: labels.offerType, value: bond.offerType },
+    { label: labels.subscriptionPeriod, value: bond.subscriptionPeriod },
+    { label: labels.documents, documents: bond.documents },
   ];
 
   return (
@@ -90,6 +93,7 @@ export function FixedIncomeDetail({
   onBack: () => void;
   onCompanySelect?: (companyId: string) => void;
 }) {
+  const t = useT();
   const isFollowed = bond.action === "followed";
   const [tab, setTab] = useState<"detail" | "orders">("detail");
   // The order just placed here — marked on the Order tab, the same hand-off the
@@ -127,7 +131,7 @@ export function FixedIncomeDetail({
       style={{ backgroundColor: "#f9fafb" }}
     >
       <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="shrink-0">
+        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
           <ArrowLeftIcon size={20} />
         </Button>
         <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
@@ -159,7 +163,7 @@ export function FixedIncomeDetail({
                 <div className="flex flex-wrap gap-2 items-center">
                   <StatusTag status={bond.status} label={bond.statusLabel} />
                   <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#f3f4f6] text-xs leading-[20px] text-[#4a5565] whitespace-nowrap">
-                    {bond.bondCategory}
+                    {t.products.fixedIncome.category[bond.category]}
                   </span>
                 </div>
               </div>
@@ -176,8 +180,8 @@ export function FixedIncomeDetail({
             {ORDER_BOOKING_ENABLED && (
               <TabGroup
                 items={[
-                  { id: "detail", title: "Detail" },
-                  { id: "orders", title: "Order" },
+                  { id: "detail", title: t.products.common.detailTabs.detail },
+                  { id: "orders", title: t.products.common.detailTabs.orders },
                 ]}
                 activeId={tab}
                 onChange={(id) => setTab(id as "detail" | "orders")}
@@ -189,7 +193,7 @@ export function FixedIncomeDetail({
                 <DetailTable bond={bond} />
                 <DealProgress productId={adapted.id} />
                 <p className="text-sm leading-[24px] text-[#6a7282] text-center whitespace-nowrap">
-                  อัปเดตล่าสุด {bond.updatedAt}
+                  {t.products.common.updatedAt(bond.updatedAt)}
                 </p>
               </div>
             ) : (
@@ -220,7 +224,7 @@ export function FixedIncomeDetail({
                   leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
                   onClick={() => proposal.send(adapted)}
                 >
-                  ส่ง Proposal ให้ลูกค้า
+                  {t.products.common.sendProposalToClient}
                 </Button>
                 <ProposalTallyLine productId={adapted.id} />
               </div>
@@ -234,7 +238,7 @@ export function FixedIncomeDetail({
                 onBook={booking.book}
                 size="xl"
                 className="w-full max-w-[343px]"
-                label={ACTION_LABELS[bond.action]}
+                label={t.products.fixedIncome.action[bond.action]}
               />
             ) : (
               <Button
@@ -243,7 +247,7 @@ export function FixedIncomeDetail({
                 disabled={isFollowed}
                 className="w-full max-w-[343px]"
               >
-                {ACTION_LABELS[bond.action]}
+                {t.products.fixedIncome.action[bond.action]}
               </Button>
             )}
           </div>

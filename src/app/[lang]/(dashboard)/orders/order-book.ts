@@ -16,14 +16,15 @@ import type {
   RequirementRequest,
 } from "@/types/domain";
 import { BACKOFFICE_ACTOR } from "@/lib/order-mock-data";
-import { REQUIREMENT_CATALOG } from "./order-requirements";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatTime } from "@/i18n/format";
 import {
   bookingModeFor,
   deskLabelFor,
   type BookableProduct,
   type BookingMode,
 } from "./bookable-products";
-import { ORDER_WORDS } from "./order-words";
 
 /**
  * A mock FX rate, used only to say what a client's THB cash is worth against a
@@ -119,6 +120,7 @@ function buildLogs(
   bookings: Booking[],
   submissions: OrderSubmission[],
   requests: RequirementRequest[],
+  t: Dictionary,
 ): OrderLogEntry[] {
   const money = (amount: number) => formatOrderAmount(amount, product.currency);
   const entries: OrderLogEntry[] = [];
@@ -130,7 +132,7 @@ function buildLogs(
       at: b.createdAt,
       actor: b.createdBy,
       action: "booking-created",
-      summary: `จองให้ ${b.clientName} ${money(b.amount)}`,
+      summary: t.orders.log.bookingCreated(b.clientName, money(b.amount)),
       detail: null,
     });
     if (b.status === "cancelled") {
@@ -143,21 +145,21 @@ function buildLogs(
         at: b.createdAt,
         actor: b.createdBy,
         action: "booking-cancelled",
-        summary: `ยกเลิกการจองของ ${b.clientName} ${money(b.amount)}`,
+        summary: t.orders.log.bookingCancelled(b.clientName, money(b.amount)),
         detail: null,
       });
     }
   }
 
   for (const r of requests) {
-    const labels = r.keys.map((k) => REQUIREMENT_CATALOG[k].label).join(", ");
+    const labels = r.keys.map((k) => t.orders.checkColumn[k]).join(", ");
     entries.push({
       id: `log-${r.id}-sent`,
       productId: product.id,
       at: r.sentAt,
       actor: r.sentBy,
       action: "requirement-sent",
-      summary: `ส่งคำขอข้อมูลให้ ${r.clientName}`,
+      summary: t.orders.log.requirementSent(r.clientName),
       detail: labels,
     });
     if (r.status === "completed" && r.completedAt) {
@@ -167,7 +169,7 @@ function buildLogs(
         at: r.completedAt,
         actor: r.clientName,
         action: "requirement-completed",
-        summary: `${r.clientName} กรอกข้อมูลครบแล้ว`,
+        summary: t.orders.log.requirementCompleted(r.clientName),
         detail: labels,
       });
     }
@@ -185,8 +187,8 @@ function buildLogs(
       // summary reading "ส่ง" under "ระบบหลังบ้าน" would contradict it.
       summary:
         s.submittedBy === BACKOFFICE_ACTOR
-          ? `ระบบหลังบ้านรับคำสั่งซื้อไป ${s.bookingIds.length} รายการ`
-          : `ส่งคำสั่งซื้อ ${s.bookingIds.length} รายการ`,
+          ? t.orders.log.orderCollected(s.bookingIds.length)
+          : t.orders.log.orderSent(s.bookingIds.length),
       detail: s.backendRef,
     });
     if (s.status !== "processing" && s.settledAt) {
@@ -197,12 +199,12 @@ function buildLogs(
         // The answer comes from the downstream system, not from the IC — the
         // log says who did what, and attributing it to the IC would read as
         // though they had marked their own order complete.
-        actor: "ระบบหลังบ้าน",
+        actor: BACKOFFICE_ACTOR,
         action: s.status === "completed" ? "order-completed" : "order-rejected",
         summary:
           s.status === "completed"
-            ? `คำสั่งซื้อสำเร็จ (${s.backendRef})`
-            : `คำสั่งซื้อถูกปฏิเสธ (${s.backendRef})`,
+            ? t.orders.log.orderCompleted(s.backendRef)
+            : t.orders.log.orderRejected(s.backendRef),
         detail: null,
       });
     }
@@ -224,6 +226,7 @@ export function assembleOrderBook(
   bookings: Booking[],
   submissions: OrderSubmission[],
   requests: RequirementRequest[],
+  t: Dictionary,
 ): OrderBook {
   const target = orderTargetFor(product);
   const live = bookings.filter((b) => b.status === "booked");
@@ -263,7 +266,7 @@ export function assembleOrderBook(
     status: bookStatus(open, sum(open), target, ordered[0]),
     pendingOrders: ordered.filter((s) => s.status === "processing"),
     submissions: ordered,
-    logs: buildLogs(product, bookings, submissions, requests),
+    logs: buildLogs(product, bookings, submissions, requests, t),
   };
 }
 
@@ -359,22 +362,6 @@ export const BOOKING_PHASES: BookingPhase[] = [
  * empty. Everything after the order is one shared vocabulary — the same words
  * `dealStatus` returns, so the chip and the row's own tag stop disagreeing.
  */
-export const BOOKING_PHASE_LABEL: Record<
-  BookingMode,
-  Partial<Record<BookingPhase, string>>
-> = {
-  basket: {
-    pending: "จองแล้ว",
-    processing: "กำลังดำเนินการรับคำสั่งซื้อ",
-    completed: "รับคำสั่งซื้อสำเร็จ",
-    cancelled: "ยกเลิก",
-  },
-  quota: {
-    processing: "กำลังดำเนินการรับคำสั่งซื้อ",
-    completed: "รับคำสั่งซื้อสำเร็จ",
-    cancelled: "ยกเลิก",
-  },
-};
 
 /**
  * The tag colour per phase.
@@ -398,21 +385,6 @@ export const BOOKING_PHASE_VARIANT: Record<
   cancelled: "gray",
 };
 
-const PHASE_EMPTY: Record<BookingMode, Partial<Record<BookingPhase | "all", string>>> = {
-  basket: {
-    all: "ยังไม่มีรายการจอง",
-    pending: "ไม่มีรายการที่จองไว้",
-    processing: "ไม่มีรายการที่กำลังดำเนินการรับคำสั่งซื้อ",
-    completed: "ยังไม่มีรายการที่รับคำสั่งซื้อสำเร็จ",
-    cancelled: "ไม่มีรายการที่ยกเลิก",
-  },
-  quota: {
-    all: "ยังไม่มีคำสั่งซื้อ",
-    processing: "ไม่มีคำสั่งซื้อที่กำลังดำเนินการ",
-    completed: "ยังไม่มีคำสั่งซื้อที่รับสำเร็จ",
-    cancelled: "ไม่มีคำสั่งซื้อที่ยกเลิก",
-  },
-};
 
 /**
  * Order Management's filter chips, in this desk's own wording.
@@ -443,17 +415,18 @@ export function bookingPhaseSteps(
    * booking is still one. A product page's Order tab cannot: its rows are
    * bookings, ten columns of them, and an offer has none of what they say.
    */
+  t: Dictionary,
   options?: { offers?: boolean },
 ): { id: OrderStep; label: string; empty: string }[] {
   return [
-    { id: "all", label: "ทั้งหมด", empty: PHASE_EMPTY[mode].all ?? "" },
+    { id: "all", label: t.orders.stepAll, empty: t.orders.phaseEmpty[mode].all ?? "" },
     ...(options?.offers
-      ? [{ id: "offered" as const, label: "ส่ง Proposal แล้ว", empty: OFFERED_EMPTY }]
+      ? [{ id: "offered" as const, label: t.orders.stepOffered, empty: t.orders.offeredEmpty }]
       : []),
-    ...BOOKING_PHASES.filter((p) => BOOKING_PHASE_LABEL[mode][p]).map((p) => ({
+    ...BOOKING_PHASES.filter((p) => t.orders.phase[mode][p]).map((p) => ({
       id: p,
-      label: BOOKING_PHASE_LABEL[mode][p] as string,
-      empty: PHASE_EMPTY[mode][p] ?? "",
+      label: t.orders.phase[mode][p] as string,
+      empty: t.orders.phaseEmpty[mode][p] ?? "",
     })),
   ];
 }
@@ -463,7 +436,6 @@ export function bookingPhaseSteps(
  * wording turns on the client not having acted rather than on what they were
  * offered.
  */
-const OFFERED_EMPTY = "ไม่มี Proposal ที่ยังรอลูกค้าตัดสินใจ";
 
 
 /**
@@ -573,8 +545,9 @@ export function bookAvailability(book: OrderBook): BookAvailability {
 export function bookAvailabilityLabel(
   book: Pick<OrderBook, "mode">,
   availability: BookAvailability,
+  t: Dictionary,
 ): string {
-  return availability === "open" ? ORDER_WORDS[book.mode].availabilityOpen : "ปิด";
+  return availability === "open" ? t.orders.words[book.mode].availabilityOpen : t.orders.availabilityClosed;
 }
 
 export const BOOK_AVAILABILITY_VARIANT: Record<BookAvailability, "green" | "gray"> = {
@@ -678,27 +651,16 @@ export function headlineRound(book: OrderBook): {
 }
 
 /**
- * A timestamp as this app writes them in a log: `24 Jul 2026 · 14:05`.
+ * A timestamp as this app writes them in a log: `24 ก.ค. 2569 · 14:05` /
+ * `24 Jul 2026 · 14:05`.
  *
  * Forced to UTC because every timestamp in the seed data is stamped at a UTC
  * hour (see `order-mock-data`). Rendering them in the viewer's zone would move
  * a 09:00 entry to 16:00 in Bangkok and, worse, disagree between the server
  * render and the client one.
  */
-export function formatLogTime(iso: string): string {
+export function formatLogTime(iso: string, locale: Locale): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const date = d.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  const time = d.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-  });
-  return `${date} · ${time}`;
+  return `${formatDate(locale, d, "short", "UTC")} · ${formatTime(locale, d, "UTC")}`;
 }

@@ -27,11 +27,11 @@ import {
   getMobileGroupGridFunds,
   MOBILE_FUND_GROUPS,
   MOBILE_PERFORMANCE_PERIODS,
-  TOP_PERFORMERS_HERO_SUBTITLE,
   TOP_PERFORMERS_LIST_UPDATED_AT,
   type MobileFundGroupId,
   type MobilePerformancePeriod,
 } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function CategoryTabs({
   activeId,
@@ -40,6 +40,7 @@ function CategoryTabs({
   activeId: MobileFundGroupId;
   onSelect: (id: MobileFundGroupId) => void;
 }) {
+  const t = useT();
   return (
     <div className="w-full overflow-x-auto xl:overflow-visible">
       <div className="flex w-full min-w-max xl:min-w-0">
@@ -56,7 +57,7 @@ function CategoryTabs({
                   : "border-black/10 text-[#6a7282]"
               }`}
             >
-              {group.label}
+              {t.fund.groups[group.id]}
             </button>
           );
         })}
@@ -107,6 +108,7 @@ export function MutualFundTopPerformersPage({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [groupId, setGroupId] = useState<MobileFundGroupId>(initialGroupId);
   const [period, setPeriod] = useState<MobilePerformancePeriod>("1M");
   const [legendOpen, setLegendOpen] = useState(false);
@@ -115,7 +117,7 @@ export function MutualFundTopPerformersPage({
   const [query, setQuery] = useState("");
 
   const group = MOBILE_FUND_GROUPS.find((g) => g.id === groupId) ?? MOBILE_FUND_GROUPS[0];
-  const heroTitle = group.id === "all" ? "กองทุนทั้งหมด" : group.label;
+  const heroTitle = group.id === "all" ? t.fund.list.allFunds : t.fund.groups[group.id];
 
   useEffect(() => {
     const main = document.querySelector("main");
@@ -140,7 +142,7 @@ export function MutualFundTopPerformersPage({
   const showViewTag = bothOrNeitherTag || viewActive;
   const showHighlightTag = bothOrNeitherTag || highlightActive;
   const tagFunds = searchFunds(filterFundsByTag(funds, viewActive, highlightActive), query);
-  const listCountLabel = `${tagFunds.length} รายการ`;
+  const listCountLabel = t.fund.list.count(tagFunds.length);
 
   return (
     <>
@@ -155,13 +157,13 @@ export function MutualFundTopPerformersPage({
             variant="plain"
             size="icon-sm"
             onClick={onBack}
-            aria-label="กลับ"
+            aria-label={t.common.back}
             className="size-[30px] shrink-0 rounded-md p-[5px]"
           >
             <ArrowLeftIcon size={20} />
           </Button>
           <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">
-            กองทุนผลตอบแทนเด่น
+            {t.fund.topPerformers.title}
           </h1>
         </div>
 
@@ -181,9 +183,9 @@ export function MutualFundTopPerformersPage({
           <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pb-2.5 pt-2.5 md:px-8 lg:px-0">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{heroTitle}</p>
-              <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{TOP_PERFORMERS_HERO_SUBTITLE}</p>
+              <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{t.fund.topPerformers.heroSubtitle}</p>
               <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
-                ข้อมูล ณ วันที่ {TOP_PERFORMERS_LIST_UPDATED_AT}
+                {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
               </p>
             </div>
             <MutualFundGroupHeroGraphic groupId={groupId} scale={1.15} />
@@ -217,7 +219,7 @@ export function MutualFundTopPerformersPage({
                           value={query}
                           onChange={setQuery}
                           onClear={() => setQuery("")}
-                          placeholder="ค้นหากองทุน"
+                          placeholder={t.fund.list.searchPlaceholder}
                           size="sm"
                           className="w-full"
                         />
@@ -243,7 +245,7 @@ export function MutualFundTopPerformersPage({
 
                 {tagFunds.length === 0 ? (
                   <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
-                    {query.trim() ? `ไม่พบกองทุนที่ตรงกับ "${query.trim()}"` : "ไม่พบกองทุนในหมวดนี้"}
+                    {query.trim() ? t.fund.list.noMatchForQuery(query.trim()) : t.fund.list.noFundsInCategory}
                   </p>
                 ) : null}
               </>

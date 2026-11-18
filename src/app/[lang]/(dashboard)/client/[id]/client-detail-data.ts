@@ -1,3 +1,6 @@
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatDate } from "@/i18n/format";
 /**
  * Client 360 detail — static data and helpers.
  *
@@ -64,7 +67,7 @@ export function lastContactFromCallLogs(logs: CallLogEntry[]): string {
  * Backend: return `nextReview` and let this do the arithmetic.
  */
 export function kycExpiry(clientId: string): {
-  /** `nextReview` formatted for display — e.g. `15 Dec 2026`. */
+  /** `nextReview` as sent (an ISO day). Format it with {@link formatKycDate}. */
   date: string;
   /** `null` when the date couldn't be parsed, so there is no countdown to show. */
   daysLeft: number | null;
@@ -92,7 +95,7 @@ export function kycExpiry(clientId: string): {
   );
 
   return {
-    date: parsed.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
+    date: record.nextReview,
     daysLeft,
     dueSoon: daysLeft < 30,
     urgent: daysLeft <= 7,
@@ -100,40 +103,56 @@ export function kycExpiry(clientId: string): {
 }
 
 /**
- * The KYC expiry as one Thai sentence, for the profile's identity bar.
+ * A KYC date for display — `15 ธ.ค. 2569` / `15 Dec 2026`. A value that won't
+ * parse is shown as sent rather than as "Invalid Date".
+ */
+export function formatKycDate(date: string, locale: Locale): string {
+  return Number.isNaN(new Date(date).getTime()) ? date : formatDate(locale, date, "short");
+}
+
+/**
+ * The KYC expiry as one sentence, for the profile's identity bar, the
+ * Dashboard queue, the bell and the calendar — one helper so the surfaces word
+ * the same deadline the same way.
  *
  * `null` when the client has no KYC record — the caller drops the whole line
  * rather than printing a countdown to nothing.
- *
- * Always counted in days, at every horizon. Thai has no plural form, so there
- * is no singular case to special-case the way the English `countdownLabel` in
- * `KycTab` needs.
  */
-export function kycExpiryLabelTh(clientId: string): string | null {
+export function kycExpiryLabel(clientId: string, t: Dictionary, locale: Locale): string | null {
   const expiry = kycExpiry(clientId);
   if (!expiry) return null;
 
   const { date, daysLeft } = expiry;
+  const m = t.dates.kyc;
   // Unparseable `nextReview` — show the date as sent rather than a countdown
   // derived from a value we couldn't read.
-  if (daysLeft === null) return `KYC หมดอายุ ${date}`;
-  if (daysLeft < 0) return `KYC หมดอายุแล้ว ${Math.abs(daysLeft)} วัน`;
-  if (daysLeft === 0) return "KYC หมดอายุวันนี้";
-  return `KYC จะหมดอายุในอีก ${daysLeft} วัน`;
+  if (daysLeft === null) return m.expiresOn(formatKycDate(date, locale));
+  if (daysLeft < 0) return m.expiredDays(Math.abs(daysLeft));
+  if (daysLeft === 0) return m.expiresToday;
+  return m.expiresIn(daysLeft);
 }
 
 export type FormStatus = "done" | "pending" | "not-done" | "oncoming" | null;
 
+/** A form's id — its key in `t.client.kyc.forms`, which holds its title and description. */
+export type ImportantFormId =
+  | "wealthDeclaration"
+  | "fatcaCrs"
+  | "w8ben"
+  | "knowledgeAssessment"
+  | "bondKnowledgeTest"
+  | "suitabilityTest";
+
 export const IMPORTANT_FORMS: {
-  title: string;
-  description: string;
-  date: string;
+  id: ImportantFormId;
+  /** Last-updated date, as sent. */
+  updatedAt: string;
   status: FormStatus;
 }[] = [
-  { title: "Wealth Declaration", description: "แบบแจ้งการเป็นผู้ลงทุนรายใหญ่ / รายใหญ่พิเศษ / ที่มีลักษณะเฉพาะ", date: "อัปเดตล่าสุด: 24 Jul 2024", status: "done" },
-  { title: "FATCA and CRS", description: "แบบแจ้งความเป็นบุคคลอเมริกัน และผู้มีถิ่นที่อยู่ทางภาษีในประเทศอื่น", date: "อัปเดตล่าสุด: 24 Jul 2024", status: "pending" },
-  { title: "W-8Ben", description: "แบบฟอร์มภาษีของกรมสรรพากรแห่งสหรัฐอเมริกา", date: "อัปเดตล่าสุด: 24 Jul 2024", status: null },
-  { title: "แบบประเมินความรู้ความสามารถในการลงทุน (Knowledge Assessment)", description: "สำหรับการลงทุนในผลิตภัณฑ์ในตลาดทุนที่มีความเสี่ยงสูงหรือมีความซับซ้อน", date: "อัปเดตล่าสุด: 24 Jul 2024", status: "not-done" },
-  { title: "แบบทดสอบความรู้ผู้ลงทุน เกี่ยวกับตราสารหนี้", description: "สำหรับการจองซื้อ/ซื้อขายตราสารหนี้ (Perpetual Bond)", date: "อัปเดตล่าสุด: 24 Jul 2024", status: "not-done" },
-  { title: "แบบประเมินความเหมาะสมในการลงทุน (Suitability Test)", description: "ประเมินระดับความสามารถในการรับความเสี่ยงจากการลงทุน เพื่อหาประเภทหลักทรัพย์ที่เหมาะสม", date: "อัปเดตล่าสุด: 24 Jul 2024", status: "oncoming" },
+  { id: "wealthDeclaration", updatedAt: "24 Jul 2024", status: "done" },
+  { id: "fatcaCrs", updatedAt: "24 Jul 2024", status: "pending" },
+  { id: "w8ben", updatedAt: "24 Jul 2024", status: null },
+  { id: "knowledgeAssessment", updatedAt: "24 Jul 2024", status: "not-done" },
+  { id: "bondKnowledgeTest", updatedAt: "24 Jul 2024", status: "not-done" },
+  { id: "suitabilityTest", updatedAt: "24 Jul 2024", status: "oncoming" },
 ];

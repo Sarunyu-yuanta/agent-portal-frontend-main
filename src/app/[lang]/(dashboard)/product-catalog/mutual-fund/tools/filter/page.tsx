@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { MutualFundFilterResultsPage } from "../../../../client/[id]/MutualFundFilterResultsPage";
 import { getAllMutualFunds } from "../../../../client/[id]/mutual-fund-data";
 import {
@@ -11,6 +11,7 @@ import {
 import { MUTUAL_FUND_FILTER_STATE_KEY } from "../../../../client/[id]/MutualFundQuickActions";
 import { navRead } from "@/lib/nav-session";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { useT } from "@/i18n/I18nProvider";
 
 function readStoredFilterState(): MutualFundFilterState {
   const raw = navRead(MUTUAL_FUND_FILTER_STATE_KEY);
@@ -23,14 +24,15 @@ function readStoredFilterState(): MutualFundFilterState {
 }
 
 export default function MutualFundFilterRoute() {
-  const router = useRouter();
+  const t = useT();
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
   const funds = useMemo(() => getAllMutualFunds(false), []);
   const [initialFilterState] = useState<MutualFundFilterState>(() => readStoredFilterState());
 
   return (
     <MutualFundFilterResultsPage
-      title="ผลการกรอง"
+      title={t.products.filterResults.title}
       funds={funds}
       initialFilterState={initialFilterState}
       onBack={goBack}

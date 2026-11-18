@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Content width tokens shared by catalog drill-in pages (MF theme detail, SET sector, …). */
 export const CATALOG_DETAIL_WIDTH = {
@@ -40,6 +41,7 @@ export function CatalogDetailBackHeader({
   widthClass?: string;
   className?: string;
 }) {
+  const t = useT();
   return (
     <div className={`${widthClass} ${className}`}>
       <div className="flex h-[46px] items-center gap-2 py-2 lg:pt-6 lg:pb-2">
@@ -47,7 +49,7 @@ export function CatalogDetailBackHeader({
           variant="plain"
           size="icon-sm"
           onClick={onBack}
-          aria-label="กลับ"
+          aria-label={t.products.common.back}
           className="size-[30px] shrink-0 rounded-md p-[5px]"
         >
           <ArrowLeftIcon size={20} />
@@ -73,6 +75,7 @@ function TabScrollButton({
   hidden: boolean;
   onClick: () => void;
 }) {
+  const t = useT();
   const Icon = direction === "prev" ? CaretLeftIcon : CaretRightIcon;
   return (
     <button
@@ -80,7 +83,7 @@ function TabScrollButton({
       onClick={onClick}
       tabIndex={hidden ? -1 : 0}
       aria-hidden={hidden}
-      aria-label={direction === "prev" ? "เลื่อนแท็บไปทางซ้าย" : "เลื่อนแท็บไปทางขวา"}
+      aria-label={direction === "prev" ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight}
       className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-black/10 bg-white text-[#4a5565] transition-opacity hover:bg-black/[0.02] ${
         hidden ? "pointer-events-none opacity-0" : "opacity-100"
       }`}

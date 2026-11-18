@@ -5,11 +5,13 @@ import { Button } from "@sarunyu/system-one";
 import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react";
 import { RECOMMENDED_ISSUER_ROWS, type GlobalBondIssuerId } from "./global-bond-data";
 import { BORDER_COLOR, BondLogo, DetailRow } from "./fixed-income-shared";
+import { useT } from "@/i18n/I18nProvider";
 
 function ViewInfoButton({ onClick }: { onClick?: () => void }) {
+  const t = useT();
   return (
     <Button variant="outline" size="xl" className="w-full max-w-[343px]" onClick={onClick}>
-      ดูข้อมูล
+      {t.products.common.viewInfo}
     </Button>
   );
 }
@@ -19,6 +21,8 @@ export function GlobalBondRecommendedAccordion({
 }: {
   onIssuerSelect?: (id: GlobalBondIssuerId) => void;
 }) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
   return (
@@ -57,15 +61,15 @@ export function GlobalBondRecommendedAccordion({
             {expanded && (
               <div className="flex flex-col gap-3 items-center px-3 pb-3 w-full">
                 <div className="flex flex-col gap-1 rounded-lg bg-[#f3f4f6] px-3 py-2 w-full">
-                  <DetailRow label="Coupon Rate" value={row.couponRate} />
-                  <DetailRow label="วันครบกำหนด" value={row.maturity} />
+                  <DetailRow label={cols.couponRate} value={row.couponRate} />
+                  <DetailRow label={cols.maturity} value={row.maturity} />
                   <hr className="w-full border-0 m-0" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-                  <span className="text-xs leading-[20px] text-[#6a7282]">Credit Rating</span>
+                  <span className="text-xs leading-[20px] text-[#6a7282]">{cols.creditRating}</span>
                   <DetailRow label="S&P" value={row.sp} />
                   <DetailRow label="Moody's" value={row.moodys} />
                   <DetailRow label="Fitch" value={row.fitch} />
                   <hr className="w-full border-0 m-0" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-                  <DetailRow label="ผลตอบแทนโดยประมาณ" value={row.estimatedYield} />
+                  <DetailRow label={cols.estimatedYield} value={row.estimatedYield} />
                 </div>
                 <ViewInfoButton onClick={() => onIssuerSelect?.(row.id)} />
               </div>

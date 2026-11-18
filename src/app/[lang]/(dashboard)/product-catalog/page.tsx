@@ -2,7 +2,8 @@
 
 import { Suspense, useState, useEffect, useRef } from "react";
 import { SearchInput } from "@sarunyu/system-one";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import {
   ProductCatalogTab,
   type CatalogNavigation,
@@ -20,6 +21,7 @@ import { rememberCatalogList } from "@/lib/nav-memory";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { useProductCatalogLoading } from "@/hooks/use-catalog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function ProductCatalogPage() {
   return (
@@ -30,6 +32,7 @@ export default function ProductCatalogPage() {
 }
 
 function ProductCatalogPageInner() {
+  const t = useT();
   const [searchValue, setSearchValue] = useState("");
   // The header search bar lives up in the dashboard chrome, but the overlay it
   // opens belongs to the catalog below — so both the open state and the anchor
@@ -38,7 +41,7 @@ function ProductCatalogPageInner() {
   const headerSearchWrapRef = useRef<HTMLDivElement>(null);
   const scrolled = useScrollThreshold();
   const setHeaderSlot = useSetHeaderSlot();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const searchParams = useSearchParams();
   const isLoading = useProductCatalogLoading();
 
@@ -68,7 +71,7 @@ function ProductCatalogPageInner() {
           <SearchInput
             value={searchValue}
             onChange={setSearchValue}
-            placeholder="ค้นหาสินทรัพย์"
+            placeholder={t.products.catalog.searchPlaceholder}
             size="sm"
             className="w-full"
           />
@@ -78,7 +81,7 @@ function ProductCatalogPageInner() {
       setHeaderSlot(null);
     }
     return () => setHeaderSlot(null);
-  }, [scrolled, isLoading, searchValue, setSearchValue, setHeaderSlot]);
+  }, [scrolled, isLoading, searchValue, setSearchValue, setHeaderSlot, t]);
 
   const navigation: CatalogNavigation = {
     onProductSelect: (p) => router.push(`/product-catalog/product/${p.id}`),

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { BellIcon, CaretRightIcon } from "@phosphor-icons/react";
 import type { DayItem } from "../calendar/day-items";
 import { HolderContactOverlay } from "../calendar/HolderContact";
@@ -9,8 +9,9 @@ import { RemindersPreviewEmpty } from "../calendar/reminder-preview";
 import { RowIcon } from "./CardHeader";
 import { KycRow } from "./KycAlertsPanel";
 import { REMINDER_ROW_LIMIT, type QueueItem } from "./dashboard-data";
+import { useT } from "@/i18n/I18nProvider";
 
-const REMINDERS_PAGE = "/calendar?tab=reminder";
+const REMINDERS_PAGE = "/reminders";
 
 /** A reminder already placed on its calendar day, ready for the preview row. */
 export type PreviewReminder = {
@@ -53,6 +54,7 @@ export function RemindersPanel({
   clientNames: Map<string, string>;
   onOpen: (item: DayItem, day: Date) => void;
 }) {
+  const t = useT();
   /** Opened by a KYC row: the person, not the record. Same call the KYC card
    *  and the Calendar's Reminder tab make. */
   const [contact, setContact] = useState<{ clientId: string; name: string } | null>(null);
@@ -64,7 +66,7 @@ export function RemindersPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <h6 className="type-h6 text-foreground">Reminders</h6>
+      <h6 className="type-h6 text-foreground">{t.commandCenter.reminders.title}</h6>
 
       {/* The card is always today, so the label is the word and nothing else —
           no date, no badge. The rows used to carry "Due today · 29 Sept 2026"
@@ -73,7 +75,7 @@ export function RemindersPanel({
           are free to say only what is on the day. The Calendar's Reminder tab
           prints real dates over its groups because it has three months of them
           to tell apart — this has one. */}
-      <p className="type-caption font-semibold text-muted-foreground">วันนี้</p>
+      <p className="type-caption font-semibold text-muted-foreground">{t.dates.today}</p>
 
       {/* One surface with rules inside it, matching the other lists on this
           page. The rows go `flush` so the list owns the radius and fill. */}
@@ -158,13 +160,14 @@ function ReminderRow({
 }
 
 function MoreRow({ count }: { count: number }) {
+  const t = useT();
   return (
     <Link
       href={REMINDERS_PAGE}
       className="flex w-full items-center gap-2 p-3 text-left no-underline transition-colors hover:bg-[var(--fill-p1-100)]"
     >
       <p className="min-w-0 flex-1 truncate text-body-sm font-bold text-foreground">
-        ดูอีก {count} รายการ
+        {t.commandCenter.moreItems(count)}
       </p>
       <CaretRightIcon
         size={16}

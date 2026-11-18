@@ -26,7 +26,8 @@ export type NavSectionKey =
   | "ic-learning"
   | "yaa-team-head"
   | "notes"
-  | "calendar";
+  | "calendar"
+  | "reminders";
 
 type NavSection = {
   key: NavSectionKey;
@@ -51,6 +52,7 @@ const SECTIONS: NavSection[] = [
   { key: "yaa-team-head", root: "/yaa-team-head", prefixes: ["/yaa-team-head"] },
   { key: "notes", root: "/notes", prefixes: ["/notes"] },
   { key: "calendar", root: "/calendar", prefixes: ["/calendar"] },
+  { key: "reminders", root: "/reminders", prefixes: ["/reminders"] },
 ];
 
 const isUnder = (pathname: string, prefix: string) =>

@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Avatar, Button, SearchInput } from "@sarunyu/system-one";
-import { CheckCircleIcon, CircleIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, CircleIcon, MagnifyingGlassIcon, UsersIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useClients } from "@/hooks/use-api";
@@ -11,6 +12,7 @@ import { maskName } from "@/lib/mask-name";
 import type { Client } from "@/types/domain";
 import { advisoryAccountStatus, riskProfileLabel, type AdvisoryService } from "./portfolio-advisory-client";
 import { AdvisoryAccountTag } from "./portfolio-advisory-ui";
+import { useT } from "@/i18n/I18nProvider";
 
 const SERVICE_TITLE: Record<AdvisoryService, string> = {
   robo: "Robo Advisory",
@@ -19,11 +21,8 @@ const SERVICE_TITLE: Record<AdvisoryService, string> = {
 
 type AccountFilter = "all" | "open" | "none";
 
-const ACCOUNT_FILTERS: { id: AccountFilter; label: string }[] = [
-  { id: "all", label: "ทั้งหมด" },
-  { id: "open", label: "เปิดบัญชีแล้ว" },
-  { id: "none", label: "ยังไม่เปิดบัญชี" },
-];
+/** Labelled by `t.products.advisory.picker.accountFilter`. */
+const ACCOUNT_FILTERS: AccountFilter[] = ["all", "open", "none"];
 
 function AccountFilterSegments({
   value,
@@ -34,9 +33,11 @@ function AccountFilterSegments({
   counts: Record<AccountFilter, number>;
   onChange: (next: AccountFilter) => void;
 }) {
+  const t = useT();
   return (
     <div role="tablist" className="flex w-full shrink-0 gap-1 rounded-lg bg-[#f3f4f6] p-1">
-      {ACCOUNT_FILTERS.map(({ id, label }) => {
+      {ACCOUNT_FILTERS.map((id) => {
+        const label = t.products.advisory.picker.accountFilter[id];
         const active = value === id;
         return (
           <button
@@ -51,7 +52,7 @@ function AccountFilterSegments({
                 : "text-[#4a5565] hover:bg-white/60 hover:text-[#101828]"
             }`}
           >
-            {label} ({counts[id]})
+            {t.products.advisory.picker.segment(label, counts[id])}
           </button>
         );
       })}
@@ -70,6 +71,7 @@ function ClientRow({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const displayName = maskName(client.name, isPrivate);
 
@@ -88,7 +90,7 @@ function ClientRow({
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="truncate text-sm font-bold leading-[24px] text-[#101828]">{displayName}</p>
         <p className="truncate text-xs leading-[20px] text-[#4a5565]">
-          {client.tier} · {riskProfileLabel(client)}
+          {client.tier} · {riskProfileLabel(client, t)}
         </p>
       </div>
       <AdvisoryAccountTag status={advisoryAccountStatus(client, service)} />
@@ -118,11 +120,12 @@ export function AdvisoryClientPickerModal({
   onClose: () => void;
   onConfirm: (clientId: string) => void;
 }) {
+  const t = useT();
   return (
     <ResponsiveBottomSheetModal
       open={open}
       onClose={onClose}
-      title="เลือกลูกค้า"
+      title={t.products.advisory.picker.title}
       titleId="advisory-client-picker-title"
     >
       {/* Remounting on each open is what resets the draft selection and search. */}
@@ -145,6 +148,8 @@ function PickerBody({
   selectedClientId?: string;
   onConfirm: (clientId: string) => void;
 }) {
+  const t = useT();
+  const labels = t.products.advisory.picker;
   const clients = useClients();
   const [search, setSearch] = useState("");
   const [accountFilter, setAccountFilter] = useState<AccountFilter>("all");
@@ -176,14 +181,14 @@ function PickerBody({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 px-4 pb-4 pt-3">
       <p className="shrink-0 text-sm leading-[24px] text-[#4a5565]">
-        เลือกลูกค้าเพื่อดูแผน {SERVICE_TITLE[service]} ที่เหมาะกับระดับความเสี่ยงของเขา
+        {labels.intro(SERVICE_TITLE[service])}
       </p>
 
       <SearchInput
         value={search}
         onChange={setSearch}
         onClear={() => setSearch("")}
-        placeholder="ค้นหาชื่อหรือรหัสลูกค้า"
+        placeholder={labels.searchPlaceholder}
         size="sm"
         className="w-full shrink-0"
       />
@@ -191,8 +196,27 @@ function PickerBody({
       <AccountFilterSegments value={accountFilter} counts={counts} onChange={setAccountFilter} />
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto max-lg:max-h-[calc(var(--dvh)*50)] lg:max-h-[calc(var(--vh)*45)]">
-        {results.length === 0 ? (
-          <p className="py-8 text-center text-sm leading-[24px] text-[#4a5565]">ไม่พบลูกค้าที่ค้นหา</p>
+        {clients.length === 0 ? (
+          // Nobody to pick at all — not something a search or segment did.
+          <EmptyState
+            size="compact"
+            icon={<UsersIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={labels.noClients}
+          />
+        ) : results.length === 0 ? (
+          <EmptyState
+            size="compact"
+            icon={<MagnifyingGlassIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={search.trim() ? t.states.noResultTitle : t.states.noFilterResultTitle}
+            body={search.trim() ? t.states.noResultBody : t.states.noFilterResultBody}
+            action={{
+              label: t.states.clearFilters,
+              onClick: () => {
+                setSearch("");
+                setAccountFilter("all");
+              },
+            }}
+          />
         ) : (
           results.map((client) => (
             <ClientRow
@@ -213,7 +237,7 @@ function PickerBody({
         onClick={() => draftId && onConfirm(draftId)}
         className="w-full shrink-0"
       >
-        ดูแผนการลงทุน
+        {labels.viewPlans}
       </Button>
     </div>
   );

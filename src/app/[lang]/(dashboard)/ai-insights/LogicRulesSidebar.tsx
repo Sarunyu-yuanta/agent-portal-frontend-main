@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { Tag, Toaster, Toggle } from "@sarunyu/system-one";
 import { GearSixIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 type ToggleKey = "high" | "revenue" | "engagement";
 
 export function LogicRulesSidebar() {
+  const dict = useT();
+  const r = dict.research.aiInsights.rules;
   const [highPriorityThreshold, setHighPriorityThreshold] = useState("80");
   const [revenueMin, setRevenueMin] = useState("0.5");
   const [engagementDays, setEngagementDays] = useState("14");
@@ -19,7 +22,7 @@ export function LogicRulesSidebar() {
 
   const triggerSave = () => {
     const id = Math.random().toString(36).slice(2);
-    setToasts((prev) => [...prev, { id, message: "Settings saved", status: "success" }]);
+    setToasts((prev) => [...prev, { id, message: r.saved, status: "success" }]);
   };
 
   const handleToggle = (key: ToggleKey) => {
@@ -32,16 +35,16 @@ export function LogicRulesSidebar() {
       {/* Header */}
       <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border">
         <GearSixIcon size={15} className="text-muted-foreground" />
-        <p className="text-body-sm font-semibold text-foreground flex-1">AI Logic Rules</p>
-        <Tag text="Active" variant="green" size="small" />
+        <p className="text-body-sm font-semibold text-foreground flex-1">{r.title}</p>
+        <Tag text={r.active} variant="green" size="small" />
       </div>
 
       {/* Rules */}
       <div className="flex flex-col">
         <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
           <div className="flex-1 min-w-0">
-            <p className="text-label font-medium text-foreground">High Priority threshold</p>
-            <p className="text-meta text-muted-foreground">AI Score ≥</p>
+            <p className="text-label font-medium text-foreground">{r.highPriority}</p>
+            <p className="text-meta text-muted-foreground">{r.highPrioritySub}</p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <input
@@ -57,8 +60,8 @@ export function LogicRulesSidebar() {
 
         <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
           <div className="flex-1 min-w-0">
-            <p className="text-label font-medium text-foreground">Revenue minimum</p>
-            <p className="text-meta text-muted-foreground">฿M impact floor</p>
+            <p className="text-label font-medium text-foreground">{r.revenueMin}</p>
+            <p className="text-meta text-muted-foreground">{r.revenueMinSub}</p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <input
@@ -74,8 +77,8 @@ export function LogicRulesSidebar() {
 
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <div className="flex-1 min-w-0">
-            <p className="text-label font-medium text-foreground">Engagement alert</p>
-            <p className="text-meta text-muted-foreground">Days without contact</p>
+            <p className="text-label font-medium text-foreground">{r.engagement}</p>
+            <p className="text-meta text-muted-foreground">{r.engagementSub}</p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <input

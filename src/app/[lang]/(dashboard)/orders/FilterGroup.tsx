@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip } from "@sarunyu/system-one";
+import { useT } from "@/i18n/I18nProvider";
 
 /** One axis of the filter dialog: "ทั้งหมด" and its options, single choice. */
 export function FilterGroup({
@@ -14,12 +15,13 @@ export function FilterGroup({
   value: string | null;
   onChange: (value: string | null) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2">
       <p className="text-label font-semibold text-muted-foreground">{label}</p>
       <div className="flex flex-wrap gap-2">
         <Chip
-          label="ทั้งหมด"
+          label={t.orders.tabAll}
           type="single"
           selected={value === null}
           onClick={() => onChange(null)}

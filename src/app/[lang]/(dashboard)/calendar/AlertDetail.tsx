@@ -2,7 +2,8 @@
 
 import { Avatar } from "@sarunyu/system-one";
 import { useState } from "react";
-import { CaretRightIcon, LightningIcon, XIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, LightningIcon, UsersIcon, XIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SlideSteps } from "@/components/ui/slide-steps";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { getInitial } from "@/lib/client-utils";
@@ -11,6 +12,7 @@ import { dayLabel, weekdayLabel } from "./calendar-grid";
 import type { DayItem } from "./day-items";
 import { HolderContact } from "./HolderContact";
 import { itemBadge } from "./source-badge";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * What a desk event opens into.
@@ -64,9 +66,11 @@ export function AlertDetail({
    */
   showHolders?: boolean;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const isSheet = variant === "sheet";
-  const badge = itemBadge(item);
+  const badge = itemBadge(item, t);
 
   const holders = item.clientIds.map((id) => ({
     id,
@@ -113,8 +117,8 @@ export function AlertDetail({
       >
         <LightningIcon size={13} weight="fill" className="shrink-0" />
         {item.source === "corporate-action"
-          ? "Published by the exchange"
-          : "Added by the desk"}
+          ? t.planner.calendar.alert.publishedByExchange
+          : t.planner.calendar.alert.addedByDesk}
       </p>
 
       {/* No rule between this and the detail line below: the two are one
@@ -147,14 +151,14 @@ export function AlertDetail({
               `NotesSidebarList`. */}
           <p className="type-body-1 font-bold! text-foreground">{item.title}</p>
           <p className="type-caption text-muted-foreground">
-            {weekdayLabel(day)}, {dayLabel(day)}
+            {weekdayLabel(day, locale)}, {dayLabel(day, locale)}
           </p>
         </div>
         {!isSheet && (
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <XIcon size={16} />
@@ -210,11 +214,18 @@ export function AlertDetail({
       {showHolders && (
         <>
       <p className="shrink-0 border-t border-border/60 px-4 pb-1 pt-3 type-caption font-medium uppercase tracking-wide text-muted-foreground">
-        Holders · {holders.length}
+        {t.planner.calendar.alert.holders(holders.length)}
       </p>
 
       {/* `max-h` rather than `flex-1`, for the reason `HolderContact` gives: a
           pane in the sliding track needs a height of its own to be measured. */}
+      {holders.length === 0 ? (
+        <EmptyState
+          size="compact"
+          icon={<UsersIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          title={t.planner.calendar.alert.noHolders}
+        />
+      ) : (
       <ul className="flex max-h-[calc(var(--vh)*40)] flex-col overflow-y-auto pb-2">
         {holders.map((holder) => (
           <li key={holder.id}>
@@ -246,6 +257,7 @@ export function AlertDetail({
           </li>
         ))}
       </ul>
+      )}
         </>
       )}
     </div>

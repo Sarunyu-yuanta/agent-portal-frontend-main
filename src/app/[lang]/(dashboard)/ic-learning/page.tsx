@@ -2,13 +2,15 @@
 
 import { GraduationCapIcon } from "@phosphor-icons/react";
 import { ComingSoonPage } from "../coming-soon-page";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function IcLearningPage() {
+  const t = useT();
   return (
     <ComingSoonPage
       icon={<GraduationCapIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-      title="IC Learning"
-      body="Training modules and certification tracking will live here. Not built yet — check back soon."
+      title={t.learning.icLearning.title}
+      body={t.learning.icLearning.body}
     />
   );
 }

@@ -19,6 +19,8 @@ import { useOrders } from "@/contexts/orders-context";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { SendProposalDialog, type ProposalSubject } from "./SendProposalDialog";
 import { useOrderBook } from "./use-order-books";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 export function useSendProposal(options?: {
   /**
@@ -73,6 +75,7 @@ function Opened({
   onClose: () => void;
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
+  const t = useT();
   const { sendProposal } = useOrders();
   const { data: book } = useOrderBook(product.id);
 
@@ -84,25 +87,58 @@ function Opened({
       }}
       product={product}
       book={book}
-      onConfirm={(clientIds, channels) => {
-        void (async () => {
-          // The rows actually written, not the ids asked for — the store drops
-          // an id it cannot name, and reporting the request would overstate it.
-          const rows = await sendProposal({ productId: product.id, clientIds, channels });
-          onClose();
-          onNotice(proposalSentMessage(product.underlying, rows), "success");
-        })();
-      }}
+      onConfirm={(clientIds, channels) =>
+        sendAndReport(
+          t,
+          () => sendProposal({ productId: product.id, clientIds, channels }),
+          product.underlying,
+          onNotice,
+          onClose,
+        )
+      }
     />
   );
 }
 
+/**
+ * Sends, then reports — the one place a Proposal send's outcome is worded.
+ *
+ * Resolves `true` only when something was written. The rows reported are the
+ * rows the store actually wrote, not the ids asked for: it drops an id it
+ * cannot name, and announcing zero sends as a success was how a failed send
+ * used to look. On failure the dialog is told to stay open, so the IC's picks
+ * survive for a second try.
+ */
+export async function sendAndReport(
+  t: Dictionary,
+  send: () => Promise<{ clientName: string }[]>,
+  underlying: string,
+  onNotice: (message: string, status: ToastStatus) => void,
+  onDone: () => void,
+): Promise<boolean> {
+  try {
+    const rows = await send();
+    if (rows.length === 0) {
+      onNotice(t.orders.proposal.noClientsFound, "warning");
+      return false;
+    }
+    onDone();
+    onNotice(proposalSentMessage(t, underlying, rows), "success");
+    return true;
+  } catch (err) {
+    console.warn("[sendProposal]", err);
+    onNotice(t.orders.proposal.sendFailed, "critical");
+    return false;
+  }
+}
+
 /** The toast after a send — one wording wherever a Proposal goes from. */
 export function proposalSentMessage(
+  t: Dictionary,
   underlying: string,
   rows: { clientName: string }[],
 ): string {
   return rows.length === 1
-    ? `ส่ง Proposal ${underlying} ให้ ${rows[0].clientName} แล้ว`
-    : `ส่ง Proposal ${underlying} ให้ลูกค้า ${rows.length} คนแล้ว`;
+    ? t.orders.proposal.sentToOne(underlying, rows[0].clientName)
+    : t.orders.proposal.sentToMany(underlying, rows.length);
 }

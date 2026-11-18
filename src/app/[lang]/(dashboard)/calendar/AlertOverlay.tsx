@@ -6,6 +6,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { AlertDetail } from "./AlertDetail";
 import { CorporateActionDetailModal } from "./CorporateActionDetailModal";
 import type { DayItem } from "./day-items";
+import { useT } from "@/i18n/I18nProvider";
 
 /** An item plus the day it was read off — a `DayItem` carries no date of its
  * own, it is only ever pulled out of a map keyed by one. */
@@ -50,6 +51,7 @@ export function AlertOverlay({
   /** Passed through to `AlertDetail` — off inside one client's own profile. */
   showHolders?: boolean;
 }) {
+  const t = useT();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const record = target && target.item.source === "corporate-action" ? target.item : null;
@@ -97,7 +99,7 @@ export function AlertOverlay({
             if (!next) onClose();
           }}
           showHeader={false}
-          title={shown?.item.title ?? "Alert"}
+          title={shown?.item.title ?? t.planner.calendar.alert.fallbackTitle}
           className="px-0 overflow-hidden"
           contentClassName="pt-0"
         >

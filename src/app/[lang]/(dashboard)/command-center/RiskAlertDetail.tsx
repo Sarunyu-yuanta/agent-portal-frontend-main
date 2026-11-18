@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Alert, Button, Tag } from "@sarunyu/system-one";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
@@ -10,11 +10,12 @@ import {
   deadlineLabel,
   detectedAtLabel,
   dueDayLabel,
-  RISK_CATEGORY_META,
-  RISK_CTA_LABEL,
-  RISK_SEVERITY_META,
+  severityMeta,
+  categoryMeta,
 } from "./risk-config";
 import type { RiskAlertRow } from "./risk-feed";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * The shell every block of *information* in this panel wears — the prose
@@ -66,6 +67,8 @@ export function RiskAlertDetail({
   onAct: (row: RiskAlertRow) => void;
   onAcknowledge: (alert: RiskAlert) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   if (!row) return null;
 
   const { alert } = row;
@@ -84,8 +87,8 @@ export function RiskAlertDetail({
    *  change rather than a rewrite. */
   const canAcknowledge = alert.dismissible && !row.acknowledged;
 
-  const severity = RISK_SEVERITY_META[alert.severity];
-  const category = RISK_CATEGORY_META[alert.category];
+  const severity = severityMeta(alert.severity, t);
+  const category = categoryMeta(alert.category, t);
   const CategoryIcon = category.Icon;
   const SeverityIcon = severity.Icon;
 
@@ -93,7 +96,7 @@ export function RiskAlertDetail({
     <ResponsiveBottomSheetModal
       open
       onClose={onClose}
-      title="รายละเอียดความเสี่ยง"
+      title={t.commandCenter.riskDetail.title}
       titleId="risk-alert-detail"
       desktopMaxWidth="max-w-[560px]"
     >
@@ -160,7 +163,7 @@ export function RiskAlertDetail({
                    the weight a bonus path should have. */
                 <Link
                   href={`/client/${alert.clientId}`}
-                  title="ดูโปรไฟล์ลูกค้า"
+                  title={t.commandCenter.riskDetail.viewClientProfile}
                   className="type-body-1 min-w-0 truncate font-bold! leading-snug text-foreground no-underline transition-colors hover:text-primary-action"
                 >
                   {row.displayName}
@@ -190,7 +193,7 @@ export function RiskAlertDetail({
                   read for staleness; a compliance record is read for when, and
                   this panel is the record. */}
               <span className="shrink-0 text-meta tabular-nums text-muted-foreground">
-                {detectedAtLabel(alert.detectedAt, new Date())}
+                {detectedAtLabel(alert.detectedAt, new Date(), t, locale)}
               </span>
             </div>
 
@@ -225,7 +228,7 @@ export function RiskAlertDetail({
                 href={`/client/${alert.clientId}`}
                 className="inline-flex w-fit items-center gap-0.5 self-start text-label font-semibold text-primary-action no-underline hover:underline"
               >
-                ดูโปรไฟล์ลูกค้า
+                {t.commandCenter.riskDetail.viewClientProfile}
                 <CaretRightIcon size={12} weight="bold" />
               </Link>
             )}
@@ -249,13 +252,13 @@ export function RiskAlertDetail({
                 an opened sheet has already been chosen, and what it owes the
                 reader first is the verdict — then the day to write down. */}
             <p className="type-body-2 font-semibold">
-              {deadlineLabel(alert.daysLeft)}
-              {alert.dueDate && ` · ${dueDayLabel(alert.dueDate)}`}
+              {deadlineLabel(alert.daysLeft, t)}
+              {alert.dueDate && ` · ${dueDayLabel(alert.dueDate, locale)}`}
             </p>
           </div>
         )}
 
-        <Section title="รายละเอียด">
+        <Section title={t.commandCenter.riskDetail.details}>
           <div className={`${INFO_BOX} p-4`}>
             <p className="type-body-2 leading-relaxed text-foreground">
               {alert.message}
@@ -264,7 +267,7 @@ export function RiskAlertDetail({
         </Section>
 
         {alert.metrics.length > 0 && (
-          <Section title="ตัวเลขที่ทำให้เกิดการแจ้งเตือน">
+          <Section title={t.commandCenter.riskDetail.triggerFigures}>
             {/* Four separate cards, not one block ruled into quarters. Each
                 figure is an independent reading taken by the same rule, and
                 hairlines between them implied a table — rows and columns that
@@ -321,7 +324,7 @@ export function RiskAlertDetail({
         {!alert.contactAllowed && alert.contactNote && (
           <Alert
             status="warning"
-            title="ข้อจำกัดในการติดต่อ"
+            title={t.commandCenter.riskDetail.contactRestriction}
             message={alert.contactNote}
             multiline
           />
@@ -339,7 +342,7 @@ export function RiskAlertDetail({
             appear: either here is how to reach them, or here is why you may
             not. */}
         {showContact && alert.clientId && (
-          <Section title="ช่องทางติดต่อ">
+          <Section title={t.commandCenter.contactChannels}>
             <ContactChips clientId={alert.clientId} />
           </Section>
         )}
@@ -376,11 +379,11 @@ export function RiskAlertDetail({
             the alternative it is. */}
         {canAcknowledge && (
           <Button variant="outline" size="xl" onClick={() => onAcknowledge(alert)}>
-            รับทราบ
+            {t.commandCenter.riskDetail.acknowledge}
           </Button>
         )}
         <Button variant="primary" size="xl" onClick={() => onAct(row)}>
-          {RISK_CTA_LABEL}
+          {t.risk.cta}
         </Button>
       </div>
     </ResponsiveBottomSheetModal>

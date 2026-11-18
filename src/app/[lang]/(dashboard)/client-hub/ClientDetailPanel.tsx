@@ -13,9 +13,10 @@ import {
 } from "@phosphor-icons/react";
 import { getCallLogs, relativeCallDate, type CallLogEntry } from "@/data/call-log-data";
 import { ClientRemindersTab } from "../client/[id]/ClientRemindersTab";
-import { kycExpiryLabelTh } from "../client/[id]/client-detail-data";
+import { kycExpiryLabel } from "../client/[id]/client-detail-data";
 import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
+import { ErrorState } from "@/components/ui/empty-state";
 import { useNoteEditModal } from "../calendar/use-note-edit-modal";
 import { formatDayOnly, formatListStamp } from "../notes/note-format";
 import { snippet } from "../notes/notes-grouping";
@@ -41,6 +42,8 @@ import {
   type AssetAccountItem,
 } from "@/data/asset-account-details";
 import type { Client } from "@/types/domain";
+import { useLocale } from "@/i18n/I18nProvider";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ClientDetailPanel({
   client,
@@ -59,6 +62,8 @@ export function ClientDetailPanel({
   onViewNotes?: () => void;
   onBack?: () => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const { isPrivate } = usePrivacy();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
@@ -68,9 +73,9 @@ export function ClientDetailPanel({
   const [remindersOpen, setRemindersOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const callLogs = getCallLogs(client.id);
-  const kycExpiryLabel = kycExpiryLabelTh(client.id);
+  const kycLine = kycExpiryLabel(client.id, t, locale);
   const clients = useClients();
-  const { notes } = useNotes();
+  const { notes, isLoading: notesLoading, error: notesError, retry: retryNotes } = useNotes();
   const { openNote, modal: noteModal } = useNoteEditModal({ clients, pinnedClientId: client.id });
   const clientNotes = notes
     .filter((n) => n.clientIds.includes(client.id))
@@ -118,15 +123,15 @@ export function ClientDetailPanel({
               ) : (
                 <PhoneIncomingIcon size={14} className="text-[var(--icon-success)]" />
               )}
-              <span className="type-caption">{log.direction === "outbound" ? "Outbound" : "Inbound"}</span>
+              <span className="type-caption">{log.direction === "outbound" ? t.client.callLog.outbound : t.client.callLog.inbound}</span>
             </div>
           </div>
-          <p className="type-caption text-muted-foreground">{relativeCallDate(log.date)} · {log.duration}</p>
+          <p className="type-caption text-muted-foreground">{relativeCallDate(log.date, t)} · {log.duration}</p>
           <p className="type-body-2 text-foreground mt-1">{log.summary}</p>
         </div>
       ))}
       {callLogs.length === 0 && (
-        <p className="type-body-2 text-muted-foreground text-center py-6">No call history yet.</p>
+        <p className="type-body-2 text-muted-foreground text-center py-6">{t.client.panel.noCallHistory}</p>
       )}
     </>
   );
@@ -144,13 +149,13 @@ export function ClientDetailPanel({
    */
   const quickActions = [
     ...(CALL_LOG_ENABLED
-      ? [{ icon: <PhoneListIcon size={20} />,  label: "Call log", onClick: () => setCallLogOpen(true),   comingSoon: false }]
+      ? [{ icon: <PhoneListIcon size={20} />,  label: t.client.panel.callLog, onClick: () => setCallLogOpen(true),   comingSoon: false }]
       : []),
     ...(REMINDERS_ENABLED
-      ? [{ icon: <BellIcon size={20} />,       label: "Reminder", onClick: () => setRemindersOpen(true), comingSoon: false }]
+      ? [{ icon: <BellIcon size={20} />,       label: t.client.panel.reminder, onClick: () => setRemindersOpen(true), comingSoon: false }]
       : []),
     ...(NOTES_ENABLED
-      ? [{ icon: <NotePencilIcon size={20} />, label: "Notes",    onClick: () => setNotesOpen(true),     comingSoon: false }]
+      ? [{ icon: <NotePencilIcon size={20} />, label: t.client.panel.notes,    onClick: () => setNotesOpen(true),     comingSoon: false }]
       : []),
   ];
 
@@ -170,23 +175,29 @@ export function ClientDetailPanel({
         >
           <div className="flex items-center justify-between gap-3">
             <span className="type-body-2 text-foreground font-semibold truncate">
-              {note.title || "Untitled note"}
+              {note.title || t.client.notes.untitled}
             </span>
             {note.reminderAt && (
               <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground">
                 <BellIcon size={14} />
-                <span className="type-caption">{formatDayOnly(note.reminderAt)}</span>
+                <span className="type-caption">{formatDayOnly(note.reminderAt, locale)}</span>
               </div>
             )}
           </div>
-          <p className="type-caption text-muted-foreground">{formatListStamp(note.updatedAt)}</p>
+          <p className="type-caption text-muted-foreground">{formatListStamp(note.updatedAt, locale)}</p>
           <p className="type-body-2 text-foreground mt-1">
-            {note.body ? snippet(note.body, 80) : "No additional text"}
+            {note.body ? snippet(note.body, 80) : t.client.reminders.noAdditionalText}
           </p>
         </button>
       ))}
-      {clientNotes.length === 0 && (
-        <p className="type-body-2 text-muted-foreground text-center py-6">No notes yet.</p>
+      {notesLoading ? (
+        <p className="type-body-2 text-muted-foreground text-center py-6">{t.common.loading}</p>
+      ) : notesError ? (
+        <ErrorState size="compact" title={t.client.notes.loadError} onRetry={retryNotes} />
+      ) : (
+        clientNotes.length === 0 && (
+          <p className="type-body-2 text-muted-foreground text-center py-6">{t.client.notes.noneForClient}</p>
+        )
       )}
     </>
   );
@@ -205,7 +216,7 @@ export function ClientDetailPanel({
               type="button"
               onClick={onBack}
               className="flex items-center justify-center size-8 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-[var(--text-default-primary)] cursor-pointer shrink-0"
-              aria-label="Go back"
+              aria-label={t.common.back}
             >
               <ArrowLeftIcon size={20} />
             </button>
@@ -235,9 +246,9 @@ export function ClientDetailPanel({
                 two plain lines of text and `mt-2` reads as a gap. */}
             <div className={`flex items-center gap-2 ${compact ? "mt-0.5" : "mt-2"}`}>
               <p className="type-caption text-muted-foreground">{client.id}</p>
-              {!compact && kycExpiryLabel && (
+              {!compact && kycLine && (
                 <span className="type-caption text-muted-foreground rounded-md bg-muted px-2 py-0.5">
-                  {kycExpiryLabel}
+                  {kycLine}
                 </span>
               )}
             </div>
@@ -250,7 +261,7 @@ export function ClientDetailPanel({
               leftIcon={<UserIcon size={14} />}
               onClick={onViewFull}
             >
-              View Full Profile
+              {t.client.panel.viewFullProfile}
             </Button>
           ) : (
             <div className="w-10 shrink-0" />
@@ -287,7 +298,7 @@ export function ClientDetailPanel({
                   </span>
                   {comingSoon && (
                     <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-default-secondary)]/70">
-                      <span className="text-meta font-semibold text-primary-action bg-[var(--bg-brand-light)] border border-primary-action/30 px-1.5 py-0.5 rounded-full">Coming soon</span>
+                      <span className="text-meta font-semibold text-primary-action bg-[var(--bg-brand-light)] border border-primary-action/30 px-1.5 py-0.5 rounded-full">{t.client.panel.comingSoon}</span>
                     </div>
                   )}
                 </button>
@@ -310,7 +321,7 @@ export function ClientDetailPanel({
               leftIcon={<UserIcon size={16} />}
               onClick={onViewFull}
             >
-              View Full Profile
+              {t.client.panel.viewFullProfile}
             </Button>
           </div>
         </div>
@@ -337,7 +348,7 @@ export function ClientDetailPanel({
               type="button"
               onClick={detail.close}
               className="flex items-center justify-center size-8 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-[var(--text-default-primary)] cursor-pointer"
-              aria-label="Go back"
+              aria-label={t.common.back}
             >
               <ArrowLeftIcon size={20} />
             </button>
@@ -359,12 +370,12 @@ export function ClientDetailPanel({
               type="button"
               onClick={liabilities.close}
               className="flex items-center justify-center size-8 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-[var(--text-default-primary)] cursor-pointer"
-              aria-label="Go back"
+              aria-label={t.common.back}
             >
               <ArrowLeftIcon size={20} />
             </button>
             <p className="type-subtitle-2 font-bold text-[var(--text-default-primary)] flex-1 min-w-0 truncate">
-              Liabilities
+              {t.client.panel.liabilities}
             </p>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar">
@@ -384,7 +395,7 @@ export function ClientDetailPanel({
     <ResponsiveDialog
       open={callLogOpen}
       onOpenChange={setCallLogOpen}
-      title={`Call log — ${client.name}`}
+      title={t.client.panel.callLogFor(client.name)}
       mobileContentClassName="flex flex-col gap-3 p-4"
       desktopContentClassName="flex flex-col gap-3 min-w-[420px] max-w-[520px]"
     >
@@ -411,7 +422,7 @@ export function ClientDetailPanel({
     <ResponsiveDialog
       open={remindersOpen}
       onOpenChange={setRemindersOpen}
-      title={`Reminders — ${client.name}`}
+      title={t.client.panel.remindersFor(client.name)}
       mobileContentClassName="flex flex-col gap-3 p-4"
       desktopContentClassName="flex flex-col gap-3 min-w-[420px] max-w-[520px]"
     >
@@ -437,7 +448,7 @@ export function ClientDetailPanel({
     <ResponsiveDialog
       open={notesOpen}
       onOpenChange={setNotesOpen}
-      title={`Notes — ${client.name}`}
+      title={t.client.panel.notesFor(client.name)}
       mobileContentClassName="flex flex-col gap-3 p-4"
       desktopContentClassName="flex flex-col gap-3 min-w-[420px] max-w-[520px]"
     >

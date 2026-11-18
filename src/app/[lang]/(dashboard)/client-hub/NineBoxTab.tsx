@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AvatarStack } from "@sarunyu/system-one";
 import { getInitial } from "@/lib/client-utils";
 import { mockClients } from "@/lib/mock-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 type Client = (typeof mockClients)[number];
 
@@ -28,21 +30,26 @@ function getAiTier(score: number): 0 | 1 | 2 {
   return 0;
 }
 
-const CELLS: { label: string; heat: 1 | 2 | 3 | 4 | 5 }[][] = [
+/** A cell's id — its name is `t.client.nineBox.cells[id]`. */
+export type NineBoxCellId = keyof Dictionary["client"]["nineBox"]["cells"];
+/** A tier's id — its name is `t.client.nineBox.tiers[id]`. */
+export type NineBoxTierId = keyof Dictionary["client"]["nineBox"]["tiers"];
+
+const CELLS: { id: NineBoxCellId; heat: 1 | 2 | 3 | 4 | 5 }[][] = [
   [
-    { label: "Protect",    heat: 3 },
-    { label: "Nurture",    heat: 4 },
-    { label: "Prioritize", heat: 5 },
+    { id: "protect",    heat: 3 },
+    { id: "nurture",    heat: 4 },
+    { id: "prioritize", heat: 5 },
   ],
   [
-    { label: "Re-engage",  heat: 2 },
-    { label: "Develop",    heat: 3 },
-    { label: "Grow",       heat: 4 },
+    { id: "reEngage",   heat: 2 },
+    { id: "develop",    heat: 3 },
+    { id: "grow",       heat: 4 },
   ],
   [
-    { label: "Monitor",      heat: 1 },
-    { label: "Activate",     heat: 2 },
-    { label: "Rising Stars", heat: 3 },
+    { id: "monitor",     heat: 1 },
+    { id: "activate",    heat: 2 },
+    { id: "risingStars", heat: 3 },
   ],
 ];
 
@@ -54,41 +61,42 @@ export const NINE_BOX_HEAT_STYLES: Record<number, { bg: string; chipBg: string; 
   1: { bg: "bg-gray-100 hover:bg-gray-200/60",       chipBg: "bg-gray-100",    dot: "bg-gray-400",    count: "text-gray-500"    },
 };
 
-const AUM_ROWS = [
-  { label: "High",   sub: "> ฿500M",    color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
-  { label: "Medium", sub: "฿150M–500M", color: "var(--fill-p1-600)", activeColor: "var(--fill-p1-700)" },
-  { label: "Low",    sub: "< ฿150M",    color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
+const AUM_ROWS: { tier: NineBoxTierId; sub: string; color: string; activeColor: string }[] = [
+  { tier: "high",   sub: "> ฿500M",    color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
+  { tier: "medium", sub: "฿150M–500M", color: "var(--fill-p1-600)", activeColor: "var(--fill-p1-700)" },
+  { tier: "low",    sub: "< ฿150M",    color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
 ];
 
-const AI_COLS = [
-  { label: "Low",    sub: "< 75",   color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
-  { label: "Medium", sub: "75–87",  color: "var(--fill-p1-600)", activeColor: "var(--fill-p1-700)" },
-  { label: "High",   sub: "> 87",   color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
+const AI_COLS: { tier: NineBoxTierId; sub: string; color: string; activeColor: string }[] = [
+  { tier: "low",    sub: "< 75",   color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
+  { tier: "medium", sub: "75–87",  color: "var(--fill-p1-600)", activeColor: "var(--fill-p1-700)" },
+  { tier: "high",   sub: "> 87",   color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
 ];
 
-export function getNineBoxCell(client: Client): { label: string; heat: 1 | 2 | 3 | 4 | 5; aumLabel: string; aiLabel: string } {
+export function getNineBoxCell(client: Client): { id: NineBoxCellId; heat: 1 | 2 | 3 | 4 | 5; aumTier: NineBoxTierId; aiTier: NineBoxTierId } {
   const row = getAumTier(client.aum);
   const col = getAiTier(client.aiScore);
   const cell = CELLS[row][col];
-  return { label: cell.label, heat: cell.heat, aumLabel: AUM_ROWS[row].label, aiLabel: AI_COLS[col].label };
+  return { id: cell.id, heat: cell.heat, aumTier: AUM_ROWS[row].tier, aiTier: AI_COLS[col].tier };
 }
 
 export function NineBoxCellPill({ client }: { client: Parameters<typeof getNineBoxCell>[0] }) {
+  const t = useT();
   const cell = getNineBoxCell(client);
   const style = NINE_BOX_HEAT_STYLES[cell.heat];
   return (
     <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 w-fit ${style.chipBg}`}>
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`} />
-      <span className="type-caption text-foreground">{cell.label}</span>
+      <span className="type-caption text-foreground">{t.client.nineBox.cells[cell.id]}</span>
     </div>
   );
 }
 
 export type NineBoxCellInfo = {
-  label: string;
+  id: NineBoxCellId;
   heat: 1 | 2 | 3 | 4 | 5;
-  aumLabel: string;
-  aiLabel: string;
+  aumTier: NineBoxTierId;
+  aiTier: NineBoxTierId;
   clients: Client[];
 };
 
@@ -120,6 +128,8 @@ export function NineBoxTab({
   });
 
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
+  const t = useT();
+  const nb = t.client.nineBox;
 
   return (
     <div className="flex gap-3 max-w-2xl mx-auto w-full">
@@ -140,7 +150,7 @@ export function NineBoxTab({
         <div className="flex flex-col gap-[1px] rounded-xl overflow-hidden shrink-0 w-7">
           {AUM_ROWS.map((r, i) => (
             <div
-              key={r.label}
+              key={r.tier}
               className="flex-1 flex items-center justify-center transition-all duration-150"
               style={{
                 minHeight: CELL_H,
@@ -152,7 +162,7 @@ export function NineBoxTab({
                 className="text-micro font-black text-white tracking-[0.15em] uppercase select-none leading-none"
                 style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
               >
-                {r.label}
+                {nb.tiers[r.tier]}
               </span>
             </div>
           ))}
@@ -178,10 +188,10 @@ export function NineBoxTab({
                   type="button"
                   onClick={() =>
                     onCellOpen({
-                      label: cell.label,
+                      id: cell.id,
                       heat: cell.heat,
-                      aumLabel: AUM_ROWS[row].label,
-                      aiLabel: AI_COLS[col].label,
+                      aumTier: AUM_ROWS[row].tier,
+                      aiTier: AI_COLS[col].tier,
                       clients: cellClients,
                     })
                   }
@@ -195,7 +205,7 @@ export function NineBoxTab({
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className={`size-2 rounded-full shrink-0 ${style.dot}`} />
-                    <p className="text-label font-semibold text-foreground leading-[20px] truncate">{cell.label}</p>
+                    <p className="text-label font-semibold text-foreground leading-[20px] truncate">{nb.cells[cell.id]}</p>
                   </div>
                   <div>
                     <p className={`text-3xl font-bold leading-none tracking-tight ${style.count}`}>
@@ -221,9 +231,9 @@ export function NineBoxTab({
 
         {/* Horizontal chips — one per AI tier, same gaps as grid */}
         <div className="flex gap-[1px] rounded-xl overflow-hidden h-7">
-          {AI_COLS.map(({ label, color, activeColor }, i) => (
+          {AI_COLS.map(({ tier, color, activeColor }, i) => (
             <div
-              key={label}
+              key={tier}
               className="flex-1 flex items-center justify-center transition-all duration-150"
               style={{
                 background: hoveredCell?.col === i ? activeColor : color,
@@ -231,7 +241,7 @@ export function NineBoxTab({
               }}
             >
               <span className="text-micro font-black text-white tracking-[0.15em] uppercase select-none leading-none">
-                {label}
+                {nb.tiers[tier]}
               </span>
             </div>
           ))}

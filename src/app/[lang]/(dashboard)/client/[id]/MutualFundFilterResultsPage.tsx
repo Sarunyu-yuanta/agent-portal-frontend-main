@@ -24,6 +24,7 @@ import { MF_ASSETS } from "./mutual-fund-assets";
 import { MutualFundTagLegend } from "./mutual-fund-ui";
 import { MutualFundFilterResultsSkeleton } from "./MutualFundListPageSkeletons";
 import { useMutualFundUniverse } from "@/hooks/use-catalog";
+import { useT } from "@/i18n/I18nProvider";
 import {
   filterFundsByTag,
   searchFunds,
@@ -85,6 +86,7 @@ export function MutualFundFilterResultsPage({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [period, setPeriod] = useState<MutualFundPerformancePeriod>(defaultPeriod);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterState, setFilterState] = useState<MutualFundFilterState>(initialFilterState);
@@ -111,7 +113,7 @@ export function MutualFundFilterResultsPage({
       value={query}
       onChange={setQuery}
       onClear={() => setQuery("")}
-      placeholder="ค้นหากองทุน"
+      placeholder={t.fund.list.searchPlaceholder}
       size="sm"
       className="w-full"
     />
@@ -121,7 +123,7 @@ export function MutualFundFilterResultsPage({
       variant="outline"
       size="icon-md"
       onClick={() => setFilterOpen(true)}
-      aria-label="ตัวกรอง"
+      aria-label={t.fund.list.filter}
       // Match the sm SearchInput's 38px height so the pair lines up.
       className="size-[38px]! shrink-0"
     >
@@ -138,7 +140,7 @@ export function MutualFundFilterResultsPage({
           variant="plain"
           size="icon-sm"
           onClick={onBack}
-          aria-label="กลับ"
+          aria-label={t.common.back}
           className="size-[30px] shrink-0 rounded-md p-[5px]"
         >
           <ArrowLeftIcon size={20} />
@@ -175,17 +177,17 @@ export function MutualFundFilterResultsPage({
           />
           <div className="flex flex-col items-center gap-3">
             <p className="text-center text-base font-bold leading-[28px] text-[#262626]">
-              ไม่พบผลลัพธ์ที่ตรงกับตัวกรองที่คุณเลือก
+              {t.fund.filter.noMatches}
             </p>
             <Button variant="primary" size="xl" onClick={() => setFilterState(EMPTY_FILTER_STATE)}>
-              แสดงกองทุนทั้งหมด
+              {t.fund.filter.showAllFunds}
             </Button>
           </div>
         </div>
       ) : (
         <div className="mx-auto flex w-full max-w-[996px] flex-col gap-3 px-4 pt-3 md:px-8 lg:px-0">
           <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">
-            {tagFunds.length} รายการ
+            {t.fund.list.count(tagFunds.length)}
           </p>
 
           <PeriodTabs active={period} onChange={setPeriod} />
@@ -219,7 +221,7 @@ export function MutualFundFilterResultsPage({
 
           {tagFunds.length === 0 ? (
             <p className="px-3 text-center text-sm text-[#6a7282]">
-              {searchTerm ? `ไม่พบกองทุนที่ตรงกับ "${searchTerm}"` : "ไม่พบกองทุนในหมวดนี้"}
+              {searchTerm ? t.fund.list.noMatchForQuery(searchTerm) : t.fund.list.noFundsInCategory}
             </p>
           ) : null}
         </div>

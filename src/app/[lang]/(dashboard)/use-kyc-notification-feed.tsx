@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { IdentificationCardIcon } from "@phosphor-icons/react";
 import type { Client } from "@/types/domain";
-import { kycExpiry, kycExpiryLabelTh } from "./client/[id]/client-detail-data";
+import { kycExpiry, kycExpiryLabel } from "./client/[id]/client-detail-data";
 import { zoneForDays, type ZonedNotification } from "./notification-zones";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * The checkpoints a KYC expiry rings at: 30 days out, then 15, 7, 1, and the
@@ -90,6 +92,8 @@ export function kycCheckpointTextTone(daysLeft: number): string {
  * staying quiet. It still shows as a date on the client's own KYC tab.
  */
 export function useKycNotificationFeed(clients: Client[]) {
+  const locale = useLocale();
+  const t = useT();
   return useMemo(() => {
     // `onItemClick` hands back only the `NotificationItem`, which has nowhere
     // to carry a client id — so this is the side table the click reads.
@@ -128,7 +132,7 @@ export function useKycNotificationFeed(clients: Client[]) {
           // print sits where a notification timestamp goes, so a date there
           // reads as "when this arrived" rather than "when KYC lapses". The
           // date itself is on the KYC tab the row opens.
-          description: kycExpiryLabelTh(client.id) ?? "",
+          description: kycExpiryLabel(client.id, t, locale) ?? "",
           // Left blank on purpose. The reminder feed puts the exact day here
           // for the bell's "กำลังจะถึง" screen to print, but a KYC row's
           // `description` already ends in "อีก N วัน" — printing a day beside
@@ -159,5 +163,5 @@ export function useKycNotificationFeed(clients: Client[]) {
       kycNotificationRows: rows,
       kycNotificationTargets: targets,
     };
-  }, [clients]);
+  }, [clients, t, locale]);
 }

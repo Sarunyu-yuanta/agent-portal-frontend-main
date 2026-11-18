@@ -12,6 +12,7 @@ import type { MarketHoliday } from "./market-feed";
 import { actionKindName, actionPalette, HOLIDAY_PALETTE, HolidayIcon } from "./market-taxonomy";
 import { SourceBadgeIcon } from "./source-badge";
 import { snippet } from "../notes/notes-grouping";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * Header badge per relation, or `null` where the date line already says it.
@@ -21,12 +22,12 @@ import { snippet } from "../notes/notes-grouping";
  * because it's the one day being looked at from the inside. A future day would
  * get "Upcoming", which is exactly what the date already told you.
  */
-const RELATION_BADGE: Record<DayRelation, { label: string; className: string } | null> = {
+const RELATION_BADGE: Record<DayRelation, { labelKey: "overdue" | "today"; className: string } | null> = {
   past: {
-    label: "Overdue",
+    labelKey: "overdue",
     className: "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]",
   },
-  today: { label: "Today", className: "bg-primary-action text-white" },
+  today: { labelKey: "today", className: "bg-primary-action text-white" },
   future: null,
 };
 
@@ -52,6 +53,7 @@ function ActionGroupCard({
   group: ActionGroup;
   onOpen: (item: DayItem) => void;
 }) {
+  const t = useT();
   const palette = actionPalette(group.kind);
 
   return (
@@ -71,7 +73,7 @@ function ActionGroupCard({
             exchange's name for it goes in the tooltip — "XD" is the label
             everyone here works in, and spelling it out on the card would push
             the chips, which are the point, onto a third line. */}
-        <span className="type-caption font-semibold text-foreground" title={actionKindName(group.kind)}>
+        <span className="type-caption font-semibold text-foreground" title={actionKindName(group.kind, t)}>
           {group.kind}
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -88,7 +90,7 @@ function ActionGroupCard({
                 // chip size is whether the action touches the book at all.
                 title={
                   held > 0
-                    ? `${item.symbol} · held in ${held} client portfolio${held > 1 ? "s" : ""}`
+                    ? t.planner.calendar.day.heldBy(item.symbol, held)
                     : item.symbol
                 }
                 className="flex max-w-full items-center gap-1 rounded px-1.5 py-0.5 type-caption cursor-pointer transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-p1-600)]"
@@ -162,6 +164,8 @@ export function DayPopoverContent({
    */
   variant?: "popover" | "sheet";
 }) {
+  const locale = useLocale();
+  const t = useT();
   const isSheet = variant === "sheet";
   // An "Overdue" badge on a day whose reminders are all ticked off would be
   // wrong: nothing is outstanding. The badge describes work still owed, so a
@@ -179,21 +183,21 @@ export function DayPopoverContent({
         }`}
       >
         <div className="min-w-0">
-          <p className="type-body-1 font-semibold text-foreground">{dayLabel(day)}</p>
+          <p className="type-body-1 font-semibold text-foreground">{dayLabel(day, locale)}</p>
           {/* Weekday and count share a line: both are context for the list below,
               and stacking them would push the first reminder out of view. */}
           {/* The count is dropped when there is nothing — "Nothing scheduled"
               is already about to say so, in bigger type, right below. */}
           <p className="type-caption text-muted-foreground">
-            {weekdayLabel(day)}
-            {items.length > 0 && ` · ${items.length} item${items.length > 1 ? "s" : ""}`}
+            {weekdayLabel(day, locale)}
+            {items.length > 0 && ` · ${t.planner.calendar.day.itemCount(items.length)}`}
           </p>
         </div>
         {badge && (
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 type-caption font-medium ${badge.className}`}
           >
-            {badge.label}
+            {t.planner.calendar.day[badge.labelKey]}
           </span>
         )}
       </header>
@@ -209,7 +213,7 @@ export function DayPopoverContent({
         >
           <HolidayIcon size={14} weight="fill" className="shrink-0" />
           <span className="min-w-0 flex-1 truncate">{holiday.name}</span>
-          <span className="shrink-0 font-medium">{holiday.market} closed</span>
+          <span className="shrink-0 font-medium">{t.planner.calendar.day.marketClosed(holiday.market)}</span>
         </p>
       )}
 
@@ -218,7 +222,7 @@ export function DayPopoverContent({
         // one rule whichever branch renders.
         <div className="flex flex-col items-center gap-2 border-y border-border/60 px-3.5 py-8 text-center">
           <CalendarBlankIcon size={28} className="text-muted-foreground/40" />
-          <p className="type-body-2 text-muted-foreground">Nothing scheduled</p>
+          <p className="type-body-2 text-muted-foreground">{t.planner.calendar.day.nothingScheduled}</p>
         </div>
       ) : (
         <div
@@ -278,7 +282,7 @@ export function DayPopoverContent({
                           {item.title}
                         </span>
                         <span className="type-caption text-muted-foreground truncate">
-                          {item.detail ? snippet(item.detail, 44) : "No additional text"}
+                          {item.detail ? snippet(item.detail, 44) : t.planner.noAdditionalText}
                         </span>
                       </span>
 
@@ -317,7 +321,7 @@ export function DayPopoverContent({
         }`}
       >
         <PlusIcon size={15} weight="bold" />
-        New reminder
+        {t.planner.newReminder}
       </button>
     </div>
   );

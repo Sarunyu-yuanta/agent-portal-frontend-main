@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Button, PaginationBanner } from "@sarunyu/system-one";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { MutualFundSeeMoreIcon, MutualFundSymbolTag } from "./MutualFundCard";
@@ -12,8 +12,10 @@ import {
   mutualFundInsightsHref,
   type MutualFundInsight,
 } from "./mutual-fund-data";
+import { MutualFundSectionEmpty } from "./mutual-fund-ui";
 import { CARD_SHADOW } from "./stock-ui";
 import { useDragScroll } from "./use-drag-scroll";
+import { useT } from "@/i18n/I18nProvider";
 
 function getInsightActiveIndex(container: HTMLElement, count: number): number {
   const cards = container.querySelectorAll<HTMLElement>("[data-insight-card]");
@@ -68,6 +70,7 @@ export function MutualFundInsightCard({
   /** Figma 38285:291118 — fixed-size grid card on the insights list page */
   list?: boolean;
 }) {
+  const t = useT();
   const holdList = isHoldListInsight(item.title);
 
   if (list) {
@@ -88,7 +91,7 @@ export function MutualFundInsightCard({
           <div className="h-px w-full bg-black/10" />
         </div>
         <div className="flex shrink-0 flex-col gap-2">
-          <p className="text-xs leading-[20px] text-[#0c244a]">กองทุนแนะนำ</p>
+          <p className="text-xs leading-[20px] text-[#0c244a]">{t.fund.list.recommendedFunds}</p>
           <div className="flex flex-wrap gap-2">
             {item.recommendedFunds.map((symbol) => (
               <MutualFundSymbolTag key={symbol} symbol={symbol} />
@@ -122,7 +125,7 @@ export function MutualFundInsightCard({
         <div className="h-px w-full bg-black/10" />
       </div>
       <div className="flex flex-col gap-2">
-        <p className="text-xs leading-[20px] text-[#0c244a]">กองทุนแนะนำ</p>
+        <p className="text-xs leading-[20px] text-[#0c244a]">{t.fund.list.recommendedFunds}</p>
         <div className="flex flex-wrap gap-2">
           {item.recommendedFunds.map((symbol) => (
             <MutualFundSymbolTag key={symbol} symbol={symbol} />
@@ -148,7 +151,9 @@ export function MutualFundInsightsSection({
   insights: MutualFundInsight[];
   onSeeAll?: () => void;
 }) {
+  const t = useT();
   const seeAllHref = mutualFundInsightsHref();
+  const isEmpty = insights.length === 0;
   const drag = useDragScroll();
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -205,14 +210,15 @@ export function MutualFundInsightsSection({
             <div className="flex items-center gap-1">
               <Image src={MF_ASSETS.bookOpen} alt="" width={20} height={20} className="size-5 shrink-0" />
               <h2 className="flex-1 text-lg font-bold leading-[32px] bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-transparent">
-                <span className="lg:hidden">เจาะลึกโอกาสลงทุน</span>
-                <span className="hidden lg:inline">เจาะลึกโอกาสลงทุนเด่น</span>
+                <span className="lg:hidden">{t.fund.insights.titleShort}</span>
+                <span className="hidden lg:inline">{t.fund.insights.titleLong}</span>
               </h2>
             </div>
             <p className="text-sm leading-[24px] bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-transparent">
-              บทวิเคราะห์จาก Yuanta CIO
+              {t.fund.insights.subtitle}
             </p>
           </div>
+          {!isEmpty && (
           <Link
             href={seeAllHref}
             className="hidden w-fit shrink-0 no-underline lg:inline-flex"
@@ -226,11 +232,18 @@ export function MutualFundInsightsSection({
             }
           >
             <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
-              ดูเพิ่มเติม
+              {t.fund.list.seeMore}
             </Button>
           </Link>
+          )}
         </div>
 
+        {isEmpty ? (
+          <div className="relative z-10">
+            <MutualFundSectionEmpty title={t.fund.empty.insights} />
+          </div>
+        ) : (
+        <>
         <div className="relative z-10 flex flex-col gap-4 lg:gap-6">
           <div
             ref={drag.ref}
@@ -261,7 +274,7 @@ export function MutualFundInsightsSection({
               <Button
                 variant="outline"
                 size="icon-md"
-                aria-label="เลื่อนซ้าย"
+                aria-label={t.fund.list.scrollLeft}
                 className={canScrollLeft ? "" : "invisible"}
                 onClick={() => scrollByCard(-1)}
               >
@@ -270,7 +283,7 @@ export function MutualFundInsightsSection({
               <Button
                 variant="outline"
                 size="icon-md"
-                aria-label="เลื่อนขวา"
+                aria-label={t.fund.list.scrollRight}
                 className={canScrollRight ? "" : "invisible"}
                 onClick={() => scrollByCard(1)}
               >
@@ -294,10 +307,12 @@ export function MutualFundInsightsSection({
             }
           >
             <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
-              ดูเพิ่มเติม
+              {t.fund.list.seeMore}
             </Button>
           </Link>
         </div>
+        </>
+        )}
       </div>
     </section>
   );

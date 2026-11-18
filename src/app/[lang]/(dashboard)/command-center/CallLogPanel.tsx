@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button } from "@sarunyu/system-one";
 import {
   ArrowDownLeftIcon,
@@ -11,9 +11,10 @@ import {
 } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { ContactFields } from "../calendar/HolderContact";
 import { CardHeader } from "./CardHeader";
+import { useT } from "@/i18n/I18nProvider";
 import type { CallLogRow } from "./call-log-feed";
 
 /** Outbound is the desk reaching out, inbound is the client. One glyph and one
@@ -27,12 +28,10 @@ const DIRECTION_BADGE = {
   outbound: {
     tone: "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]",
     Icon: ArrowUpRightIcon,
-    label: "โทรออก",
   },
   inbound: {
     tone: "bg-[var(--fill-emerald-100)] text-[var(--fill-emerald-600)]",
     Icon: ArrowDownLeftIcon,
-    label: "รับสาย",
   },
 } as const;
 
@@ -40,12 +39,10 @@ const DIRECTION = {
   outbound: {
     color: "text-[var(--fill-p1-600)]",
     Icon: ArrowUpRightIcon,
-    label: "โทรออก",
   },
   inbound: {
     color: "text-[var(--fill-emerald-600)]",
     Icon: ArrowDownLeftIcon,
-    label: "รับสาย",
   },
 } as const;
 
@@ -57,7 +54,8 @@ const DIRECTION = {
  * Reminders and KYC cards use.
  */
 export function CallLogPanel({ rows, limit }: { rows: CallLogRow[]; limit: number }) {
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
   /** The call whose record is open. A row opens the call, not the client — the
    *  summary in the list is clipped to one line, and the thing you wanted when
    *  you clicked was the rest of that sentence. The client's full history is
@@ -67,11 +65,11 @@ export function CallLogPanel({ rows, limit }: { rows: CallLogRow[]; limit: numbe
   if (rows.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <CardHeader title="Call Log" />
+        <CardHeader title={t.commandCenter.callLog.title} />
         <EmptyState
         icon={<PhoneIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-          title="ยังไม่มีบันทึกการโทร"
-          body="สายที่บันทึกไว้จากลูกค้าทุกรายจะมารวมกันที่นี่"
+          title={t.commandCenter.callLog.emptyTitle}
+          body={t.commandCenter.callLog.emptyBodyAll}
         />
       </div>
     );
@@ -80,9 +78,9 @@ export function CallLogPanel({ rows, limit }: { rows: CallLogRow[]; limit: numbe
   return (
     <div className="flex flex-col gap-4">
       <CardHeader
-        title="Call Log"
+        title={t.commandCenter.callLog.title}
         count={rows.length}
-        link={{ href: CALL_LOG_PAGE, label: "ดูทั้งหมด" }}
+        link={{ href: CALL_LOG_PAGE, label: t.commandCenter.viewAll }}
       />
 
       {/* One surface with rules inside it, rather than a stack of separate
@@ -126,14 +124,16 @@ export function CallDetailModal({
   onClose: () => void;
   onViewClient: (clientId: string) => void;
 }) {
+  const t = useT();
   if (!row) return null;
-  const { tone, Icon, label } = DIRECTION_BADGE[row.entry.direction];
+  const { tone, Icon } = DIRECTION_BADGE[row.entry.direction];
+  const label = t.commandCenter.callLog.direction[row.entry.direction];
 
   return (
     <ResponsiveBottomSheetModal
       open
       onClose={onClose}
-      title="รายละเอียดการโทร"
+      title={t.commandCenter.callLog.detailTitle}
       titleId="dashboard-call-detail"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
@@ -163,7 +163,7 @@ export function CallDetailModal({
             rather than the call and the client. */}
         <div className="flex flex-col gap-2">
           <p className="type-caption font-semibold text-muted-foreground">
-            ช่องทางติดต่อ
+            {t.commandCenter.contactChannels}
           </p>
           <ContactFields clientId={row.clientId} />
         </div>
@@ -171,7 +171,7 @@ export function CallDetailModal({
 
       <div className="flex shrink-0 justify-center border-t border-border px-4 py-3">
         <Button variant="plain" size="sm" onClick={() => onViewClient(row.clientId)}>
-          ดูประวัติการโทรทั้งหมดของลูกค้า
+          {t.commandCenter.callLog.viewClientHistory}
         </Button>
       </div>
     </ResponsiveBottomSheetModal>
@@ -186,13 +186,14 @@ function callLogHref(clientId: string): string {
 }
 
 function MoreRow({ count }: { count: number }) {
+  const t = useT();
   return (
     <Link
       href={CALL_LOG_PAGE}
       className="flex w-full items-center gap-2 p-3 text-left no-underline transition-colors hover:bg-[var(--fill-p1-100)]"
     >
       <p className="min-w-0 flex-1 truncate text-body-sm font-bold text-foreground">
-        ดูอีก {count} รายการ
+        {t.commandCenter.moreItems(count)}
       </p>
       <CaretRightIcon
         size={16}
@@ -203,7 +204,9 @@ function MoreRow({ count }: { count: number }) {
 }
 
 export function CallRow({ row, onOpen }: { row: CallLogRow; onOpen: () => void }) {
-  const { color, Icon, label } = DIRECTION[row.entry.direction];
+  const t = useT();
+  const { color, Icon } = DIRECTION[row.entry.direction];
+  const label = t.commandCenter.callLog.direction[row.entry.direction];
 
   return (
     <div

@@ -1,8 +1,9 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import {
   BrainIcon,
+  AlarmIcon,
   CalendarBlankIcon,
   ChartBarIcon,
   ClipboardTextIcon,
@@ -21,6 +22,7 @@ import {
 import { useClients } from "@/hooks/use-api";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { usePageBreadcrumb, type Crumb } from "./page-breadcrumbs";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Everything the dashboard shell needs to know about the page inside it, all
@@ -51,6 +53,12 @@ export type PageChrome = {
   isMobileFullBleed: boolean;
   /** Page fills the viewport below the top bar and scrolls inside itself. */
   isFullHeight: boolean;
+  /**
+   * Page is one surface that runs to every edge of the content area at every
+   * size: no shell padding and no 1280px cap. Unlike `isFullWidth` it keeps the
+   * shell's own column sizing, so it combines with `isFullHeight`.
+   */
+  isEdgeToEdge: boolean;
   /** Page renders its own mobile breadcrumb; the layout must not add another. */
   ownsMobileBreadcrumb: boolean;
   /** Page content starts on white rather than `main`'s gray-50. */
@@ -74,6 +82,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/orders": "Order Management",
   "/notes": "Notes",
   "/calendar": "Calendar",
+  "/reminders": "Reminders",
 };
 
 /**
@@ -96,6 +105,7 @@ const PAGE_ICONS = {
   "/orders": ClipboardTextIcon,
   "/notes": NotePencilIcon,
   "/calendar": CalendarBlankIcon,
+  "/reminders": AlarmIcon,
 } satisfies Record<keyof typeof PAGE_TITLES, PhosphorIcon>;
 
 /**
@@ -121,9 +131,10 @@ const WHITE_CONTENT_TOP = [
 ];
 
 export function usePageChrome(): PageChrome {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const clients = useClients();
   const { isPrivate } = usePrivacy();
+  const t = useT();
 
   const breadcrumb = usePageBreadcrumb(pathname, { clients, isPrivate });
   // Longest prefix wins, so `/client-hub` doesn't shadow a deeper entry.
@@ -134,7 +145,11 @@ export function usePageChrome(): PageChrome {
   return {
     // A breadcrumb replaces the title — its leaf already names the page, and
     // the section name is the rung above it.
-    title: breadcrumb ? null : titleKey ? PAGE_TITLES[titleKey] : "",
+    title: breadcrumb
+      ? null
+      : titleKey
+        ? (t.pageTitles[titleKey as keyof typeof t.pageTitles] ?? PAGE_TITLES[titleKey])
+        : "",
     titleIcon:
       breadcrumb || !titleKey
         ? null
@@ -147,14 +162,16 @@ export function usePageChrome(): PageChrome {
     // Notes and Calendar: each is one surface rather than a document on a
     // background, which is exactly the shape that gains nothing from a frame
     // and a heading on a phone.
-    isMobileFullBleed: pathname === "/notes" || pathname === "/calendar",
-    // Notes is a master/detail surface: it owns the whole area below the top
-    // bar and scrolls internally. Calendar is not on this list: its month grid
-    // is a plain document, so the page itself scrolls. (Its Reminder tab wants
-    // a bounded height and sizes itself — the shell can't know the tab without
-    // `useSearchParams`, which would force a Suspense boundary around every
-    // page.)
-    isFullHeight: pathname === "/notes",
+    isMobileFullBleed:
+      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+    // Each owns the whole area below the top bar and never scrolls the page:
+    // Notes is master/detail, Calendar's six weeks split the height between
+    // them (each cell counts how many pills fit), and Reminders' timeline
+    // scrolls inside itself.
+    isFullHeight:
+      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+    isEdgeToEdge:
+      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
     // Full Profile puts the breadcrumb inside its own sticky identity bar (and
     // pulls itself up over the layout's padding to do it), so a second one
     // above would overlap.

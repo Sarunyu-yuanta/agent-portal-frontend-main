@@ -19,6 +19,7 @@ import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import type { ProposalSubject } from "./SendProposalDialog";
 import { ProposalTallyLine } from "./ProposalTallyLine";
 import { useSendProposal } from "./useSendProposal";
+import { useT } from "@/i18n/I18nProvider";
 
 export function SendProposalButton({
   subject,
@@ -27,6 +28,7 @@ export function SendProposalButton({
   subject: ProposalSubject;
   className?: string;
 }) {
+  const t = useT();
   const proposal = useSendProposal();
   // Proposals are part of the order feature; with it off there is nowhere for
   // one to be logged, so the button goes with it.
@@ -43,7 +45,7 @@ export function SendProposalButton({
         style={{ backgroundColor: "#0a6ee7" }}
       >
         <PaperPlaneTiltIcon size={16} weight="fill" />
-        <span>ส่ง Proposal ให้ลูกค้า</span>
+        <span>{t.orders.proposal.sendToClients}</span>
       </button>
       <ProposalTallyLine productId={subject.id} />
       {proposal.ui}

@@ -39,11 +39,12 @@ import {
   Tag,
   Toaster,
 } from "@sarunyu/system-one";
-import Link from "next/link";
-import { EmptyState } from "@/components/ui/empty-state";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { EmptyState, ErrorState } from "@/components/ui/empty-state";
+import { OrdersPanelSkeleton } from "../../OrdersPanelSkeleton";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { IC_NAME } from "@/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
@@ -54,11 +55,9 @@ import {
   formatOrderAmount,
   type BookingPhase,
   BOOKING_PHASES,
-  BOOKING_PHASE_LABEL,
   BOOKING_PHASE_VARIANT,
   bookingPhase,
 } from "../../order-book";
-import { ORDER_WORDS } from "../../order-words";
 import {
   bookingModeForDesk,
   findBookableProduct,
@@ -72,7 +71,10 @@ const FALLBACK_PRODUCT = { id: "", tags: [], currency: "", minInvestment: "0" } 
 import { BookingDetailModal } from "../../BookingDetailModal";
 import { useClientReadiness } from "../../use-order-books";
 import { useToasts } from "@/hooks/use-toasts";
-import { useOrderBooks } from "../../use-order-books";
+import { useOrderBook, useOrderBooks } from "../../use-order-books";
+import { useOrders } from "@/contexts/orders-context";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /** One product this client holds, with their own bookings on it. */
 type Holding = { book: OrderBook; bookings: Booking[] };
@@ -89,16 +91,27 @@ export function ClientOrdersDetail({
   tabId: string;
   catalogHref: string;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
   /** The booking whose receipt is open — the same sheet the list opens. */
   const [opened, setOpened] = useState<{ book: OrderBook; booking: Booking } | null>(null);
   const { toasts, addToast, removeToast } = useToasts();
+  // Live, not the snapshot from the click — see `OrderRecordsTable`.
+  const { data: liveBook } = useOrderBook(opened?.book.productId ?? "");
+  const { bookings: allBookings } = useOrders();
+  const live = opened
+    ? {
+        book: liveBook ?? opened.book,
+        booking: allBookings.find((b) => b.id === opened.booking.id) ?? opened.booking,
+      }
+    : null;
   const openedProduct = opened ? findBookableProduct(opened.book.productId) : undefined;
   const readiness = useClientReadiness(client, openedProduct ?? FALLBACK_PRODUCT);
-  const { data: books } = useOrderBooks();
+  const { data: books, isLoading: booksLoading, error: booksError, retry: retryBooks } = useOrderBooks();
   const back = useSectionBack(() => `${ordersListHref(tabId)}`);
 
-  const profile = getClientProfile(client.id);
+  const profile = getAccountIdentity(client.id);
   const name = maskName(client.name, isPrivate);
   // One desk per page, so one mode — the same thing the panel resolved.
   const mode = bookingModeForDesk(desk);
@@ -156,7 +169,7 @@ export function ClientOrdersDetail({
             variant="plain"
             size="icon-sm"
             onClick={back}
-            aria-label="กลับไป Order Management"
+            aria-label={t.orders.clientPage.backToOrders}
             className="shrink-0"
           >
             <ArrowLeftIcon size={20} />
@@ -173,7 +186,7 @@ export function ClientOrdersDetail({
               )}
             </div>
             <p className="type-caption truncate text-muted-foreground">
-              {client.id} · บัญชี {profile.accountNo} · {desk}
+              {t.orders.clientPage.subtitle(client.id, profile.accountNo, desk)}
             </p>
           </div>
         </div>
@@ -183,7 +196,7 @@ export function ClientOrdersDetail({
             basket's business and the basket is not theirs. */}
         <div className="flex flex-col justify-center gap-0.5 self-stretch border-l border-border px-6">
           <span className="type-caption whitespace-nowrap text-muted-foreground">
-            ยอดรวมของลูกค้า
+            {t.orders.clientPage.clientTotal}
           </span>
           <div className="flex flex-col">
             {totals.size === 0 ? (
@@ -202,9 +215,9 @@ export function ClientOrdersDetail({
         </div>
 
         <div className="flex flex-col justify-center gap-0.5 self-stretch border-l border-border px-6">
-          <span className="type-caption whitespace-nowrap text-muted-foreground">สินค้า</span>
+          <span className="type-caption whitespace-nowrap text-muted-foreground">{t.orders.clientPage.products}</span>
           <span className="type-body-2 !font-semibold whitespace-nowrap tabular-nums text-foreground">
-            {holdings.length} รายการ
+            {t.orders.clientPage.productCount(holdings.length)}
           </span>
         </div>
 
@@ -212,7 +225,7 @@ export function ClientOrdersDetail({
           {BOOKING_PHASES.filter((p) => phases.get(p)).map((p) => (
             <Tag
               key={p}
-              text={`${BOOKING_PHASE_LABEL[mode][p]} ${phases.get(p)}`}
+              text={`${t.orders.phase[mode][p]} ${phases.get(p)}`}
               variant={BOOKING_PHASE_VARIANT[p]}
               size="large"
             />
@@ -220,15 +233,19 @@ export function ClientOrdersDetail({
         </div>
       </header>
 
-      {holdings.length === 0 ? (
+      {booksLoading ? (
+        <OrdersPanelSkeleton />
+      ) : booksError ? (
+        <ErrorState onRetry={retryBooks} />
+      ) : holdings.length === 0 ? (
         <EmptyState
           icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-          title="ยังไม่มีรายการจองในหมวดนี้"
-          body={`${name} ยังไม่มีการจอง ${desk} — เริ่มจองได้จากหน้าสินค้าใน Product Catalog`}
+          title={t.orders.clientPage.emptyTitle}
+          body={t.orders.clientPage.emptyBody(name, desk)}
           actionSlot={
             <Link href={catalogHref}>
               <Button variant="outline" size="md">
-                ไปที่ Product Catalog
+                {t.orders.books.goToCatalog}
               </Button>
             </Link>
           }
@@ -238,11 +255,11 @@ export function ClientOrdersDetail({
           <Table className="table-fixed min-w-[880px]">
             <TableHead>
               <TableRow>
-                <TableHeaderCell className="w-[34%]">สินค้า</TableHeaderCell>
-                <TableHeaderCell className="w-[18%] whitespace-nowrap">ยอดจอง</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">สถานะดีล</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">ชำระเงิน</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">อัปเดตล่าสุด</TableHeaderCell>
+                <TableHeaderCell className="w-[34%]">{t.orders.clientPage.col.product}</TableHeaderCell>
+                <TableHeaderCell className="w-[18%] whitespace-nowrap">{t.orders.clientPage.col.booked}</TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.deal}</TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.payment}</TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.updated}</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -251,9 +268,9 @@ export function ClientOrdersDetail({
                 // into the same product twice, and the two can be at different
                 // steps — collapsing them would have to pick one status.
                 bookings.map((b) => {
-                  const deal = dealStatus(b, book);
-                  const payment = paymentStatus(b, book);
-                  const email = emailStatus(b, book);
+                  const deal = dealStatus(b, book, t);
+                  const payment = paymentStatus(b, book, t);
+                  const email = emailStatus(b, book, t);
                   const cancelled = b.status === "cancelled";
                   const struck = cancelled
                     ? "text-muted-foreground line-through"
@@ -263,7 +280,7 @@ export function ClientOrdersDetail({
                       key={b.id}
                       hoverable
                       tabIndex={0}
-                      aria-label={`ดูดีล ${book.productName}`}
+                      aria-label={t.orders.clientPage.openDealAria(book.productName)}
                       className="cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
                       // The booking's own receipt, over this page rather than
                       // away from it — the same sheet the list opens.
@@ -283,7 +300,7 @@ export function ClientOrdersDetail({
                             </p>
                             <p className="type-caption truncate text-muted-foreground">
                               {book.productType} · {book.currency} ·{" "}
-                              {ORDER_WORDS[book.mode].placedAt} {formatLogTime(b.createdAt)}
+                              {t.orders.words[book.mode].placedAt} {formatLogTime(b.createdAt, locale)}
                             </p>
                           </div>
                           <CaretRightIcon
@@ -308,7 +325,7 @@ export function ClientOrdersDetail({
                       <TableCell>
                         <div className="flex min-w-0 flex-col gap-1">
                           <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-                            {formatLogTime(book.logs[0]?.at ?? b.createdAt)}
+                            {formatLogTime(book.logs[0]?.at ?? b.createdAt, locale)}
                           </p>
                           {/* The pre-confirmation, which has nowhere else to go
                               now that the table is five columns wide. */}
@@ -325,15 +342,15 @@ export function ClientOrdersDetail({
       )}
 
       {/* Rendered whether or not one is open, so it can animate out. */}
-      {openedProduct && opened && (
+      {openedProduct && live && (
         <BookingDetailModal
-          booking={opened.booking}
-          book={opened.book}
+          booking={live.booking}
+          book={live.book}
           product={openedProduct}
-          checks={checksAtBooking(opened.booking, readiness.items)}
-          deal={dealStatus(opened.booking, opened.book)}
-          payment={paymentStatus(opened.booking, opened.book)}
-          email={emailStatus(opened.booking, opened.book)}
+          checks={checksAtBooking(live.booking, readiness.items)}
+          deal={dealStatus(live.booking, live.book, t)}
+          payment={paymentStatus(live.booking, live.book, t)}
+          email={emailStatus(live.booking, live.book, t)}
           onClose={() => setOpened(null)}
           onNotice={(message, status) => addToast({ message, status })}
         />

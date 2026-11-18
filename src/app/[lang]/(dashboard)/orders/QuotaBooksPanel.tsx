@@ -17,14 +17,15 @@
 
 import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { ClipboardTextIcon } from "@phosphor-icons/react";
 import { Button, Chip, SearchInput } from "@sarunyu/system-one";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FadeIn } from "@/components/ui/fade-in";
 import { usePrivacy } from "@/contexts/privacy-context";
-import { getClientProfile } from "@/data/client-profiles";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { OrderRecordsTable } from "./OrderRecordsTable";
@@ -35,6 +36,7 @@ import { IC_NAME } from "@/lib/current-ic";
 import { useOrders } from "@/contexts/orders-context";
 import { useOrderBooks } from "./use-order-books";
 import { bookingModeForDesk, type Desk } from "./bookable-products";
+import { useT } from "@/i18n/I18nProvider";
 
 
 export function QuotaBooksPanel({
@@ -66,7 +68,8 @@ export function QuotaBooksPanel({
    */
   productIds?: string[];
 }) {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const { data: books, isLoading } = useOrderBooks();
   // Offers are part of this list now — see `hasOwnWorkAt`.
@@ -76,7 +79,7 @@ export function QuotaBooksPanel({
   // Memoised on the mode: `step` is an object picked out of this array and
   // feeds the filter below, so a fresh array every render would cost the
   // memoisation of the whole list.
-  const STEPS = useMemo(() => bookingPhaseSteps(mode, { offers: true }), [mode]);
+  const STEPS = useMemo(() => bookingPhaseSteps(mode, t, { offers: true }), [mode, t]);
   const { isPrivate } = usePrivacy();
   const [search, setSearch] = useState("");
 
@@ -102,7 +105,7 @@ export function QuotaBooksPanel({
         ...ownBookings(book, IC_NAME).flatMap((b) => [
           b.clientId,
           maskName(b.clientName, isPrivate),
-          getClientProfile(b.clientId).accountNo,
+          getAccountIdentity(b.clientId).accountNo,
         ]),
         book.productName,
         book.productType,
@@ -144,7 +147,7 @@ export function QuotaBooksPanel({
               // The same words as the transaction tabs' box: all seven tabs of
               // Order Management search the same two things, and "Search All" was
               // the only English left on the page.
-              placeholder="ค้นหาสินค้า หรือลูกค้า"
+              placeholder={t.orders.list.searchPlaceholder}
               className="w-full"
             />
           </div>
@@ -158,19 +161,20 @@ export function QuotaBooksPanel({
       ) : matching.length === 0 ? (
         <EmptyState
           icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-          title={search ? "ไม่พบรายการที่ค้นหา" : step.empty}
+          title={search.trim() ? t.states.noResultTitle : step.empty}
+          action={search.trim() ? { label: t.states.clearFilters, onClick: () => setSearch("") } : undefined}
           body={
-            search
-              ? "ลองค้นหาด้วยชื่อลูกค้า Account No ชื่อสินค้า หรือเลขคำสั่งซื้อ"
+            search.trim()
+              ? t.orders.books.searchHint
               : catalogHref
-                ? "ส่งคำสั่งซื้อให้ลูกค้าได้จากหน้าสินค้าใน Product Catalog — กดครั้งเดียวส่งถึงหลังบ้านเลย ทำได้จนกว่าจะเต็มโควตา"
-                : "กด \"สร้างคำสั่งซื้อ\" ที่หุ้นกู้ด้านบน — กดครั้งเดียวส่งถึงหลังบ้านเลย ทำได้จนกว่าจะเต็มโควตา"
+                ? t.orders.books.quotaEmptyHint
+                : t.orders.books.quotaEmptyHintInline
           }
           actionSlot={
-            search || !catalogHref ? undefined : (
+            search.trim() || !catalogHref ? undefined : (
               <Link href={catalogHref}>
                 <Button variant="outline" size="md">
-                  ไปที่ Product Catalog
+                  {t.orders.books.goToCatalog}
                 </Button>
               </Link>
             )

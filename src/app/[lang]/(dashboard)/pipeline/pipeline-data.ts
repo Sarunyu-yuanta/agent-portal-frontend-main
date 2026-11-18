@@ -22,42 +22,45 @@ export const STAGES = [
 export type Stage = (typeof STAGES)[number];
 export type Deal = (typeof mockPipelineDeals)[number];
 
-export const STAGE_META: Record<Stage, { dot: string; label: string }> = {
-  "Qualified":    { dot: "var(--bg-brand-primary)", label: "Qualified" },
-  "Proposed":     { dot: "var(--bg-brand-secondary)", label: "Proposed" },
-  "Under Review": { dot: "var(--bg-warning-primary)", label: "Under Review" },
-  "Negotiation":  { dot: "var(--text-warning-primary)", label: "Negotiation" },
-  "Closed Won":   { dot: "var(--bg-success-primary)", label: "Closed Won" },
-  "Closed Lost":  { dot: "var(--text-default-secondary)", label: "Closed Lost" },
+/** Stage labels: `t.pipeline.stage[stage]`. */
+export const STAGE_META: Record<Stage, { dot: string }> = {
+  "Qualified":    { dot: "var(--bg-brand-primary)" },
+  "Proposed":     { dot: "var(--bg-brand-secondary)" },
+  "Under Review": { dot: "var(--bg-warning-primary)" },
+  "Negotiation":  { dot: "var(--text-warning-primary)" },
+  "Closed Won":   { dot: "var(--bg-success-primary)" },
+  "Closed Lost":  { dot: "var(--text-default-secondary)" },
 };
 
-export const STAGE_ADVANCE: Partial<Record<Stage, { label: string; next: Stage }>> = {
-  "Qualified":    { label: "Propose",   next: "Proposed" },
-  "Proposed":     { label: "Review",    next: "Under Review" },
-  "Under Review": { label: "Negotiate", next: "Negotiation" },
-  "Negotiation":  { label: "Mark Won",  next: "Closed Won" },
+/** Button labels: `t.pipeline.advance[stage]`. */
+export const STAGE_ADVANCE: Partial<Record<Stage, { next: Stage }>> = {
+  "Qualified":    { next: "Proposed" },
+  "Proposed":     { next: "Under Review" },
+  "Under Review": { next: "Negotiation" },
+  "Negotiation":  { next: "Closed Won" },
 };
 
-export const ADVANCE_CHECKLIST: Partial<Record<Stage, { id: string; label: string }[]>> = {
+/** Item labels: `t.pipeline.checklist[id]`. */
+export const ADVANCE_CHECKLIST: Partial<Record<Stage, { id: string }[]>> = {
   "Qualified": [
-    { id: "product-match",       label: "ยืนยัน product ตรงกับ risk profile ของลูกค้า" },
-    { id: "proposal-ready",      label: "เตรียม term sheet / proposal document เรียบร้อยแล้ว" },
-    { id: "meeting-scheduled",   label: "นัดหมายการนำเสนอกับลูกค้าแล้ว" },
+    { id: "product-match" },
+    { id: "proposal-ready" },
+    { id: "meeting-scheduled" },
   ],
   "Proposed": [
-    { id: "sent-to-client",      label: "ส่ง proposal ให้ลูกค้าแล้ว" },
-    { id: "client-ack",          label: "ลูกค้ารับทราบและตรวจสอบเอกสาร" },
-    { id: "compliance-ok",       label: "ผ่านการตรวจสอบ compliance เบื้องต้น" },
+    { id: "sent-to-client" },
+    { id: "client-ack" },
+    { id: "compliance-ok" },
   ],
   "Under Review": [
-    { id: "client-feedback",     label: "ได้รับ feedback จากลูกค้าแล้ว" },
-    { id: "pricing-reviewed",    label: "ทบทวนราคาและเงื่อนไขเรียบร้อยแล้ว" },
-    { id: "internal-approval",   label: "ได้รับ internal approval" },
+    { id: "client-feedback" },
+    { id: "pricing-reviewed" },
+    { id: "internal-approval" },
   ],
   "Negotiation": [
-    { id: "terms-agreed",        label: "ตกลงเงื่อนไขสุดท้ายกับลูกค้าแล้ว" },
-    { id: "compliance-signoff",  label: "compliance sign-off เรียบร้อย" },
-    { id: "contract-signed",     label: "ลูกค้าลงนามสัญญา / subscription form แล้ว" },
+    { id: "terms-agreed" },
+    { id: "compliance-signoff" },
+    { id: "contract-signed" },
   ],
 };
 

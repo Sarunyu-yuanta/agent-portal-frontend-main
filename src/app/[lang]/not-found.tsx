@@ -2,8 +2,11 @@
 
 import { Button } from "@sarunyu/system-one";
 import { HouseIcon } from "@phosphor-icons/react";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 export default function NotFound() {
+  const t = useT();
+  const locale = useLocale();
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-10 bg-[var(--bg-default-secondary)] px-4">
       {/* Logo */}
@@ -25,10 +28,10 @@ export default function NotFound() {
 
         <div className="flex flex-col gap-2">
           <p className="type-subtitle-1 font-semibold text-[var(--text-default-secondary)]">
-            ไม่พบหน้าที่ต้องการ
+            {t.states.notFoundPage}
           </p>
           <p className="type-body-2 text-[var(--text-default-tertiary)]">
-            หน้าที่คุณกำลังมองหาอาจถูกย้าย ลบ หรือ<br />ไม่มีอยู่ในระบบ
+            {t.states.notFoundPageBody}
           </p>
         </div>
 
@@ -37,9 +40,9 @@ export default function NotFound() {
             variant="outline"
             size="lg"
             leftIcon={<HouseIcon size={20} />}
-            onClick={() => { window.location.href = "/"; }}
+            onClick={() => { window.location.href = `/${locale}`; }}
           >
-            หน้าแรก
+            {t.common.backHome}
           </Button>
         </div>
       </div>

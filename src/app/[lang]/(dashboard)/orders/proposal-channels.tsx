@@ -25,7 +25,6 @@ export const PROPOSAL_CHANNEL_META: Record<
   {
     label: string;
     /** One line under the label in the picker — what the client gets. */
-    hint: string;
     Icon: ElementType;
     /** Icon colour in the picker. */
     color: string;
@@ -35,26 +34,22 @@ export const PROPOSAL_CHANNEL_META: Record<
 > = {
   app: {
     label: "YSInvest",
-    hint: "แจ้งเตือนและเอกสารในแอปของลูกค้า",
     Icon: DeviceMobileIcon,
     color: "#0a6ee7",
     required: true,
   },
   email: {
     label: "Email",
-    hint: "ส่งเอกสารแนบไปยังอีเมลของลูกค้า",
     Icon: EnvelopeSimpleIcon,
     color: "#6a7282",
   },
   line: {
     label: "Line",
-    hint: "ส่งข้อความพร้อมลิงก์เอกสารทาง LINE",
     Icon: ChatCircleTextIcon,
     color: "#06c755",
   },
   "voice-ai": {
     label: "Voice AI",
-    hint: "โทรแนะนำสินค้าให้ลูกค้าด้วยเสียง AI",
     Icon: WaveformIcon,
     color: "#7c3aed",
   },

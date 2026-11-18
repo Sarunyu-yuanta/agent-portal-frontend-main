@@ -14,7 +14,6 @@ import {
   isSameMonth,
   monthGrid,
   weeksOf,
-  WEEKDAY_LABELS,
 } from "../calendar/calendar-grid";
 import type { DayItem } from "../calendar/day-items";
 import { ReminderPreviewRow, RemindersPreviewEmpty } from "../calendar/reminder-preview";
@@ -23,6 +22,8 @@ import { NoteDetailPane } from "../notes/NoteDetailPane";
 import { NoteModalShell } from "../notes/note-modal-shell";
 import { reminderAtFromDate } from "../notes/note-format";
 import type { DatedReminder } from "./dashboard-data";
+import { formatDate, weekdayNames } from "@/i18n/format";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 /**
  * The month, small.
  *
@@ -30,16 +31,6 @@ import type { DatedReminder } from "./dashboard-data";
  * Clicking that day opens the day's reminders in a popover. It does not
  * rewrite the Reminders card above; that card stays on today.
  */
-const WEEKDAY_TH = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
-
-function monthLabelTh(date: Date): string {
-  return date.toLocaleDateString("th-TH", { month: "long", year: "numeric" });
-}
-
-function dayLabelTh(date: Date): string {
-  return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" });
-}
-
 export function MiniCalendar({
   viewDate,
   today,
@@ -57,6 +48,8 @@ export function MiniCalendar({
   /** `+1` / `-1`, relative to the month on screen. */
   onMonthChange: (delta: number) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const weeks = weeksOf(monthGrid(viewDate));
   const todayKey = dayKey(today);
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -113,8 +106,12 @@ export function MiniCalendar({
         reminderAt: draftAttrs.reminderAt,
         reminderDone: draftAttrs.reminderDone,
       });
-      addToast({ status: "success", message: "Reminder added" });
+      addToast({ status: "success", message: t.commandCenter.calendar.reminderAdded });
       setCreateOpen(false);
+    } catch (err) {
+      // The modal stays open with what was typed.
+      console.warn("[MiniCalendar] create failed", err);
+      addToast({ status: "critical", message: t.commandCenter.calendar.reminderAddError });
     } finally {
       setSaving(false);
     }
@@ -132,13 +129,13 @@ export function MiniCalendar({
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <p className="type-subtitle-1 font-bold text-foreground">
-          {monthLabelTh(viewDate)}
+          {formatDate(locale, viewDate, "monthYear")}
         </p>
         <div className="flex items-center gap-0.5">
-          <MonthNavButton label="เดือนก่อนหน้า" onClick={() => onMonthChange(-1)}>
+          <MonthNavButton label={t.commandCenter.calendar.prevMonth} onClick={() => onMonthChange(-1)}>
             <CaretLeftIcon size={14} weight="bold" />
           </MonthNavButton>
-          <MonthNavButton label="เดือนถัดไป" onClick={() => onMonthChange(1)}>
+          <MonthNavButton label={t.commandCenter.calendar.nextMonth} onClick={() => onMonthChange(1)}>
             <CaretRightIcon size={14} weight="bold" />
           </MonthNavButton>
         </div>
@@ -146,9 +143,9 @@ export function MiniCalendar({
 
       <div>
         <div className="grid grid-cols-7">
-          {WEEKDAY_TH.map((label, i) => (
+          {weekdayNames(locale, "narrow").map((label, i) => (
             <div
-              key={WEEKDAY_LABELS[i]}
+              key={weekdayNames(locale, "short")[i]}
               className="pb-1.5 text-center text-meta font-semibold text-[var(--text-default-placeholder)]"
             >
               {label}
@@ -232,7 +229,7 @@ export function MiniCalendar({
         onOpenChange={(next) => {
           if (!next) setOpenKey(null);
         }}
-        title={openDay ? dayLabelTh(openDay.day) : "Reminders"}
+        title={openDay ? formatDate(locale, openDay.day, "dayMonth") : t.commandCenter.reminders.title}
         showHandle
       >
         {openDay && (
@@ -262,7 +259,7 @@ export function MiniCalendar({
       footer={
         <>
           <Button variant="outline" size="sm" onClick={() => setCreateOpen(false)}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button
             variant="primary"
@@ -270,7 +267,7 @@ export function MiniCalendar({
             onClick={handleCreateSave}
             disabled={blank || saving}
           >
-            Add note
+            {t.commandCenter.calendar.addNote}
           </Button>
         </>
       }
@@ -391,6 +388,7 @@ function DayPopoverBody({
   onAddReminder: (day: Date) => void;
 }) {
   const future = isFutureDay(day, today);
+  const t = useT();
 
   return (
     <div className="flex flex-col gap-2">
@@ -407,7 +405,7 @@ function DayPopoverBody({
           leftIcon={<PlusIcon size={15} weight="bold" />}
           onClick={() => onAddReminder(day)}
         >
-          Add reminder
+          {t.commandCenter.calendar.addReminder}
         </Button>
       )}
     </div>

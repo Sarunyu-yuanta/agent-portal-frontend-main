@@ -26,10 +26,13 @@ import {
  */
 export function useNbaRows(clientId?: string): {
   rows: NbaRow[];
+  isLoading: boolean;
+  error: Error | null;
+  retry: () => void;
   /** Clears a suggestion everywhere, since the store behind it is shared. */
   dismiss: (id: string) => void;
 } {
-  const actions = useNBAActions();
+  const { data: actions, isLoading, error, retry } = useNBAActions();
   const { isPrivate } = usePrivacy();
   const [dismissed, setDismissed] = useStoredIds<string>(
     HIDDEN_NBA_IDS_PREF,
@@ -51,5 +54,5 @@ export function useNbaRows(clientId?: string): {
     [dismissed, setDismissed],
   );
 
-  return { rows, dismiss };
+  return { rows, isLoading, error, retry, dismiss };
 }

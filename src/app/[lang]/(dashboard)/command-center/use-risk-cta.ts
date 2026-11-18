@@ -2,6 +2,7 @@
 
 import { useToasts } from "@/hooks/use-toasts";
 import type { RiskAlertRow } from "./risk-feed";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * What the CTA on a risk finding does — mocked, and in one place.
@@ -27,6 +28,7 @@ import type { RiskAlertRow } from "./risk-feed";
  */
 export function useRiskCta() {
   const { toasts, addToast, removeToast } = useToasts();
+  const t = useT();
 
   /** Fires the finding's one action. Takes the row, not the alert, so the
    *  confirmation can still name what it was fired on — the rule code and the
@@ -40,7 +42,7 @@ export function useRiskCta() {
     addToast({
       status: "information",
       multiline: true,
-      message: `Lorem ipsum — ${row.alert.ruleCode} · ${row.displayName}`,
+      message: t.commandCenter.risk.ctaToast(row.alert.ruleCode, row.displayName),
     });
   };
 

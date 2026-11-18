@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { BottomSheet, useIsMobile } from "@sarunyu/system-one";
 import { XIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ResponsiveBottomSheetModal({
   open,
@@ -39,6 +40,7 @@ export function ResponsiveBottomSheetModal({
   headerAction?: ReactNode;
   children: ReactNode;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -51,7 +53,7 @@ export function ResponsiveBottomSheetModal({
         title={title}
         showHandle
         rightSide="action"
-        actionLabel="Close"
+        actionLabel={t.common.close}
         onActionClick={onClose}
         contentClassName="flex min-h-0 max-h-[calc(var(--dvh)*100-10rem)] flex-col overflow-hidden pt-0"
       >
@@ -112,7 +114,7 @@ export function ResponsiveBottomSheetModal({
             type="button"
             onClick={onClose}
             className="shrink-0 p-0.5 text-[var(--text-default-tertiary)] hover:text-[var(--text-default-primary)] cursor-pointer"
-            aria-label="Close"
+            aria-label={t.common.close}
           >
             <XIcon size={20} />
           </button>

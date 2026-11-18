@@ -12,7 +12,7 @@ import {
   TOP_PICK_COUNT,
   type StructuredProduct,
 } from "./structured-product-data";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import {
   INVESTMENT_SOLUTIONS,
   type InvestmentSolutionId,
@@ -23,6 +23,8 @@ import {
   GRAD_SECURE,
   InvestmentCard,
 } from "./ProductCatalogInvestmentCard";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const IMG_SECURE_INCOME = "/products/investment-solution/invest-secure-income.webp";
 const IMG_BALANCED_GROWTH = "/products/investment-solution/invest-balanced-growth.webp";
@@ -48,6 +50,7 @@ export function TopIdeaStrip({
   onTopIdeaSelect: (sector: TopIdeaSector) => void;
   onAllTopIdeasView: () => void;
 }) {
+  const t = useT();
   const { ref, onMouseDown, onMouseMove, onMouseUp, onMouseLeave } = drag;
   return (
     <div
@@ -61,16 +64,23 @@ export function TopIdeaStrip({
         >
           Top idea
         </p>
-        <Button
-          variant="plain"
-          size="sm"
-          rightIcon={<ArrowRightIcon size={18} />}
-          className="shrink-0"
-          onClick={onAllTopIdeasView}
-        >
-          ทั้งหมด
-        </Button>
+        {TOP_IDEAS.length > 0 && (
+          <Button
+            variant="plain"
+            size="sm"
+            rightIcon={<ArrowRightIcon size={18} />}
+            className="shrink-0"
+            onClick={onAllTopIdeasView}
+          >
+            {t.products.common.all}
+          </Button>
+        )}
       </div>
+      {TOP_IDEAS.length === 0 ? (
+        <div className="w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+          <CatalogSectionEmpty title={t.products.states.noTopIdeas} />
+        </div>
+      ) : (
       <div
         ref={ref}
         className="overflow-x-auto w-full pb-3 hide-scrollbar"
@@ -94,6 +104,7 @@ export function TopIdeaStrip({
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 }
@@ -106,6 +117,7 @@ export function InvestmentSolutionSection({
   onInvestmentSolutionSelect: (id: InvestmentSolutionId) => void;
   bgImage?: string;
 }) {
+  const t = useT();
   return (
     <div
       className="relative shrink-0 w-full"
@@ -125,6 +137,11 @@ export function InvestmentSolutionSection({
         >
           Investment Solution
         </p>
+        {INVESTMENT_SOLUTIONS.length === 0 ? (
+          <div className="w-full rounded-xl bg-white">
+            <CatalogSectionEmpty title={t.products.states.noInvestmentSolutions} />
+          </div>
+        ) : (
         <div className="flex flex-col gap-6 items-start relative shrink-0 w-full">
           <div className="flex flex-col lg:flex-row gap-4 shrink-0 w-full">
             {INVESTMENT_SOLUTIONS.map((solution) => {
@@ -171,6 +188,7 @@ export function InvestmentSolutionSection({
             })}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
@@ -195,6 +213,7 @@ export function TopPickSection({
 }: {
   onProductSelect: (product: StructuredProduct) => void;
 }) {
+  const t = useT();
   const { topPicks } = useStructuredShelf();
   return (
     <div
@@ -222,6 +241,10 @@ export function TopPickSection({
             Top pick
           </p>
         </div>
+        {topPicks.length === 0 ? (
+          // Every product on the shelf can be booked out.
+          <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+        ) : (
         <div className="grid grid-cols-1 md:flex md:flex-col lg:grid lg:grid-cols-3 gap-4 shrink-0 w-full">
           {topPicks.map((p) => (
             <StructuredProductCard
@@ -231,6 +254,7 @@ export function TopPickSection({
             />
           ))}
         </div>
+        )}
       </div>
     </div>
   );
@@ -246,6 +270,7 @@ export function StructuredProductGridSection({
   onProductSelect: (product: StructuredProduct) => void;
   onAllProductsView: () => void;
 }) {
+  const t = useT();
   const { grid } = useStructuredShelf();
   return (
     <div
@@ -260,6 +285,12 @@ export function StructuredProductGridSection({
           {title}
         </p>
       </div>
+      {grid.length === 0 ? (
+        <div className="w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+          <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+        </div>
+      ) : (
+        <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
         {grid.map((p) => (
           <StructuredProductCard
@@ -275,8 +306,10 @@ export function StructuredProductGridSection({
         className="shrink-0"
         onClick={onAllProductsView}
       >
-        ดูทั้งหมด
+        {t.products.common.viewAll}
       </Button>
+        </>
+      )}
     </div>
   );
 }

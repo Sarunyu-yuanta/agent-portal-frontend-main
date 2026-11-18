@@ -21,17 +21,19 @@
  */
 
 import { Tag } from "@sarunyu/system-one";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Where a proposal's colour is decided, for every surface that shows one. */
 export const PROPOSAL_VARIANT = "blue" as const;
 
 export function ProposalChip({
-  label = "ส่ง Proposal แล้ว",
+  label,
   size = "sm",
 }: {
   label?: string;
   /** `lg` is `Tag`'s own `large` — what every status in a table row uses. */
   size?: "sm" | "lg";
 }) {
-  return <Tag text={label} variant={PROPOSAL_VARIANT} size={size === "lg" ? "large" : "small"} />;
+  const t = useT();
+  return <Tag text={label ?? t.orders.stepOffered} variant={PROPOSAL_VARIANT} size={size === "lg" ? "large" : "small"} />;
 }

@@ -1,20 +1,52 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { Button, Input } from "@sarunyu/system-one";
-import { EyeIcon, EyeSlashIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { Suspense, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
+import { Alert, Button, Input } from "@sarunyu/system-one";
+import { EyeIcon, EyeSlashIcon, CheckCircleIcon, LinkBreakIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/components/AuthShell";
+import { useT } from "@/i18n/I18nProvider";
 
 const MIN_PASSWORD_LENGTH = 8;
 
 /**
- * Reached via the reset link emailed from `/forgot-password`. No auth backend
- * exists yet (nor a way to verify the link's token) — submitting just flips to
- * the confirmation state like the rest of this mocked auth flow.
+ * Stands in for setting the new password, which has no backend yet. The real
+ * one verifies `token` and rejects with a {@link ResetLinkError} when the link
+ * is expired or already used.
+ */
+function resetPassword(_token: string, _password: string): Promise<void> {
+  return Promise.resolve();
+}
+
+/** The link can't be used — expired, already used, or not a real token. */
+class ResetLinkError extends Error {
+  constructor() {
+    super("reset link invalid");
+    this.name = "ResetLinkError";
+  }
+}
+
+/**
+ * Reached via the reset link emailed from `/forgot-password`, which carries a
+ * `?token=`. `useSearchParams` needs a Suspense boundary above it.
  */
 export default function ResetPasswordPage() {
-  const router = useRouter();
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordInner />
+    </Suspense>
+  );
+}
+
+function ResetPasswordInner() {
+  const router = useLocalizedRouter();
+  const t = useT();
+  const token = useSearchParams().get("token");
+  // The link was refused by the server (as opposed to a field being wrong).
+  const [linkInvalid, setLinkInvalid] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,32 +55,66 @@ export default function ResetPasswordPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (submitting || !token) return;
 
     let hasError = false;
     if (!password) {
-      setPasswordError("กรุณากรอกรหัสผ่าน");
+      setPasswordError(t.auth.reset.passwordRequired);
       hasError = true;
     } else if (password.length < MIN_PASSWORD_LENGTH) {
-      setPasswordError(`รหัสผ่านต้องมีอย่างน้อย ${MIN_PASSWORD_LENGTH} ตัวอักษร`);
+      setPasswordError(t.auth.reset.passwordTooShort(MIN_PASSWORD_LENGTH));
       hasError = true;
     } else {
       setPasswordError(null);
     }
 
     if (!confirmPassword) {
-      setConfirmError("กรุณายืนยันรหัสผ่าน");
+      setConfirmError(t.auth.reset.confirmRequired);
       hasError = true;
     } else if (confirmPassword !== password) {
-      setConfirmError("รหัสผ่านไม่ตรงกัน");
+      setConfirmError(t.auth.reset.mismatch);
       hasError = true;
     } else {
       setConfirmError(null);
     }
 
     if (hasError) return;
-    setSubmitted(true);
+    setRequestError(null);
+    setSubmitting(true);
+    try {
+      await resetPassword(token, password);
+      setSubmitted(true);
+    } catch (err) {
+      console.warn("[reset-password]", err);
+      if (err instanceof ResetLinkError) setLinkInvalid(true);
+      else setRequestError(t.auth.reset.requestFailed);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // No token in the link, or the server refused it: nothing on this page can
+  // succeed, so say so and point at the one thing that will work.
+  if (!token || linkInvalid) {
+    return (
+      <AuthShell>
+        <div className="flex flex-col items-center gap-3 py-6 text-center">
+          <LinkBreakIcon size={48} weight="duotone" className="text-[var(--text-danger-primary)]" />
+          <h1 className="type-h4 text-foreground">{t.auth.reset.invalidTitle}</h1>
+          <p className="text-sm text-muted-foreground">
+            {t.auth.reset.invalidBody}
+          </p>
+        </div>
+        <Button variant="primary" size="lg" className="w-full" onClick={() => router.push("/forgot-password")}>
+          {t.auth.reset.requestNew}
+        </Button>
+        <p className="type-description text-center text-muted-foreground">
+          {t.auth.copyright}
+        </p>
+      </AuthShell>
+    );
   }
 
   return (
@@ -57,25 +123,26 @@ export default function ResetPasswordPage() {
         <>
           <div className="flex flex-col items-center gap-3 py-6 text-center">
             <CheckCircleIcon size={48} className="text-success" weight="fill" />
-            <h1 className="type-h4 text-foreground">เปลี่ยนรหัสผ่านสำเร็จ</h1>
+            <h1 className="type-h4 text-foreground">{t.auth.reset.doneTitle}</h1>
             <p className="text-sm text-muted-foreground">
-              คุณสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที
+              {t.auth.reset.doneBody}
             </p>
           </div>
           <Button variant="outline" size="lg" className="w-full" onClick={() => router.push("/login")}>
-            เข้าสู่ระบบ
+            {t.auth.login}
           </Button>
         </>
       ) : (
         <>
           <div className="flex flex-col gap-1">
-            <h1 className="type-h4 text-foreground">ตั้งรหัสผ่านใหม่</h1>
-            <p className="text-sm text-muted-foreground">กรุณาตั้งรหัสผ่านใหม่สำหรับบัญชีของคุณ</p>
+            <h1 className="type-h4 text-foreground">{t.auth.reset.title}</h1>
+            <p className="text-sm text-muted-foreground">{t.auth.reset.body}</p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+            {requestError && <Alert status="critical" message={requestError} multiline />}
             <Input
-              placeholder="รหัสผ่านใหม่"
+              placeholder={t.auth.reset.newPassword}
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(value) => {
@@ -89,7 +156,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeSlashIcon size={20} /> : <EyeIcon size={20} />}
@@ -98,7 +165,7 @@ export default function ResetPasswordPage() {
             />
 
             <Input
-              placeholder="ยืนยันรหัสผ่านใหม่"
+              placeholder={t.auth.reset.confirmPassword}
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(value) => {
@@ -112,7 +179,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((s) => !s)}
-                  aria-label={showConfirmPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  aria-label={showConfirmPassword ? t.auth.hidePassword : t.auth.showPassword}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showConfirmPassword ? <EyeSlashIcon size={20} /> : <EyeIcon size={20} />}
@@ -120,15 +187,21 @@ export default function ResetPasswordPage() {
               }
             />
 
-            <Button type="submit" variant="primary" size="lg" className="w-full mt-6">
-              บันทึกรหัสผ่านใหม่
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="w-full mt-6"
+              disabled={submitting}
+            >
+              {submitting ? t.common.saving : t.auth.reset.submit}
             </Button>
           </form>
         </>
       )}
 
       <p className="type-description text-center text-muted-foreground">
-        ©Copyright 2016 Yuanta Securities (Thailand). All Rights Reserved
+        {t.auth.copyright}
       </p>
     </AuthShell>
   );

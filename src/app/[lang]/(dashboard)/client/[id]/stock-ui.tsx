@@ -13,8 +13,10 @@ import {
   PhoneIcon,
   ShirtFoldedIcon,
   ShoppingBagIcon,
+  TrayIcon,
   WallIcon,
 } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Trend } from "./stock-data";
 
 /** Matches the catalog's other card shadow tokens (`MutualFundCard.tsx`'s
@@ -88,4 +90,15 @@ export function SectorGlyph({ id, size, color }: { id: string; size: number; col
   if (!Icon) return null;
   const glyph = <Icon size={size} weight="fill" />;
   return color ? <span style={{ color }}>{glyph}</span> : glyph;
+}
+
+/** A stock section or card with nothing in it yet — sits under the section's heading. */
+export function StockSectionEmpty({ title }: { title: string }) {
+  return (
+    <EmptyState
+      size="compact"
+      icon={<TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      title={title}
+    />
+  );
 }

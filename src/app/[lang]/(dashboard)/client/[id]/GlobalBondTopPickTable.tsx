@@ -13,6 +13,7 @@ import {
   FactsheetButton,
 } from "./fixed-income-shared";
 import { GlobalBondListCta } from "./GlobalBondDetailBondList";
+import { useT } from "@/i18n/I18nProvider";
 
 const ROW_CELL_CLS = "cursor-pointer transition-colors";
 
@@ -21,6 +22,8 @@ export function GlobalBondTopPickTable({
 }: {
   onIssuerSelect?: (id: GlobalBondIssuerId) => void;
 }) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
   function rowCellProps(i: number, bottom?: boolean) {
@@ -53,7 +56,7 @@ export function GlobalBondTopPickTable({
               className="flex h-11 items-center px-4"
               style={headerBorderStyle({ right: false })}
             >
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Top pick</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.topPick}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div
@@ -87,7 +90,7 @@ export function GlobalBondTopPickTable({
           {/* ISIN */}
           <div className="flex flex-col w-[154px] shrink-0">
             <div className="flex h-11 items-center px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ISIN</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.isin}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -98,7 +101,7 @@ export function GlobalBondTopPickTable({
           {/* Currency */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Currency</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.currency}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -109,7 +112,7 @@ export function GlobalBondTopPickTable({
           {/* Coupon Rate */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Coupon Rate</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -120,7 +123,7 @@ export function GlobalBondTopPickTable({
           {/* Price */}
           <div className="flex flex-col w-[81px] shrink-0">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Price</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.price}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -131,7 +134,7 @@ export function GlobalBondTopPickTable({
           {/* Yield */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ผลตอบแทน</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.yield}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -142,7 +145,7 @@ export function GlobalBondTopPickTable({
           {/* Maturity */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>วันครบกำหนด</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -153,7 +156,7 @@ export function GlobalBondTopPickTable({
           {/* Duration */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>ระยะเวลา (ปี)</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -164,7 +167,7 @@ export function GlobalBondTopPickTable({
           {/* Factsheet */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-center px-3" style={headerBorderStyle()}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>เอกสาร</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.documents}</span>
             </div>
             {TOP_PICK_ROWS.map((_row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-center px-3 py-[11px] min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
@@ -175,7 +178,7 @@ export function GlobalBondTopPickTable({
           {/* Invest */}
           <div className="flex flex-col shrink-0">
             <div className="flex h-11 items-center justify-center px-3" style={headerBorderStyle({ right: false })}>
-              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>คำสั่งซื้อ</span>
+              <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.order}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
               <div key={i} className={`flex flex-1 items-center justify-center px-3 py-[11px] min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>

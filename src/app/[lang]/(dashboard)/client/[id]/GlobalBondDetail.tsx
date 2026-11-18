@@ -6,6 +6,7 @@ import { ArrowLeftIcon } from "@phosphor-icons/react";
 import {
   filterGlobalBonds,
   globalBondBookableId,
+  type GlobalBondIssuer,
   type GlobalBondIssuerId,
   type MaturityFilter,
   type YieldFilter,
@@ -17,31 +18,30 @@ import {
   GlobalBondDetailTable,
   GlobalBondProposalContext,
 } from "./GlobalBondDetailBondList";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
-import { useQuotaBooking } from "@/app/(dashboard)/orders/useQuotaBooking";
-import { useSendProposal } from "@/app/(dashboard)/orders/useSendProposal";
-import { QuotaBooksPanel } from "@/app/(dashboard)/orders/QuotaBooksPanel";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { useQuotaBooking } from "@/app/[lang]/(dashboard)/orders/useQuotaBooking";
+import { useSendProposal } from "@/app/[lang]/(dashboard)/orders/useSendProposal";
+import { QuotaBooksPanel } from "@/app/[lang]/(dashboard)/orders/QuotaBooksPanel";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { GlobalBondDetailRecommended } from "./GlobalBondDetailRecommended";
-import { useGlobalBondIssuer } from "@/hooks/use-catalog";
-import { GlobalBondDetailSkeleton } from "./ProductDetailSkeletons";
+import { useT } from "@/i18n/I18nProvider";
 
-/** Stable empty list, so `useOpenProducts` doesn't recompute while loading. */
-const NO_BONDS: never[] = [];
-
+/**
+ * Handed a resolved issuer: the lookup, its loading and its not-found belong
+ * to whoever resolves the id (`global-bond/[issuerId]/page.tsx`), the same
+ * split as the other catalog detail routes.
+ */
 export function GlobalBondDetail({
-  issuerId,
+  issuer,
   onBack,
   onIssuerSelect,
 }: {
-  issuerId: GlobalBondIssuerId;
+  issuer: GlobalBondIssuer;
   onBack: () => void;
   onIssuerSelect?: (issuerId: GlobalBondIssuerId) => void;
 }) {
-  // The `if (isLoading)` return below stays *above* the `!issuer` branch: once
-  // this resource is fetched, a not-yet-arrived issuer must read as loading,
-  // not as "ไม่พบข้อมูล".
-  const { data: issuer, isLoading } = useGlobalBondIssuer(issuerId);
+  const t = useT();
+  const issuerId = issuer.id;
   const [yieldFilter, setYieldFilter] = useState<YieldFilter>("all");
   const [maturityFilter, setMaturityFilter] = useState<MaturityFilter>("all");
 
@@ -51,7 +51,7 @@ export function GlobalBondDetail({
   // able to report. See `useSendProposal`.
   const proposal = useSendProposal();
   // A bond whose quota is used up has nothing left to sell — off the list.
-  const openBonds = useOpenProducts(issuer?.bonds ?? NO_BONDS, globalBondBookableId);
+  const openBonds = useOpenProducts(issuer.bonds, globalBondBookableId);
   /**
    * Every bond of this issuer, as book ids — the Order tab's scope.
    *
@@ -60,7 +60,7 @@ export function GlobalBondDetail({
    * issuer's and still the IC's to read.
    */
   const bookIds = useMemo(
-    () => (issuer?.bonds ?? NO_BONDS).map((row) => globalBondBookableId(row)),
+    () => issuer.bonds.map((row) => globalBondBookableId(row)),
     [issuer],
   );
   const filteredBonds = useMemo(
@@ -85,27 +85,14 @@ export function GlobalBondDetail({
     setTab("detail");
   }
 
-  if (isLoading) return <GlobalBondDetailSkeleton />;
-
-  if (!issuer) {
-    return (
-      <div className="flex flex-col items-center w-full pt-6 pb-20 px-4 md:px-8 lg:px-20">
-        <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px]">
-          <Button
-            variant="plain"
-            size="icon-sm"
-            onClick={onBack}
-            aria-label="กลับ"
-          >
-            <ArrowLeftIcon size={20} />
-          </Button>
-          <h1 className="text-lg font-bold leading-[30px] text-[#101828]">
-            ไม่พบข้อมูล
-          </h1>
-        </div>
-      </div>
-    );
-  }
+  // The filters emptied the list, versus an issuer with no open bonds at all.
+  const clearFilters =
+    openBonds.length > 0 && (yieldFilter !== "all" || maturityFilter !== "all")
+      ? () => {
+          setYieldFilter("all");
+          setMaturityFilter("all");
+        }
+      : undefined;
 
   const updatedAtMobile = issuer.updatedAt
     .replace("September", "Sep")
@@ -118,7 +105,7 @@ export function GlobalBondDetail({
           variant="plain"
           size="icon-sm"
           onClick={onBack}
-          aria-label="กลับ"
+          aria-label={t.products.common.back}
           className="shrink-0"
         >
           <ArrowLeftIcon size={20} />
@@ -147,8 +134,8 @@ export function GlobalBondDetail({
           {ORDER_BOOKING_ENABLED && (
             <TabGroup
               items={[
-                { id: "detail", title: "Detail" },
-                { id: "orders", title: "Order" },
+                { id: "detail", title: t.products.common.detailTabs.detail },
+                { id: "orders", title: t.products.common.detailTabs.orders },
               ]}
               activeId={tab}
               onChange={(id) => setTab(id as "detail" | "orders")}
@@ -162,14 +149,14 @@ export function GlobalBondDetail({
               <div className="flex flex-col gap-4 w-full">
                 <div className="flex items-center justify-between w-full gap-3">
                   <p className="text-sm font-bold leading-[24px] text-[#101828] md:text-base md:leading-[28px]">
-                    จำนวน {filteredBonds.length} รายการ
+                    {t.products.common.itemCount(filteredBonds.length)}
                   </p>
                   <span className="text-xs leading-[20px] text-[#6a7282] md:text-sm md:leading-[24px] whitespace-nowrap shrink-0">
                     <span className="md:hidden">
-                      อัปเดตล่าสุด {updatedAtMobile}
+                      {t.products.common.updatedAt(updatedAtMobile)}
                     </span>
                     <span className="hidden md:inline">
-                      อัปเดตล่าสุด {issuer.updatedAt}
+                      {t.products.common.updatedAt(issuer.updatedAt)}
                     </span>
                   </span>
                 </div>
@@ -180,10 +167,10 @@ export function GlobalBondDetail({
                     value={ORDER_BOOKING_ENABLED ? proposal.send : null}
                   >
                   <div className="lg:hidden">
-                    <GlobalBondDetailAccordion bonds={filteredBonds} />
+                    <GlobalBondDetailAccordion bonds={filteredBonds} onClearFilters={clearFilters} />
                   </div>
                   <div className="hidden lg:block">
-                    <GlobalBondDetailTable bonds={filteredBonds} />
+                    <GlobalBondDetailTable bonds={filteredBonds} onClearFilters={clearFilters} />
                   </div>
                   </GlobalBondProposalContext.Provider>
                 </GlobalBondBookingContext.Provider>

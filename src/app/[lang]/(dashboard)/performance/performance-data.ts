@@ -21,11 +21,11 @@ export const PRODUCT_COLORS: Record<string, string> = {
   "Alternatives":    "var(--bg-theme-pink)",
 };
 
+/** Labels: `t.performance.gap.items[id]`. */
 export const GAP_ITEMS = [
   {
-    label: "Revenue Shortfall",
+    id: "revenue" as const,
     value: "฿5.8M",
-    sub: "to hit Q2 target",
     badge: "19% gap",
     progress: 81,
     color: "var(--text-danger-primary)",
@@ -34,9 +34,8 @@ export const GAP_ITEMS = [
     track: "var(--bg-danger-light)",
   },
   {
-    label: "AUM Growth Gap",
+    id: "aum" as const,
     value: "−1.6pp",
-    sub: "below target rate",
     badge: "16% gap",
     progress: 84,
     color: "var(--text-warning-primary)",
@@ -45,9 +44,8 @@ export const GAP_ITEMS = [
     track: "var(--bg-warning-light)",
   },
   {
-    label: "Product Penetration",
+    id: "penetration" as const,
     value: "−0.6",
-    sub: "products / client gap",
     badge: "20% gap",
     progress: 80,
     color: "var(--text-warning-primary)",

@@ -1,6 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The writing surface of a note: an untitled-looking Title line and the body
@@ -28,19 +29,20 @@ export function NoteEditorFields({
   /** Lets the caller place the caret here on open. */
   titleRef?: RefObject<HTMLInputElement | null>;
 }) {
+  const t = useT();
   return (
     <>
       <input
         ref={titleRef}
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
-        placeholder="Title"
+        placeholder={t.planner.notes.fields.title}
         className="type-h5 text-foreground bg-transparent outline-none border-none placeholder:text-muted-foreground/50 w-full"
       />
       <textarea
         value={body}
         onChange={(e) => onBodyChange(e.target.value)}
-        placeholder="Start typing…"
+        placeholder={t.planner.notes.fields.body}
         className="type-body-2 text-foreground bg-transparent outline-none border-none resize-none flex-1 min-h-[200px] placeholder:text-muted-foreground/50 w-full"
       />
     </>

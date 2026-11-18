@@ -1,3 +1,4 @@
+import type { Dictionary } from "@/i18n/dictionaries/th";
 export type CallLogEntry = {
   id: string;
   date: string;
@@ -49,16 +50,15 @@ const MONTHS: Record<string, number> = {
   Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
 };
 
-export function relativeCallDate(dateStr: string): string {
+export function relativeCallDate(dateStr: string, t: Dictionary): string {
   const [d, m, y] = dateStr.split(" ");
   const date = new Date(Number(y), MONTHS[m] ?? 0, Number(d));
   if (isNaN(date.getTime())) return dateStr;
   const days = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-  if (days <= 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 7) return `${days} days ago`;
-  if (days < 14) return "1 week ago";
-  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-  if (days < 60) return "1 month ago";
-  return `${Math.floor(days / 30)} months ago`;
+  const w = t.dates;
+  if (days <= 0) return w.today;
+  if (days === 1) return w.yesterday;
+  if (days < 7) return w.daysAgo(days);
+  if (days < 30) return w.weeksAgo(Math.floor(days / 7));
+  return w.monthsAgo(Math.floor(days / 30));
 }

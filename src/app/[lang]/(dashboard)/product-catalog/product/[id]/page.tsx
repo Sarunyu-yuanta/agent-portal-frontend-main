@@ -6,6 +6,7 @@ import { StructuredProductDetailSkeleton } from "../../../client/[id]/ProductDet
 import { useStructuredProduct } from "@/hooks/use-catalog";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { CatalogNotFound } from "../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Resolving the product is this route's job, so the loading state belongs here
@@ -21,6 +22,7 @@ export default function StructuredProductDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useT();
   const { id } = use(params);
   const { data: product, isLoading } = useStructuredProduct(decodeURIComponent(id));
   // Called unconditionally — the early returns below must not skip a hook.
@@ -31,7 +33,7 @@ export default function StructuredProductDetailPage({
   }
 
   if (!product) {
-    return <CatalogNotFound message="ไม่พบสินค้านี้" onBack={goBack} />;
+    return <CatalogNotFound message={t.states.notFoundProduct} onBack={goBack} />;
   }
 
   return <StructuredProductDetail product={product} onBack={goBack} />;

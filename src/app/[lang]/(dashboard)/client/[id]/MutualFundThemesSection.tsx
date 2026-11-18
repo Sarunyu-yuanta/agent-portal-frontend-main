@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Bank, CaretLeftIcon, CaretRightIcon, Cpu, Cube, HeadCircuit, RocketLaunch } from "@phosphor-icons/react";
 import { Button, PaginationBanner } from "@sarunyu/system-one";
 import { MutualFundSeeMoreIcon, MutualFundThemeList } from "./MutualFundCard";
@@ -15,7 +15,9 @@ import {
   type MutualFundThemeIcon,
   type MutualFundThemeId,
 } from "./mutual-fund-data";
+import { MutualFundSectionEmpty } from "./mutual-fund-ui";
 import { useDragScroll } from "./use-drag-scroll";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Figma theme icons resolve to Phosphor glyphs, not exported assets — the mock catalog's icon-*.svg files for bank/cpu/plant/health turned out to be misassigned/decorative filler, not real glyphs. */
 export const THEME_ICON_COMPONENTS: Record<
@@ -57,6 +59,7 @@ export function ThemeHeroGraphic({ themeId, scale = 1 }: { themeId: MutualFundTh
         style={{ bottom: 8 * scale, right: 24 * scale, width: 100 * scale, height: 100 * scale }}
         aria-hidden
       >
+        {MF_ASSETS.themeHero[themeId] && (
         <Image
           src={MF_ASSETS.themeHero[themeId]}
           alt=""
@@ -64,6 +67,7 @@ export function ThemeHeroGraphic({ themeId, scale = 1 }: { themeId: MutualFundTh
           className="object-contain"
           sizes={`${100 * scale}px`}
         />
+        )}
       </div>
     </>
   );
@@ -83,7 +87,9 @@ function scrollThemeToPage(el: HTMLElement, pageIndex: number) {
 }
 
 function ThemeIcon({ icon }: { icon: MutualFundThemeIcon }) {
+  // An icon key the app doesn't know draws nothing rather than crashing.
   const Icon = THEME_ICON_COMPONENTS[icon];
+  if (!Icon) return null;
   return <Icon size={20} weight="fill" className="mt-0.5 size-5 shrink-0 text-white" />;
 }
 
@@ -97,6 +103,7 @@ function ThemeCard({
   onFundSelect?: (fundId: string) => void;
   onThemeSeeAll?: (themeId: MutualFundTheme["id"]) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex min-h-[380px] w-[308px] shrink-0 flex-col gap-[10px] rounded-lg bg-gradient-to-b from-[#0a6ee7] to-[#f3f4f6] to-[85.462%] px-1 pb-1 pt-2">
       <div className="flex w-full items-start gap-1 px-3">
@@ -111,6 +118,13 @@ function ThemeCard({
         </div>
       </div>
       <div className="flex w-full flex-col gap-0.5">
+        {theme.funds.length === 0 ? (
+          // Same white box the fund list sits in, so the card keeps its shape; no "see more" into an empty theme.
+          <div className="w-full shrink-0 overflow-hidden rounded-lg border border-black/10 bg-white">
+            <MutualFundSectionEmpty title={t.fund.empty.themeFunds} />
+          </div>
+        ) : (
+        <>
         <MutualFundThemeList funds={theme.funds} onFundSelect={onFundSelect} />
         <div className="flex h-10 w-full items-center justify-center">
           <Link
@@ -126,10 +140,12 @@ function ThemeCard({
             }
           >
             <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
-              ดูเพิ่มเติม
+              {t.fund.list.seeMore}
             </Button>
           </Link>
         </div>
+        </>
+        )}
       </div>
     </div>
   );
@@ -145,6 +161,7 @@ export function MutualFundThemesSection({
   onFundSelect?: (fundId: string) => void;
   onThemeSeeAll?: (themeId: MutualFundTheme["id"]) => void;
 }) {
+  const t = useT();
   const drag = useDragScroll();
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -179,17 +196,21 @@ export function MutualFundThemesSection({
       <div>
         <div className="flex items-center gap-1">
           <Image src={MF_ASSETS.medal} alt="" width={24} height={24} className="size-6 shrink-0" />
-          <h2 className="text-lg font-bold leading-[32px] text-[#101828]">5 ธีมกองทุนเด่น</h2>
+          <h2 className="text-lg font-bold leading-[32px] text-[#101828]">{t.fund.themes.sectionTitle}</h2>
         </div>
-        <p className="text-sm leading-[24px] text-[#101828]">ธีมกองทุนผลตอบแทนโดดเด่น</p>
+        <p className="text-sm leading-[24px] text-[#101828]">{t.fund.themes.sectionSubtitle}</p>
       </div>
 
+      {themes.length === 0 ? (
+        <MutualFundSectionEmpty title={t.fund.empty.themes} />
+      ) : (
+      <>
       <div className="relative w-full px-0 lg:px-12">
         {canScrollLeft && (
           <Button
             variant="outline"
             size="icon-md"
-            aria-label="เลื่อนซ้าย"
+            aria-label={t.fund.list.scrollLeft}
             className="absolute left-0 top-1/2 z-10 hidden -translate-y-1/2 lg:flex"
             onClick={() => scrollBy(-1)}
           >
@@ -200,7 +221,7 @@ export function MutualFundThemesSection({
           <Button
             variant="outline"
             size="icon-md"
-            aria-label="เลื่อนขวา"
+            aria-label={t.fund.list.scrollRight}
             className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 lg:flex"
             onClick={() => scrollBy(1)}
           >
@@ -234,6 +255,8 @@ export function MutualFundThemesSection({
           if (el) scrollThemeToPage(el, index);
         }}
       />
+      </>
+      )}
     </section>
   );
 }

@@ -16,6 +16,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { CUSTOMER_COLUMNS } from "./columns";
 import type { ColumnId, SortDir, SortKey } from "./types";
 import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 const NO_WIDTH = 60;
 
@@ -30,6 +31,7 @@ export function CustomerTable({
   onSort,
   onRowClick,
   onClearFilters,
+  isFiltered = false,
 }: {
   rows: Client[];
   visibleColumns: Set<ColumnId>;
@@ -41,7 +43,10 @@ export function CustomerTable({
   onSort: (key: SortKey) => (next: SortDir) => void;
   onRowClick: (client: Client) => void;
   onClearFilters?: () => void;
+  /** Whether a search is narrowing `rows` — tells "no match" apart from "nothing yet". */
+  isFiltered?: boolean;
 }) {
+  const t = useT();
   const shown = CUSTOMER_COLUMNS.filter((col) => visibleColumns.has(col.id));
   const flipRef = useFlipRows<string>();
 
@@ -95,7 +100,7 @@ export function CustomerTable({
               sortDirection={dirFor("rowIndex")}
               onSortChange={onSort("rowIndex")}
             >
-              No.
+              {t.client.hub.rowNo}
             </TableHeaderCell>
             {shown.map((col) => (
               <TableHeaderCell
@@ -106,7 +111,7 @@ export function CustomerTable({
                 sortDirection={dirFor(col.sortKey)}
                 onSortChange={onSort(col.sortKey)}
               >
-                {col.label}
+                {t.clientHub.columns[col.id] ?? col.label}
               </TableHeaderCell>
             ))}
           </TableRow>
@@ -117,7 +122,7 @@ export function CustomerTable({
             return (
               <Tooltip
                 key={client.id}
-                content="View client profile"
+                content={t.client.hub.viewClientProfile}
                 side="top"
                 delayDuration={400}
               >
@@ -141,10 +146,14 @@ export function CustomerTable({
         </TableBody>
       </Table>
       {isEmpty && (
-        <TableEmptyOverlay
-          body="ลองค้นหาด้วยคำอื่น หรือล้างตัวกรองเพื่อดูรายชื่อลูกค้าทั้งหมด"
-          onClearFilters={onClearFilters}
-        />
+        isFiltered ? (
+          <TableEmptyOverlay
+            body={t.client.hub.noClientResultBody}
+            onClearFilters={onClearFilters}
+          />
+        ) : (
+          <TableEmptyOverlay variant="empty" title={t.client.hub.noClientsYet} />
+        )
       )}
     </div>
   );

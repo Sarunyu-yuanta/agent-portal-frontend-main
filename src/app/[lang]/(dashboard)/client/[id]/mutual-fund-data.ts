@@ -213,10 +213,6 @@ export const TOP_PERFORMERS_LIST_UPDATED_AT = "2 ส.ค 69";
 /** Figma 39889:667557 — total catalog count (mock). */
 export const TOP_PERFORMERS_DISPLAY_COUNT = 160;
 
-/** The performers hero's one line of copy. Shared by the desktop page and the
- *  mobile one, which each held their own identical `HERO_SUBTITLE`. */
-export const TOP_PERFORMERS_HERO_SUBTITLE = "คัดสรรกองทุนเด่น เพื่อคุณโดยเฉพาะ";
-
 export const MUTUAL_FUND_PERFORMANCE_PERIODS = [
   "1M",
   "3M",
@@ -241,26 +237,25 @@ export type MobileFundGroupId =
   | "tax-saving"
   | "others";
 
+/** The tab's title is per language — `t.fund.groups[id]`. */
 export type MobileFundGroup = {
   id: MobileFundGroupId;
-  label: string;
   /** Underlying categories this group pools funds from; omitted (tax-saving/others) means no catalog data exists yet. */
   categoryIds?: MutualFundCategoryId[];
 };
 
 export const MOBILE_FUND_GROUPS: MobileFundGroup[] = [
-  { id: "all", label: "ทั้งหมด" },
-  { id: "fixed-income", label: "ตราสารหนี้ไทย", categoryIds: ["fixed-income"] },
-  { id: "global-fixed-income", label: "ตราสารหนี้ต่างประเทศ", categoryIds: ["global-fixed-income"] },
-  { id: "thai-equity", label: "หุ้นไทย", categoryIds: ["thai-equity"] },
+  { id: "all" },
+  { id: "fixed-income", categoryIds: ["fixed-income"] },
+  { id: "global-fixed-income", categoryIds: ["global-fixed-income"] },
+  { id: "thai-equity", categoryIds: ["thai-equity"] },
   {
     id: "foreign-equity",
-    label: "หุ้นต่างประเทศ",
     categoryIds: ["global-equity", "us-equity", "japan-equity", "europe-equity", "emerging-equity"],
   },
-  { id: "commodities-group", label: "Commodities", categoryIds: ["reits", "commodities", "gold"] },
-  { id: "tax-saving", label: "ลดหย่อนภาษี" },
-  { id: "others", label: "อื่นๆ" },
+  { id: "commodities-group", categoryIds: ["reits", "commodities", "gold"] },
+  { id: "tax-saving" },
+  { id: "others" },
 ];
 
 /** Funds for a mobile tab — pools every underlying category, deduped by fund id. */
@@ -296,6 +291,14 @@ export function resolveMobileFundGroupId(value: string): MobileFundGroupId {
   const categoryId = normalizeMutualFundCategoryId(value);
   const group = MOBILE_FUND_GROUPS.find((g) => g.categoryIds?.includes(categoryId));
   return group?.id ?? "all";
+}
+
+/** Like {@link resolveMobileFundGroupId}, but `null` for a param that names neither a group nor a category. */
+export function findMobileFundGroupId(value: string): MobileFundGroupId | null {
+  const direct = MOBILE_FUND_GROUPS.find((g) => g.id === value);
+  if (direct) return direct.id;
+  if (!MUTUAL_FUND_CATEGORIES.some((c) => c.id === value)) return null;
+  return resolveMobileFundGroupId(value);
 }
 
 export function mutualFundCategoryHref(categoryId: MutualFundCategoryId): string {
@@ -395,6 +398,11 @@ export function getMutualFundTheme(themeId: MutualFundThemeId): MutualFundTheme 
   return MUTUAL_FUND_CATALOG.themes.find((t) => t.id === themeId) ?? MUTUAL_FUND_CATALOG.themes[0];
 }
 
+/** The theme a route param names, or `null` — a detail route must not stand in another theme for an unknown id. */
+export function findMutualFundThemeId(value: string): MutualFundThemeId | null {
+  return MUTUAL_FUND_CATALOG.themes.some((t) => t.id === value) ? (value as MutualFundThemeId) : null;
+}
+
 export function normalizeMutualFundThemeId(value: string): MutualFundThemeId {
   return MUTUAL_FUND_CATALOG.themes.some((t) => t.id === value)
     ? (value as MutualFundThemeId)
@@ -442,17 +450,22 @@ export function getThemeDescription(themeId: MutualFundThemeId): string {
  * mobile performers tabs (minus "ทั้งหมด"). Each option pools catalog categories;
  * "tax-saving" matches any fund with a tax-saving type, "others" funds outside the catalog.
  */
-export type FilterCategoryOption = { id: MobileFundGroupId; label: string; categoryIds?: string[] };
+export type FilterCategoryOption = { id: MobileFundGroupId; categoryIds?: string[] };
 export const FILTER_CATEGORY_OPTIONS: FilterCategoryOption[] = MOBILE_FUND_GROUPS.filter((g) => g.id !== "all").map(
   (g) => ({
     id: g.id,
-    label: g.label,
     categoryIds: g.id === "others" ? ["others"] : g.categoryIds,
   }),
 );
 
 export const TAX_SAVING_FUND_TYPES = ["RMF", "TESG", "TESGX"] as const;
 export type TaxSavingFundType = (typeof TAX_SAVING_FUND_TYPES)[number];
+
+/** The tax-saving fund type a route param names, or `null` when it names none. */
+export function findTaxSavingFundType(value: string): TaxSavingFundType | null {
+  const upper = value.toUpperCase();
+  return (TAX_SAVING_FUND_TYPES as readonly string[]).includes(upper) ? (upper as TaxSavingFundType) : null;
+}
 
 export function normalizeTaxSavingFundType(value: string): TaxSavingFundType {
   const upper = value.toUpperCase();
@@ -461,14 +474,14 @@ export function normalizeTaxSavingFundType(value: string): TaxSavingFundType {
     : "RMF";
 }
 
-export const DIVIDEND_POLICY_OPTIONS = ["จ่าย", "ไม่จ่าย"] as const;
-export const INVESTMENT_POLICY_OPTIONS = ["เชิงรุก", "เชิงรับ"] as const;
-/** 9 stands for "8+" (Figma 360:78597) — funds riskier than level 8. */
+/** Ids, not labels — the chip text is per language (`t.fund.filter.dividendPolicy[id]`). */
+export const DIVIDEND_POLICY_OPTIONS = ["pay", "no-pay"] as const;
+export type DividendPolicyId = (typeof DIVIDEND_POLICY_OPTIONS)[number];
+/** Ids, not labels — the chip text is per language (`t.fund.filter.investmentPolicy[id]`). */
+export const INVESTMENT_POLICY_OPTIONS = ["active", "passive"] as const;
+export type InvestmentPolicyId = (typeof INVESTMENT_POLICY_OPTIONS)[number];
+/** 9 stands for "8+" (Figma 360:78597) — funds riskier than level 8; label via `t.fund.filter.riskLevel`. */
 export const FUND_RISK_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
-
-export function fundRiskLevelLabel(level: number): string {
-  return level >= 9 ? "Level 8+" : `Level ${level}`;
-}
 
 /** Figma 39910:727252 — "บริษัทจัดการกองทุน" chip row; icon looked up via MF_ASSETS.amcLogo[id]. */
 export const FUND_MANAGEMENT_COMPANIES = [
@@ -570,11 +583,11 @@ export function getFundTaxSavingType(fundId: string): TaxSavingFundType | null {
   return TAX_SAVING_FUND_TYPES[hash % TAX_SAVING_FUND_TYPES.length];
 }
 
-export function getFundDividendPolicy(fundId: string): (typeof DIVIDEND_POLICY_OPTIONS)[number] {
+export function getFundDividendPolicy(fundId: string): DividendPolicyId {
   return DIVIDEND_POLICY_OPTIONS[hashString(`div-${fundId}`) % DIVIDEND_POLICY_OPTIONS.length];
 }
 
-export function getFundInvestmentPolicy(fundId: string): (typeof INVESTMENT_POLICY_OPTIONS)[number] {
+export function getFundInvestmentPolicy(fundId: string): InvestmentPolicyId {
   return INVESTMENT_POLICY_OPTIONS[hashString(`inv-${fundId}`) % INVESTMENT_POLICY_OPTIONS.length];
 }
 
@@ -690,6 +703,9 @@ const MOCK_POLICY: Record<MockFundGroup, string> = {
     "กองทุนมีนโยบายลงทุนในตราสารหนี้ภาครัฐ ตราสารหนี้ภาคเอกชนที่มีอันดับความน่าเชื่อถืออยู่ในระดับที่สามารถลงทุนได้ และเงินฝาก โดยมีอายุเฉลี่ยของตราสารที่ลงทุนไม่เกิน 3 ปี เพื่อสร้างรายได้สม่ำเสมอและรักษาเงินต้นในระดับที่เหมาะสม",
 };
 
+/** The fund-info row's value — mock record text, like the rest of `fundInfo`. */
+const MOCK_DIVIDEND_POLICY_TEXT: Record<DividendPolicyId, string> = { pay: "จ่าย", "no-pay": "ไม่จ่าย" };
+
 const MOCK_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MOCK_THAI_MONTHS = ["ม.ค", "ก.พ", "มี.ค", "เม.ย", "พ.ค", "มิ.ย", "ก.ค", "ส.ค", "ก.ย", "ต.ค", "พ.ย", "ธ.ค"];
 
@@ -770,7 +786,7 @@ function defaultDetailFields(fund: MutualFund): MutualFundDetailFields {
   const managementFee = between(rnd, 0.5, 1.8).toFixed(2);
   const frontEnd = pick(rnd, ["0.00%", "1.00%", "1.50%"] as const);
   const backEnd = pick(rnd, ["0.00%", "1.00%"] as const);
-  const dividendHistory = dividendPolicy === "จ่าย" ? mockDividendHistory(rnd) : [];
+  const dividendHistory = dividendPolicy === "pay" ? mockDividendHistory(rnd) : [];
 
   const holdingPool = [...MOCK_HOLDINGS[group]].sort(() => rnd() - 0.5);
   const topHoldings = mockAllocation(rnd, holdingPool.slice(0, 3), foreign ? [85, 97] : [8, 14]).map(
@@ -819,7 +835,7 @@ function defaultDetailFields(fund: MutualFund): MutualFundDetailFields {
       foreignInvestment: foreign ? "มี" : "ไม่มี",
       fxRiskPolicy: foreign ? "มี" : "ไม่มี",
       riskScore: fund.risk,
-      dividendPolicy,
+      dividendPolicy: MOCK_DIVIDEND_POLICY_TEXT[dividendPolicy],
       currencyPolicy: foreign
         ? "ป้องกันความเสี่ยงอัตราแลกเปลี่ยนตามดุลยพินิจของผู้จัดการกองทุน"
         : "ไม่มีความเสี่ยงอัตราแลกเปลี่ยน",

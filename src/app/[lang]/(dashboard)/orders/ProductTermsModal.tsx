@@ -16,8 +16,10 @@
  * on that button is now a logged Proposal rather than a download.
  */
 
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useState } from "react";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Button } from "@sarunyu/system-one";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
@@ -41,14 +43,14 @@ import { ProductLogos } from "./ProductLogos";
  * is a conversion that drops the theme's own columns, so those come from the
  * source row rather than from `product`.
  */
-function termsFor(product: BookableProduct): DetailRow[] {
+function termsFor(product: BookableProduct, t: Dictionary): DetailRow[] {
   if (product.id.startsWith("thai-")) {
     const source = THAI_STRUCTURED_PRODUCTS.find((p) => thaiBookableId(p.theme) === product.id);
     if (source) return thaiProductRows(source);
   }
   // `link` is the catalogue page's pointer to the product family; it goes
   // nowhere from here, so it reads as plain text.
-  return structuredProductRows(product).map((row) => ({ ...row, link: false }));
+  return structuredProductRows(product, t).map((row) => ({ ...row, link: false }));
 }
 
 export function ProductTermsModal({
@@ -60,6 +62,7 @@ export function ProductTermsModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useT();
   const [doc, setDoc] = useState<"presentation" | "package" | null>(null);
   // Its own toast stack: this modal is mounted by hosts that have none, and
   // the send has to be able to report from inside it.
@@ -78,7 +81,7 @@ export function ProductTermsModal({
       <ResponsiveBottomSheetModal
         open={open}
         onClose={onClose}
-        title="รายละเอียดสินค้า"
+        title={t.orders.terms.title}
         titleId="product-terms-title"
         desktopMaxWidth="max-w-[614px]"
       >
@@ -87,15 +90,15 @@ export function ProductTermsModal({
             <ProductLogos logos={product.logos} />
             <div className="flex min-w-0 flex-1 flex-col">
               <p className="type-body-1 truncate font-bold text-foreground">{product.underlying}</p>
-              <p className="type-caption text-muted-foreground">Underlying</p>
+              <p className="type-caption text-muted-foreground">{t.orders.terms.underlying}</p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
               <p className="type-body-1 font-bold text-[#0a6ee7]">{product.coupon}</p>
-              <p className="type-caption text-muted-foreground">Coupon</p>
+              <p className="type-caption text-muted-foreground">{t.orders.terms.coupon}</p>
             </div>
           </div>
 
-          <DetailTable rows={termsFor(product)} />
+          <DetailTable rows={termsFor(product, t)} />
 
           {/* Stacked and centred: the documents first, as the one primary
               action; the full page under it as a plain button, since leaving
@@ -121,7 +124,7 @@ export function ProductTermsModal({
                 style={{ height: 48 }}
                 rightIcon={<ArrowRightIcon size={16} />}
               >
-                ไปหน้าสินค้า
+                {t.orders.terms.goToProduct}
               </Button>
             </Link>
           </div>

@@ -70,8 +70,8 @@ export const MARKET_STATUS_STYLE: Record<MarketStatusValue, { bg: string; text: 
 export const MARKET_STATUS: MarketStatusValue = "Open";
 
 export const MARKET_WATCHLIST = [
-  { id: "th", flag: "🇹🇭", label: "Thai Market", active: true },
-  { id: "us", flag: "🇺🇸", label: "US Market", active: false },
+  { id: "th", flag: "🇹🇭", active: true },
+  { id: "us", flag: "🇺🇸", active: false },
 ];
 
 /** Placeholder circular mark used by every `MarketBoard` in the Figma file
@@ -86,7 +86,8 @@ export const MARKET_INDICES: MarketIndex[] = [
   { code: "MAI", icon: MARKET_INDEX_ICON, price: "395.80", changeAmount: "+1.25", changePercent: "+0.32%", trend: "up", series: seededSeries("MAI", 20, "up") },
 ];
 
-export const MARKET_LATEST_UPDATE = "Latest update: 30 Apr 2025 - 09:22";
+/** The feed's own timestamp — the "Latest update:" wording is the dictionary's. */
+export const MARKET_LATEST_UPDATE = "30 Apr 2025 - 09:22";
 
 export type StockRow = {
   symbol: string;
@@ -270,9 +271,8 @@ const STOCK_FILTER_COUNTRIES_THAILAND: FilterChipOption = {
 
 export type StockCrossSellKind = "dr" | "etf";
 
+/** Title and description are UI copy — `t.stock.crossSell.kinds[kind]`. */
 export type StockCrossSellDetailConfig = {
-  title: string;
-  description: string;
   /** Hero banner gradient — Figma "Asset detail" instance (node 23228:30095).
    *  The 320% end-stop (vs. the ~34% Figma's own gradient-handle math implies)
    *  is fit to the rendered frame's actual pixels — the handle length isn't
@@ -297,9 +297,6 @@ export type StockCrossSellDetailConfig = {
  *  both otherwise share `StockCrossSellDetail`'s layout entirely. */
 export const STOCK_CROSS_SELL_DETAIL: Record<StockCrossSellKind, StockCrossSellDetailConfig> = {
   dr: {
-    title: "DR (Depositary Receipt)",
-    description:
-      "An investment product that is traded on the Stock Exchange of Thailand.\nIt is designed to provide Thai investors with increased opportunities.",
     gradient: "linear-gradient(180deg, #3597de 0%, #0004ff 320%)",
     heroImage: "/products/stock/cross-sell-hero-dr.png",
     showIssuerFilter: true,
@@ -308,9 +305,6 @@ export const STOCK_CROSS_SELL_DETAIL: Record<StockCrossSellKind, StockCrossSellD
     defaultCountryIds: ["china"],
   },
   etf: {
-    title: "ETF (Exchange Traded Fund)",
-    description:
-      "An investment policy that follows various indexes like stocks, commodities, \nand bonds, aiming to generate returns similar to the index's movements.",
     gradient: "linear-gradient(180deg, #f6bb43 0%, #ff4d00 320%)",
     heroImage: "/products/stock/cross-sell-hero-etf.png",
     heroImageBlend: "screen",
@@ -606,9 +600,6 @@ export type MarketCatalog = {
   exchange: string;
   exchangeIcon: string;
   sectors: SectorRow[];
-  /** Heading of the industry-sector card. Every market currently ships the SET
-   *  wording Figma specced; swap per catalog once the US/HK/VN copy lands. */
-  sectorsTitle: string;
   /** Which sector taxonomy `sectors` belongs to — decides the drill-in route.
    *  HK/VN alias the Thai catalog, so they resolve to the SET pages too. */
   sectorsMarket: IndustrySectorMarket;
@@ -631,7 +622,6 @@ const THAI_CATALOG: MarketCatalog = {
   exchange: "SET",
   exchangeIcon: "/products/stock/detail/set-circle.svg",
   sectors: SET_INDUSTRY_SECTORS,
-  sectorsTitle: "SET Industry Sector",
   sectorsMarket: "th",
   heatmapLayout: "treemap-8",
   servicesTitle: "Essential Investment Services",
@@ -641,7 +631,7 @@ const THAI_CATALOG: MarketCatalog = {
 
 const US_CATALOG: MarketCatalog = {
   indices: US_MARKET_INDICES,
-  indicesUpdatedAt: "Latest update: 29 Apr 2025 - 16:00",
+  indicesUpdatedAt: "29 Apr 2025 - 16:00",
   currency: "USD",
   topGain: US_STOCK_TOP_GAIN,
   topLoss: US_STOCK_TOP_LOSS,
@@ -655,7 +645,6 @@ const US_CATALOG: MarketCatalog = {
   exchange: "NASDAQ",
   exchangeIcon: "/products/stock/logos/indices/ndx.svg",
   sectors: US_INDUSTRY_SECTORS,
-  sectorsTitle: "SET Industry Sector",
   sectorsMarket: "us",
   heatmapLayout: "treemap-us",
   servicesTitle: "Unlock new growth with Global stocks",

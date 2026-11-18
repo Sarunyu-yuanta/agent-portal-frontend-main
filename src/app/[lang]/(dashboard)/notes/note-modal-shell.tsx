@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Modal } from "@sarunyu/system-one";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The backdrop/panel/footer shell `NoteEditModal` and `ClientNotesTab`'s note
@@ -63,6 +64,7 @@ export function NoteDeleteConfirmModal({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   if (!open) return null;
 
   return (
@@ -71,10 +73,10 @@ export function NoteDeleteConfirmModal({
         variant="alert"
         alertStatus="danger"
         title={title}
-        description="This note will be permanently removed."
+        description={t.planner.deleteNoteBody}
         actionLayout="double"
-        primaryLabel="Delete"
-        secondaryLabel="Cancel"
+        primaryLabel={t.planner.delete}
+        secondaryLabel={t.common.cancel}
         onPrimaryClick={onConfirm}
         onSecondaryClick={onCancel}
         onClose={onCancel}

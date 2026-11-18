@@ -9,6 +9,8 @@ import {
   DetailRow,
   TopPickTag,
 } from "./fixed-income-shared";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 function IssuerLogo({ src }: { src: string }) {
   return (
@@ -29,7 +31,16 @@ function BondCheckbox() {
   );
 }
 
-export function GlobalBondAllAccordion({ bonds }: { bonds: GlobalBondRow[] }) {
+export function GlobalBondAllAccordion({
+  bonds,
+  onClearFilters,
+}: {
+  bonds: GlobalBondRow[];
+  /** Given only while a filter is narrowing a non-empty list — see `GlobalBondAllPage`. */
+  onClearFilters?: () => void;
+}) {
+  const t = useT();
+  const cols = t.products.globalBond.columns;
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [prevBonds, setPrevBonds] = useState(bonds);
   if (prevBonds !== bonds) {
@@ -40,10 +51,10 @@ export function GlobalBondAllAccordion({ bonds }: { bonds: GlobalBondRow[] }) {
   if (bonds.length === 0) {
     return (
       <div
-        className="w-full rounded-lg overflow-hidden bg-white px-4 py-10 text-center text-sm text-[#6a7282]"
+        className="w-full rounded-lg overflow-hidden bg-white px-4"
         style={{ border: `1px solid ${BORDER_COLOR}` }}
       >
-        ไม่พบรายการที่ตรงกับตัวกรอง
+        <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
       </div>
     );
   }
@@ -101,19 +112,19 @@ export function GlobalBondAllAccordion({ bonds }: { bonds: GlobalBondRow[] }) {
             {expanded && (
               <div className="flex flex-col items-center gap-3 px-3 pb-3 w-full">
                 <div className="flex w-full flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2">
-                  <DetailRow label="Currency" value={row.currency} />
-                  <DetailRow label="Coupon Rate" value={row.couponRate} />
-                  <DetailRow label="Price" value={row.price} />
-                  <DetailRow label="ผลตอบแทนโดยประมาณ" value={row.yieldPct} />
-                  <DetailRow label="วันครบกำหนด" value={row.maturity} />
-                  <DetailRow label="ระยะเวลา (ปี)" value={row.duration} />
+                  <DetailRow label={cols.currency} value={row.currency} />
+                  <DetailRow label={cols.couponRate} value={row.couponRate} />
+                  <DetailRow label={cols.price} value={row.price} />
+                  <DetailRow label={cols.estimatedYield} value={row.yieldPct} />
+                  <DetailRow label={cols.maturity} value={row.maturity} />
+                  <DetailRow label={cols.durationYears} value={row.duration} />
                   <div className="flex w-full items-start gap-3 text-sm leading-[24px]">
-                    <span className="flex-1 text-[#4a5565]">เอกสารที่เกี่ยวข้อง</span>
+                    <span className="flex-1 text-[#4a5565]">{t.products.common.relatedDocuments}</span>
                     <button
                       type="button"
                       className="inline-flex cursor-pointer items-center gap-0.5 border-none bg-transparent p-0"
                     >
-                      <span className="text-sm text-[#2b7fff] underline">Factsheet</span>
+                      <span className="text-sm text-[#2b7fff] underline">{t.products.common.factsheet}</span>
                       <FileTextIcon size={14} color="#2b7fff" />
                     </button>
                   </div>

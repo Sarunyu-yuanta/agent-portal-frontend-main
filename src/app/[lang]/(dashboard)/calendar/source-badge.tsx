@@ -2,6 +2,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { CoinsIcon, NotePencilIcon } from "@phosphor-icons/react";
 import type { DayItem, DayItemSource } from "./day-items";
 import { actionKindName, actionPalette, eventCategory } from "./market-taxonomy";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The mark a row leads with, so a reader can tell "something I wrote" from
@@ -57,14 +59,17 @@ const NOTE_TONE = "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]";
  * says "money happened", "XD" says which of eleven things did — and it is the
  * same mark the Company Events grid on a stock puts in the same place.
  */
-export function itemBadge(item: Pick<DayItem, "source" | "kind" | "done">): ItemBadge {
+export function itemBadge(
+  item: Pick<DayItem, "source" | "kind" | "done">,
+  t: Dictionary,
+): ItemBadge {
   if (item.source === "corporate-action") {
     const palette = actionPalette(item.kind);
     return {
       icon: (
         <span className="text-meta font-semibold leading-none tracking-tight">{item.kind}</span>
       ),
-      label: actionKindName(item.kind),
+      label: actionKindName(item.kind, t),
       className: item.done ? DONE_BADGE_TONE : "",
       style: item.done
         ? undefined
@@ -73,7 +78,7 @@ export function itemBadge(item: Pick<DayItem, "source" | "kind" | "done">): Item
   }
 
   if (item.source === "event") {
-    const category = eventCategory(item.kind);
+    const category = eventCategory(item.kind, t);
     return {
       icon: category.icon,
       label: category.label,
@@ -86,7 +91,7 @@ export function itemBadge(item: Pick<DayItem, "source" | "kind" | "done">): Item
 
   return {
     icon: <NotePencilIcon size={15} />,
-    label: "Note",
+    label: t.planner.badge.note,
     className: item.done ? DONE_BADGE_TONE : NOTE_TONE,
   };
 }
@@ -100,15 +105,16 @@ export function itemBadge(item: Pick<DayItem, "source" | "kind" | "done">): Item
  * for any particular one, and a caller that can reach the item should call
  * {@link itemBadge} instead and get the real thing.
  */
-export const SOURCE_BADGE: Record<DayItemSource, ItemBadge> = {
-  note: itemBadge({ source: "note", kind: "", done: false }),
-  "corporate-action": {
-    icon: <CoinsIcon size={15} />,
-    label: "Corporate action",
-    className: "bg-[var(--fill-orange-100)] text-[var(--fill-orange-600)]",
-  },
-  event: itemBadge({ source: "event", kind: "other", done: false }),
-};
+export function sourceBadge(source: DayItemSource, t: Dictionary): ItemBadge {
+  if (source === "corporate-action") {
+    return {
+      icon: <CoinsIcon size={15} />,
+      label: t.planner.badge.corporateAction,
+      className: "bg-[var(--fill-orange-100)] text-[var(--fill-orange-600)]",
+    };
+  }
+  return itemBadge({ source, kind: source === "event" ? "other" : "", done: false }, t);
+}
 
 /**
  * The circle itself — {@link itemBadge} plus the shell every caller built by
@@ -128,7 +134,8 @@ export function SourceBadgeIcon({
   /** Accessible name override — defaults to the badge's own label. */
   label?: string;
 }) {
-  const badge = itemBadge(item);
+  const t = useT();
+  const badge = itemBadge(item, t);
   return (
     <span
       role="img"

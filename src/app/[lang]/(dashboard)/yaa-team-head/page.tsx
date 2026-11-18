@@ -2,6 +2,7 @@
 
 import { UsersThreeIcon } from "@phosphor-icons/react";
 import { ComingSoonPage } from "../coming-soon-page";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * One page for two readers of the same numbers: a Team Head looking at how
@@ -10,11 +11,12 @@ import { ComingSoonPage } from "../coming-soon-page";
  * `/ic-learning`.
  */
 export default function YaaTeamHeadPage() {
+  const t = useT();
   return (
     <ComingSoonPage
       icon={<UsersThreeIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-      title="YAA/Team Head"
-      body="Team Heads will track the performance of ICs on their team, and ICs will see their own YAA here. Not built yet — check back soon."
+      title={t.learning.yaaTeamHead.title}
+      body={t.learning.yaaTeamHead.body}
     />
   );
 }

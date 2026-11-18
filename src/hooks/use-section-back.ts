@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import {
   catalogListUrl,
   crossSectionReferrer,
@@ -55,8 +55,8 @@ function sectionRoot(pathname: string): string {
  *   Called at click time, since resolving it may read storage.
  */
 export function useSectionBack(getFallback?: (pathname: string) => string) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const router = useLocalizedRouter();
+  const pathname = useAppPathname();
 
   return useCallback(() => {
     // Cross-section entry — e.g. Product Catalog → House View insight detail.

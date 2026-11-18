@@ -14,11 +14,10 @@ import {
   detectedAgoLabel,
   detectedAtLabel,
   RISK_ALERTS_PAGE,
-  RISK_CATEGORY_META,
-  RISK_CATEGORY_TABS,
-  RISK_CTA_LABEL,
-  RISK_SEVERITY_META,
+  riskCategoryTabs,
   SEVERITY_ORDER,
+  severityMeta,
+  categoryMeta,
 } from "./risk-config";
 import {
   countRiskByCategory,
@@ -26,10 +25,8 @@ import {
   type RiskAlertRow,
 } from "./risk-feed";
 import { useRiskCta } from "./use-risk-cta";
-
-/** The name this feature goes by, shared so the card heading and the sub page
- *  cannot drift apart. */
-export const RISK_ALERTS_TITLE = "Proactive Compliance Alerts";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * What the book is exposed to right now: margin, suitability and market
@@ -60,6 +57,7 @@ export function RiskAlertsPanel({
   onCategoryChange,
   severity,
   onSeverityChange,
+  onClearFilters,
 }: {
   /** Pre-ranked by `buildRiskAlertRows`: worst first, which is the order the
    *  scrolling list below reads in. */
@@ -74,11 +72,15 @@ export function RiskAlertsPanel({
    *  remounts, so a narrowed card survives a trip to a client and back. */
   severity: RiskSeverity | null;
   onSeverityChange: (next: RiskSeverity | null) => void;
+  /** Resets family and level in one go — two separate query writes would race
+   *  each other on the same stale search params. */
+  onClearFilters?: () => void;
 }) {
   /** The finding whose panel is open. A row opens the alert, not the client —
    *  the row is clipped to a line, and what you wanted when you clicked was the
    *  rest of it plus the figures behind it. The client is a button further on. */
   const [detail, setDetail] = useState<RiskAlertRow | null>(null);
+  const t = useT();
 
   /** The mocked action behind every CTA on this card — on the rows and in the
    *  sheet they open, from one definition. */
@@ -93,7 +95,7 @@ export function RiskAlertsPanel({
       category: category === "all" ? null : category,
       severity,
     }),
-    label: "ดูทั้งหมด",
+    label: t.commandCenter.viewAll,
   };
 
   if (rows.length === 0) {
@@ -102,7 +104,7 @@ export function RiskAlertsPanel({
         {/* No link out. The sub page no longer keeps an archive of
             acknowledged findings — it lists the same open rows this card
             does — so with nothing open there is nothing there to reach. */}
-        <CardHeader title={RISK_ALERTS_TITLE} />
+        <CardHeader title={t.commandCenter.risk.title} />
         <EmptyState
           icon={
             <ShieldCheckIcon
@@ -111,8 +113,8 @@ export function RiskAlertsPanel({
               className="text-[var(--text-default-placeholder)]"
             />
           }
-          title="ไม่มีรายการความเสี่ยงค้างอยู่"
-          body="ระบบจะแจ้งเตือนทันทีเมื่อพบความเสี่ยงด้านมาร์จิ้น ความเหมาะสมของการลงทุน หรือพฤติกรรมการซื้อขาย"
+          title={t.commandCenter.risk.emptyTitle}
+          body={t.commandCenter.risk.emptyBody}
         />
       </div>
     );
@@ -142,7 +144,7 @@ export function RiskAlertsPanel({
           on the heading was the same figure stated twice, an inch apart — and
           the one that said less of the two, since it could only give a total
           where the strip gives the total *and* what it is made of. */}
-      <CardHeader title={RISK_ALERTS_TITLE} link={seeAll} />
+      <CardHeader title={t.commandCenter.risk.title} link={seeAll} />
 
       {/* Family first, level second — the pair the sub page carries, in the
           same order. The tabs answer "what kind of exposure is this", which is
@@ -175,9 +177,14 @@ export function RiskAlertsPanel({
             />
           }
           title={
-            severity ? "ไม่มีรายการในระดับนี้" : "ไม่มีรายการในหมวดนี้"
+            severity ? t.commandCenter.risk.emptySeverity : t.commandCenter.risk.emptyCategory
           }
-          body="เลือก “ทั้งหมด” เพื่อดูรายการความเสี่ยงอื่น"
+          body={t.commandCenter.risk.emptyFilteredBody}
+          action={
+            onClearFilters
+              ? { label: t.states.clearFilters, onClick: onClearFilters }
+              : undefined
+          }
         />
       ) : (
         /* One surface with rules inside it, matching the Call Log and KYC
@@ -261,10 +268,11 @@ export function RiskCategoryTabs({
   value: RiskAlertCategory | "all";
   onChange: (next: RiskAlertCategory | "all") => void;
 }) {
+  const t = useT();
   return (
     <div className="scrollable-tabs transparent-tabs count-tabs">
       <TabGroup
-        items={RISK_CATEGORY_TABS.map((tab) => ({
+        items={riskCategoryTabs(t).map((tab) => ({
           id: tab.id,
           title: tab.title,
           // `|| undefined` so a family with nothing open shows no badge at all
@@ -313,11 +321,12 @@ export function RiskSeverityStrip({
   value: RiskSeverity | null;
   onChange: (next: RiskSeverity | null) => void;
 }) {
+  const t = useT();
   const cells: { id: RiskSeverity | null; label: string; n: number }[] = [
-    { id: null, label: "ทั้งหมด", n: total },
+    { id: null, label: t.risk.all, n: total },
     ...SEVERITY_ORDER.map((id) => ({
       id,
-      label: RISK_SEVERITY_META[id].label,
+      label: t.risk.severity[id],
       n: counts[id],
     })),
   ];
@@ -335,7 +344,7 @@ export function RiskSeverityStrip({
             label={`${cell.label} ${cell.n}`}
             selected={selected}
             disabled={cell.n === 0 && !selected}
-            aria-label={`${cell.label} ${cell.n} รายการ`}
+            aria-label={t.commandCenter.risk.severityChipAria(cell.label, cell.n)}
             onClick={() => onChange(selected ? null : cell.id)}
           />
         );
@@ -370,9 +379,11 @@ export function RiskAlertRowItem({
   /** Fires the row's one action without opening it — see `useRiskCta`. */
   onAct: (row: RiskAlertRow) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { alert, acknowledged } = row;
-  const severity = RISK_SEVERITY_META[alert.severity];
-  const category = RISK_CATEGORY_META[alert.category];
+  const severity = severityMeta(alert.severity, t);
+  const category = categoryMeta(alert.category, t);
   const CategoryIcon = category.Icon;
 
   return (
@@ -430,7 +441,7 @@ export function RiskAlertRowItem({
               already centred. As a direct flex item the Tag centres itself. */}
           {acknowledged ? (
             <Tag
-              text="รับทราบแล้ว"
+              text={t.commandCenter.risk.acknowledged}
               variant="gray"
               size="small"
               className="shrink-0"
@@ -450,10 +461,10 @@ export function RiskAlertRowItem({
               or not a deadline follows below it. */}
           <span
             suppressHydrationWarning
-            title={detectedAtLabel(alert.detectedAt, new Date())}
+            title={detectedAtLabel(alert.detectedAt, new Date(), t, locale)}
             className="shrink-0 text-label tabular-nums text-muted-foreground"
           >
-            {detectedAgoLabel(alert.detectedAt, new Date())}
+            {detectedAgoLabel(alert.detectedAt, new Date(), t)}
           </span>
         </div>
 
@@ -517,13 +528,13 @@ export function RiskAlertRowItem({
             variant="primary"
             size="sm"
             className="shrink-0"
-            aria-label={`${RISK_CTA_LABEL} — ${row.displayName}`}
+            aria-label={`${t.risk.cta} — ${row.displayName}`}
             onClick={(e) => {
               e.stopPropagation();
               onAct(row);
             }}
           >
-            {RISK_CTA_LABEL}
+            {t.risk.cta}
           </Button>
           {/* The deadline closes the row, wedged into its bottom-right corner
               — the corner being where a row is left, and a filled shape being
@@ -558,7 +569,7 @@ export function RiskAlertRowItem({
               )}`}
             >
               <ClockCountdownIcon size={13} weight="bold" className="shrink-0" />
-              {deadlineDateLabel(alert.daysLeft, alert.dueDate)}
+              {deadlineDateLabel(alert.daysLeft, alert.dueDate, t, locale)}
             </span>
           )}
         </div>

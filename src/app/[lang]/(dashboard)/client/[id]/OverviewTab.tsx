@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Card, Button } from "@sarunyu/system-one";
+import { ClockCounterClockwiseIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { ReminderPreviewRow, RemindersPreviewEmpty } from "../../calendar/reminder-preview";
 import { useClients } from "@/hooks/use-api";
@@ -12,6 +13,7 @@ import {
 } from "../../command-center/NbaComingSoonCard";
 import { useNbaRows } from "../../command-center/use-nba-rows";
 import { useNotes } from "@/contexts/notes-context";
+import { EmptyState, ErrorState } from "@/components/ui/empty-state";
 import { REMINDERS_ENABLED } from "@/lib/feature-flags";
 import { dayFromKey, dayOffset, todayDateKey } from "../../calendar/calendar-grid";
 import { groupDayItems, type DayItem } from "../../calendar/day-items";
@@ -19,6 +21,7 @@ import { useDayItemModals } from "../../calendar/use-day-item-modals";
 import { CurrentAllocationSection, TopHoldingsSection } from "./ClientSections";
 import type { SortDir, HoldingsSortKey } from "./client-detail-data";
 import type { ClientDetail } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 /** How far out the Reminders card looks — past this, a reminder only shows
  *  up once you open the full Reminders tab. */
@@ -64,15 +67,17 @@ export function OverviewTab({
   onViewReminders,
 }: {
   clientId: string;
-  detail: ClientDetail;
+  /** `undefined` when the client has no detail record; sections show empty states. */
+  detail: ClientDetail | undefined;
   holdingsSortKey: HoldingsSortKey;
   holdingsSortDir: SortDir;
   onSort: (key: "value" | "pnlPct" | "pct", dir: SortDir) => void;
   onViewAllHoldings?: () => void;
   onViewReminders?: () => void;
 }) {
+  const t = useT();
   const clients = useClients();
-  const { notes } = useNotes();
+  const { notes, isLoading: notesLoading, error: notesError, retry: retryNotes } = useNotes();
   /** This client's slice of the Dashboard's list — same ranking, same
    *  dismissals. `dismiss` is unused: the card below is behind a blur and
    *  cannot be clicked, so there is nothing to write back. */
@@ -84,10 +89,12 @@ export function OverviewTab({
   // fallback. `allocationData` is a required field every client's record
   // does carry, so that's what a missing `allocationSlices` falls back to.
   const allocationSlices =
-    detail.assetSummary?.allocationSlices ??
-    detail.allocationData.map((s) => ({ label: s.name, percent: s.value }));
+    detail?.assetSummary?.allocationSlices ??
+    (detail?.allocationData ?? []).map((s) => ({ label: s.name, percent: s.value }));
 
   const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const topHoldings = detail?.topHoldings ?? [];
+  const recentActivity = detail?.recentActivity ?? [];
 
   // `todayKey` rather than the `Date`: a fresh object every render would make
   // the memo useless, and only the day is what either source is measured
@@ -101,7 +108,7 @@ export function OverviewTab({
   // card even though the full Reminders tab already shows them.
   const upcomingReminders = useMemo(() => {
     const today = new Date(todayKey);
-    const map = groupDayItems(notes, today, clientId);
+    const map = groupDayItems(notes, today, t, clientId);
     const items: { item: DayItem; day: Date; daysUntil: number }[] = [];
     for (const [key, dayItems] of map) {
       const day = dayFromKey(key);
@@ -116,7 +123,7 @@ export function OverviewTab({
     }
     items.sort((a, b) => a.day.getTime() - b.day.getTime());
     return items.slice(0, 3);
-  }, [notes, clientId, todayKey]);
+  }, [notes, clientId, todayKey, t]);
 
   // Opens the reminder's own note in place — see `useDayItemModals` — rather
   // than only handing off to the Reminders tab, which is all `onViewReminders`
@@ -160,7 +167,7 @@ export function OverviewTab({
         {/* Current Allocation */}
         <Card variant="default">
           <div className="flex flex-col gap-4">
-            <h6 className="type-h6 text-foreground">Current Allocation</h6>
+            <h6 className="type-h6 text-foreground">{t.client.overview.currentAllocation}</h6>
             <CurrentAllocationSection slices={allocationSlices} />
           </div>
         </Card>
@@ -169,11 +176,13 @@ export function OverviewTab({
         <Card variant="default">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">Top Holdings</h6>
-              <Button variant="plain" size="sm" onClick={onViewAllHoldings}>ดูทั้งหมด</Button>
+              <h6 className="type-h6 text-foreground">{t.client.overview.topHoldings}</h6>
+              {topHoldings.length > 0 && (
+                <Button variant="plain" size="sm" onClick={onViewAllHoldings}>{t.client.overview.viewAll}</Button>
+              )}
             </div>
             <TopHoldingsSection
-              holdings={detail.topHoldings}
+              holdings={topHoldings}
               sortKey={holdingsSortKey}
               sortDir={holdingsSortDir}
               onSort={onSort}
@@ -198,12 +207,18 @@ export function OverviewTab({
         <Card variant="default">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">Reminders</h6>
+              <h6 className="type-h6 text-foreground">{t.client.tabs.reminders}</h6>
               {upcomingReminders.length > 0 && (
-                <Button variant="plain" size="sm" onClick={onViewReminders}>View all</Button>
+                <Button variant="plain" size="sm" onClick={onViewReminders}>{t.client.overview.viewAll}</Button>
               )}
             </div>
-            {upcomingReminders.length === 0 ? (
+            {/* Loading and error before "none": an empty card while the notes
+                are still coming would claim there is nothing due. */}
+            {notesLoading ? (
+              <p className="type-body-2 py-6 text-center text-muted-foreground">{t.common.loading}</p>
+            ) : notesError ? (
+              <ErrorState size="compact" title={t.client.overview.remindersLoadError} onRetry={retryNotes} />
+            ) : upcomingReminders.length === 0 ? (
               <RemindersPreviewEmpty />
             ) : (
               <div className="flex flex-col gap-2">
@@ -229,12 +244,22 @@ export function OverviewTab({
         <Card variant="default">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">Recent Activity</h6>
-              <Button variant="plain" size="sm" onClick={() => setActivityModalOpen(true)}>
-                ดูทั้งหมด
-              </Button>
+              <h6 className="type-h6 text-foreground">{t.client.overview.recentActivity}</h6>
+              {recentActivity.length > 0 && (
+                <Button variant="plain" size="sm" onClick={() => setActivityModalOpen(true)}>
+                  {t.client.overview.viewAll}
+                </Button>
+              )}
             </div>
-            <ActivityTimeline items={detail.recentActivity.slice(0, RECENT_ACTIVITY_PREVIEW)} />
+            {recentActivity.length === 0 ? (
+              <EmptyState
+                size="compact"
+                icon={<ClockCounterClockwiseIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                title={t.client.overview.noActivity}
+              />
+            ) : (
+              <ActivityTimeline items={recentActivity.slice(0, RECENT_ACTIVITY_PREVIEW)} />
+            )}
           </div>
         </Card>
 
@@ -247,14 +272,14 @@ export function OverviewTab({
     <ResponsiveBottomSheetModal
       open={activityModalOpen}
       onClose={() => setActivityModalOpen(false)}
-      title="Recent Activity"
+      title={t.client.overview.recentActivity}
       titleId="client-activity-modal-title"
     >
       {/* The timeline scrolls inside the modal rather than the modal growing:
           a client's full history is unbounded, and the sheet already caps its
           own height on both mobile and desktop. */}
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        <ActivityTimeline items={detail.recentActivity} />
+        <ActivityTimeline items={recentActivity} />
       </div>
     </ResponsiveBottomSheetModal>
     </>

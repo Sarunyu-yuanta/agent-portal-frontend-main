@@ -1,10 +1,12 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { MutualFundTopPerformersPage } from "../../../../client/[id]/MutualFundTopPerformersPage";
-import { resolveMobileFundGroupId } from "../../../../client/[id]/mutual-fund-data";
+import { findMobileFundGroupId } from "../../../../client/[id]/mutual-fund-data";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { CatalogNotFound } from "../../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundTopPerformersRoute({
   params,
@@ -12,9 +14,15 @@ export default function MutualFundTopPerformersRoute({
   params: Promise<{ categoryId: string }>;
 }) {
   const { categoryId: rawCategoryId } = use(params);
-  const initialGroupId = resolveMobileFundGroupId(decodeURIComponent(rawCategoryId));
-  const router = useRouter();
+  const t = useT();
+  // Accepts a group id or a category id; anything else is a dead link, not "all".
+  const initialGroupId = findMobileFundGroupId(decodeURIComponent(rawCategoryId));
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
+
+  if (!initialGroupId) {
+    return <CatalogNotFound message={t.fund.notFound.category} onBack={goBack} />;
+  }
 
   return (
     <MutualFundTopPerformersPage

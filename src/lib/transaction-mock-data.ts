@@ -21,9 +21,9 @@ import type {
 } from "@/types/domain";
 import { mockClients } from "@/lib/mock-data";
 import { stampFromDaysAgo } from "@/lib/order-mock-data";
-import { STOCK_TOP_PICK } from "@/app/(dashboard)/client/[id]/stock-data";
-import { getSectorStockBatch } from "@/app/(dashboard)/client/[id]/stock-industry-sector-data";
-import { getTopPerformers } from "@/app/(dashboard)/client/[id]/mutual-fund-data";
+import { STOCK_TOP_PICK } from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
+import { getSectorStockBatch } from "@/app/[lang]/(dashboard)/client/[id]/stock-industry-sector-data";
+import { getTopPerformers } from "@/app/[lang]/(dashboard)/client/[id]/mutual-fund-data";
 
 /** The platforms a client can trade each asset through. */
 export const TRANSACTION_CHANNELS: Record<TransactionAsset, string[]> = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Pagination } from "@sarunyu/system-one";
 import {
   HEADER_TEXT_CLS,
@@ -16,8 +16,10 @@ import { HourglassMediumIcon } from "@phosphor-icons/react";
 import {
   useOpenProducts,
   useProcessingProductIds,
-} from "@/app/(dashboard)/orders/use-order-books";
+} from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import type { ThaiStructuredProduct } from "./thai-structured-data";
+import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
 
 const MIN_WIDTH = "min-w-[1290px]";
 
@@ -80,6 +82,7 @@ function TableRow({
   onRowClick?: (row: ThaiStructuredProduct) => void;
   href?: string;
 }) {
+  const t = useT();
   const border = cellBorderStyle({ bottom: !isLast });
   const processing = useProcessingProductIds().has(thaiBookableId(row.theme));
   const interactive = Boolean(onRowClick || href);
@@ -113,7 +116,7 @@ function TableRow({
         {col.key === "theme" && processing && (
           <span className="mt-0.5 flex w-fit items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5 text-micro font-normal leading-[18px] text-[#101828]">
             <HourglassMediumIcon size={12} weight="fill" color="#2b7fff" />
-            กำลังดำเนินการสั่งซื้อ
+            {t.products.common.processingOrder}
           </span>
         )}
       </span>
@@ -151,6 +154,7 @@ export function ThaiStructuredProductTable({
   products?: ThaiStructuredProduct[];
   getRowHref?: (row: ThaiStructuredProduct) => string;
 } = {}) {
+  const t = useT();
   // A theme whose order has gone out is no longer offered; the rows behind it
   // move up, and the page count follows.
   const products = useOpenProducts(allProducts, (p) => thaiBookableId(p.theme));
@@ -193,6 +197,10 @@ export function ThaiStructuredProductTable({
               tableCardRef.current.dataset.scrolled = String((body?.scrollLeft ?? 0) > 0);
           }}
         >
+          {total === 0 ? (
+            // Every theme booked out, or none offered — nothing to page through.
+            <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+          ) : (
           <div className={`flex flex-col ${MIN_WIDTH}`}>
             {paged.map((row, i) => (
               <TableRow
@@ -204,13 +212,15 @@ export function ThaiStructuredProductTable({
               />
             ))}
           </div>
+          )}
         </div>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination — hidden with no rows, as on GlobalBondAllPage */}
+      {total > 0 && (
       <div className="flex flex-wrap-reverse items-center justify-end gap-3">
         <div className="flex items-center gap-2">
-          <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+          <p className="text-label text-muted-foreground whitespace-nowrap">{t.products.pagination.perPage}</p>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
@@ -221,17 +231,15 @@ export function ThaiStructuredProductTable({
         </div>
         <div className="flex items-center gap-3">
           <p className="text-label text-muted-foreground">
-            Showing{" "}
-            <span className="font-medium text-foreground">{(safePage - 1) * pageSize + 1}</span>
-            {" – "}
-            <span className="font-medium text-foreground">{Math.min(safePage * pageSize, total)}</span>
-            {" of "}
-            <span className="font-medium text-foreground">{total}</span>{" "}
-            items
+            {t.products.pagination.showing(
+              { from: (safePage - 1) * pageSize + 1, to: Math.min(safePage * pageSize, total), total },
+              (n) => <span className="font-medium text-foreground">{n}</span>,
+            )}
           </p>
           <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setCurrentPage} />
         </div>
       </div>
+      )}
     </div>
   );
 }

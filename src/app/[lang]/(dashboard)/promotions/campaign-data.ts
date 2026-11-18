@@ -28,6 +28,9 @@ import type {
   ClientSegment,
   RsvpStatus,
 } from "@/types/domain";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Locale } from "@/i18n/config";
+import { formatDate } from "@/i18n/format";
 
 // ── Dates and status ────────────────────────────────────────────────────────
 
@@ -141,12 +144,6 @@ export function isPastEvent(campaign: Campaign, today: Date): boolean {
 export type SeatState = "available" | "full" | "past";
 
 export const SEAT_STATES: SeatState[] = ["available", "full", "past"];
-
-export const SEAT_STATE_LABEL: Record<SeatState, string> = {
-  available: "ยังไม่เต็ม",
-  full: "เต็มแล้ว",
-  past: "ผ่านไปแล้ว",
-};
 
 export function seatState(
   campaign: Campaign,
@@ -323,64 +320,11 @@ export function sortByEndingSoonest(
 
 // ── Labels ──────────────────────────────────────────────────────────────────
 
-export const PRODUCT_LABEL: Record<CampaignProduct, string> = {
-  stock: "หุ้น",
-  "mutual-fund": "กองทุน",
-  global: "Global",
-  fcn: "FCN",
-  bond: "Bond",
-};
-
-export const STATUS_LABEL: Record<CampaignStatus, string> = {
-  upcoming: "เร็ว ๆ นี้",
-  active: "กำลังดำเนินการ",
-  ended: "หมดเขต",
-};
-
-export const SEGMENT_LABEL: Record<ClientSegment, string> = {
-  uhnw: "UHNW",
-  hnw: "HNW",
-  aggressive: "รับความเสี่ยงสูง",
-  moderate: "รับความเสี่ยงปานกลาง",
-  conservative: "รับความเสี่ยงต่ำ",
-  "idle-cash": "มีเงินสดคงค้าง",
-};
-
-export const FORMAT_LABEL: Record<CampaignFormat, string> = {
-  online: "Online",
-  onsite: "Onsite",
-};
-
-export const TYPE_LABEL: Record<CampaignType, string> = {
-  promotion: "โปรโมชัน",
-  event: "สัมมนา/อีเว้นท์",
-};
-
-export const CLIENT_STATUS_LABEL: Record<CampaignClientStatus, string> = {
-  "not-sent": "ยังไม่ส่ง",
-  sent: "ส่งแล้ว",
-  interested: "สนใจ",
-  redeemed: "ใช้สิทธิ์แล้ว",
-};
-
-export const RSVP_LABEL: Record<RsvpStatus, string> = {
-  registered: "ลงทะเบียน",
-  confirmed: "ยืนยัน",
-  attended: "เข้าร่วม",
-  "no-show": "ไม่มา",
-};
-
 /** "12 ต.ค. 2569" — Buddhist era, matching every other date in the app. */
-export function thaiDay(isoDay: string): string {
-  return dayFromIso(isoDay).toLocaleDateString("th-TH", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+export function campaignDay(isoDay: string, locale: Locale): string {
+  return formatDate(locale, dayFromIso(isoDay), "short");
 }
 
-/** What a card and the detail header print where a date range would go. */
-export const NO_PERIOD_LABEL = "ไม่ระบุช่วงเวลา";
 
 /**
  * The one date line a card shows.
@@ -393,20 +337,20 @@ export const NO_PERIOD_LABEL = "ไม่ระบุช่วงเวลา";
  * row: the dash the row would otherwise collapse to reads as a layout fault,
  * and the IC's question — "how long have I got?" — still has an answer.
  */
-export function campaignDateLine(campaign: Campaign): string {
+export function campaignDateLine(campaign: Campaign, t: Dictionary, locale: Locale): string {
   if (campaign.type === "event" && campaign.eventDate) {
-    return thaiDay(campaign.eventDate);
+    return campaignDay(campaign.eventDate, locale);
   }
   if (campaign.startDate === null || campaign.endDate === null) {
-    return NO_PERIOD_LABEL;
+    return t.promotions.noPeriod;
   }
-  return `${thaiDay(campaign.startDate)} – ${thaiDay(campaign.endDate)}`;
+  return `${campaignDay(campaign.startDate, locale)} – ${campaignDay(campaign.endDate, locale)}`;
 }
 
 /** "เหลือ 3 วัน" / "วันสุดท้าย" — only meaningful while a campaign is open. */
-export function countdownLabel(campaign: Campaign, today: Date): string | null {
+export function countdownLabel(campaign: Campaign, today: Date, t: Dictionary): string | null {
   if (!isEndingSoon(campaign, today)) return null;
   const left = daysLeft(campaign, today);
   if (left === null) return null;
-  return left === 0 ? "วันสุดท้าย" : `เหลือ ${left} วัน`;
+  return left === 0 ? t.dates.campaign.lastDay : t.dates.campaign.daysLeft(left);
 }

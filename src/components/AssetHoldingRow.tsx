@@ -8,6 +8,7 @@ import type {
   HoldingItem,
 } from "@/data/asset-account-details";
 import { displayAssetLabel } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 
 function HoldingItemRow({
   item,
@@ -18,8 +19,9 @@ function HoldingItemRow({
   open: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
   const hasPosition = item.position && item.position.fields.length > 0;
-  const avgCost = item.position?.fields.find((f) => f.label.startsWith("Average Cost"))?.value;
+  const avgCost = item.position?.fields.find((f) => f.id === "avgCost")?.value;
 
   return (
     <div className={`rounded-md overflow-hidden border ${open ? "border-[rgba(0,0,0,0.1)] bg-[var(--bg-default-secondary)]" : "border-transparent"}`}>
@@ -43,7 +45,7 @@ function HoldingItemRow({
           </p>
           {avgCost && (
             <p className="type-caption text-[var(--text-default-tertiary)] leading-4 whitespace-nowrap">
-              ราคาทุนเฉลี่ย {avgCost}
+              {t.client.assets.avgCost(avgCost)}
             </p>
           )}
           <ProfitLossBadge
@@ -63,8 +65,8 @@ function HoldingItemRow({
       {open && hasPosition && (
         <div className="px-2 pb-2 flex flex-col gap-1">
           {item.position!.fields.map((field) => (
-            <div key={field.label} className="flex items-center justify-between gap-2">
-              <p className="type-caption text-[var(--text-default-tertiary)] leading-4">{field.label}</p>
+            <div key={field.id} className="flex items-center justify-between gap-2">
+              <p className="type-caption text-[var(--text-default-tertiary)] leading-4">{t.client.assets.position[field.id]}</p>
               <p className="type-caption font-semibold text-[var(--text-default-primary)] leading-4 shrink-0">{field.value}</p>
             </div>
           ))}
@@ -75,6 +77,7 @@ function HoldingItemRow({
 }
 
 export function AssetHoldingAccordion({ detail }: { detail: AssetAccountDetail }) {
+  const t = useT();
   const allItems = detail.sections.flatMap((s) => s.items);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const allExpanded = allItems.length > 0 && allItems.every((item) => expandedIds.has(item.id));
@@ -95,7 +98,7 @@ export function AssetHoldingAccordion({ detail }: { detail: AssetAccountDetail }
         <div key={section.title} className="px-3 py-2 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <p className="type-caption font-bold text-[var(--text-default-secondary)] leading-5">
-              {displayAssetLabel(section.title)}
+              {displayAssetLabel(section.title, t)}
             </p>
             {sIdx === 0 && (
               <button
@@ -103,7 +106,7 @@ export function AssetHoldingAccordion({ detail }: { detail: AssetAccountDetail }
                 onClick={handleExpandCollapseAll}
                 className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
               >
-                {allExpanded ? "Collapse All" : "Expand All"}
+                {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
               </button>
             )}
           </div>

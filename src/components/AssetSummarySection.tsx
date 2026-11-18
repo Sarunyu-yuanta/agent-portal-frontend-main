@@ -3,8 +3,14 @@
 import { useState, type ReactNode } from "react";
 import { CaretRightIcon, InfoIcon } from "@phosphor-icons/react";
 import { NetValueSummaryModal } from "@/components/NetValueSummaryModal";
-import { displayAssetLabel } from "@/lib/client-utils";
-import { AllocationDonut, AllocationDonutWithTiles } from "@/components/allocation-donut";
+import { ASSET_CLASS, displayAssetLabel } from "@/lib/client-utils";
+import {
+  AllocationDonut,
+  AllocationDonutWithTiles,
+  AllocationEmptyState,
+  hasAllocation,
+} from "@/components/allocation-donut";
+import { useT } from "@/i18n/I18nProvider";
 
 export type AssetHeroSummary = {
   netValue: string;
@@ -39,21 +45,22 @@ const DEFAULT_HERO: AssetHeroSummary = {
 };
 
 export const ALLOCATION_SLICES: AssetAllocationSlice[] = [
-  { label: "เงินสด", percent: 35, statusIcon: "/asset-allocation/status-0.svg" },
-  { label: "หุ้นไทย", percent: 20, statusIcon: "/asset-allocation/status-1.svg" },
-  { label: "หุ้นต่างประเทศ", percent: 20, statusIcon: "/asset-allocation/status-2.svg" },
-  { label: "หุ้นกู้ที่มีอนุพันธ์แฝง", percent: 10, statusIcon: "/asset-allocation/status-3.svg" },
-  { label: "กองทุนรวม", percent: 8, statusIcon: "/asset-allocation/status-4.svg" },
-  { label: "ตราสารหนี้", percent: 6, statusIcon: "/asset-allocation/status-5.svg" },
-  { label: "อนุพันธ์", percent: 3, statusIcon: "/asset-allocation/status-6.svg" },
-  { label: "ตราสารหนี้ต่างประเทศ", percent: 1, statusIcon: "/asset-allocation/status-7.svg" },
+  { label: ASSET_CLASS.cash, percent: 35, statusIcon: "/asset-allocation/status-0.svg" },
+  { label: ASSET_CLASS.thaiStock, percent: 20, statusIcon: "/asset-allocation/status-1.svg" },
+  { label: ASSET_CLASS.foreignStock, percent: 20, statusIcon: "/asset-allocation/status-2.svg" },
+  { label: ASSET_CLASS.structuredBond, percent: 10, statusIcon: "/asset-allocation/status-3.svg" },
+  { label: ASSET_CLASS.mutualFund, percent: 8, statusIcon: "/asset-allocation/status-4.svg" },
+  { label: ASSET_CLASS.bond, percent: 6, statusIcon: "/asset-allocation/status-5.svg" },
+  { label: ASSET_CLASS.derivatives, percent: 3, statusIcon: "/asset-allocation/status-6.svg" },
+  { label: ASSET_CLASS.foreignBond, percent: 1, statusIcon: "/asset-allocation/status-7.svg" },
 ];
 
 function AllocationBreakdownHeader() {
+  const t = useT();
   return (
     <div className="flex w-full shrink-0 justify-start">
       <p className="type-body-2 !font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-5">
-        Allocation breakdown
+        {t.client.assets.allocationBreakdown}
       </p>
     </div>
   );
@@ -96,6 +103,7 @@ export function AllocationBreakdown({ slices }: { slices: AssetAllocationSlice[]
 }
 
 function AllocationLegendItemCompact({ slice }: { slice: AssetAllocationSlice }) {
+  const t = useT();
   return (
     <div className="flex gap-2 items-center w-full justify-between">
       <div className="flex gap-1 items-center px-2 py-1">
@@ -104,7 +112,7 @@ function AllocationLegendItemCompact({ slice }: { slice: AssetAllocationSlice })
           <img alt="" className="block size-full max-w-none" src={slice.statusIcon} />
         </span>
         <p className="type-body-2 text-[var(--text-default-tertiary)] leading-5 whitespace-nowrap">
-          {displayAssetLabel(slice.label)}
+          {displayAssetLabel(slice.label, t)}
         </p>
       </div>
       <p className="type-body-2 text-[var(--text-default-tertiary)] leading-5 shrink-0">
@@ -124,14 +132,20 @@ export function AllocationBreakdownSidebar({ slices }: { slices: AssetAllocation
   return (
     <AllocationBreakdownCard>
       <AllocationBreakdownHeader />
-      <div className="flex gap-3 items-center shrink-0 w-full">
-        <AllocationDonut slices={slices} size={96} />
-        <div className="flex flex-1 flex-col items-start min-w-0">
-          {slices.map((slice) => (
-            <AllocationLegendItemCompact key={slice.label} slice={slice} />
-          ))}
+      {hasAllocation(slices) ? (
+        <div className="flex gap-3 items-center shrink-0 w-full">
+          <AllocationDonut slices={slices} size={96} />
+          <div className="flex flex-1 flex-col items-start min-w-0">
+            {slices.map((slice) => (
+              <AllocationLegendItemCompact key={slice.label} slice={slice} />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full">
+          <AllocationEmptyState />
+        </div>
+      )}
     </AllocationBreakdownCard>
   );
 }
@@ -143,6 +157,7 @@ export function LiabilitiesBar({
   amount: string;
   onClick?: () => void;
 }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -151,7 +166,7 @@ export function LiabilitiesBar({
     >
       <div className="flex flex-1 gap-0.5 items-center min-w-0">
         <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4 shrink-0">
-          Liabilities (THB)
+          {t.client.assets.liabilities}
         </p>
         <p className="flex-1 type-body-2 font-bold text-destructive text-right leading-5 min-w-0">
           {amount}
@@ -163,6 +178,7 @@ export function LiabilitiesBar({
 }
 
 export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
+  const t = useT();
   const [infoOpen, setInfoOpen] = useState(false);
   const changePrefix = summary.changePositive ? "+" : "";
 
@@ -173,13 +189,13 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
         <div className="flex items-start justify-center w-full">
           <div className="flex gap-1 items-center justify-center">
             <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-              มูลค่าสุทธิ (THB)
+              {t.client.assets.netValue}
             </p>
             <button
               type="button"
               onClick={() => setInfoOpen(true)}
               className="text-[var(--text-default-tertiary)] hover:text-[var(--text-default-secondary)] transition-colors cursor-pointer"
-              aria-label="ดูรายละเอียดมูลค่าสุทธิ"
+              aria-label={t.client.assets.netValueInfoAria}
             >
               <InfoIcon size={16} className="shrink-0" />
             </button>
@@ -232,7 +248,7 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
       <div className="flex items-center w-full">
         <div className="flex flex-[1_0_0] flex-col items-center min-w-0 pt-1.5 pb-3">
           <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-            Line Available (THB)
+            {t.client.assets.lineAvailable}
           </p>
           <p className="type-subtitle-1 font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-6">
             {summary.lineAvailable}
@@ -240,7 +256,7 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
         </div>
         <div className="flex flex-[1_0_0] flex-col items-center min-w-0 pt-1.5 pb-3">
           <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-            Cash (THB)
+            {t.client.assets.cash}
           </p>
           <p className="type-subtitle-1 font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-6">
             {summary.cash}
@@ -257,9 +273,10 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
 }
 
 export function LastUpdated({ summary }: { summary: AssetHeroSummary }) {
+  const t = useT();
   return (
     <div className="flex gap-1 items-center justify-center w-full type-caption text-[var(--text-default-placeholder)] whitespace-nowrap leading-4">
-      <span>อัปเดตล่าสุด</span>
+      <span>{t.client.assets.lastUpdated}</span>
       <span>{summary.lastUpdatedDate}</span>
       <span>-</span>
       <span>{summary.lastUpdatedTime}</span>

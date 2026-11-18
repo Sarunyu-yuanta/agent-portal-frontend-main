@@ -1,12 +1,13 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { FixedIncomeDetail } from "../../../../client/[id]/FixedIncomeDetail";
 import { FixedIncomeDetailSkeleton } from "../../../../client/[id]/ProductDetailSkeletons";
 import { useFixedIncomeBond } from "@/hooks/use-catalog";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { CatalogNotFound } from "../../../CatalogNotFound";
+import { useT } from "@/i18n/I18nProvider";
 
 /** Loading lives with the lookup — see the note in `product/[id]/page.tsx`. */
 export default function FixedIncomeBondDetailPage({
@@ -14,8 +15,9 @@ export default function FixedIncomeBondDetailPage({
 }: {
   params: Promise<{ bondId: string }>;
 }) {
+  const t = useT();
   const { bondId } = use(params);
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const { data: bond, isLoading } = useFixedIncomeBond(decodeURIComponent(bondId));
   // Called unconditionally — the early returns below must not skip a hook.
   const goBack = useSectionBack();
@@ -25,7 +27,7 @@ export default function FixedIncomeBondDetailPage({
   }
 
   if (!bond) {
-    return <CatalogNotFound message="ไม่พบตราสารหนี้นี้" onBack={goBack} />;
+    return <CatalogNotFound message={t.products.notFound.bond} onBack={goBack} />;
   }
 
   return (

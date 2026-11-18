@@ -1,5 +1,6 @@
 "use client";
 
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useState } from "react";
 import {
   CaretRightIcon,
@@ -16,6 +17,7 @@ import {
 } from "../use-kyc-notification-feed";
 import { CardCount, RowIcon } from "./CardHeader";
 import { groupQueueByBucket, type QueueItem } from "./dashboard-data";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Whose KYC is about to lapse.
@@ -51,6 +53,7 @@ export function KycAlertsPanel({
   /** When false, only the sheet/contact overlays render — inline card hidden. */
   showInline?: boolean;
 }) {
+  const t = useT();
   const [allOpenInternal, setAllOpenInternal] = useState(false);
   const allOpen = allOpenProp ?? allOpenInternal;
   const setAllOpen = (open: boolean) => {
@@ -103,22 +106,39 @@ export function KycAlertsPanel({
   };
 
   if (rows.length === 0) {
-    if (!showInline) return null;
+    const empty = (size: "default" | "compact") => (
+      <EmptyState
+        icon={
+          <ShieldCheckIcon
+            size={40}
+            weight="duotone"
+            className="text-[var(--text-default-placeholder)]"
+          />
+        }
+        title={t.commandCenter.kyc.emptyTitle}
+        body={t.commandCenter.kyc.emptyBody}
+        size={size}
+      />
+    );
     return (
-      <div className="flex flex-col gap-4">
-        <Header count={0} />
-        <EmptyState
-          icon={
-            <ShieldCheckIcon
-              size={40}
-              weight="duotone"
-              className="text-[var(--text-default-placeholder)]"
-            />
-          }
-          title="ไม่มี KYC ใกล้หมดอายุ"
-          body="ลูกค้าทุกรายมี KYC ที่ยังไม่เข้าช่วงเตือน"
-        />
-      </div>
+      <>
+        {showInline && (
+          <div className="flex flex-col gap-4">
+            <Header count={0} />
+            {empty("default")}
+          </div>
+        )}
+        {/* The stat tile still opens this sheet at 0 — say so rather than
+            opening a blank panel. */}
+        <ResponsiveBottomSheetModal
+          open={allOpen}
+          onClose={closeSheet}
+          title={t.commandCenter.kyc.title}
+          titleId="dashboard-kyc-all"
+        >
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{empty("compact")}</div>
+        </ResponsiveBottomSheetModal>
+      </>
     );
   }
 
@@ -162,7 +182,7 @@ export function KycAlertsPanel({
       <ResponsiveBottomSheetModal
         open={allOpen}
         onClose={closeSheet}
-        title="KYC ใกล้หมดอายุ"
+        title={t.commandCenter.kyc.title}
         titleId="dashboard-kyc-all"
       >
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -176,7 +196,7 @@ export function KycAlertsPanel({
                 {groupQueueByBucket(rows, new Date()).map((group) => (
                   <div key={group.bucket} className="flex flex-col gap-2">
                     <p className="type-caption font-semibold text-muted-foreground">
-                      {group.label}
+                      {t.buckets.reminder[group.bucket]}
                     </p>
                     <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
                       {group.items.map((row) => (
@@ -242,9 +262,10 @@ export function KycAlertsPanel({
  * somewhere no row of theirs does — the Calendar, the Call Log page.
  */
 function Header({ count }: { count: number }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-2">
-      <h6 className="type-h6 text-foreground">KYC ใกล้หมดอายุ</h6>
+      <h6 className="type-h6 text-foreground">{t.commandCenter.kyc.title}</h6>
       {count > 0 && <CardCount value={count} />}
     </div>
   );
@@ -252,10 +273,10 @@ function Header({ count }: { count: number }) {
 
 /** The countdown, as the pill on the right of a row. Signed, because "เลยมา 10
  *  วัน" and "อีก 10 วัน" are opposite situations and a bare `10` is neither. */
-export function countdownLabel(daysLeft: number): string {
-  if (daysLeft === 0) return "วันนี้";
-  if (daysLeft < 0) return `เลยมา ${Math.abs(daysLeft)} วัน`;
-  return `อีก ${daysLeft} วัน`;
+export function countdownLabel(daysLeft: number, t: Dictionary): string {
+  if (daysLeft === 0) return t.dates.today;
+  if (daysLeft < 0) return t.dates.overdueDays(Math.abs(daysLeft));
+  return t.dates.inDays(daysLeft);
 }
 
 /**
@@ -298,6 +319,7 @@ function MoreRow({
   sole: boolean;
   onOpen: () => void;
 }) {
+  const t = useT();
   const next = rows[0];
   return (
     <button
@@ -307,13 +329,13 @@ function MoreRow({
     >
       <p className="min-w-0 flex-1 truncate text-body-sm text-foreground">
         <span className="font-bold">
-          {sole ? "ดูทั้ง" : "ดูอีก"} {rows.length} รายการ
+          {sole ? t.commandCenter.viewAllItems(rows.length) : t.commandCenter.moreItems(rows.length)}
         </span>
-        <span className="text-muted-foreground"> · ใกล้สุด </span>
+        <span className="text-muted-foreground">{t.commandCenter.kyc.nearestSeparator}</span>
         <span
           className={`font-semibold ${kycCheckpointTextTone(next.daysLeft)}`}
         >
-          {countdownLabel(next.daysLeft)}
+          {countdownLabel(next.daysLeft, t)}
         </span>
       </p>
 
@@ -335,6 +357,7 @@ export function KycRow({
   /** Off in the Reminders card — the card already says "วันนี้" once up top. */
   showBadge?: boolean;
 }) {
+  const t = useT();
   const tone = kycCheckpointTone(row.daysLeft);
 
   return (
@@ -367,7 +390,7 @@ export function KycRow({
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-meta font-semibold tabular-nums ${tone}`}
         >
-          {countdownLabel(row.daysLeft)}
+          {countdownLabel(row.daysLeft, t)}
         </span>
       ) : null}
     </div>

@@ -5,12 +5,11 @@ import { BottomSheet, Popover } from "@sarunyu/system-one";
 import { CaretDownIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { monthLabel } from "./calendar-grid";
+import { useLocale, useT } from "@/i18n/I18nProvider";
+import { monthNames } from "@/i18n/format";
 
 /** Built from a fixed date so the list is the same on the server and the client
  * — a locale month name is otherwise the kind of thing that hydrates twice. */
-const MONTH_NAMES = Array.from({ length: 12 }, (_, month) =>
-  new Date(2000, month, 1).toLocaleDateString("en-GB", { month: "short" }),
-);
 
 /**
  * The month label, as a control rather than a heading: reading it tells you
@@ -31,6 +30,8 @@ export function MonthPicker({
   today: Date;
   onSelect: (month: Date) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
   // The year being browsed, which is not the year being viewed: paging to 2027
@@ -55,7 +56,7 @@ export function MonthPicker({
         <button
           type="button"
           onClick={() => setYear((y) => y - 1)}
-          aria-label="Previous year"
+          aria-label={t.planner.calendar.previousYear}
           className={`flex items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
             isMobile ? "size-9" : "size-7"
           }`}
@@ -66,7 +67,7 @@ export function MonthPicker({
         <button
           type="button"
           onClick={() => setYear((y) => y + 1)}
-          aria-label="Next year"
+          aria-label={t.planner.calendar.nextYear}
           className={`flex items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
             isMobile ? "size-9" : "size-7"
           }`}
@@ -82,7 +83,7 @@ export function MonthPicker({
           isMobile ? "p-3 pb-[max(1rem,env(safe-area-inset-bottom))]" : "p-2"
         }`}
       >
-        {MONTH_NAMES.map((name, month) => {
+        {monthNames(locale, "short").map((name, month) => {
           const selected = month === value.getMonth() && year === value.getFullYear();
           // Marked even when it is not the selection, so "where is now" stays
           // answerable while browsing another year.
@@ -131,7 +132,7 @@ export function MonthPicker({
     >
       <button
         type="button"
-        aria-label="Change month"
+        aria-label={t.planner.calendar.changeMonth}
         // On a phone the Popover isn't listening, so the trigger opens the sheet
         // itself. Reset the browsed year here too — `handleOpenChange` is the
         // Popover's callback and never fires on that path.
@@ -139,7 +140,7 @@ export function MonthPicker({
         className="flex min-w-0 items-center gap-1 rounded-lg px-1.5 py-1 transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]!"
       >
         <span className="type-body-1 font-semibold text-foreground truncate">
-          {monthLabel(value)}
+          {monthLabel(value, locale)}
         </span>
         <CaretDownIcon
           size={13}
@@ -156,7 +157,7 @@ export function MonthPicker({
         open={open}
         onOpenChange={handleOpenChange}
         showHeader={false}
-        title="Change month"
+        title={t.planner.calendar.changeMonth}
         className="px-0 pb-0"
         contentClassName="pt-0"
       >

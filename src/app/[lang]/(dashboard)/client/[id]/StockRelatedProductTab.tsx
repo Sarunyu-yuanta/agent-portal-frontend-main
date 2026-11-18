@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { Chip } from "@sarunyu/system-one";
 import { CardsIcon, CaretDownIcon, FireIcon, TableIcon } from "@phosphor-icons/react";
 import { ChipScroller } from "@/components/ui/chip-scroller";
@@ -15,7 +16,6 @@ import { BondLogo } from "./fixed-income-shared";
 import { BOND_LOGOS, type FixedIncomeBond } from "./fixed-income-data";
 import { getIssuerIdForBondRow, type GlobalBondRow } from "./global-bond-data";
 import {
-  RELATED_PRODUCT_CHIP_LABEL,
   relatedProductKinds,
   type RelatedDerivativeBundle,
   type RelatedDrBundle,
@@ -30,8 +30,9 @@ import {
   TOP_PICK_COUNT,
   type StructuredProduct,
 } from "./structured-product-data";
-import { useOpenProducts } from "@/app/(dashboard)/orders/use-order-books";
+import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
 import type { MutualFund } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 const ASSETS = {
   yuantaMark: "/products/stock/detail/yuanta-logo-mark-white.svg",
@@ -103,12 +104,13 @@ function RelatedDrRowView({ row }: { row: RelatedDrRow }) {
 }
 
 function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
+  const t = useT();
   return (
     <div className="flex w-full flex-col gap-8">
       {dr.yuanta ? (
         <div className="w-full max-w-[434px] rounded-lg bg-gradient-to-r from-[#00a1e9] to-[#004eba] p-1.5">
           <div className="flex items-center justify-between px-1.5">
-            <p className="truncate text-sm font-bold leading-[24px] text-white">DR issued by Yuanta</p>
+            <p className="truncate text-sm font-bold leading-[24px] text-white">{t.stock.related.drYuanta}</p>
             <YuantaWordmark />
           </div>
           <div className="mt-2 overflow-hidden rounded-lg">
@@ -121,11 +123,11 @@ function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
         <div className="flex w-full flex-col gap-4">
           <div className="flex items-center gap-3">
             <p className="truncate text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">
-              DR issued by other brokers
+              {t.stock.related.drOthers}
             </p>
             <span className="h-[22px] w-px shrink-0 bg-black/10" aria-hidden />
             <p className="shrink-0 text-sm leading-[24px] text-[rgba(0,0,0,0.75)]">
-              {dr.others.length} Symbols
+              {t.stock.related.symbols(dr.others.length)}
             </p>
           </div>
           <div className="h-px w-full bg-black/10" />
@@ -141,19 +143,20 @@ function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
 }
 
 function FutureCard({ contract }: { contract: RelatedFutureContract }) {
+  const t = useT();
   return (
     <div className={`flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 ${ROW_HOVER}`}>
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <p className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{contract.symbol}</p>
-          <p className="truncate text-xs leading-[20px] text-black/40">IM: {contract.im}</p>
+          <p className="truncate text-xs leading-[20px] text-black/40">{t.stock.related.im(contract.im)}</p>
         </div>
         <div className="flex max-w-24 min-w-0 flex-1 flex-col items-end justify-center gap-0.5">
           <div className="flex items-center justify-end gap-1">
             <span className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">
               {contract.lastPrice}
             </span>
-            <span className="text-micro leading-[18px] text-black/40">points</span>
+            <span className="text-micro leading-[18px] text-black/40">{t.stock.related.points}</span>
           </div>
           <div className="flex items-center justify-end gap-1 text-[#21761d]">
             <span className="truncate text-xs leading-[20px]">{contract.change}</span>
@@ -167,75 +170,59 @@ function FutureCard({ contract }: { contract: RelatedFutureContract }) {
 }
 
 function FuturesRemark() {
+  const t = useT();
+  const r = t.stock.related.remark;
   return (
     <div className="flex max-w-[480px] flex-col gap-0.5 text-[rgba(0,0,0,0.75)]">
-      <p className="text-xs font-medium leading-[22px]">Remark</p>
+      <p className="text-xs font-medium leading-[22px]">{r.title}</p>
       <ul className="flex flex-col text-xs leading-[20px]">
         <li className="flex gap-1">
-          <span className="font-semibold">• Price:</span>
-          <span className="font-medium leading-[18px]">Exclude Block Trade Transaction</span>
+          <span className="font-semibold">{r.price}</span>
+          <span className="font-medium leading-[18px]">{r.priceBody}</span>
         </li>
         <li className="flex gap-1">
-          <span className="font-semibold">• Chg (Change):</span>
-          <span className="font-medium leading-[18px]">Change from Prior Settlement Price</span>
+          <span className="font-semibold">{r.chg}</span>
+          <span className="font-medium leading-[18px]">{r.chgBody}</span>
         </li>
         <li>
-          <span className="font-semibold">• OI (Open Interest):</span>
-          <p className="mt-0">- During Day Session, Open Interest is the value as of the Night Session of previous day.</p>
-          <p>- During Night Session, Open Interest is the value as of the Afternoon Session of current day.</p>
+          <span className="font-semibold">{r.oi}</span>
+          <p className="mt-0">{r.oiDay}</p>
+          <p>{r.oiNight}</p>
         </li>
         <li className="flex gap-1">
-          <span className="font-semibold">• IM:</span>
-          <span>Initial Margin</span>
+          <span className="font-semibold">{r.im}</span>
+          <span>{r.imBody}</span>
         </li>
       </ul>
     </div>
   );
 }
 
+/** Labels are `t.stock.related.cols[key]`. */
 const TABLE_COLS = [
-  { key: "lastTradingDay", label: "Last Trading Day" },
-  { key: "lastPrice", label: "Last Price", align: "right" },
-  { key: "im", label: "IM", align: "right" },
-  { key: "change", label: "Change", align: "right", tone: "up" },
-  { key: "changePercent", label: "% Change", align: "right", tone: "up" },
-  { key: "open", label: "Open", align: "right" },
-  { key: "high", label: "High", align: "right" },
-  { key: "low", label: "Low", align: "right" },
-  { key: "volume", label: "Volume", align: "right" },
-  { key: "openInterest", label: "Open Interest", align: "right" },
-  { key: "settlementPrice", label: "Settlement Price", align: "right" },
+  { key: "lastTradingDay" },
+  { key: "lastPrice", align: "right" },
+  { key: "im", align: "right" },
+  { key: "change", align: "right", tone: "up" },
+  { key: "changePercent", align: "right", tone: "up" },
+  { key: "open", align: "right" },
+  { key: "high", align: "right" },
+  { key: "low", align: "right" },
+  { key: "volume", align: "right" },
+  { key: "openInterest", align: "right" },
+  { key: "settlementPrice", align: "right" },
 ] as const;
 
+/** A header the dictionary breaks with `\n` wraps there. */
 function headerLabel(label: string) {
-  if (label === "Last Trading Day") {
-    return (
-      <>
-        Last Trading
-        <br />
-        Day
-      </>
-    );
-  }
-  if (label === "Open Interest") {
-    return (
-      <>
-        Open
-        <br />
-        Interest
-      </>
-    );
-  }
-  if (label === "Settlement Price") {
-    return (
-      <>
-        Settlement
-        <br />
-        Price
-      </>
-    );
-  }
-  return label;
+  const lines = label.split("\n");
+  if (lines.length === 1) return label;
+  return lines.map((line, i) => (
+    <Fragment key={i}>
+      {i > 0 && <br />}
+      {line}
+    </Fragment>
+  ));
 }
 
 function FuturesTable({
@@ -245,13 +232,14 @@ function FuturesTable({
   contracts: RelatedFutureContract[];
   totals: RelatedDerivativeBundle["totals"];
 }) {
+  const t = useT();
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-black/10">
       <table className="w-full min-w-[1080px] border-collapse text-sm leading-[26px]">
         <thead>
           <tr>
             <th className="sticky left-0 z-[1] border-b border-r border-black/10 bg-white px-4 py-2 text-left font-normal text-black/40">
-              Symbol
+              {t.stock.related.symbol}
             </th>
             {TABLE_COLS.map((col) => (
               <th
@@ -260,7 +248,7 @@ function FuturesTable({
                   "align" in col && col.align === "right" ? "text-right" : "text-center"
                 }`}
               >
-                {headerLabel(col.label)}
+                {headerLabel(t.stock.related.cols[col.key])}
               </th>
             ))}
           </tr>
@@ -295,7 +283,7 @@ function FuturesTable({
               colSpan={9}
               className="border-b border-black/10 px-4 py-1 font-semibold whitespace-nowrap text-[rgba(0,0,0,0.85)]"
             >
-              Total Futures
+              {t.stock.related.totalFutures}
             </td>
             <td className="border-b border-black/10 px-4 py-1 text-right font-semibold text-[#0a6ee7]">
               {totals.volume}
@@ -318,6 +306,7 @@ function ViewModeMenu({
   mode: "card" | "table";
   onChange: (mode: "card" | "table") => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -347,7 +336,7 @@ function ViewModeMenu({
         className="inline-flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-black/10 bg-white px-2 py-1 text-sm font-semibold leading-[26px] text-[#4a5565] transition-colors hover:bg-[#f9fafb]"
       >
         <TableIcon size={20} className="shrink-0" />
-        View Mode
+        {t.stock.related.viewMode}
         <CaretDownIcon size={20} className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
@@ -357,8 +346,8 @@ function ViewModeMenu({
         >
           {(
             [
-              { id: "table" as const, label: "Table", Icon: TableIcon },
-              { id: "card" as const, label: "Card", Icon: CardsIcon },
+              { id: "table" as const, label: t.stock.related.viewTable, Icon: TableIcon },
+              { id: "card" as const, label: t.stock.related.viewCard, Icon: CardsIcon },
             ] as const
           ).map((opt) => {
             const selected = mode === opt.id;
@@ -387,6 +376,7 @@ function ViewModeMenu({
 }
 
 function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
+  const t = useT();
   const [mode, setMode] = useState<"card" | "table">("card");
 
   return (
@@ -394,10 +384,10 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
       <div className="flex w-full flex-col gap-6">
         <div className="flex w-full items-end justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h2 className="truncate text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">Related Futures</h2>
+            <h2 className="truncate text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{t.stock.related.relatedFutures}</h2>
             <span className="h-4 w-px shrink-0 bg-black/10" aria-hidden />
             <p className="shrink-0 text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">
-              {data.contracts.length} Contracts
+              {t.stock.related.contracts(data.contracts.length)}
             </p>
           </div>
           <ViewModeMenu mode={mode} onChange={setMode} />
@@ -407,12 +397,12 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
           <div className="flex w-full flex-col gap-3">
             <div className="flex w-full max-w-[343px] items-start gap-6 overflow-hidden rounded-lg bg-[#f9f9f9] p-2">
               <div className="flex min-w-0 flex-1 flex-col items-center">
-                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">Volume (Contracts)</p>
+                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">{t.stock.related.volumeContracts}</p>
                 <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{data.totals.volume}</p>
               </div>
               <span className="w-px self-stretch bg-black/10" aria-hidden />
               <div className="flex min-w-0 flex-1 flex-col items-center">
-                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">Open Interest (Contracts)</p>
+                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">{t.stock.related.oiContracts}</p>
                 <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{data.totals.openInterest}</p>
               </div>
             </div>
@@ -421,12 +411,12 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
                 <FutureCard key={contract.symbol} contract={contract} />
               ))}
             </div>
-            <p className="text-xs leading-[20px] text-black/40">{data.updated}</p>
+            <p className="text-xs leading-[20px] text-black/40">{t.stock.related.futuresUpdated(data.updated)}</p>
           </div>
         ) : (
           <div className="flex w-full flex-col gap-3">
             <FuturesTable contracts={data.contracts} totals={data.totals} />
-            <p className="text-xs leading-[20px] text-black/40">{data.updated}</p>
+            <p className="text-xs leading-[20px] text-black/40">{t.stock.related.futuresUpdated(data.updated)}</p>
           </div>
         )}
       </div>
@@ -456,13 +446,14 @@ function thaiStructuredHref(product: ThaiStructuredProduct) {
 
 function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProduct[] }) {
   // The catalogue's own Top pick, closed products out — see `STRUCTURED_SHELF`.
+  const t = useT();
   const topPicks = useOpenProducts(STRUCTURED_SHELF, (p) => p.id, TOP_PICK_COUNT);
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center gap-1">
           <FireIcon size={24} weight="fill" color="#f97316" className="shrink-0" />
-          <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">Top pick</p>
+          <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">{t.stock.related.topPick}</p>
         </div>
         <div className="grid w-full grid-cols-1 gap-4 md:flex md:flex-col lg:grid lg:grid-cols-3">
           {topPicks.map((product) => (
@@ -475,7 +466,7 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
         </div>
       </div>
       <div className="flex w-full flex-col gap-4">
-        <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">All Thai FCN</p>
+        <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">{t.stock.related.allThaiFcn}</p>
         <ThaiStructuredProductTable products={products} getRowHref={thaiStructuredHref} />
       </div>
     </div>
@@ -511,6 +502,7 @@ function RelatedFixedIncomeBody({ bonds }: { bonds: FixedIncomeBond[] }) {
 }
 
 function RelatedGlobalBondBody({ bonds }: { bonds: GlobalBondRow[] }) {
+  const t = useT();
   return (
     <div className="flex w-full flex-col">
       {bonds.map((bond) => {
@@ -526,7 +518,7 @@ function RelatedGlobalBondBody({ bonds }: { bonds: GlobalBondRow[] }) {
             </div>
             <div className="shrink-0 text-right">
               <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{bond.yieldPct}</p>
-              <p className="text-xs leading-[20px] text-black/40">Yield</p>
+              <p className="text-xs leading-[20px] text-black/40">{t.stock.related.yield}</p>
             </div>
           </>
         );
@@ -579,8 +571,9 @@ function RelatedProductPanel({ related, kind }: { related: RelatedProducts; kind
 }
 
 export function StockRelatedProductTab({ related }: { related: RelatedProducts }) {
+  const t = useT();
   const kinds = useMemo(() => relatedProductKinds(related), [related]);
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const relatedParam = searchParams.get("related");
   const filter: RelatedProductKind =
@@ -606,7 +599,7 @@ export function StockRelatedProductTab({ related }: { related: RelatedProducts }
             key={id}
             type="single"
             size="small"
-            label={RELATED_PRODUCT_CHIP_LABEL[id]}
+            label={t.stock.related.chips[id] ?? id}
             selected={filter === id}
             onClick={() =>
               setQueryState(withQuery(pathname, searchParams, { tab: "related", related: id }))

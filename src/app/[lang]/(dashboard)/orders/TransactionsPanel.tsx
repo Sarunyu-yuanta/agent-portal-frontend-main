@@ -16,7 +16,8 @@
 
 import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { FunnelSimpleIcon, ReceiptIcon } from "@phosphor-icons/react";
 import {
   Button,
@@ -55,23 +56,20 @@ import { PROPOSAL_VARIANT } from "./ProposalChip";
 import { FilterGroup } from "./FilterGroup";
 import { TransactionDetailModal } from "./TransactionDetailModal";
 import {
-  PRICE_LABEL,
-  QUANTITY_LABEL,
   SIDE_CLASS,
-  SIDE_LABEL,
   STATUS_TAG,
   formatAmount,
   formatPrice,
   formatQuantity,
 } from "./transaction-display";
 import { useTransactions } from "./use-transactions";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 const COLUMNS = 9;
 
 /** The chip row: a trade's status, or "proposed" for a Proposal sent. */
 type StatusFilter = TransactionStatus | "proposed";
-
-const PROPOSED_LABEL = "ส่ง Proposal แล้ว";
 
 /** One line of the table — a client's trade, or a Proposal the IC sent. */
 type Row =
@@ -128,7 +126,8 @@ export function TransactionsPanel({
   asset: TransactionAsset;
   clientId?: string;
 }) {
-  const pathname = usePathname();
+  const dict = useT();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const { data: trades, isLoading } = useTransactions(asset);
   const { proposals } = useOrders();
@@ -207,6 +206,10 @@ export function TransactionsPanel({
 
   const query = search.trim().toLowerCase();
   const visible = rows.filter((r) => matches(r, { status, side, channel, query }, isPrivate));
+  const clearFilters = () => {
+    setSearch("");
+    setParams({ status: null, side: null, channel: null });
+  };
 
   /** How many the dialog's draft would leave — its primary action says so. */
   const previewed = rows.filter((r) =>
@@ -237,7 +240,7 @@ export function TransactionsPanel({
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="scrollable-tabs flex min-w-0 items-center gap-2">
           <Chip
-            label="ทั้งหมด"
+            label={dict.orders.tabAll}
             type="single"
             selected={status === null}
             onClick={() => setParams({ status: null })}
@@ -245,7 +248,7 @@ export function TransactionsPanel({
           {statuses.map((s) => (
             <Chip
               key={s}
-              label={s === "proposed" ? PROPOSED_LABEL : STATUS_TAG[s].text}
+              label={s === "proposed" ? dict.orders.stepOffered : dict.orders.tradeStatus[s]}
               type="single"
               selected={status === s}
               onClick={() => setParams({ status: s })}
@@ -267,7 +270,7 @@ export function TransactionsPanel({
             leftIcon={<FunnelSimpleIcon size={16} weight="bold" />}
             onClick={openFilters}
           >
-            ตัวกรอง
+            {dict.orders.list.filter}
             {activeFilters > 0 && (
               <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
                 {activeFilters}
@@ -282,7 +285,7 @@ export function TransactionsPanel({
                 setPage(1);
               }}
               onClear={() => setSearch("")}
-              placeholder="ค้นหาสินค้า หรือลูกค้า"
+              placeholder={dict.orders.list.searchPlaceholder}
               className="w-full"
             />
           </div>
@@ -292,9 +295,9 @@ export function TransactionsPanel({
       <ResponsiveDialog
         open={filterOpen}
         onOpenChange={setFilterOpen}
-        title="ตัวกรอง"
+        title={dict.orders.list.filter}
         headerAction={{
-          label: "ล้างทั้งหมด",
+          label: dict.orders.list.clearAll,
           onClick: () => setDraft({ side: null, channel: null }),
         }}
         closeOnBackdrop
@@ -302,13 +305,13 @@ export function TransactionsPanel({
       >
         <div className="flex flex-col gap-4 pt-1">
           <FilterGroup
-            label="ประเภท"
-            options={sides.map((s) => ({ value: s, label: SIDE_LABEL[s] }))}
+            label={dict.orders.list.side}
+            options={sides.map((s) => ({ value: s, label: dict.orders.side[s] }))}
             value={draft.side}
             onChange={(v) => setDraft((d) => ({ ...d, side: v as TransactionSide | null }))}
           />
           <FilterGroup
-            label="ช่องทาง"
+            label={dict.orders.list.channel}
             options={tradeChannels.map((c) => ({ value: c, label: c }))}
             value={draft.channel}
             onChange={(v) => setDraft((d) => ({ ...d, channel: v }))}
@@ -323,39 +326,47 @@ export function TransactionsPanel({
                 setFilterOpen(false);
               }}
             >
-              ดูผลลัพธ์ ({previewed})
+              {dict.orders.list.viewResults(previewed)}
             </Button>
           </div>
         </div>
       </ResponsiveDialog>
 
       {!isLoading && visible.length === 0 ? (
-        <EmptyState
-          icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
-          title={search ? "ไม่พบรายการที่ค้นหา" : "ไม่มีรายการในเงื่อนไขนี้"}
-          body="ลองเปลี่ยนตัวกรอง หรือค้นหาด้วยชื่อสินค้า รหัสลูกค้า หรือชื่อลูกค้า"
-        />
+        rows.length === 0 ? (
+          <EmptyState
+            icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={dict.orders.list.emptyTitle}
+          />
+        ) : (
+          <EmptyState
+            icon={<ReceiptIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            title={query ? dict.states.noResultTitle : dict.states.noFilterResultTitle}
+            body={query ? dict.orders.list.noMatchHint : dict.states.noFilterResultBody}
+            action={{ label: dict.states.clearFilters, onClick: clearFilters }}
+          />
+        )
       ) : (
         <FadeIn key={`${status}|${side}|${channel}`} className="flex flex-col gap-3">
           <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
             <Table className="table-fixed min-w-[1100px]">
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell className="w-[13%] whitespace-nowrap">วันเวลา</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">ลูกค้า</TableHeaderCell>
-                  <TableHeaderCell className="w-[19%] whitespace-nowrap">สินค้า</TableHeaderCell>
-                  <TableHeaderCell className="w-[7%] whitespace-nowrap">ประเภท</TableHeaderCell>
+                  <TableHeaderCell className="w-[13%] whitespace-nowrap">{dict.orders.list.col.time}</TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{dict.orders.list.col.client}</TableHeaderCell>
+                  <TableHeaderCell className="w-[19%] whitespace-nowrap">{dict.orders.list.col.product}</TableHeaderCell>
+                  <TableHeaderCell className="w-[7%] whitespace-nowrap">{dict.orders.list.col.side}</TableHeaderCell>
                   <TableHeaderCell className="w-[10%] whitespace-nowrap text-right">
-                    {QUANTITY_LABEL[asset]}
+                    {dict.orders.quantityLabel[asset]}
                   </TableHeaderCell>
                   <TableHeaderCell className="w-[8%] whitespace-nowrap text-right">
-                    {PRICE_LABEL[asset]}
+                    {dict.orders.priceLabel[asset]}
                   </TableHeaderCell>
                   <TableHeaderCell className="w-[11%] whitespace-nowrap text-right">
-                    มูลค่า
+                    {dict.orders.list.col.amount}
                   </TableHeaderCell>
-                  <TableHeaderCell className="w-[9%] whitespace-nowrap">ช่องทาง</TableHeaderCell>
-                  <TableHeaderCell className="w-[9%] whitespace-nowrap">สถานะ</TableHeaderCell>
+                  <TableHeaderCell className="w-[9%] whitespace-nowrap">{dict.orders.list.col.channel}</TableHeaderCell>
+                  <TableHeaderCell className="w-[9%] whitespace-nowrap">{dict.orders.list.col.status}</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -383,7 +394,7 @@ export function TransactionsPanel({
           {!isLoading && (
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
-                <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+                <p className="text-label text-muted-foreground whitespace-nowrap">{dict.orders.list.perPage}</p>
                 <select
                   value={pageSize}
                   onChange={(e) => {
@@ -401,14 +412,14 @@ export function TransactionsPanel({
               </div>
               <div className="flex items-center gap-3">
                 <p className="text-label text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-medium text-foreground">{(safePage - 1) * pageSize + 1}</span>
-                  {" – "}
-                  <span className="font-medium text-foreground">
-                    {Math.min(safePage * pageSize, visible.length)}
-                  </span>
-                  {" of "}
-                  <span className="font-medium text-foreground">{visible.length}</span> items
+                  {dict.products.pagination.showing(
+                    {
+                      from: (safePage - 1) * pageSize + 1,
+                      to: Math.min(safePage * pageSize, visible.length),
+                      total: visible.length,
+                    },
+                    (n) => <span className="font-medium text-foreground">{n}</span>,
+                  )}
                 </p>
                 <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setPage} />
               </div>
@@ -431,13 +442,15 @@ function ProposalRow({
   row: Extract<Row, { kind: "proposal" }>;
   isPrivate: boolean;
 }) {
+  const locale = useLocale();
+  const dict = useT();
   const p = row.proposal;
   const dash = <span className="type-body-2 text-muted-foreground">—</span>;
   return (
     <TableRow>
       <TableCell>
         <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-          {formatLogTime(p.sentAt)}
+          {formatLogTime(p.sentAt, locale)}
         </p>
       </TableCell>
       <TableCell>
@@ -460,7 +473,7 @@ function ProposalRow({
         <span className="type-caption text-foreground">{row.channels.join(", ")}</span>
       </TableCell>
       <TableCell>
-        <Tag text={PROPOSED_LABEL} variant={PROPOSAL_VARIANT} size="large" />
+        <Tag text={dict.orders.stepOffered} variant={PROPOSAL_VARIANT} size="large" />
       </TableCell>
     </TableRow>
   );
@@ -478,6 +491,8 @@ function TradeRow({
   isPrivate: boolean;
   onOpen: () => void;
 }) {
+  const locale = useLocale();
+  const dict = useT();
   return (
                     // The whole row opens the trade — same as a booking row on
                     // a product's tab, and cheaper than a column of arrows in a
@@ -485,7 +500,7 @@ function TradeRow({
                     <TableRow
                       hoverable
                       tabIndex={0}
-                      aria-label={`ดูรายละเอียดรายการ ${t.symbol} ของ ${maskName(t.clientName, isPrivate)}`}
+                      aria-label={dict.orders.list.openTradeAria(t.symbol, maskName(t.clientName, isPrivate))}
                       onClick={onOpen}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -497,7 +512,7 @@ function TradeRow({
                     >
                       <TableCell>
                         <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-                          {formatLogTime(t.at)}
+                          {formatLogTime(t.at, locale)}
                         </p>
                       </TableCell>
                       <TableCell>
@@ -518,7 +533,7 @@ function TradeRow({
                       </TableCell>
                       <TableCell>
                         <span className={`type-body-2 !font-semibold ${SIDE_CLASS[t.side]}`}>
-                          {SIDE_LABEL[t.side]}
+                          {dict.orders.side[t.side]}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
@@ -545,7 +560,7 @@ function TradeRow({
                             column is the one an IC scans down, and it reads at
                             the same size as the booking tabs' beside it. */}
                         <Tag
-                          text={STATUS_TAG[t.status].text}
+                          text={dict.orders.tradeStatus[t.status]}
                           variant={STATUS_TAG[t.status].variant}
                           size="large"
                         />

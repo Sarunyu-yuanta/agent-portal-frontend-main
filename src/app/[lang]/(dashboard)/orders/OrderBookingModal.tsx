@@ -42,13 +42,15 @@ import {
   PhoneOutgoingIcon,
   WarningCircleIcon,
   XCircleIcon,
+  MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { SLIDE_MS, SlideSteps } from "@/components/ui/slide-steps";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useOrders } from "@/contexts/orders-context";
-import { useClients } from "@/hooks/use-api";
-import { getClientProfile } from "@/data/client-profiles";
+import { useClients, useClientsResource } from "@/hooks/use-api";
+import { EmptyState, ErrorState } from "@/components/ui/empty-state";
+import { getAccountIdentity } from "@/data/client-profiles";
 import { getCallLogs } from "@/data/call-log-data";
 import { IC_NAME, IC_TEAM } from "@/lib/current-ic";
 import { formatThbAmount, getInitial, parseAmount } from "@/lib/client-utils";
@@ -66,11 +68,9 @@ import type {
 import { bookingModeFor, type BookableProduct } from "./bookable-products";
 import { BackButton } from "./BackButton";
 import { ProposalSteps, type ProposalStep, type ProposalSubject } from "./SendProposalDialog";
-import { proposalSentMessage } from "./useSendProposal";
-import { ORDER_WORDS } from "./order-words";
+import { sendAndReport } from "./useSendProposal";
 import { SHEET_DASHED, SHEET_PANEL, SheetBlock, SheetRow } from "./detail-sheet-ui";
 import {
-  CALL_DIRECTION_LABEL,
   EVIDENCE_CHANNEL,
   EVIDENCE_CHANNELS,
   evidenceComplete,
@@ -87,13 +87,20 @@ import {
   isBookingOpen,
   minTicketFor,
 } from "./order-book";
-import { clientReadiness, requestableKeys, shortRequirementLabel } from "./order-requirements";
+import {
+  clientReadiness,
+  requestableKeys,
+  requirementDetailText,
+  shortRequirementLabel,
+} from "./order-requirements";
 import {
   useClientReadiness,
   useOrderBook,
   useRequestsFor,
   useRosterReadiness,
 } from "./use-order-books";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 /**
  * Steps that come before the client list, in the same modal — Order
@@ -155,6 +162,7 @@ export function OrderBookingModal({
   /** After a booking lands — the product page uses it to show the new row. */
   onBooked?: (booking: Booking) => void;
 }) {
+  const t = useT();
   /**
    * The chosen customer lives here rather than in the form, because the back
    * button that clears it sits in the modal's own title row.
@@ -212,17 +220,17 @@ export function OrderBookingModal({
         title={
           atLead || !subject
             ? (lead?.title ?? "")
-            : `ส่ง Proposal · ${subject.underlying}${subject.coupon ? ` ${subject.coupon}` : ""}`
+            : t.orders.proposal.sheetTitle(subject.underlying, subject.coupon ?? "")
         }
         titleId="order-booking-title"
         desktopMaxWidth="max-w-[614px]"
         desktopTitleIcon={
           atLead ? (
-            lead?.onBack ? <BackButton label="ย้อนกลับ" onClick={lead.onBack} /> : undefined
+            lead?.onBack ? <BackButton label={t.orders.back} onClick={lead.onBack} /> : undefined
           ) : proposalStep === "channels" ? (
-            <BackButton label="ย้อนกลับ" onClick={() => setProposalStep("clients")} />
+            <BackButton label={t.orders.back} onClick={() => setProposalStep("clients")} />
           ) : onBack ? (
-            <BackButton label="ย้อนกลับ" onClick={onBack} />
+            <BackButton label={t.orders.back} onClick={onBack} />
           ) : undefined
         }
       >
@@ -238,15 +246,15 @@ export function OrderBookingModal({
           initialPicked={fixedClientId ? [fixedClientId] : undefined}
           initialHeight={trackHeight}
           onHeightChange={setTrackHeight}
-          onConfirm={(clientIds, channels) => {
-            if (!subject) return;
-            void (async () => {
-              // The rows actually written, not the ids asked for — see
-              // `useSendProposal`.
-              const rows = await sendProposal({ productId: subject.id, clientIds, channels });
-              onClose();
-              onNotice(proposalSentMessage(subject.underlying, rows), "success");
-            })();
+          onConfirm={async (clientIds, channels) => {
+            if (!subject) return false;
+            return sendAndReport(
+              t,
+              () => sendProposal({ productId: subject.id, clientIds, channels }),
+              subject.underlying,
+              onNotice,
+              onClose,
+            );
           }}
         />
       </ResponsiveBottomSheetModal>
@@ -260,7 +268,7 @@ export function OrderBookingModal({
       title={
         atLead || !product
           ? (lead?.title ?? "")
-          : `ทำรายการ${ORDER_WORDS[bookingModeFor(product)].action} ${product.underlying} ${product.coupon}`
+          : t.orders.words[bookingModeFor(product)].modalTitle(product.underlying, product.coupon)
       }
       titleId="order-booking-title"
       // Two columns of short fields and one amount — past about this width the
@@ -272,9 +280,9 @@ export function OrderBookingModal({
       // a step of its own (`onBack`).
       desktopTitleIcon={
         atLead ? (
-          lead?.onBack ? <BackButton label="ย้อนกลับ" onClick={lead.onBack} /> : undefined
+          lead?.onBack ? <BackButton label={t.orders.back} onClick={lead.onBack} /> : undefined
         ) : clientId && reviewing ? (
-          <BackButton label="กลับไปแก้ไข" onClick={() => setReviewing(false)} />
+          <BackButton label={t.orders.backToEdit} onClick={() => setReviewing(false)} />
         ) : clientId ? (
           fixedClientId && !onBack ? undefined : <BackButton onClick={leaveForm} />
         ) : onBack ? (
@@ -343,6 +351,7 @@ function BookingForm({
   onNotice: (message: string, status: ToastStatus) => void;
   onBooked?: (booking: Booking) => void;
 }) {
+  const t = useT();
   const clients = useClients();
   const { isPrivate } = usePrivacy();
   const { placeOrder } = useOrders();
@@ -467,7 +476,7 @@ function BookingForm({
                       back to the lead step sits at the top of the list. */}
                   {isMobile && onListBack && (
                     <div className="px-4 pt-3">
-                      <BackButton label="ย้อนกลับ" onClick={onListBack} />
+                      <BackButton label={t.orders.back} onClick={onListBack} />
                     </div>
                   )}
                   <CustomerPicker
@@ -508,7 +517,7 @@ function BookingForm({
                       far apart across the modal, where the rows are two lines
                       of text that would otherwise run together. */}
                   <div className="grid grid-cols-1 gap-x-3 gap-y-4 md:grid-cols-2">
-                    <FieldCard label="Customer">
+                    <FieldCard label={t.orders.field.customer}>
                       {/* The link trails the name, not the label. "เปลี่ยน" acts
                           on the customer, and the customer is the line below the
                           caption — put it up there and it reads as an action on
@@ -520,7 +529,7 @@ function BookingForm({
                         </span>
                         {!clientLocked && (
                           <ActionLink
-                            label="เปลี่ยน"
+                            label={t.orders.booking.change}
                             disabled={false}
                             onClick={() => setClientId("")}
                           />
@@ -528,8 +537,8 @@ function BookingForm({
                       </div>
                     </FieldCard>
                     <ReadOnlyField
-                      label="Account No"
-                      value={getClientProfile(shown.id).accountNo}
+                      label={t.orders.field.accountNo}
+                      value={getAccountIdentity(shown.id).accountNo}
                     />
                     {/* The IC sits with the customer, above the checks, because
                         the four of them together are the header of the order:
@@ -537,8 +546,8 @@ function BookingForm({
                         which desk. None of it is a decision — putting it after
                         the checks made the reader step over a block of facts to
                         reach the amount. */}
-                    <ReadOnlyField label="IC Name" value={IC_NAME} />
-                    <ReadOnlyField label="IC Team" value={IC_TEAM} />
+                    <ReadOnlyField label={t.orders.field.icName} value={IC_NAME} />
+                    <ReadOnlyField label={t.orders.field.icTeam} value={IC_TEAM} />
                   </div>
 
                   {/* The checks keep the receipt's rows — four grey cards made
@@ -584,11 +593,10 @@ function BookingForm({
                   ) : (
                     <Alert
                       status="warning"
-                      message={`${ORDER_WORDS[bookingModeFor(product)].prereq}ยังไม่ครบ (${
-                        checks.filter((i) => i.status === "passed").length
-                      }/${checks.length}) — ทำให้ครบก่อนจึงจะ${
-                        ORDER_WORDS[bookingModeFor(product)].action
-                      }ได้`}
+                      message={t.orders.words[bookingModeFor(product)].prereqIncomplete(
+                        checks.filter((i) => i.status === "passed").length,
+                        checks.length,
+                      )}
                       multiline
                       className="mt-5"
                     />
@@ -603,7 +611,7 @@ function BookingForm({
                 <>
                   {isMobile && (
                     <div className="mb-2">
-                      <BackButton label="กลับไปแก้ไข" onClick={() => onReviewChange(false)} />
+                      <BackButton label={t.orders.backToEdit} onClick={() => onReviewChange(false)} />
                     </div>
                   )}
                   <BookingSummary
@@ -644,18 +652,33 @@ function BookingForm({
           onCancel={onClose}
           onBooked={async (amount) => {
             setBooking(true);
-            const { booking: placed, submission } = await placeOrder({
-              productId: product.id,
-              clientId: shown.id,
-              clientName: shown.name,
-              amount,
-              checks,
-              // `?? undefined`, so a desk that does not ask for it sends
-              // nothing rather than an explicit null the store would have to
-              // know to ignore.
-              evidence: evidence ?? undefined,
-            });
-            setBooking(false);
+            let result: Awaited<ReturnType<typeof placeOrder>>;
+            try {
+              result = await placeOrder({
+                productId: product.id,
+                clientId: shown.id,
+                clientName: shown.name,
+                amount,
+                checks,
+                // `?? undefined`, so a desk that does not ask for it sends
+                // nothing rather than an explicit null the store would have to
+                // know to ignore.
+                evidence: evidence ?? undefined,
+              });
+            } catch (err) {
+              // The form stays as the IC filled it, and the buttons come back:
+              // a failure used to leave `booking` true, disabling both the
+              // primary and Cancel with only the ✕ as a way out.
+              console.warn("[placeOrder]", err);
+              onNotice(
+                t.orders.words[bookingModeFor(product)].actionFailed,
+                "critical",
+              );
+              return;
+            } finally {
+              setBooking(false);
+            }
+            const { booking: placed, submission } = result;
             onClose();
             onBookedProp?.(placed);
             // On a bond the order has already gone downstream, so the notice
@@ -665,8 +688,8 @@ function BookingForm({
             const who = maskName(shown.name, isPrivate);
             onNotice(
               submission
-                ? `ส่งคำสั่งซื้อ ${money} ของ ${who} แล้ว (${submission.backendRef})`
-                : `จอง ${money} ให้ ${who} แล้ว`,
+                ? t.orders.booking.orderSent(money, who, submission.backendRef)
+                : t.orders.booking.booked(money, who),
               "success",
             );
           }}
@@ -700,7 +723,9 @@ function CustomerPicker({
   scrollerRef: React.RefObject<HTMLDivElement | null>;
   onSelect: (clientId: string) => void;
 }) {
-  const clients = useClients();
+  const t = useT();
+  const { data: clients, isLoading: clientsLoading, error: clientsError, retry: retryClients } =
+    useClientsResource();
   const { isPrivate } = usePrivacy();
   const [search, setSearch] = useState("");
   const readiness = useRosterReadiness(clients, product);
@@ -753,10 +778,9 @@ function CustomerPicker({
           be stated once per side rather than as a margin cancelling one. */}
       <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pb-2 pt-3 md:px-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="type-body-2 !font-semibold text-foreground">เลือกลูกค้า</span>
+          <span className="type-body-2 !font-semibold text-foreground">{t.orders.booking.pickClient}</span>
           <span className="type-caption text-muted-foreground tabular-nums">
-            {ORDER_WORDS[bookingModeFor(product)].eligible} {readyCount} จาก{" "}
-            {results.length} ราย
+            {t.orders.words[bookingModeFor(product)].readyCount(readyCount, results.length)}
           </span>
         </div>
 
@@ -764,17 +788,34 @@ function CustomerPicker({
           value={search}
           onChange={setSearch}
           onClear={() => setSearch("")}
-          placeholder="ค้นหาชื่อหรือรหัสลูกค้า"
+          placeholder={t.orders.booking.searchClient}
           size="sm"
           className="w-full"
         />
       </div>
 
       <div className="px-4 md:px-6">
-        {results.length === 0 ? (
+        {clientsLoading ? (
           <p className="type-body-2 py-10 text-center leading-5 text-muted-foreground">
-            ไม่พบลูกค้าที่ค้นหา
+            {t.orders.booking.loadingClients}
           </p>
+        ) : clientsError ? (
+          <ErrorState size="compact" title={t.orders.booking.clientsLoadFailed} onRetry={retryClients} />
+        ) : results.length === 0 ? (
+          // "Nothing matched" only when there was a search; an empty book is
+          // a different fact and gets its own words.
+          search.trim() ? (
+            <EmptyState
+              size="compact"
+              icon={<MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+              title={t.orders.booking.noClientMatch(search.trim())}
+              action={{ label: t.states.clearFilters, onClick: () => setSearch("") }}
+            />
+          ) : (
+            <p className="type-body-2 py-10 text-center leading-5 text-muted-foreground">
+              {t.orders.booking.noClients}
+            </p>
+          )
         ) : (
           /* One frame, divided inside, rather than eight floating cards. The
              rows are a single list read top to bottom — gaps between them made
@@ -809,25 +850,19 @@ function CustomerPicker({
  */
 const READINESS_VERDICT: Record<
   ClientReadiness["status"],
-  { icon: typeof CheckCircleIcon; chip: string; text: string; prefix: string }
+  { icon: typeof CheckCircleIcon; chip: string }
 > = {
   ready: {
     icon: CheckCircleIcon,
     chip: "bg-[var(--fill-green-100)] text-[var(--fill-green-600)]",
-    text: "ครบแล้ว",
-    prefix: "",
   },
   "in-review": {
     icon: ClockIcon,
     chip: "bg-[var(--fill-yellow-100)] text-[var(--fill-yellow-600)]",
-    text: "รอตรวจสอบ",
-    prefix: "รอผล",
   },
   blocked: {
     icon: XCircleIcon,
     chip: "bg-[var(--fill-red-100)] text-[var(--fill-red-600)]",
-    text: "ยังไม่ครบ",
-    prefix: "ยังขาด",
   },
 };
 
@@ -840,9 +875,11 @@ function CustomerRow({
   readiness: ClientReadiness | undefined;
   onSelect: () => void;
 }) {
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const displayName = maskName(client.name, isPrivate);
-  const verdict = READINESS_VERDICT[readiness?.status ?? "blocked"];
+  const status = readiness?.status ?? "blocked";
+  const verdict = READINESS_VERDICT[status];
   // Named, not counted. "2/4" says how much is wrong without saying what, and
   // the answer is four words away — the IC had to open the client to find out
   // whether this was a form to send or a KYC review they cannot start.
@@ -894,11 +931,11 @@ function CustomerRow({
             className={`type-caption flex shrink-0 items-center gap-1 rounded-full py-0.5 pl-1.5 pr-2 !font-semibold ${verdict.chip}`}
           >
             <verdict.icon size={14} weight="fill" />
-            {verdict.text}
+            {t.orders.readiness[status].text}
           </span>
           {outstanding && (
             <span className="type-caption max-w-full truncate text-muted-foreground">
-              {verdict.prefix} {outstanding}
+              {t.orders.readiness[status].outstanding(outstanding)}
             </span>
           )}
         </span>
@@ -919,6 +956,8 @@ function StatusGrid({
   client: Client;
   onNotice: (message: string, status: ToastStatus) => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const { sendRequirementRequest } = useOrders();
   const readiness = useClientReadiness(client, product);
@@ -945,21 +984,32 @@ function StatusGrid({
    * minus the other applications. See `contexts/orders-context`.
    */
   const sendOne = async (item: RequirementItem) => {
+    // One send at a time: a second row pressed mid-flight would otherwise
+    // clear the first row's pending label before its request settled.
+    if (sendingKey) return;
     setSendingKey(item.key);
-    await sendRequirementRequest({
-      clientId: client.id,
-      clientName: client.name,
-      productId: product.id,
-      keys: [item.key],
-    });
-    setSendingKey(null);
+    try {
+      await sendRequirementRequest({
+        clientId: client.id,
+        clientName: client.name,
+        productId: product.id,
+        keys: [item.key],
+      });
+    } catch (err) {
+      console.warn("[sendRequirementRequest]", err);
+      onNotice(t.orders.booking.requestFailed(item.label), "critical");
+      return;
+    } finally {
+      // Always cleared, so the row never sits on "กำลังส่ง…" after a failure.
+      setSendingKey(null);
+    }
     onNotice(
-      `ส่ง "${item.label}" ให้ ${displayName} ดำเนินการแล้ว — จะแจ้งเตือนเมื่อลูกค้าทำเสร็จ`,
+      t.orders.booking.requestSent(item.label, displayName),
       "success",
     );
   };
 
-  const verdict = READINESS_VERDICT[readiness.status];
+  const verdictText = t.orders.readiness[readiness.status].text;
 
   return (
     <>
@@ -973,7 +1023,7 @@ function StatusGrid({
           the same heading. */}
       <div className="flex flex-wrap items-center gap-2 pb-1">
         <span className="text-body-sm font-bold text-foreground">
-          {ORDER_WORDS[bookingModeFor(product)].prereq}
+          {t.orders.words[bookingModeFor(product)].prereq}
         </span>
         {/* The same word the customer list gave this client a moment ago — the
             IC picked the row that said "ยังไม่ครบ" and the next screen has to
@@ -988,8 +1038,8 @@ function StatusGrid({
           }`}
         >
           {readiness.status === "ready"
-            ? verdict.text
-            : `${verdict.text} (${readiness.outstanding.length} รายการ)`}
+            ? verdictText
+            : t.orders.readiness.withCount(verdictText, readiness.outstanding.length)}
         </span>
       </div>
 
@@ -1011,7 +1061,7 @@ function StatusGrid({
           <SheetRow
             key={item.key}
             label={item.label}
-            hint={item.detail}
+            hint={requirementDetailText(item.detail, t, locale)}
             // The action sits beside the label, so the row names the record and
             // the move on it in one breath. See `sendOne`.
             action={
@@ -1022,7 +1072,7 @@ function StatusGrid({
                   onClick={() => void sendOne(item)}
                   className="shrink-0 cursor-pointer text-label font-semibold text-primary-action hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
                 >
-                  {inFlight ? "กำลังส่ง…" : "ส่งให้ลูกค้า"}
+                  {inFlight ? t.common.sending : t.orders.booking.sendToClient}
                 </button>
               ) : undefined
             }
@@ -1042,8 +1092,8 @@ function StatusGrid({
       {readiness.status === "blocked" && sendable.length === 0 && (
         <Alert
           status="critical"
-          title="ลูกค้ารายนี้ยังซื้อผลิตภัณฑ์นี้ไม่ได้"
-          message={`ระดับความเสี่ยงที่ลูกค้ารับได้ (${client.riskProfile}) ต่ำกว่าที่ผลิตภัณฑ์นี้กำหนด — ต้องให้ลูกค้าทำแบบประเมินความเสี่ยงใหม่ก่อน`}
+          title={t.orders.booking.blockedTitle}
+          message={t.orders.booking.blockedRisk(String(client.riskProfile))}
           multiline
           className="mt-4"
         />
@@ -1051,7 +1101,7 @@ function StatusGrid({
       {readiness.status === "in-review" && (
         <Alert
           status="information"
-          message="ลูกค้าดำเนินการแล้ว อยู่ระหว่างรอผลตรวจสอบ — จะแจ้งเตือนเมื่อผ่าน"
+          message={t.orders.booking.inReview}
           multiline
           className="mt-4"
         />
@@ -1320,6 +1370,7 @@ function AmountSection({
   raw: string;
   onRawChange: (next: string) => void;
 }) {
+  const t = useT();
   const { data: book } = useOrderBook(product.id);
   const currency = product.currency;
   const minTicket = minTicketFor(product);
@@ -1329,7 +1380,7 @@ function AmountSection({
   // `bookingModeFor(product)`, not `book.mode` — the book may not have loaded
   // and the product is the authority on its desk either way.
   const mode = bookingModeFor(product);
-  const words = ORDER_WORDS[mode];
+  const words = t.orders.words[mode];
 
   const cashThb = clientCashThb(client);
   const cashHere = cashInCurrency(cashThb, currency);
@@ -1407,10 +1458,10 @@ function AmountSection({
           status="information"
           message={
             mode === "quota"
-              ? `${product.underlying} เต็มโควตาแล้ว — ไม่สามารถจองเพิ่มได้`
+              ? t.orders.amount.quotaFull(product.underlying)
               : book && isBookClosed(book)
-                ? `ส่งคำสั่งซื้อของ ${product.underlying} แล้ว — สินค้านี้ปิดรับจอง`
-                : `คำสั่งซื้อของ ${product.underlying} กำลังดำเนินการที่ระบบหลังบ้าน — ไม่สามารถจองเพิ่มได้`
+                ? t.orders.amount.orderSent(product.underlying)
+                : t.orders.amount.orderProcessing(product.underlying)
           }
           multiline
         />
@@ -1494,17 +1545,17 @@ function AmountSection({
           {showError ? (
             <p className="type-caption text-center text-[var(--fill-red-600)]">
               {invalid
-                ? "กรอกได้เฉพาะตัวเลข 0–9 เท่านั้น"
+                ? t.orders.amount.digitsOnly
                 : tooSmall
-                  ? `ต่ำกว่าขั้นต่ำ ${formatOrderAmount(minTicket, currency)}`
+                  ? t.orders.amount.belowMinimum(formatOrderAmount(minTicket, currency))
                   : tooBig
-                    ? `เกิน${words.remainingLabel} ${formatOrderAmount(cap ?? 0, currency)}`
-                    : `เกินเงินสดคงเหลือของลูกค้า ${formatOrderAmount(Math.floor(cashHere), currency)}`}
+                    ? words.overRemaining(formatOrderAmount(cap ?? 0, currency))
+                    : t.orders.amount.overCash(formatOrderAmount(Math.floor(cashHere), currency))}
             </p>
           ) : (
             <p className="type-caption text-center text-muted-foreground">
-              ขั้นต่ำ {formatOrderAmount(minTicket, currency)}
-              {cap !== null && <> · {words.remainingLabel} {formatOrderAmount(cap, currency)}</>}
+              {t.orders.create.minimum(formatOrderAmount(minTicket, currency))}
+              {cap !== null && <> · {words.remaining(formatOrderAmount(cap, currency))}</>}
             </p>
           )}
 
@@ -1537,7 +1588,7 @@ function AmountSection({
               account's own currency — where the amount above exceeds it, the
               error line says so in the product's. */}
           <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5">
-            <span className="type-caption text-muted-foreground">เงินสดคงเหลือของลูกค้า</span>
+            <span className="type-caption text-muted-foreground">{t.orders.amount.cashBalance}</span>
             <span className="type-body-2 !font-semibold tabular-nums text-foreground">
               ฿ {formatThbAmount(cashThb)}
             </span>
@@ -1547,7 +1598,7 @@ function AmountSection({
         {overCash && (
           <Alert
             status="critical"
-            message="จำนวนมากกว่าเงินสดคงเหลือของลูกค้า — ลดจำนวนลง หรือให้ลูกค้าเติมเงินก่อนจึงจะทำรายการได้"
+            message={t.orders.amount.overCashAlert}
             multiline
           />
         )}
@@ -1586,6 +1637,7 @@ function EvidenceSection({
   value: OrderEvidence | null;
   onChange: (next: OrderEvidence | null) => void;
 }) {
+  const t = useT();
   const [channel, setChannel] = useState<EvidenceChannel | null>(null);
   /** Phone only: pick the call off the Call Log, or attach the recording. */
   const [callSource, setCallSource] = useState<"call-log" | "file">("call-log");
@@ -1691,11 +1743,11 @@ function EvidenceSection({
     <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
         <span className="type-body-2 !font-semibold text-foreground">
-          หลักฐานการรับคำสั่งจากลูกค้า
+          {t.orders.evidenceForm.title}
         </span>
         {/* Said once, here, rather than only by a disabled button: the IC
             should know it is required before they go looking for the file. */}
-        <span className="type-caption text-[var(--fill-red-600)]">จำเป็นต้องแนบ</span>
+        <span className="type-caption text-[var(--fill-red-600)]">{t.orders.evidenceForm.required}</span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -1730,7 +1782,7 @@ function EvidenceSection({
                     on ? "text-primary-action" : "text-foreground"
                   }`}
                 >
-                  {meta.label}
+                  {t.orders.evidence[c].label}
                 </span>
               </button>
             );
@@ -1743,8 +1795,8 @@ function EvidenceSection({
           <div className="flex gap-1 rounded-lg bg-[var(--bg-default-secondary)] p-1">
             {(
               [
-                { id: "call-log", label: "เลือกจาก Call Log" },
-                { id: "file", label: "แนบไฟล์เสียง" },
+                { id: "call-log", label: t.orders.evidenceForm.fromCallLog },
+                { id: "file", label: t.orders.evidenceForm.attachAudio },
               ] as const
             ).map((o) => (
               <button
@@ -1767,16 +1819,16 @@ function EvidenceSection({
         {byLog && (
           <>
             <p className="type-caption text-muted-foreground">
-              เลือกสายที่ลูกค้าให้คำสั่งซื้อนี้
+              {t.orders.evidenceForm.pickCall}
             </p>
             {calls.length === 0 ? (
               <p className="type-caption rounded-xl border border-dashed border-border px-3 py-4 text-center text-muted-foreground">
-                ยังไม่มีประวัติการโทรของลูกค้ารายนี้ — แนบไฟล์เสียงแทน
+                {t.orders.evidenceForm.noCalls}
               </p>
             ) : (
               <div
                 role="radiogroup"
-                aria-label="Call Log"
+                aria-label={t.orders.evidenceForm.callLogAria}
                 className="-mx-1 flex max-h-[232px] flex-col gap-2 overflow-y-auto px-1 py-0.5"
               >
                 {calls.map((call) => {
@@ -1804,7 +1856,7 @@ function EvidenceSection({
                         <span className="type-body-2 !font-semibold text-foreground">
                           {call.date} · {call.time}
                           <span className="type-caption ml-1.5 !font-normal text-muted-foreground">
-                            {CALL_DIRECTION_LABEL[call.direction]} · {call.duration}
+                            {t.orders.callDirection[call.direction]} · {call.duration}
                           </span>
                         </span>
                         <span className="type-caption line-clamp-1 text-muted-foreground">
@@ -1836,7 +1888,7 @@ function EvidenceSection({
               type="file"
               accept={chosen.accept || undefined}
               className="hidden"
-              aria-label={`แนบ${chosen.hint}`}
+              aria-label={t.orders.evidence[channel!].hint}
               onChange={(e) => attach(e.target.files?.[0])}
             />
             {/* The library's upload pair, as it is meant to be used together:
@@ -1845,7 +1897,7 @@ function EvidenceSection({
                 UploadItem, loading and then done, with its own delete. */}
             <UploadArea
               className="mt-2"
-              label={value?.source === "file" ? "เปลี่ยนไฟล์" : "เลือกไฟล์ หรือลากไฟล์มาวาง"}
+              label={value?.source === "file" ? t.orders.evidenceForm.changeFile : t.orders.evidenceForm.pickFile}
               disabled={uploading !== null}
               onClick={() => fileRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
@@ -1855,7 +1907,7 @@ function EvidenceSection({
               }}
             />
             {/* What to attach, under the area it is attached through. */}
-            <p className="type-caption -mt-1.5 text-center text-muted-foreground">{chosen.hint}</p>
+            <p className="type-caption -mt-1.5 text-center text-muted-foreground">{t.orders.evidence[channel!].hint}</p>
             {uploading ? (
               <UploadItem
                 variant="card"
@@ -1887,17 +1939,17 @@ function EvidenceSection({
                   // the asterisk needs its own colour.
                   ((
                     <>
-                      หมายเหตุ <span className="text-[var(--fill-red-600)]">*</span>
+                      {t.orders.evidenceForm.note} <span className="text-[var(--fill-red-600)]">*</span>
                     </>
                   ) as unknown as string)
-                : "หมายเหตุ (ถ้ามี)"
+                : t.orders.evidenceForm.noteOptional
             }
             value={note}
             onChange={changeNote}
             placeholder={
               noteRequired(channel)
-                ? "ระบุว่าไฟล์นี้คืออะไร และลูกค้าสั่งมาทางไหน"
-                : "เช่น ลูกค้ายืนยันยอดและเงื่อนไขแล้ว"
+                ? t.orders.evidenceForm.notePlaceholderRequired
+                : t.orders.evidenceForm.notePlaceholder
             }
             showCount
             maxCount={300}
@@ -1906,7 +1958,7 @@ function EvidenceSection({
             forceState={
               noteRequired(channel) && value !== null && !note.trim() ? "error" : undefined
             }
-            errorMessage="กรุณาระบุหมายเหตุสำหรับหลักฐานประเภทอื่นๆ"
+            errorMessage={t.orders.evidenceForm.noteRequired}
           />
         )}
 
@@ -1938,6 +1990,7 @@ function BookingSummary({
   evidence: OrderEvidence | null;
   cashAvailable: number;
 }) {
+  const t = useT();
   const { isPrivate } = usePrivacy();
   const { data: book } = useOrderBook(product.id);
   const { amount } = amountCheck(
@@ -1947,16 +2000,16 @@ function BookingSummary({
     cashAvailable,
     raw,
   );
-  const words = ORDER_WORDS[bookingModeFor(product)];
+  const words = t.orders.words[bookingModeFor(product)];
   const channel = evidence ? EVIDENCE_CHANNEL[evidence.channel] : null;
   const ChannelIcon = channel?.icon;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col items-center gap-1 text-center">
-        <p className="type-body-2 !font-semibold text-foreground">สรุปรายการ{words.action}</p>
+        <p className="type-body-2 !font-semibold text-foreground">{words.summaryTitle}</p>
         <p className="type-caption text-muted-foreground">
-          ตรวจสอบให้ถูกต้องก่อน{words.action}
+          {words.summaryHint}
         </p>
       </div>
 
@@ -1971,8 +2024,8 @@ function BookingSummary({
         </span>
       </div>
 
-      <SheetBlock title="รายละเอียดคำสั่ง">
-        <SheetRow label="สินค้า">
+      <SheetBlock title={t.orders.summary.section}>
+        <SheetRow label={t.orders.summary.product}>
           <span className="truncate text-body-sm font-semibold text-foreground">
             {product.underlying}
             {product.coupon && (
@@ -1980,37 +2033,37 @@ function BookingSummary({
             )}
           </span>
         </SheetRow>
-        {product.productType && <SheetRow label="ประเภท" value={product.productType} />}
-        <SheetRow label="ลูกค้า" value={`${client.id} - ${maskName(client.name, isPrivate)}`} />
-        <SheetRow label="Account No" value={getClientProfile(client.id).accountNo} />
-        <SheetRow label="IC" value={`${IC_NAME} · ${IC_TEAM}`} />
+        {product.productType && <SheetRow label={t.orders.summary.type} value={product.productType} />}
+        <SheetRow label={t.orders.sheet.client} value={`${client.id} - ${maskName(client.name, isPrivate)}`} />
+        <SheetRow label={t.orders.field.accountNo} value={getAccountIdentity(client.id).accountNo} />
+        <SheetRow label={t.orders.field.ic} value={`${IC_NAME} · ${IC_TEAM}`} />
       </SheetBlock>
 
       {evidence && channel && (
         <>
           <div className={SHEET_DASHED} />
-          <SheetBlock title="หลักฐานการรับคำสั่ง">
-            <SheetRow label="ช่องทาง">
+          <SheetBlock title={t.orders.evidenceSheet.title}>
+            <SheetRow label={t.orders.evidenceSheet.channel}>
               <span className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-foreground">
                 {ChannelIcon && (
                   <ChannelIcon size={15} weight="fill" className="shrink-0 text-muted-foreground" />
                 )}
-                {channel.label}
+                {t.orders.evidence[evidence!.channel].label}
               </span>
             </SheetRow>
             {evidence.source === "call-log" && evidence.callLog ? (
               <>
                 <SheetRow
-                  label="สายจาก Call Log"
+                  label={t.orders.evidenceSheet.callFromLog}
                   value={`${evidence.callLog.date} ${evidence.callLog.time}`}
                 />
                 <SheetRow
-                  label="ประเภทสาย"
-                  value={`${CALL_DIRECTION_LABEL[evidence.callLog.direction]} · ${evidence.callLog.duration}`}
+                  label={t.orders.evidenceSheet.callType}
+                  value={`${t.orders.callDirection[evidence.callLog.direction]} · ${evidence.callLog.duration}`}
                 />
               </>
             ) : (
-              <SheetRow label="ไฟล์">
+              <SheetRow label={t.orders.evidenceSheet.file}>
                 <span className="text-right text-body-sm font-semibold break-all text-foreground">
                   {evidence.fileName}
                   {evidence.fileSize != null && (
@@ -2022,7 +2075,7 @@ function BookingSummary({
               </SheetRow>
             )}
             {evidence.note && (
-              <SheetRow label="หมายเหตุ">
+              <SheetRow label={t.orders.evidenceSheet.note}>
                 <span className="text-right text-body-sm font-semibold whitespace-pre-line text-foreground">
                   {evidence.note}
                 </span>
@@ -2064,6 +2117,7 @@ function Footer({
   onCancel: () => void;
   onBooked: (amount: number) => void;
 }) {
+  const t = useT();
   const { data: book } = useOrderBook(product.id);
   const { amount, ok } = amountCheck(
     product,
@@ -2080,7 +2134,7 @@ function Footer({
   // have it removed after it was attached.
   const hasEvidence = !evidenceRequired(mode) || evidenceComplete(evidence);
   const canBook = ready && ok && hasEvidence && !booking;
-  const words = ORDER_WORDS[mode];
+  const words = t.orders.words[mode];
 
   return (
     <div className="flex shrink-0 flex-col gap-2 border-t border-border px-4 py-3 md:px-6">
@@ -2092,7 +2146,7 @@ function Footer({
         {/* Cancel on both screens — the way back from the summary is the
             arrow in the title row (or atop the sheet on a phone). */}
         <Button variant="outline" size="md" disabled={booking} onClick={onCancel}>
-          Cancel
+          {t.common.cancel}
         </Button>
         <Button
           variant={canBook ? "primary" : "disabled"}
@@ -2101,10 +2155,10 @@ function Footer({
           onClick={() => (reviewing ? onBooked(amount) : onReview())}
         >
           {!reviewing
-            ? "ตรวจสอบรายการ"
+            ? t.orders.summary.review
             : booking
               ? words.actionBusy
-              : `ยืนยัน${words.action}`}
+              : words.confirm}
         </Button>
       </div>
     </div>

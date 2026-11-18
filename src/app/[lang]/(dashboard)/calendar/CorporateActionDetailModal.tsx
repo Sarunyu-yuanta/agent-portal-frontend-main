@@ -2,8 +2,11 @@
 
 import { useEffect } from "react";
 import { Button } from "@sarunyu/system-one";
+import { FileTextIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { MarketFact } from "./market-feed";
 import { actionKindName, actionPalette } from "./market-taxonomy";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The sheet's own tag palette (Figma node 24635:107155).
@@ -60,6 +63,7 @@ export function CorporateActionDetailModal({
   rows: MarketFact[][];
   onClose: () => void;
 }) {
+  const t = useT();
   // Escape closes, as it does for every other dismissible layer in the app.
   // Bound on the document rather than the panel so it works before anything
   // inside has been focused.
@@ -81,7 +85,7 @@ export function CorporateActionDetailModal({
       }}
       role="dialog"
       aria-modal="true"
-      aria-label={`${actionKindName(kind)} detail for ${symbol}`}
+      aria-label={t.planner.calendar.alert.recordLabel(actionKindName(kind, t), symbol)}
     >
       {/* Figma fixes the panel at 704px and lets it hug its content. `max-h` and
           the scrolling card below are this implementation's own: fourteen rows
@@ -93,7 +97,7 @@ export function CorporateActionDetailModal({
             <span
               className="rounded px-2 py-0.5 text-sm font-semibold leading-[1.5]"
               style={{ backgroundColor: tag.bg, color: tag.text }}
-              title={actionKindName(kind)}
+              title={actionKindName(kind, t)}
             >
               {kind}
             </span>
@@ -107,6 +111,13 @@ export function CorporateActionDetailModal({
           </div>
 
           <div className="flex flex-col gap-3 rounded-2xl bg-[#f9f9f9] p-4">
+            {rows.length === 0 && (
+              <EmptyState
+                size="compact"
+                icon={<FileTextIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                title={t.planner.calendar.alert.noDetails}
+              />
+            )}
             {rows.map((group, groupIndex) => (
               <div key={groupIndex} className="flex flex-col gap-3">
                 {/* The rule leads each group but the first, so it never trails
@@ -134,7 +145,7 @@ export function CorporateActionDetailModal({
         {/* Figma's 343px, but capped at the panel: on a phone-width viewport a
             fixed 343 would push past the 16px gutter the overlay sets. */}
         <Button variant="primary" className="w-[343px] max-w-full shrink-0" onClick={onClose}>
-          Close
+          {t.common.close}
         </Button>
       </div>
     </div>

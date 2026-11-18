@@ -4,12 +4,17 @@ import { useState } from "react";
 import { Card, Tag, Button, Modal, Input, Dropdown, DropdownMultiple } from "@sarunyu/system-one";
 import { PlusIcon } from "@phosphor-icons/react";
 import { usePipelineDeals } from "@/hooks/use-api";
+import { ErrorState } from "@/components/ui/empty-state";
 import { StageAdvanceModal } from "./StageAdvanceModal";
 import { KanbanColumn } from "./KanbanColumn";
 import type { Deal, Stage } from "./pipeline-data";
+import { useT } from "@/i18n/I18nProvider";
 
 export default function PipelinePage() {
-  const strapiDeals = usePipelineDeals();
+  const { data: strapiDeals, isLoading: dealsLoading, error: dealsError, retry: retryDeals } =
+    usePipelineDeals();
+  const t = useT();
+  const p = t.pipeline;
   const [showModal, setShowModal] = useState(false);
   const [newProposal, setNewProposal] = useState({ clientName: "", productType: "", dealSize: "" });
   const [deals, setDeals] = useState<Deal[]>(() => strapiDeals.map(d => ({ ...d })));
@@ -42,10 +47,10 @@ export default function PipelinePage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
         {[
-          { label: "Total Pipeline Value",  tag: "+8% vs Q1",  tagV: "green" as const, value: "฿ 770M",  sub: "8 active deals" },
-          { label: "Weighted Est. Revenue", tag: "+15% vs Q1", tagV: "green" as const, value: "฿ 8.2M",  sub: "Probability-weighted" },
-          { label: "Win Rate",              tag: "YTD 2026",   tagV: "blue" as const,  value: "68%",     sub: "Industry avg: 52%" },
-          { label: "Avg Deal Cycle",        tag: "+3d vs Q1",  tagV: "red" as const,   value: "18 days", sub: "Target: 15 days" },
+          { label: p.kpi.totalValue,      tag: p.kpi.vsQuarter("+8%", "Q1"),  tagV: "green" as const, value: "฿ 770M",  sub: p.kpi.activeDeals(8) },
+          { label: p.kpi.weightedRevenue, tag: p.kpi.vsQuarter("+15%", "Q1"), tagV: "green" as const, value: "฿ 8.2M",  sub: p.kpi.probabilityWeighted },
+          { label: p.kpi.winRate,         tag: "YTD 2026",                    tagV: "blue" as const,  value: "68%",     sub: p.kpi.industryAvg("52%") },
+          { label: p.kpi.avgCycle,        tag: p.kpi.vsQuarter("+3d", "Q1"),  tagV: "red" as const,   value: p.kpi.days(18), sub: p.kpi.target(p.kpi.days(15)) },
         ].map((k) => (
           <Card key={k.label} variant="default" className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-2">
@@ -65,21 +70,21 @@ export default function PipelinePage() {
         <div className="flex flex-col sm:flex-row sm:items-end gap-3">
           <div className="w-full sm:w-72">
             <DropdownMultiple
-              label="Product Type"
-              placeholder="All Products"
+              label={p.toolbar.productType}
+              placeholder={p.toolbar.allProducts}
               options={[
-                { value: "sn", label: "Structured Note" },
-                { value: "eq", label: "Equity Fund" },
-                { value: "fi", label: "Fixed Income" },
-                { value: "reit", label: "REITs" },
-                { value: "bond", label: "Bond" },
+                { value: "sn", label: p.product.sn },
+                { value: "eq", label: p.product.eq },
+                { value: "fi", label: p.product.fi },
+                { value: "reit", label: p.product.reit },
+                { value: "bond", label: p.product.bond },
               ]}
             />
           </div>
           <div className="w-full sm:w-52">
             <Dropdown
-              label="Quarter"
-              placeholder="All Quarters"
+              label={p.toolbar.quarter}
+              placeholder={p.toolbar.allQuarters}
               options={[
                 { value: "q2-2026", label: "Q2 2026" },
                 { value: "q1-2026", label: "Q1 2026" },
@@ -94,11 +99,16 @@ export default function PipelinePage() {
           leftIcon={<PlusIcon size={16} />}
           onClick={() => setShowModal(true)}
         >
-          New Proposal
+          {p.toolbar.newProposal}
         </Button>
       </div>
 
       {/* Kanban Board */}
+      {dealsLoading ? (
+        <p className="type-body-2 py-10 text-center text-muted-foreground">{t.common.loading}</p>
+      ) : dealsError ? (
+        <ErrorState onRetry={retryDeals} />
+      ) : (
       <div className="flex gap-5 overflow-x-auto pb-3">
         {allStages.map((stage) => {
           const stageDeals = deals.filter(d => d.stage === stage);
@@ -114,6 +124,7 @@ export default function PipelinePage() {
           );
         })}
       </div>
+      )}
 
       {/* Stage Advance Modal */}
       {advancing && (
@@ -130,36 +141,36 @@ export default function PipelinePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
           <Modal
             variant="content"
-            title="New Proposal"
+            title={p.newProposal.title}
             actionLayout="none"
             onClose={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}
           >
             <div className="flex flex-col gap-4">
               <Input
-                placeholder="Client Name"
+                placeholder={p.newProposal.clientName}
                 value={newProposal.clientName}
                 onChange={(val) => setNewProposal((p) => ({ ...p, clientName: val }))}
               />
               <Dropdown
-                placeholder="Product Type"
+                placeholder={p.newProposal.productType}
                 value={newProposal.productType}
                 options={[
-                  { value: "sn", label: "Structured Note" },
-                  { value: "eq", label: "Equity Fund" },
-                  { value: "fi", label: "Fixed Income" },
+                  { value: "sn", label: p.product.sn },
+                  { value: "eq", label: p.product.eq },
+                  { value: "fi", label: p.product.fi },
                 ]}
                 onChange={(val) => setNewProposal((p) => ({ ...p, productType: val as string }))}
               />
               <Input
-                placeholder="Deal Size (฿)"
+                placeholder={p.newProposal.dealSize}
                 value={newProposal.dealSize}
                 onChange={(val) => setNewProposal((p) => ({ ...p, dealSize: val }))}
               />
               <Button variant="primary" size="xl" className="w-full" onClick={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}>
-                Create
+                {p.newProposal.create}
               </Button>
               <Button variant="outline" size="xl" className="w-full" onClick={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}>
-                Cancel
+                {t.common.cancel}
               </Button>
             </div>
           </Modal>

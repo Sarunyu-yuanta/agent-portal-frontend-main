@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * A horizontal chip strip. It scrolls by swipe/wheel on any device, but a
@@ -91,6 +92,7 @@ function ChipScrollButton({
   side: "left" | "right";
   onClick: () => void;
 }) {
+  const t = useT();
   const isLeft = side === "left";
   return (
     // The wrapper is click-through so it only fades the chips sliding under it;
@@ -105,7 +107,7 @@ function ChipScrollButton({
       <button
         type="button"
         onClick={onClick}
-        aria-label={isLeft ? "เลื่อนไปทางซ้าย" : "เลื่อนไปทางขวา"}
+        aria-label={isLeft ? t.shell.chipScroller.scrollLeft : t.shell.chipScroller.scrollRight}
         className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white shadow-sm transition-colors cursor-pointer hover:bg-muted active:bg-[var(--fill-gray-200)]"
       >
         {isLeft ? <CaretLeftIcon size={14} /> : <CaretRightIcon size={14} />}

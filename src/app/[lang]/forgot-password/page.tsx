@@ -1,38 +1,64 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { Button, Input } from "@sarunyu/system-one";
+import { useLocalizedRouter } from "@/i18n/navigation";
+import { Alert, Button, Input } from "@sarunyu/system-one";
 import { CheckCircleIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/components/AuthShell";
+import { useT } from "@/i18n/I18nProvider";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Stands in for the reset-link request, which has no backend yet. The real
+ * one should answer the same way whether or not the email is on file (the
+ * confirmation copy is worded for that) and reject only when the request
+ * itself fails.
+ */
+function requestPasswordReset(_email: string): Promise<void> {
+  return Promise.resolve();
+}
+
 /** No auth backend exists yet — submitting just flips to the confirmation state. */
 export default function ForgotPasswordPage() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  // The request failed (not "no such email" — that is never revealed).
+  const [requestError, setRequestError] = useState<string | null>(null);
 
   /**
    * The design system's `Input` `required` prop only draws the red asterisk —
    * it doesn't set the native `required` attribute, so the browser never
    * blocks submission on its own. Validate by hand instead.
    */
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (submitting) return;
     const trimmed = email.trim();
     if (!trimmed) {
-      setError("กรุณากรอกอีเมล");
+      setError(t.auth.forgot.emailRequired);
       return;
     }
     if (!EMAIL_PATTERN.test(trimmed)) {
-      setError("รูปแบบอีเมลไม่ถูกต้อง");
+      setError(t.auth.forgot.emailInvalid);
       return;
     }
     setError(null);
-    setSubmitted(true);
+    setRequestError(null);
+    setSubmitting(true);
+    try {
+      await requestPasswordReset(trimmed);
+      setSubmitted(true);
+    } catch (err) {
+      console.warn("[forgot-password]", err);
+      setRequestError(t.auth.forgot.requestFailed);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function handleEmailChange(value: string) {
@@ -46,28 +72,30 @@ export default function ForgotPasswordPage() {
         <>
           <div className="flex flex-col items-center gap-3 py-6 text-center">
             <CheckCircleIcon size={48} className="text-success" weight="fill" />
-            <h1 className="type-h4 text-foreground">ส่งอีเมลแล้ว</h1>
+            <h1 className="type-h4 text-foreground">{t.auth.forgot.sentTitle}</h1>
             <p className="text-sm text-muted-foreground">
-              หากอีเมล <span className="font-semibold text-foreground">{email}</span> มีอยู่ในระบบ
-              เราได้ส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้แล้ว กรุณาตรวจสอบกล่องขาเข้าของคุณ
+              {t.auth.forgot.sentBodyBefore}{" "}
+              <span className="font-semibold text-foreground">{email}</span>{" "}
+              {t.auth.forgot.sentBodyAfter}
             </p>
           </div>
           <Button variant="outline" size="lg" className="w-full" onClick={() => router.push("/login")}>
-            เข้าสู่ระบบ
+            {t.auth.login}
           </Button>
         </>
       ) : (
         <>
           <div className="flex flex-col gap-1">
-            <h1 className="type-h4 text-foreground">ลืมรหัสผ่าน</h1>
+            <h1 className="type-h4 text-foreground">{t.auth.forgot.title}</h1>
             <p className="text-sm text-muted-foreground">
-              กรอกอีเมลที่ใช้ลงทะเบียน เราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้ทางอีเมล
+              {t.auth.forgot.body}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+            {requestError && <Alert status="critical" message={requestError} multiline />}
             <Input
-              placeholder="อีเมล"
+              placeholder={t.auth.forgot.email}
               type="email"
               value={email}
               onChange={handleEmailChange}
@@ -77,8 +105,14 @@ export default function ForgotPasswordPage() {
             />
 
             <div className="flex flex-col gap-2 mt-6">
-              <Button type="submit" variant="primary" size="lg" className="w-full">
-                ส่งลิงก์รีเซ็ตรหัสผ่าน
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full"
+                disabled={submitting}
+              >
+                {submitting ? t.common.sending : t.auth.forgot.submit}
               </Button>
               <Button
                 type="button"
@@ -87,7 +121,7 @@ export default function ForgotPasswordPage() {
                 className="w-full"
                 onClick={() => router.push("/login")}
               >
-                เข้าสู่ระบบ
+                {t.auth.login}
               </Button>
             </div>
           </form>
@@ -95,7 +129,7 @@ export default function ForgotPasswordPage() {
       )}
 
       <p className="type-description text-center text-muted-foreground">
-        ©Copyright 2016 Yuanta Securities (Thailand). All Rights Reserved
+        {t.auth.copyright}
       </p>
     </AuthShell>
   );

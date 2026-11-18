@@ -3,8 +3,8 @@
 import { CheckIcon } from "@phosphor-icons/react";
 import { Alert, Tag } from "@sarunyu/system-one";
 import type { Campaign } from "@/types/domain";
-import { PRODUCT_LABEL, SEGMENT_LABEL } from "../campaign-data";
 import { DetailSectionGroup, DetailSubsection } from "./DetailSection";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * What the offer is, who it is for, and the small print.
@@ -16,10 +16,11 @@ import { DetailSectionGroup, DetailSubsection } from "./DetailSection";
  * fine print nobody reads aloud.
  */
 export function PromotionBody({ campaign }: { campaign: Campaign }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-5">
       <DetailSectionGroup>
-        <DetailSubsection title="รายละเอียดแคมเปญ">
+        <DetailSubsection title={t.campaigns.body.campaignDetails}>
           {/* The long form, not `summary` — that one-liner is already in the
               banner directly above this section. */}
           <div className="flex flex-col gap-3">
@@ -35,15 +36,15 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
 
           <div className="mt-4 flex flex-wrap gap-1.5">
             {campaign.products.map((product) => (
-              <Tag key={product} text={PRODUCT_LABEL[product]} variant="blue" size="small" />
+              <Tag key={product} text={t.promotions.product[product]} variant="blue" size="small" />
             ))}
             {campaign.segments.map((segment) => (
-              <Tag key={segment} text={SEGMENT_LABEL[segment]} variant="gray" size="small" />
+              <Tag key={segment} text={t.promotions.segment[segment]} variant="gray" size="small" />
             ))}
           </div>
         </DetailSubsection>
 
-        <DetailSubsection title="เงื่อนไขการเข้าร่วม">
+        <DetailSubsection title={t.campaigns.body.conditions}>
           <ul className="flex list-none flex-col gap-3 p-0">
             {campaign.conditions.map((condition) => (
               <li
@@ -65,7 +66,7 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
           </ul>
         </DetailSubsection>
 
-        <DetailSubsection title="ข้อกำหนดและเงื่อนไข">
+        <DetailSubsection title={t.campaigns.body.terms}>
           <ol className="flex list-none flex-col gap-3 p-0">
             {campaign.terms.map((term, index) => (
               <li
@@ -95,7 +96,8 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
 
 /** Regulatory disclaimer — shared by promotion and event detail bodies. */
 export function Disclaimer({ text }: { text: string }) {
+  const t = useT();
   return (
-    <Alert status="warning" title="คำเตือน" message={text} multiline />
+    <Alert status="warning" title={t.campaigns.body.disclaimer} message={text} multiline />
   );
 }

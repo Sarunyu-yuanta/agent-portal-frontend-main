@@ -1,5 +1,6 @@
 import type { Client } from "@/types/domain";
 import { ROBO_RISK_CONFIG, type RoboRiskTier } from "./robo-risk-level";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /** The two Portfolio Advisory services; each client opens an account per service. */
 export type AdvisoryService = "robo" | "definit";
@@ -40,17 +41,18 @@ export function planSuitability(client: Client, planTier: RoboRiskTier): PlanSui
   return riskRank(planTier) <= riskRank(ceiling) ? "suitable" : "exceeds";
 }
 
-export type AdvisoryCta = { label: string; href: string; variant: "primary" | "outline" };
+/** `action` is labelled by `t.products.advisory.cta`. */
+export type AdvisoryCta = { action: "changePlan" | "openAccount"; href: string; variant: "primary" | "outline" };
 
 /** Opening an account is the headline action; changing an existing plan is secondary. */
 export function advisoryCta(client: Client, service: AdvisoryService): AdvisoryCta {
   return advisoryAccountStatus(client, service) === "open"
-    ? { label: "เปลี่ยนแผน", href: ADVISORY_EXTERNAL_URL, variant: "outline" }
-    : { label: "เปิดบัญชี", href: ADVISORY_EXTERNAL_URL, variant: "primary" };
+    ? { action: "changePlan", href: ADVISORY_EXTERNAL_URL, variant: "outline" }
+    : { action: "openAccount", href: ADVISORY_EXTERNAL_URL, variant: "primary" };
 }
 
-/** Thai label for the client's suitability profile, shown on the selected-client bar. */
-export function riskProfileLabel(client: Client): string {
+/** Label for the client's suitability profile, shown on the selected-client bar. */
+export function riskProfileLabel(client: Client, t: Dictionary): string {
   const ceiling = RISK_PROFILE_CEILING[client.riskProfile];
-  return ceiling ? ROBO_RISK_CONFIG[ceiling].label : client.riskProfile;
+  return ceiling ? t.products.advisory.riskTier[ceiling] : client.riskProfile;
 }

@@ -28,9 +28,9 @@ import { bookingPhase, bookingPhaseSteps, ownBookings, type BookingPhase } from 
 import { openOffersFor } from "./order-proposals";
 import { offeredSymbol } from "./offered-products";
 import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
-import { SIDE_LABEL, STATUS_TAG, formatQuantity } from "./transaction-display";
+import { STATUS_TAG, formatQuantity } from "./transaction-display";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
-const UNIT: Record<TransactionAsset, string> = { stock: "หุ้น", tfex: "สัญญา", "mutual-fund": "หน่วย" };
 
 /** The asset column, and the filter on it — the seven tabs, by their own names. */
 export type AllAsset = TransactionAsset | "fixed-income" | "thai-structured" | "structured" | "global-bond";
@@ -75,12 +75,6 @@ export type StatusBucket = "proposed" | "processing" | "done" | "cancelled";
 
 export const STATUS_BUCKETS: StatusBucket[] = ["proposed", "processing", "done", "cancelled"];
 
-export const STATUS_BUCKET_LABEL: Record<StatusBucket, string> = {
-  proposed: "ส่ง Proposal แล้ว",
-  processing: "กำลังดำเนินการ",
-  done: "สำเร็จ",
-  cancelled: "ยกเลิก",
-};
 
 const TRADE_BUCKET: Record<TransactionStatus, StatusBucket> = {
   pending: "processing",
@@ -127,8 +121,9 @@ export function buildAllRows(input: {
   books: OrderBook[];
   proposals: ProposalLog[];
   icName: string;
+  dict: Dictionary;
 }): AllRow[] {
-  const { trades, books, proposals, icName } = input;
+  const { trades, books, proposals, icName, dict } = input;
   const rows: AllRow[] = [];
   const nameOf = new Map<string, string>();
 
@@ -143,12 +138,12 @@ export function buildAllRows(input: {
         clientId: t.clientId,
         clientName: t.clientName,
         title: t.symbol,
-        subtitle: `${SIDE_LABEL[t.side]} ${formatQuantity(asset, t.quantity)} ${UNIT[asset]}`,
+        subtitle: `${dict.orders.side[t.side]} ${formatQuantity(asset, t.quantity)} ${dict.orders.quantityUnit[asset]}`,
         amount: { value: t.amount, currency: t.currency },
         bucket: TRADE_BUCKET[t.status],
         native: t.status,
         trade: t,
-        status: STATUS_TAG[t.status],
+        status: { text: dict.orders.tradeStatus[t.status], variant: STATUS_TAG[t.status].variant },
       });
     }
   }
@@ -170,7 +165,7 @@ export function buildAllRows(input: {
         native: bookingPhase(booking, book),
         book,
         booking,
-        status: dealStatus(booking, book),
+        status: dealStatus(booking, book, dict),
       });
     }
     for (const offer of openOffersFor(proposals, book, icName)) {
@@ -206,7 +201,7 @@ export function buildAllRows(input: {
         clientId: p.clientId,
         clientName: p.clientName,
         title: symbol,
-        subtitle: nameOf.get(`${asset}:${symbol}`) ?? `ส่งทาง ${channels.join(", ")}`,
+        subtitle: nameOf.get(`${asset}:${symbol}`) ?? dict.orders.list.sentVia(channels.join(", ")),
         amount: null,
         bucket: "proposed",
         native: "offered",
@@ -227,8 +222,8 @@ export function buildAllRows(input: {
  * Ids are what {@link matchesStatus} compares: a bucket with no asset, the
  * row's `native` status with one.
  */
-export function statusChipsFor(asset: AllAsset | null): { id: string; label: string }[] {
-  if (!asset) return STATUS_BUCKETS.map((b) => ({ id: b, label: STATUS_BUCKET_LABEL[b] }));
+export function statusChipsFor(asset: AllAsset | null, dict: Dictionary): { id: string; label: string }[] {
+  if (!asset) return STATUS_BUCKETS.map((b) => ({ id: b, label: dict.orders.statusBucket[b] }));
   if (asset === "stock" || asset === "tfex" || asset === "mutual-fund") {
     const statuses: TransactionStatus[] =
       asset === "mutual-fund"
@@ -236,12 +231,12 @@ export function statusChipsFor(asset: AllAsset | null): { id: string; label: str
         : ["pending", "partial", "matched", "cancelled"];
     return [
       // TFEX is never offered — see `offered-products`.
-      ...(asset === "tfex" ? [] : [{ id: "offered", label: STATUS_BUCKET_LABEL.proposed }]),
-      ...statuses.map((s) => ({ id: s, label: STATUS_TAG[s].text })),
+      ...(asset === "tfex" ? [] : [{ id: "offered", label: dict.orders.statusBucket.proposed }]),
+      ...statuses.map((s) => ({ id: s, label: dict.orders.tradeStatus[s] })),
     ];
   }
   const desk = (Object.keys(ASSET_OF_DESK) as Desk[]).find((d) => ASSET_OF_DESK[d] === asset)!;
-  return bookingPhaseSteps(bookingModeForDesk(desk), { offers: true })
+  return bookingPhaseSteps(bookingModeForDesk(desk), dict, { offers: true })
     .filter((s) => s.id !== "all")
     .map((s) => ({ id: s.id, label: s.label }));
 }

@@ -3,6 +3,7 @@
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import type { Client } from "@/types/domain";
 import { AssetSummaryPanel } from "./AssetSummaryPanel";
+import { useT } from "@/i18n/I18nProvider";
 
 export function AssetSummaryModal({
   open,
@@ -13,11 +14,12 @@ export function AssetSummaryModal({
   clients: Client[];
   onClose: () => void;
 }) {
+  const t = useT();
   return (
     <ResponsiveBottomSheetModal
       open={open}
       onClose={onClose}
-      title="ภาพรวมสินทรัพย์"
+      title={t.commandCenter.assetSummary.title}
       titleId="dashboard-asset-summary"
       desktopMaxWidth="max-w-[420px]"
     >

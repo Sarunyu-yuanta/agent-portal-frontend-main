@@ -19,6 +19,7 @@ import type { Resource } from "@/hooks/use-api";
 import type { ClientReadiness, OrderBook, RequirementRequest } from "@/types/domain";
 import type { Client } from "@/types/domain";
 import { assembleOrderBook, isBookClosed } from "./order-book";
+import { useT } from "@/i18n/I18nProvider";
 import { clientReadiness } from "./order-requirements";
 import {
   bookingModeForId,
@@ -28,7 +29,8 @@ import {
 
 /** One product's book, or `null` when the id resolves to no product. */
 export function useOrderBook(productId: string): Resource<OrderBook | null> {
-  const { bookings, submissions, requirementRequests, isLoading } = useOrders();
+  const { bookings, submissions, requirementRequests, isLoading, error, retry } = useOrders();
+  const t = useT();
 
   const data = useMemo(() => {
     const product = findBookableProduct(productId);
@@ -38,10 +40,11 @@ export function useOrderBook(productId: string): Resource<OrderBook | null> {
       bookings.filter((b) => b.productId === productId),
       submissions.filter((s) => s.productId === productId),
       requirementRequests.filter((r) => r.productId === productId),
+      t,
     );
-  }, [productId, bookings, submissions, requirementRequests]);
+  }, [productId, bookings, submissions, requirementRequests, t]);
 
-  return { data, isLoading };
+  return { data, isLoading, error, isStale: false, retry };
 }
 
 /**
@@ -57,7 +60,8 @@ export function useOrderBook(productId: string): Resource<OrderBook | null> {
  * row the IC can act on.
  */
 export function useOrderBooks(): Resource<OrderBook[]> {
-  const { bookings, submissions, requirementRequests, isLoading } = useOrders();
+  const { bookings, submissions, requirementRequests, isLoading, error, retry } = useOrders();
+  const t = useT();
 
   const data = useMemo(() => {
     const ids = new Set([
@@ -76,6 +80,7 @@ export function useOrderBooks(): Resource<OrderBook[]> {
           bookings.filter((b) => b.productId === id),
           submissions.filter((s) => s.productId === id),
           requirementRequests.filter((r) => r.productId === id),
+          t,
         ),
       );
     }
@@ -84,9 +89,9 @@ export function useOrderBooks(): Resource<OrderBook[]> {
     // newest event is today belongs above one that has been quiet for a week,
     // whatever state either is in.
     return books.sort((a, b) => (b.logs[0]?.at ?? "").localeCompare(a.logs[0]?.at ?? ""));
-  }, [bookings, submissions, requirementRequests]);
+  }, [bookings, submissions, requirementRequests, t]);
 
-  return { data, isLoading };
+  return { data, isLoading, error, isStale: false, retry };
 }
 
 /**
@@ -106,6 +111,7 @@ export function useOrderBooks(): Resource<OrderBook[]> {
  */
 export function useBooksByIds(productIds: readonly string[]): Map<string, OrderBook> {
   const { bookings, submissions, requirementRequests } = useOrders();
+  const t = useT();
   return useMemo(() => {
     const byId = new Map<string, OrderBook>();
     for (const id of productIds) {
@@ -118,11 +124,12 @@ export function useBooksByIds(productIds: readonly string[]): Map<string, OrderB
           bookings.filter((b) => b.productId === id),
           submissions.filter((s) => s.productId === id),
           requirementRequests.filter((r) => r.productId === id),
+          t,
         ),
       );
     }
     return byId;
-  }, [productIds, bookings, submissions, requirementRequests]);
+  }, [productIds, bookings, submissions, requirementRequests, t]);
 }
 
 /**
@@ -138,6 +145,7 @@ export function useBooksByIds(productIds: readonly string[]): Map<string, OrderB
  */
 export function useClosedProductIds(): Set<string> {
   const { bookings, submissions } = useOrders();
+  const t = useT();
   return useMemo(() => {
     const closed = new Set(
       submissions
@@ -155,11 +163,12 @@ export function useClosedProductIds(): Set<string> {
         bookings.filter((b) => b.productId === id),
         submissions.filter((s) => s.productId === id),
         [],
+        t,
       );
       if (isBookClosed(book)) closed.add(id);
     }
     return closed;
-  }, [bookings, submissions]);
+  }, [bookings, submissions, t]);
 }
 
 /**

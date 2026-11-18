@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Avatar } from "@sarunyu/system-one";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
@@ -9,6 +9,7 @@ import { usePrivacy } from "@/contexts/privacy-context";
 import { formatAumThb, getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 export function ClientListModal({
   open,
@@ -20,6 +21,7 @@ export function ClientListModal({
   onClose: () => void;
 }) {
   const { isPrivate } = usePrivacy();
+  const t = useT();
 
   const sorted = useMemo(
     () => [...clients].sort((a, b) => b.aum - a.aum),
@@ -30,13 +32,13 @@ export function ClientListModal({
     <ResponsiveBottomSheetModal
       open={open}
       onClose={onClose}
-      title="รายชื่อ Client"
+      title={t.commandCenter.clientList.title}
       titleId="dashboard-client-list"
     >
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
         {sorted.length === 0 ? (
           <p className="py-6 text-center text-body-sm text-muted-foreground">
-            ไม่มีลูกค้าในระบบ
+            {t.commandCenter.clientList.empty}
           </p>
         ) : (
           <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">

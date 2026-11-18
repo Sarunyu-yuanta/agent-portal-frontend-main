@@ -1,14 +1,36 @@
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatDate, formatTime } from "@/i18n/format";
 import type { AssetHeroSummary } from "@/components/AssetSummarySection";
 
 export const LINE_AVAILABLE_RATIO = 320_000 / 9_400_000;
 export const LIABILITIES_MULTIPLIER = 0.0197;
 
 /**
- * Display-only rename for asset-class / product labels. The underlying data
- * label stays "อนุพันธ์" for lookups; only the rendered text becomes "TFEX".
+ * Asset-class keys as the data spells them (allocation slices, holdings
+ * sections, product rows are all keyed by these Thai labels), by a stable id —
+ * so code compares against an id rather than a display string.
  */
-export function displayAssetLabel(label: string): string {
-  return label === "อนุพันธ์" ? "TFEX" : label;
+export const ASSET_CLASS = {
+  cash: "เงินสด",
+  thaiStock: "หุ้นไทย",
+  foreignStock: "หุ้นต่างประเทศ",
+  structuredBond: "หุ้นกู้ที่มีอนุพันธ์แฝง",
+  mutualFund: "กองทุนรวม",
+  bond: "ตราสารหนี้",
+  derivatives: "อนุพันธ์",
+  foreignBond: "ตราสารหนี้ต่างประเทศ",
+} as const;
+
+/**
+ * Display text for an asset-class / product label. The underlying data label
+ * stays "อนุพันธ์" for lookups; only the rendered text becomes "TFEX". Pass `t`
+ * to show the class in the current language; a label the dictionary doesn't
+ * know (a product or account name) shows as itself.
+ */
+export function displayAssetLabel(label: string, t?: Pick<Dictionary, "assetClass">): string {
+  if (label === ASSET_CLASS.derivatives) return "TFEX";
+  return t?.assetClass[label] ?? label;
 }
 
 export type ClientSummaryInput = {
@@ -82,23 +104,12 @@ export function formatThbAmount(amount: number, withSign = false): string {
   return `${amount >= 0 ? "+" : "-"}${formatted}`;
 }
 
-export function formatThaiUpdatedAt(now: Date): { date: string; time: string } {
-  return {
-    date: now.toLocaleDateString("th-TH", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }),
-    time: now.toLocaleTimeString("th-TH", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }),
-  };
+export function formatUpdatedAt(now: Date, locale: Locale): { date: string; time: string } {
+  return { date: formatDate(locale, now, "short"), time: formatTime(locale, now) };
 }
 
-export function buildHeroSummaryFromClient(client: ClientSummaryInput): AssetHeroSummary {
-  const updatedAt = formatThaiUpdatedAt(new Date());
+export function buildHeroSummaryFromClient(client: ClientSummaryInput, locale: Locale): AssetHeroSummary {
+  const updatedAt = formatUpdatedAt(new Date(), locale);
   const aumThb = client.aum;
   const cash = aumThb * (client.cashIdlePct / 100);
   const lineAvailable = aumThb * LINE_AVAILABLE_RATIO;

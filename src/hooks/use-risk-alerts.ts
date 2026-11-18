@@ -32,7 +32,8 @@ export function useRiskAlertsResource(): Resource<RiskAlert[]> {
 
 /** One finding. `undefined` once loaded means the id isn't an alert. */
 export function useRiskAlert(id: string): Resource<RiskAlert | undefined> {
-  const { data, isLoading } = useRiskAlertsResource();
+  const source = useRiskAlertsResource();
+  const { data } = source;
   const alert = useMemo(() => data.find((a) => a.id === id), [data, id]);
-  return { data: alert, isLoading };
+  return { ...source, data: alert };
 }

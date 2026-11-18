@@ -3,6 +3,7 @@
 import { Button, Tag } from "@sarunyu/system-one";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { maskName } from "@/lib/mask-name";
+import { useT } from "@/i18n/I18nProvider";
 import { CATEGORY_CONFIG, confidenceColor, type Insight } from "./insight-config";
 
 export function InsightRow({
@@ -17,10 +18,14 @@ export function InsightRow({
   onSelect: (id: string) => void;
 }) {
   const { isPrivate } = usePrivacy();
+  const t = useT();
+  const ai = t.research.aiInsights;
   const maskedName = maskName(insight.clientName, isPrivate);
   const config = CATEGORY_CONFIG[insight.type as keyof typeof CATEGORY_CONFIG];
   if (!config) return null;
-  const { color, bg, Icon, tagVariant, tagText, primaryAction } = config;
+  const { color, bg, Icon, tagVariant } = config;
+  const tagText = ai.category[insight.type] ?? insight.type;
+  const primaryAction = ai.primaryAction[insight.type];
   const confColor = confidenceColor(insight.confidence);
   const isRisk = insight.type === "Risk Alert";
 
@@ -41,12 +46,12 @@ export function InsightRow({
         <p className="text-body font-semibold text-foreground leading-snug">{maskedName}</p>
         <p className="type-body-2 text-muted-foreground leading-snug">{insight.insight}</p>
         <div className="flex items-center gap-3">
-          <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{insight.confidence}% confidence</span>
-          {!isRisk && <span className="text-meta font-medium text-success">{insight.revenueImpact} potential</span>}
-          {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>Risk Reduction</span>}
+          <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{ai.row.confidence(insight.confidence)}</span>
+          {!isRisk && <span className="text-meta font-medium text-success">{ai.row.potential(insight.revenueImpact)}</span>}
+          {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>{ai.row.riskReduction}</span>}
         </div>
         <div className="flex items-center justify-end gap-2">
-          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>Snooze 24h</Button>
+          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>{ai.row.snooze}</Button>
           <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>{primaryAction}</Button>
         </div>
       </div>
@@ -64,14 +69,14 @@ export function InsightRow({
           <p className="text-body font-semibold text-foreground leading-snug">{maskedName}</p>
           <p className="type-body-2 text-muted-foreground leading-snug">{insight.insight}</p>
           <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{insight.confidence}% confidence</span>
-            {!isRisk && <span className="text-meta font-medium text-success">{insight.revenueImpact} potential</span>}
-            {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>Risk Reduction</span>}
+            <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{ai.row.confidence(insight.confidence)}</span>
+            {!isRisk && <span className="text-meta font-medium text-success">{ai.row.potential(insight.revenueImpact)}</span>}
+            {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>{ai.row.riskReduction}</span>}
           </div>
         </div>
         <div className="flex flex-col gap-1.5 shrink-0 items-end">
           <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>{primaryAction}</Button>
-          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>Snooze 24h</Button>
+          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>{ai.row.snooze}</Button>
         </div>
       </div>
     </div>

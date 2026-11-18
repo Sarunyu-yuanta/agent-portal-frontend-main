@@ -8,6 +8,7 @@ import { useClientNames } from "@/hooks/use-client-names";
 import { ClientAvatarStack } from "@/components/ui/client-avatar-stack";
 import { ClientField, ReminderField } from "./NoteAttributeFields";
 import { formatDayOnly } from "./note-format";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * The pill that reads out a note's client and reminder, and opens the fields for
@@ -67,6 +68,8 @@ export function NoteAttributesControl({
    */
   side?: "top" | "bottom";
 }) {
+  const locale = useLocale();
+  const t = useT();
   const nothingSet = clientIds.length === 0 && !reminderAt;
   const isMobile = useMediaQuery("(max-width: 767px)");
   const nameFor = useClientNames(clients);
@@ -91,7 +94,7 @@ export function NoteAttributesControl({
               className="-mb-1 flex items-center gap-1.5 self-end rounded-lg px-2 py-1 type-caption text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
             >
               <XIcon size={12} weight="bold" className="shrink-0" />
-              Clear
+              {t.planner.notes.fields.clear}
             </button>
           )}
 
@@ -122,7 +125,7 @@ export function NoteAttributesControl({
       >
         <SlidersHorizontalIcon size={16} className="shrink-0" />
         {nothingSet ? (
-          <span>Client, reminder</span>
+          <span>{t.planner.notes.fields.attributes}</span>
         ) : (
           <>
             <ClientAvatarStack
@@ -135,7 +138,7 @@ export function NoteAttributesControl({
               // "reminder", so it gets the bell to name it.
               <span className="flex items-center gap-1 truncate">
                 <BellIcon size={14} className="shrink-0" />
-                {formatDayOnly(reminderAt)}
+                {formatDayOnly(reminderAt, locale)}
               </span>
             )}
           </>
@@ -176,13 +179,13 @@ export function NoteAttributesControl({
           onOpenChange={onOpenChange}
           showHeader
           headerType="text"
-          title="Client, reminder"
+          title={t.planner.notes.fields.attributes}
           rightSide={nothingSet ? "none" : "action"}
           // `BottomSheet` gives its content `pt-2`, which leaves the first
           // switch sitting almost on the title. `contentClassName` goes through
           // `cn`, so this replaces that padding rather than adding to it.
           contentClassName="pt-5"
-          actionLabel="Clear"
+          actionLabel={t.planner.notes.fields.clear}
           onActionClick={() => {
             onClear();
             setResetKey((k) => k + 1);
@@ -196,7 +199,7 @@ export function NoteAttributesControl({
               onClick={() => onOpenChange(false)}
               className="mt-auto w-full justify-center"
             >
-              Done
+              {t.planner.notes.fields.done}
             </Button>
           </div>
         </BottomSheet>

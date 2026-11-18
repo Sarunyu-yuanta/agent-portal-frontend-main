@@ -53,9 +53,9 @@ import { useStatic } from "@/hooks/use-api";
 import {
   bookingModeForId,
   findBookableProduct,
-} from "@/app/(dashboard)/orders/bookable-products";
-import { orderTargetFor } from "@/app/(dashboard)/orders/order-book";
-import { evidenceComplete, evidenceRequired } from "@/app/(dashboard)/orders/order-evidence";
+} from "@/app/[lang]/(dashboard)/orders/bookable-products";
+import { orderTargetFor } from "@/app/[lang]/(dashboard)/orders/order-book";
+import { evidenceComplete, evidenceRequired } from "@/app/[lang]/(dashboard)/orders/order-evidence";
 import type {
   Booking,
   OrderEvidence,
@@ -115,6 +115,10 @@ type OrdersContextValue = {
   proposals: ProposalLog[];
   /** The order records haven't arrived — sourced from `useStatic` over the seed. */
   isLoading: boolean;
+  /** The first load of the order records failed; screens show `ErrorState`. */
+  error: Error | null;
+  /** Fetch the order records again. */
+  retry: () => void;
   /**
    * Places one client's order on a product — the single action behind every
    * booking button in the app.
@@ -185,7 +189,7 @@ const localId = (prefix: string) => `${prefix}-local-${++localSeq}`;
 export function OrdersProvider({ children }: { children: ReactNode }) {
   // The seed is what a real feed would be fetching; its loading state is the
   // context's, so every order screen and the bell wait on the same thing.
-  const { isLoading } = useStatic(seedBookings);
+  const { isLoading, error, retry } = useStatic(seedBookings);
   const [bookings, setBookings] = useState<Booking[]>(seedBookings);
   const [submissions, setSubmissions] = useState<OrderSubmission[]>(seedSubmissions);
   const [requirementRequests, setRequirementRequests] =
@@ -520,6 +524,8 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       requirementRequests,
       proposals,
       isLoading,
+      error,
+      retry,
       placeOrder,
       cancelBooking,
       sendRequirementRequest,
@@ -531,6 +537,8 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       requirementRequests,
       proposals,
       isLoading,
+      error,
+      retry,
       placeOrder,
       cancelBooking,
       sendRequirementRequest,

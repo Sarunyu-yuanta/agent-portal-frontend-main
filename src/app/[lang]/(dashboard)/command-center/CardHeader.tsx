@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 
 /**
  * `Button variant="plain" size="sm"`, as classes rather than as a component.

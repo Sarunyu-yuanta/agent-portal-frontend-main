@@ -25,9 +25,8 @@ import type { BookingMode } from "./bookable-products";
 export const EVIDENCE_CHANNEL: Record<
   EvidenceChannel,
   {
-    label: string;
-    /** What to attach, in the IC's words — under the picker. */
-    hint: string;
+    // Label and hint ("what to attach") are in the dictionary:
+    // `t.orders.evidence[channel]`.
     /**
      * The file input's `accept`.
      *
@@ -41,31 +40,23 @@ export const EVIDENCE_CHANNEL: Record<
   }
 > = {
   call: {
-    label: "โทรศัพท์",
     // The file half only — the Call Log half has its own words in the form.
-    hint: "ไฟล์เสียงที่อัดไว้ตอนคุยกับลูกค้า",
     accept: "audio/*,.mp3,.wav,.m4a,.aac,.ogg",
     icon: PhoneIcon,
   },
   email: {
-    label: "อีเมล",
     // Three forms, because an IC has whichever their mail client gave them and
     // refusing a PDF print would mean refusing the booking. The raw mail is the
     // strongest of the three — it carries headers a screenshot cannot — so it
     // is named first.
-    hint: "ไฟล์อีเมล (.eml / .msg) PDF หรือภาพหน้าจอ",
     accept: ".eml,.msg,application/pdf,.pdf,image/*",
     icon: EnvelopeSimpleIcon,
   },
   chat: {
-    label: "แชท / LINE",
-    hint: "ภาพหน้าจอบทสนทนา หรือไฟล์แชทที่บันทึกไว้",
     accept: "image/*,application/pdf,.pdf,.txt",
     icon: ChatCircleDotsIcon,
   },
   other: {
-    label: "อื่นๆ",
-    hint: "เอกสารหรือไฟล์อื่นที่ยืนยันคำสั่งของลูกค้า",
     // No filter: "other" is for whatever the three above do not cover, and a
     // list here would only be a guess at what that is.
     accept: "",
@@ -91,10 +82,6 @@ export function evidenceComplete(e: OrderEvidence | null | undefined): boolean {
   return !noteRequired(e.channel) || Boolean(e.note?.trim());
 }
 
-export const CALL_DIRECTION_LABEL: Record<"inbound" | "outbound", string> = {
-  inbound: "สายเข้า",
-  outbound: "โทรออก",
-};
 
 /**
  * Whether a booking on this desk needs evidence before it can be placed.

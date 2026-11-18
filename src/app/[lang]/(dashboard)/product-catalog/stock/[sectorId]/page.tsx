@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, use } from "react";
-import { notFound } from "next/navigation";
 import { MarketIndexDetail } from "../../../client/[id]/MarketIndexDetail";
 import { SetIndustrySectorDetail } from "../../../client/[id]/SetIndustrySectorDetail";
 import { StockProductDetail } from "../../../client/[id]/StockProductDetail";
@@ -11,6 +10,8 @@ import {
   useStockProductDetail,
 } from "@/hooks/use-catalog";
 import { useSectionBack } from "@/hooks/use-section-back";
+import { useT } from "@/i18n/I18nProvider";
+import { CatalogNotFound } from "../../CatalogNotFound";
 
 const STOCK_STATIC_ROUTES = new Set(["dr", "etf"]);
 
@@ -19,6 +20,7 @@ export default function StockCatalogDetailPage({
 }: {
   params: Promise<{ sectorId: string }>;
 }) {
+  const t = useT();
   const { sectorId: raw } = use(params);
   const sectorId = decodeURIComponent(raw);
   const goBack = useSectionBack();
@@ -27,8 +29,12 @@ export default function StockCatalogDetailPage({
   const sector = useIndustrySectorPage(sectorId);
   const quote = useStockProductDetail(sectorId);
 
+  // The in-catalog not-found (back to the catalog, dashboard chrome kept) — the
+  // same one the other catalog detail routes use, not the root 404 page.
+  const notFoundView = <CatalogNotFound message={t.stock.notFoundSymbol} onBack={goBack} />;
+
   if (STOCK_STATIC_ROUTES.has(sectorId)) {
-    notFound();
+    return notFoundView;
   }
 
   // Index slugs are prefixed (`index-th-set`), so this can't shadow a sector id
@@ -57,5 +63,5 @@ export default function StockCatalogDetailPage({
     );
   }
 
-  notFound();
+  return notFoundView;
 }

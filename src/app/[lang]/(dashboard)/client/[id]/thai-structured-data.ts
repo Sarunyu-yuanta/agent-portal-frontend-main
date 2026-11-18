@@ -1,4 +1,5 @@
 import type { StructuredProduct } from "./structured-product-data";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 
 export type ThaiStructuredProduct = {
   theme: string;
@@ -103,14 +104,14 @@ function underlyingLogo(ticker: string): string {
  * needs the same conversion and two of them would be two answers to "what is
  * this product's currency".
  */
-export function toBookableProduct(p: ThaiStructuredProduct): StructuredProduct {
+export function toBookableProduct(p: ThaiStructuredProduct, t: Dictionary): StructuredProduct {
   const tickers = [p.bbg1, p.bbg2, p.bbg3].filter(Boolean);
   const underlying = tickers.join(" - ");
   return {
     id: thaiBookableId(p.theme),
     underlying,
     coupon: p.couponPa,
-    tenor: `${p.tenor} เดือน`,
+    tenor: t.products.structured.tenorMonths(p.tenor),
     ko: p.koBarrier,
     strike: p.strike,
     ki: p.kiBarrier,
@@ -119,7 +120,7 @@ export function toBookableProduct(p: ThaiStructuredProduct): StructuredProduct {
     logos: tickers.map(underlyingLogo),
     offerDate: "-",
     couponPeriod: "-",
-    detailTenor: `${p.tenor} เดือน`,
+    detailTenor: t.products.structured.tenorMonths(p.tenor),
     // The theme, not the underlying. This is what names the book in Order
     // Management, and "Big Data" is how the Thai desk refers to the deal —
     // the tickers are already the row above it.

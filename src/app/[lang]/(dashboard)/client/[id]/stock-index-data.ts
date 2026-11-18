@@ -67,6 +67,8 @@ export function getIndexStockBatch(
   market: MarketId = "th",
 ): StockRow[] {
   const source = INDEX_MEMBERS[market];
+  // An empty source would make `% 0` NaN and every row undefined.
+  if (source.length === 0) return [];
   return Array.from({ length: count }, (_, i) => {
     const row = source[(offset + i) % source.length];
     return {
@@ -78,8 +80,6 @@ export function getIndexStockBatch(
 
 export type MarketIndexPage = {
   market: MarketId;
-  /** Back-header copy — names the board the index came from. */
-  title: string;
   index: MarketIndex;
   /** Every index on the same board, for the drill-in's tab strip. */
   indices: MarketIndex[];
@@ -90,15 +90,10 @@ export type MarketIndexPage = {
   updatedAt: string;
 };
 
-const BOARD_TITLE: Record<MarketId, string> = {
-  th: "Thai Market Index",
-  us: "Global Market Index",
-};
-
 /** The part of an index page that is navigation, not data: which board, which
  *  index, and the board's tab strip — resolved from the slug and the static
- *  board list. */
-type MarketIndexNav = Pick<MarketIndexPage, "market" | "title" | "index" | "indices">;
+ *  board list. The back-header title is UI copy, keyed by `market`. */
+type MarketIndexNav = Pick<MarketIndexPage, "market" | "index" | "indices">;
 
 function getMarketIndexNav(slug: string): MarketIndexNav | null {
   if (!slug.startsWith(INDEX_SLUG_PREFIX)) return null;
@@ -114,7 +109,7 @@ function getMarketIndexNav(slug: string): MarketIndexNav | null {
   const index = catalog.indices.find((i) => slugOf(i.code) === codeSlug);
   if (!index) return null;
 
-  return { market, title: BOARD_TITLE[market], index, indices: catalog.indices };
+  return { market, index, indices: catalog.indices };
 }
 
 /** Resolves an `index-<market>-<code>` slug, or null so the route can fall

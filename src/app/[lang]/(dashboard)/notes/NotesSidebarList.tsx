@@ -11,6 +11,8 @@ import { useClientNames } from "@/hooks/use-client-names";
 import { groupNotesByDate, snippet } from "./notes-grouping";
 import { formatListStamp } from "./note-format";
 import { useIsoLayoutEffect } from "@/hooks/use-iso-layout-effect";
+import { useT } from "@/i18n/I18nProvider";
+import { useLocale } from "@/i18n/I18nProvider";
 
 type Filter = "all" | "clients" | "reminders";
 
@@ -25,11 +27,7 @@ type Filter = "all" | "clients" | "reminders";
  * the search box's job (it matches client names), so the two compose: search a
  * name, then switch to Reminders for just that person's open ones.
  */
-const FILTERS: { id: Filter; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "clients", label: "Clients" },
-  { id: "reminders", label: "Reminders" },
-];
+const FILTERS: Filter[] = ["all", "clients", "reminders"];
 
 /** How long a discarded row takes to fade and collapse out. */
 const DISCARD_EXIT_MS = 200;
@@ -216,6 +214,8 @@ export function NotesSidebarList({
   /** Notes on their way out — rendered collapsing rather than yanked instantly. */
   discardingIds?: string[];
 }) {
+  const locale = useLocale();
+  const t = useT();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -245,7 +245,7 @@ export function NotesSidebarList({
     return result;
   }, [notes, filter, search, nameFor]);
 
-  const groups = useMemo(() => groupNotesByDate(filtered), [filtered]);
+  const groups = useMemo(() => groupNotesByDate(filtered, t, locale), [filtered, t, locale]);
 
   /**
    * An empty list has four different causes here and they are not the same news.
@@ -263,13 +263,14 @@ export function NotesSidebarList({
    * clients and reminders are both opt-in per note, so an empty list is as
    * likely to mean "you've never used this" as "nothing matches today".
    */
+  const copy = t.planner.notes.list;
   const empty: { title: string; hint?: string } = searchActive
-    ? { title: "No matching notes" }
+    ? { title: copy.noMatch }
     : filter === "clients"
-      ? { title: "No notes linked to a client", hint: "Attach one from a note's Client field." }
+      ? { title: copy.noClientNotes, hint: copy.noClientNotesHint }
       : filter === "reminders"
-        ? { title: "No open reminders", hint: "Set a reminder on a note and it lands here." }
-        : { title: "No notes" };
+        ? { title: copy.noOpenReminders, hint: copy.noOpenRemindersHint }
+        : { title: copy.noNotes };
 
   // Keyed by note id so a row keeps its entry across re-sorts — the whole point
   // is to compare where a given note was with where it now is.
@@ -295,7 +296,7 @@ export function NotesSidebarList({
           }}
         >
           <SearchInput
-            placeholder="Search"
+            placeholder={copy.search}
             value={search}
             onChange={setSearch}
             onClear={() => setSearch("")}
@@ -313,7 +314,7 @@ export function NotesSidebarList({
           leftIcon={<NotePencilIcon size={18} weight="bold" />}
           className="w-full justify-center"
         >
-          New Note
+          {t.planner.notes.newNoteTitle}
         </Button>
       </div>
 
@@ -326,10 +327,10 @@ export function NotesSidebarList({
         onValueChange={(v) => setFilter(v as Filter)}
         className="px-3 pb-2 shrink-0"
       >
-        <TabsList aria-label="Filter notes" className="w-full">
-          {FILTERS.map(({ id, label }) => (
+        <TabsList aria-label={copy.filterNotes} className="w-full">
+          {FILTERS.map((id) => (
             <TabsTrigger key={id} value={id}>
-              {label}
+              {copy.tabs[id]}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -355,7 +356,7 @@ export function NotesSidebarList({
           >
             <XIcon size={12} weight="bold" className="shrink-0" />
             <span className="truncate">
-              Clear search · {filtered.length} of {notes.length}
+              {copy.clearSearch(filtered.length, notes.length)}
             </span>
           </button>
         </div>
@@ -543,7 +544,7 @@ export function NotesSidebarList({
                                       isSelected ? SELECTED_TITLE : ""
                                     }`}
                                   >
-                                    {note.title || "New Note"}
+                                    {note.title || t.planner.notes.newNoteTitle}
                                   </p>
                                   {/* What's attached to the note, at a glance.
                                       Pinned right on the title line — the title
@@ -575,7 +576,7 @@ export function NotesSidebarList({
                                         <BellIcon
                                           size={13}
                                           role="img"
-                                          aria-label="Has a reminder"
+                                          aria-label={copy.hasReminder}
                                           className={`text-muted-foreground ${
                                             isSelected ? SELECTED_SECONDARY : ""
                                           }`}
@@ -595,10 +596,10 @@ export function NotesSidebarList({
                                       isSelected ? SELECTED_STAMP : ""
                                     }`}
                                   >
-                                    {formatListStamp(note.updatedAt)}
+                                    {formatListStamp(note.updatedAt, locale)}
                                   </span>
                                   <span className="truncate">
-                                    {snippet(note.body)}
+                                    {snippet(note.body, undefined, t.planner.noAdditionalText)}
                                   </span>
                                 </p>
                               </div>

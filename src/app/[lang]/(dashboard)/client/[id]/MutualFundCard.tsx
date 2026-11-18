@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { Tag } from "@sarunyu/system-one";
 import { useId, useMemo } from "react";
 import { fundHasHighlightTag, fundHasViewTag, getNavHistory, type MutualFund } from "./mutual-fund-data";
 import { MF_ASSETS, mutualFundRiskMeterSrc } from "./mutual-fund-assets";
+import { useT } from "@/i18n/I18nProvider";
 
 const LIST_CARD_CLASS =
   "shadow-[0px_0px_1px_rgba(102,102,102,0.16),0px_4px_4px_rgba(102,102,102,0.12)]";
@@ -24,13 +25,14 @@ export function MutualFundSeeMoreIcon() {
 }
 
 function PickTag() {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5">
       <Image src={MF_ASSETS.performersTagHighlight} alt="" width={11} height={11} className="size-[11px] shrink-0" />
       <span
         className="text-micro leading-[15px] font-normal bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-transparent"
       >
-        Pick
+        {t.fund.tags.pick}
       </span>
     </span>
   );
@@ -54,10 +56,11 @@ function RiskMeterIcon({ risk }: { risk: number }) {
 
 /** Figma risk pill — compact badge (node 36234:961677 / 39889:667997). */
 export function RiskBadge({ risk, inline }: { risk: number; inline?: boolean }) {
+  const t = useT();
   const pill = (
     <span className="inline-flex h-5 shrink-0 self-start items-center gap-1 rounded-2xl border border-black/10 bg-white px-2">
       <RiskMeterIcon risk={risk} />
-      <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">risk: {risk}</span>
+      <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">{t.fund.tags.risk(risk)}</span>
     </span>
   );
 
@@ -147,6 +150,7 @@ function ListCardMetaTag({
 
 /** View / Highlight badges for one fund — only the tags it actually carries. */
 export function FundTagBadges({ fund }: { fund: MutualFund }) {
+  const t = useT();
   const view = fundHasViewTag(fund);
   const highlight = fundHasHighlightTag(fund);
   if (!view && !highlight) return null;
@@ -155,7 +159,7 @@ export function FundTagBadges({ fund }: { fund: MutualFund }) {
       {view ? (
         <ListCardMetaTag
           iconSrc={MF_ASSETS.performersTagView}
-          label="View"
+          label={t.fund.tags.view}
           className="bg-[#f6f3ef]"
           labelClassName="text-[#935737]"
         />
@@ -163,7 +167,7 @@ export function FundTagBadges({ fund }: { fund: MutualFund }) {
       {highlight ? (
         <ListCardMetaTag
           iconSrc={MF_ASSETS.performersTagHighlight}
-          label="Highlight"
+          label={t.fund.tags.highlight}
           className="bg-[#eff6ff]"
           labelClassName="text-[#0a6ee7]"
         />
@@ -173,8 +177,9 @@ export function FundTagBadges({ fund }: { fund: MutualFund }) {
 }
 
 function ListCardPercentPill({ changePct }: { changePct: string }) {
-  const positive = changePct.startsWith("+");
-  const value = changePct.replace(/^[+-]/, "");
+  const pct = changePct ?? "";
+  const positive = pct.startsWith("+");
+  const value = pct.replace(/^[+-]/, "") || "-";
 
   return (
     <span
@@ -190,8 +195,13 @@ function ListCardPercentPill({ changePct }: { changePct: string }) {
 
 /** Figma 39889:667997 — price row (gain vs neutral abs). */
 function ListCardPriceChange({ fund }: { fund: MutualFund }) {
-  const absNeutral = fund.changeAbs === "0.0000";
-  const absValue = fund.changeAbs.replace(/^\+/, "");
+  // A missing change reads as no change rather than crashing the card.
+  const changeAbs = fund.changeAbs ?? "0.0000";
+  const absNeutral = changeAbs === "0.0000";
+  // Negative moves were drawn "+-0.12" in green: the sign and colour were
+  // hard-coded for gains.
+  const negative = changeAbs.startsWith("-");
+  const absValue = changeAbs.replace(/^[+-]/, "");
 
   return (
     <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
@@ -201,13 +211,17 @@ function ListCardPriceChange({ fund }: { fund: MutualFund }) {
       </div>
       {absNeutral ? (
         <div className="flex w-[105px] items-center gap-1">
-          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-[#4a5565]">{fund.changeAbs}</span>
+          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-[#4a5565]">{changeAbs}</span>
           <ListCardPercentPill changePct={fund.changePct} />
         </div>
       ) : (
-        <div className="flex items-center gap-1 text-xs leading-[20px] text-[#008236]">
+        <div
+          className={`flex items-center gap-1 text-xs leading-[20px] ${
+            negative ? "text-[#fb2c36]" : "text-[#008236]"
+          }`}
+        >
           <span className="flex items-center">
-            <span>+</span>
+            <span>{negative ? "-" : "+"}</span>
             <span>{absValue}</span>
           </span>
           <ListCardPercentPill changePct={fund.changePct} />
@@ -218,8 +232,8 @@ function ListCardPriceChange({ fund }: { fund: MutualFund }) {
 }
 
 function PriceChange({ fund }: { fund: MutualFund }) {
-  const isNeutral = fund.changeAbs === "0.0000";
-  const isPositive = !isNeutral && fund.changePct.startsWith("+");
+  const isNeutral = (fund.changeAbs ?? "0.0000") === "0.0000";
+  const isPositive = !isNeutral && (fund.changePct ?? "").startsWith("+");
   const valueColor = isNeutral ? "#4a5565" : isPositive ? "#008236" : "#fb2c36";
 
   return (
@@ -313,6 +327,7 @@ export function MutualFundListCard({
   showView?: boolean;
   showHighlight?: boolean;
 }) {
+  const t = useT();
   const href = mutualFundDetailHref(fund.id);
   const inner = (
     <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-clip">
@@ -331,7 +346,7 @@ export function MutualFundListCard({
         {showView ? (
           <ListCardMetaTag
             iconSrc={MF_ASSETS.performersTagView}
-            label="View"
+            label={t.fund.tags.view}
             className="bg-[#f6f3ef]"
             labelClassName="text-[#935737]"
           />
@@ -339,7 +354,7 @@ export function MutualFundListCard({
         {showHighlight ? (
           <ListCardMetaTag
             iconSrc={MF_ASSETS.performersTagHighlight}
-            label="Highlight"
+            label={t.fund.tags.highlight}
             className="bg-[#eff6ff]"
             labelClassName="text-[#0a6ee7]"
           />
@@ -384,6 +399,7 @@ export function MutualFundListCardMobile({
   showView?: boolean;
   showHighlight?: boolean;
 }) {
+  const t = useT();
   const href = mutualFundDetailHref(fund.id);
   const inner = (
     <div className="flex w-full flex-col gap-2">
@@ -402,7 +418,7 @@ export function MutualFundListCardMobile({
         {showView ? (
           <ListCardMetaTag
             iconSrc={MF_ASSETS.performersTagView}
-            label="View"
+            label={t.fund.tags.view}
             className="bg-[#f6f3ef]"
             labelClassName="text-[#935737]"
           />
@@ -410,7 +426,7 @@ export function MutualFundListCardMobile({
         {showHighlight ? (
           <ListCardMetaTag
             iconSrc={MF_ASSETS.performersTagHighlight}
-            label="Highlight"
+            label={t.fund.tags.highlight}
             className="bg-[#eff6ff]"
             labelClassName="text-[#0a6ee7]"
           />
@@ -525,6 +541,7 @@ function MutualFundThemeRow({
   fund: MutualFund;
   onSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const href = mutualFundDetailHref(fund.id);
   const className =
     "block w-full p-3 text-left no-underline text-inherit cursor-pointer hover:bg-black/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-inset";
@@ -555,7 +572,7 @@ function MutualFundThemeRow({
           {fundHasViewTag(fund) ? (
             <ListCardMetaTag
               iconSrc={MF_ASSETS.performersTagView}
-              label="View"
+              label={t.fund.tags.view}
               className="bg-[#f6f3ef]"
               labelClassName="text-[#935737]"
             />
@@ -563,7 +580,7 @@ function MutualFundThemeRow({
           {fundHasHighlightTag(fund) ? (
             <ListCardMetaTag
               iconSrc={MF_ASSETS.performersTagHighlight}
-              label="Highlight"
+              label={t.fund.tags.highlight}
               className="bg-[#eff6ff]"
               labelClassName="text-[#0a6ee7]"
             />

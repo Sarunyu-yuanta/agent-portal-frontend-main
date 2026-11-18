@@ -1,7 +1,8 @@
-import Link from "next/link";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { FireIcon, HourglassMediumIcon, ShieldCheckIcon } from "@phosphor-icons/react";
-import { useProcessingProductIds } from "@/app/(dashboard)/orders/use-order-books";
-import type { StructuredProduct } from "./structured-product-data";
+import { useProcessingProductIds } from "@/app/[lang]/(dashboard)/orders/use-order-books";
+import { STRUCTURED_TAG, type StructuredProduct } from "./structured-product-data";
+import { useT } from "@/i18n/I18nProvider";
 
 type CardProduct = Pick<
   StructuredProduct,
@@ -24,6 +25,7 @@ function LogoRow({
   /** The product's order is with the back office — see `useProcessingProductIds`. */
   processing: boolean;
 }) {
+  const t = useT();
   return (
     <div className="flex gap-2 items-center w-full shrink-0">
       <div className="flex gap-1 items-center flex-1 min-w-0">
@@ -41,22 +43,22 @@ function LogoRow({
       <div className="flex gap-1 items-center shrink-0">
         {/* "ใกล้เต็ม" stops being true once the order has gone out — the
             card's status band says what replaced it. */}
-        {!processing && tags.includes("ใกล้เต็ม") && (
+        {!processing && tags.includes(STRUCTURED_TAG.almostFull) && (
           <div
             className="flex gap-0.5 items-center overflow-hidden px-1 py-0.5 rounded shrink-0"
             style={{ backgroundColor: "#fdefe6" }}
           >
             <FireIcon size={14} weight="fill" color="#f97316" />
-            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">ใกล้เต็ม</p>
+            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">{t.products.structured.tags.almostFull}</p>
           </div>
         )}
-        {tags.includes("รับประกันเงินต้น") && (
+        {tags.includes(STRUCTURED_TAG.principalProtected) && (
           <div
             className="flex gap-0.5 items-center overflow-hidden px-1 py-0.5 rounded shrink-0"
             style={{ backgroundColor: "#eff6ff" }}
           >
             <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" />
-            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">รับประกันเงินต้น</p>
+            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">{t.products.structured.tags.principalProtected}</p>
           </div>
         )}
       </div>
@@ -74,10 +76,11 @@ function LogoRow({
  * it with its top padding.
  */
 function ProcessingBand() {
+  const t = useT();
   return (
     <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label font-medium leading-[20px] text-[#0a6ee7]">
       <HourglassMediumIcon size={14} weight="fill" />
-      กำลังดำเนินการสั่งซื้อ
+      {t.products.common.processingOrder}
     </div>
   );
 }

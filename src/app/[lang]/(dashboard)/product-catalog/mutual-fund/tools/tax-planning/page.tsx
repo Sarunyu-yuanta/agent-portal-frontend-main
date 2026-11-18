@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { MutualFundTaxPlanningPage } from "../../../../client/[id]/MutualFundTaxPlanningPage";
 import { useSectionBack } from "@/hooks/use-section-back";
 
 export default function MutualFundTaxPlanningRoute() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const goBack = useSectionBack();
 
   return (

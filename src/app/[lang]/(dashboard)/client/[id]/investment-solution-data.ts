@@ -148,7 +148,8 @@ export const INVESTMENT_SOLUTIONS: InvestmentSolution[] = (
 export const INVESTMENT_SOLUTION_UPDATED_AT = "10 September 2026 - 09:00";
 export const INVESTMENT_SOLUTION_UPDATED_AT_MOBILE = "10 Sep 2026 - 09:00";
 
-export function getInvestmentSolution(id: InvestmentSolutionId): InvestmentSolution {
-  return INVESTMENT_SOLUTIONS.find((s) => s.id === id) ?? INVESTMENT_SOLUTIONS[2];
+/** `undefined` for an id that isn't a solution — the route shows not-found. */
+export function getInvestmentSolution(id: string): InvestmentSolution | undefined {
+  return INVESTMENT_SOLUTIONS.find((s) => s.id === id);
 }
 

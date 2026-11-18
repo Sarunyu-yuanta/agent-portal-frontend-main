@@ -39,16 +39,19 @@ import {
   type MutualFundTheme,
   type MutualFundThemeId,
 } from "./mutual-fund-data";
+import { useT } from "@/i18n/I18nProvider";
 
 function MutualFundThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme: MutualFundTheme }) {
+  // Falls back to no icon for a key the app doesn't know, rather than crashing.
+  const t = useT();
   const Icon = THEME_ICON_COMPONENTS[theme.icon];
 
   return (
     <CatalogDetailThemeHero
-      icon={<Icon size={24} weight="fill" style={{ color: THEME_HERO_COLOR.title }} />}
+      icon={Icon ? <Icon size={24} weight="fill" style={{ color: THEME_HERO_COLOR.title }} /> : null}
       title={getThemeHeroTitle(themeId)}
       description={getThemeDescription(themeId)}
-      meta={`ข้อมูล ณ วันที่ ${TOP_PERFORMERS_LIST_UPDATED_AT}`}
+      meta={t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
       trailing={<ThemeHeroGraphic themeId={themeId} scale={1.15} />}
     />
   );
@@ -96,6 +99,7 @@ export function MutualFundThemeDetailPage({
   onBack: () => void;
   onFundSelect?: (fundId: string) => void;
 }) {
+  const t = useT();
   const [themeId, setThemeId] = useState<MutualFundThemeId>(initialThemeId);
   const [period, setPeriod] = useState<MobilePerformancePeriod>("1M");
   const [legendOpen, setLegendOpen] = useState(false);
@@ -116,7 +120,7 @@ export function MutualFundThemeDetailPage({
   const showViewTag = bothOrNeitherTag || viewActive;
   const showHighlightTag = bothOrNeitherTag || highlightActive;
   const tagFunds = filterFundsByTag(funds, viewActive, highlightActive);
-  const listCountLabel = `${tagFunds.length} รายการ`;
+  const listCountLabel = t.fund.list.count(tagFunds.length);
   // Two levels. First load (the fund universe the page hangs off): the whole
   // page is skeleton, theme tabs included. After that, switching theme only
   // waits on that theme — the real tabs stay live and only the hero, list
@@ -140,7 +144,7 @@ export function MutualFundThemeDetailPage({
 
       {isPageLoading ? (
         <CatalogDetailDesktopShell>
-          <CatalogDetailBackHeader title="ธีมกองทุนเด่น" onBack={onBack} className="!pt-8" />
+          <CatalogDetailBackHeader title={t.fund.themes.detailTitle} onBack={onBack} className="!pt-8" />
           <TabsSkeleton count={themeTabItems.length} className={CATALOG_DETAIL_WIDTH.narrow} />
           <MutualFundTabbedListHeroSkeleton />
           <div
@@ -159,7 +163,7 @@ export function MutualFundThemeDetailPage({
         </CatalogDetailDesktopShell>
       ) : (
         <CatalogTabbedDetailView
-          title="ธีมกองทุนเด่น"
+          title={t.fund.themes.detailTitle}
           onBack={onBack}
           tabItems={themeTabItems}
           activeTabId={themeId}
@@ -200,7 +204,7 @@ export function MutualFundThemeDetailPage({
                 ))}
               </div>
               {tagFunds.length === 0 ? (
-                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">ไม่พบกองทุนในธีมนี้</p>
+                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">{t.fund.list.noFundsInTheme}</p>
               ) : null}
             </>
           )}

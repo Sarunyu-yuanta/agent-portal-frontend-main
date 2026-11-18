@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { Avatar, Tag } from "@sarunyu/system-one";
 import {
   CurrencyCircleDollarIcon,
@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getInitials } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 import { RowIcon } from "./CardHeader";
 import { NBA_ROW_LIMIT, type NbaRow } from "./dashboard-data";
 
@@ -32,28 +33,28 @@ import { NBA_ROW_LIMIT, type NbaRow } from "./dashboard-data";
  */
 const CATEGORY: Record<
   string,
-  { label: string; variant: "green" | "red" | "blue" | "yellow"; tone: string; Icon: React.ElementType }
+  { id: "revenue" | "compliance" | "productMatch" | "reengage"; variant: "green" | "red" | "blue" | "yellow"; tone: string; Icon: React.ElementType }
 > = {
   "Review & Send": {
-    label: "โอกาสสร้างรายได้",
+    id: "revenue",
     variant: "green",
     tone: "bg-[var(--fill-emerald-100)] text-[var(--fill-emerald-600)]",
     Icon: CurrencyCircleDollarIcon,
   },
   "Schedule Review": {
-    label: "ความเสี่ยงด้าน Compliance",
+    id: "compliance",
     variant: "red",
     tone: "bg-[var(--fill-red-100)] text-[var(--fill-red-600)]",
     Icon: WarningCircleIcon,
   },
   "Pitch Product": {
-    label: "สินค้าที่ตรงกับลูกค้า",
+    id: "productMatch",
     variant: "blue",
     tone: "bg-[var(--fill-violet-100)] text-[var(--fill-violet-600)]",
     Icon: SparkleIcon,
   },
   "Re-engage": {
-    label: "กลับมาติดต่อ",
+    id: "reengage",
     variant: "yellow",
     tone: "bg-[var(--fill-amber-100)] text-[var(--fill-amber-600)]",
     Icon: UsersIcon,
@@ -77,14 +78,15 @@ export function NbaPanel({
   limit?: number;
   onDismiss: (id: string) => void;
 }) {
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
 
   if (rows.length === 0) {
     return (
       <EmptyState
         icon={<SparkleIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-        title="ไม่มีข้อเสนอค้างอยู่"
-        body="AI จะเสนอ action ใหม่เมื่อมีสัญญาณจากพอร์ตหรือพฤติกรรมของลูกค้า"
+        title={t.commandCenter.nba.emptyTitle}
+        body={t.commandCenter.nba.emptyBody}
       />
     );
   }
@@ -129,7 +131,7 @@ export function NbaPanel({
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Tag text={category?.label ?? action.action} variant={variant} size="small" />
+                  <Tag text={category ? t.commandCenter.nba.category[category.id] : action.action} variant={variant} size="small" />
                   <Tag text={action.priority} variant={action.priorityVariant} size="small" />
                 </div>
               </div>
@@ -144,7 +146,7 @@ export function NbaPanel({
                       <p className="text-body-lg font-bold leading-none text-success tabular-nums">
                         ฿{revenueThbM}M
                       </p>
-                      <p className="mt-1 text-meta text-muted-foreground">โอกาสรายได้</p>
+                      <p className="mt-1 text-meta text-muted-foreground">{t.commandCenter.nba.revenueOpportunity}</p>
                     </>
                   ) : (
                     <p className="text-meta font-medium text-warning">
@@ -154,8 +156,8 @@ export function NbaPanel({
                 </div>
                 <button
                   type="button"
-                  aria-label="ไม่สนใจข้อเสนอนี้"
-                  title="ไม่สนใจ"
+                  aria-label={t.commandCenter.nba.dismissAria}
+                  title={t.commandCenter.nba.dismiss}
                   onClick={(e) => {
                     e.stopPropagation();
                     onDismiss(action.id);

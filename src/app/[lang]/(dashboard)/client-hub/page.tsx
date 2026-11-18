@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { CircleNotchIcon } from "@phosphor-icons/react";
-import { TabGroup, SearchInput, Pagination } from "@sarunyu/system-one";
+import { TabGroup, SearchInput, Pagination, Toaster } from "@sarunyu/system-one";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
 import { useClientsResource, useHasLoaded } from "@/hooks/use-api";
 import { usePrivacy } from "@/contexts/privacy-context";
@@ -12,6 +13,7 @@ import { setQueryState } from "@/lib/query-state";
 import { recordVisit } from "@/lib/nav-memory";
 import { useStoredIds } from "@/hooks/use-stored-ids";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useToasts } from "@/hooks/use-toasts";
 import { FadeIn } from "@/components/ui/fade-in";
 import { NineBoxTab, type NineBoxCellInfo } from "./NineBoxTab";
 import { ColumnVisibilityMenu } from "./ColumnVisibilityMenu";
@@ -26,6 +28,7 @@ import { NineBoxCellDrawer } from "./NineBoxCellDrawer";
 import { ClientDetailPanel } from "./ClientDetailPanel";
 import type { ColumnId, ProductSortKey, SortKey, ViewFilter } from "./types";
 import type { Client, ProductRow } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -99,9 +102,10 @@ export default function ClientHubPage() {
 }
 
 function ClientHubPageInner() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
+  const t = useT();
   const searchParams = useSearchParams();
-  const { data: clients, isLoading } = useClientsResource();
+  const { data: clients, isLoading, error } = useClientsResource();
   const hasLoaded = useHasLoaded(isLoading);
   const { isPrivate } = usePrivacy();
 
@@ -143,6 +147,21 @@ function ClientHubPageInner() {
   // Only rewind history if we're the ones who pushed the panel onto it —
   // arriving straight on `?client=…` must not bounce out of the app.
   const pushedPanelRef = useRef(false);
+
+  // A `?client=` that matches no one (a stale link, a client since removed)
+  // used to open nothing and say nothing. Once the list has loaded, drop the
+  // param and say why, rather than leave a URL that silently does nothing.
+  // Not while loading (the list is still empty) and not on a failed load
+  // (the client may well exist — the table shows the error instead).
+  const { toasts, addToast, removeToast } = useToasts();
+  const unknownClientParam =
+    !isLoading && !error && clientParam && !selectedClient ? clientParam : null;
+  useEffect(() => {
+    if (!unknownClientParam) return;
+    setQueryState("/client-hub", "replace");
+    addToast({ status: "warning", message: t.client.hub.clientParamNotFound });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per bad id
+  }, [unknownClientParam]);
 
   // Drawers
   const [selectedProduct, setSelectedProduct] = useState<ProductRow | null>(null);
@@ -227,12 +246,12 @@ function ClientHubPageInner() {
       const valueOf = (r: ProductRow) =>
         key === "rowIndex"
           ? (productIndexMap.get(r.label) ?? 0)
-          : getProductSortValue(r, key);
+          : getProductSortValue(r, key, t);
       list = [...list].sort((a, b) => compareBy(valueOf(a), valueOf(b), dir));
     }
 
     return list;
-  }, [productRows, debouncedProductSearch, productSort, productIndexMap]);
+  }, [productRows, debouncedProductSearch, productSort, productIndexMap, t]);
 
   function openClient(client: Client) {
     const href = `/client-hub?client=${encodeURIComponent(client.id)}`;
@@ -322,11 +341,11 @@ function ClientHubPageInner() {
               items={[
                 {
                   id: "customer",
-                  title: isLoading ? "Customer" : `Customer (${sorted.length})`,
+                  title: isLoading ? t.client.hub.customerTab : t.client.hub.customerTabCount(sorted.length),
                 },
                 {
                   id: "product",
-                  title: isLoading ? "Product" : `Product (${filteredProductRows.length})`,
+                  title: isLoading ? t.client.hub.productTab : t.client.hub.productTabCount(filteredProductRows.length),
                 },
               ]}
               activeId={viewFilter}
@@ -352,7 +371,7 @@ function ClientHubPageInner() {
                   <DebouncedSearchField
                     className="flex-1 lg:w-64"
                     inputClassName="!h-10"
-                    placeholder="Search clients…"
+                    placeholder={t.client.hub.searchClients}
                     value={search}
                     debouncedValue={debouncedSearch}
                     onChange={(val) => {
@@ -369,7 +388,7 @@ function ClientHubPageInner() {
               {viewFilter === "product" && (
                 <DebouncedSearchField
                   className="w-full lg:w-56 lg:ml-auto"
-                  placeholder="Search products…"
+                  placeholder={t.client.hub.searchProducts}
                   value={productSearch}
                   debouncedValue={debouncedProductSearch}
                   onChange={setProductSearch}
@@ -405,6 +424,7 @@ function ClientHubPageInner() {
                     setSearch("");
                     setCurrentPage(1);
                   }}
+                  isFiltered={!!debouncedSearch.trim()}
                 />
 
                 {isLoading ? (
@@ -413,10 +433,10 @@ function ClientHubPageInner() {
                     <Skeleton className="h-8 w-48" />
                     <Skeleton className="h-10 w-[120px] rounded-lg" />
                   </div>
-                ) : (
+                ) : sorted.length > 0 && (
                 <div className="flex flex-wrap-reverse items-center justify-end gap-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-label text-muted-foreground whitespace-nowrap">Show per page</p>
+                    <p className="text-label text-muted-foreground whitespace-nowrap">{t.client.hub.perPage}</p>
                     <select
                       value={pageSize}
                       onChange={(e) => {
@@ -432,19 +452,17 @@ function ClientHubPageInner() {
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-label text-muted-foreground">
-                      Showing{" "}
-                      <span className="font-medium text-foreground">
-                        {(safePage - 1) * pageSize + 1}
-                      </span>
-                      {" – "}
-                      <span className="font-medium text-foreground">
-                        {Math.min(safePage * pageSize, sorted.length)}
-                      </span>
-                      {" of "}
-                      <span className="font-medium text-foreground">
-                        {sorted.length}
-                      </span>{" "}
-                      clients
+                      {t.client.hub.showingClients(
+                        <span key="from" className="font-medium text-foreground">
+                          {(safePage - 1) * pageSize + 1}
+                        </span>,
+                        <span key="to" className="font-medium text-foreground">
+                          {Math.min(safePage * pageSize, sorted.length)}
+                        </span>,
+                        <span key="total" className="font-medium text-foreground">
+                          {sorted.length}
+                        </span>,
+                      )}
                     </p>
                     <Pagination
                       totalPages={totalPages}
@@ -467,11 +485,14 @@ function ClientHubPageInner() {
                   setProductDrawerOpen(true);
                 }}
                 onClearFilters={() => setProductSearch("")}
+                isFiltered={!!debouncedProductSearch.trim()}
               />
             )}
           </FadeIn>
         </div>
       </section>
+
+      <Toaster items={toasts} onRemove={removeToast} />
 
       {/* Client Detail Drawer */}
       <DetailDrawer

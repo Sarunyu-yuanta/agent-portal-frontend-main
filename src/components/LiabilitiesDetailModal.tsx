@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, CaretUpIcon, CreditCardIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useIsMobile } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { DashedDivider } from "@/components/ui/finance-ui";
 import { AllocationDonut } from "@/components/allocation-donut";
 import type { LiabilitiesDetail, LiabilityCategory } from "@/data/liabilities-details";
 import { getCategoryAmount } from "@/data/liabilities-details";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Same donut as the allocation cards — it was a `conic-gradient` with a white
@@ -20,9 +22,10 @@ function LiabilitiesDonutChart({
 }: {
   categories: LiabilityCategory[];
 }) {
+  const t = useT();
   return (
     <AllocationDonut
-      slices={categories.map((c) => ({ label: c.label, percent: c.percent, color: c.color }))}
+      slices={categories.map((c) => ({ label: t.client.liabilities.categories[c.id] ?? c.label, percent: c.percent, color: c.color }))}
       size={96}
     />
   );
@@ -33,6 +36,7 @@ function LiabilitiesLegendItem({
 }: {
   category: LiabilityCategory;
 }) {
+  const t = useT();
   return (
     <div className="flex gap-2 items-center w-full">
       <div className="flex flex-1 gap-1 items-center min-w-0 px-2 py-1">
@@ -41,7 +45,7 @@ function LiabilitiesLegendItem({
           style={{ backgroundColor: category.color }}
         />
         <p className="text-label font-normal leading-[20px] text-[var(--text-default-tertiary)] truncate">
-          {category.label}
+          {t.client.liabilities.categories[category.id] ?? category.label}
         </p>
       </div>
       <p className="text-label font-normal leading-[20px] text-[var(--text-default-tertiary)] shrink-0">
@@ -62,6 +66,7 @@ function LiabilityCategoryCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
   const amount = getCategoryAmount(totalAmount, category.percent);
 
   const headerRow = (
@@ -72,7 +77,7 @@ function LiabilityCategoryCard({
           style={{ backgroundColor: category.color }}
         />
         <p className="text-body font-bold leading-[24px] text-[var(--text-default-primary)] whitespace-nowrap">
-          {category.label}
+          {t.client.liabilities.categories[category.id] ?? category.label}
         </p>
       </div>
 
@@ -147,6 +152,7 @@ export function LiabilitiesDetailContent({
   totalAmount: string;
   detail: LiabilitiesDetail;
 }) {
+  const t = useT();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["debt"]));
   const allExpanded = detail.categories.length > 0 && detail.categories.every((c) => expandedIds.has(c.id));
 
@@ -159,6 +165,23 @@ export function LiabilitiesDetailContent({
 
   const handleExpandCollapseAll = () =>
     setExpandedIds(allExpanded ? new Set() : new Set(detail.categories.map((c) => c.id)));
+
+  // Nothing owed: say so, rather than a blank donut over an empty list with an
+  // "Expand all" that has nothing to expand.
+  if (detail.categories.length === 0) {
+    return (
+      <div className="flex flex-col gap-4 w-full">
+        <EmptyState
+          size="compact"
+          icon={<CreditCardIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          title={t.client.liabilities.empty}
+        />
+        <p className="type-caption text-[var(--text-default-tertiary)] leading-4 text-center w-full">
+          {t.client.liabilities.lastUpdated(detail.lastUpdated)}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -180,7 +203,7 @@ export function LiabilitiesDetailContent({
             onClick={handleExpandCollapseAll}
             className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
           >
-            {allExpanded ? "Collapse All" : "Expand All"}
+            {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
           </button>
         </div>
         {detail.categories.map((category) => (
@@ -195,7 +218,7 @@ export function LiabilitiesDetailContent({
       </div>
 
       <p className="type-caption text-[var(--text-default-tertiary)] leading-4 text-center w-full">
-        อัปเดตล่าสุด {detail.lastUpdated}
+        {t.client.liabilities.lastUpdated(detail.lastUpdated)}
       </p>
     </div>
   );
@@ -212,13 +235,14 @@ export function LiabilitiesDetailModal({
   detail: LiabilitiesDetail;
   onClose: () => void;
 }) {
+  const t = useT();
   const isMobile = useIsMobile();
 
   return (
     <ResponsiveBottomSheetModal
       open={open}
       onClose={onClose}
-      title="Liabilities Fund Receivable"
+      title={t.client.liabilities.modalTitle}
       titleId="liabilities-modal-title"
       desktopMaxWidth="max-w-[704px]"
       desktopTitleClassName="leading-7"

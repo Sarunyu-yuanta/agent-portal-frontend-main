@@ -11,6 +11,8 @@ import {
   type Trend,
 } from "./stock-data";
 
+import type { Dictionary } from "@/i18n/dictionaries/th";
+
 export type { IndustrySectorMarket };
 
 /** Thai sectors keep their bare slug so existing `/product-catalog/stock/<id>`
@@ -105,6 +107,8 @@ export function getSectorStockBatch(
   market: IndustrySectorMarket = "th",
 ): StockRow[] {
   const source = market === "us" ? US_SECTOR_STOCKS : RESOURCES_STOCKS;
+  // An empty source would make `% 0` NaN and every row undefined.
+  if (source.length === 0) return [];
   return Array.from({ length: count }, (_, i) => {
     const row = source[(offset + i) % source.length];
     return {
@@ -116,9 +120,6 @@ export function getSectorStockBatch(
 
 export type IndustrySectorPage = {
   market: IndustrySectorMarket;
-  /** Back-header copy. Both markets ship the SET wording for now — mirrors
-   *  `MarketCatalog.sectorsTitle`; swap together once US copy lands. */
-  title: string;
   sector: SectorRow;
   sectors: SectorRow[];
   description: string;
@@ -131,7 +132,7 @@ export type IndustrySectorPage = {
 
 /** The navigation half of a sector page — the taxonomy's tab strip and which
  *  sector is open — from the slug and the static sector lists. */
-type IndustrySectorNav = Pick<IndustrySectorPage, "market" | "title" | "sector" | "sectors">;
+type IndustrySectorNav = Pick<IndustrySectorPage, "market" | "sector" | "sectors">;
 
 function getIndustrySectorNav(slug: string): IndustrySectorNav | null {
   const isUs = slug.startsWith(US_SLUG_PREFIX);
@@ -140,7 +141,7 @@ function getIndustrySectorNav(slug: string): IndustrySectorNav | null {
   const sector = sectors.find((s) => s.id === sectorId);
   if (!sector) return null;
   const market: IndustrySectorMarket = isUs ? "us" : "th";
-  return { market, title: "SET Industry Sector", sector, sectors };
+  return { market, sector, sectors };
 }
 
 /** Resolves a drill-in slug against whichever taxonomy it names — a bare id is
@@ -162,6 +163,19 @@ export function getIndustrySectorPage(slug: string): IndustrySectorPage | null {
     totalCount: 260,
     updatedAt: MARKET_LATEST_UPDATE,
   };
+}
+
+/**
+ * A sector row with its UI names swapped for the dictionary's — the list name
+ * and, where the heatmap tile spells it differently, the tile's. A sector the
+ * dictionary doesn't know keeps the feed's own name.
+ */
+export function localizeSector(t: Dictionary, market: IndustrySectorMarket, sector: SectorRow): SectorRow {
+  const name = t.stock.sectorNames[market][sector.id] ?? sector.name;
+  const heatmapName = sector.heatmapName
+    ? (t.stock.sectorTileNames[market][sector.id] ?? sector.heatmapName)
+    : undefined;
+  return { ...sector, name, heatmapName };
 }
 
 export function industrySectorHref(sectorId: string, market: IndustrySectorMarket = "th"): string {

@@ -14,9 +14,11 @@
 import { mockClientDetails, mockKYCData } from "@/lib/mock-data";
 import { ALLOCATION_SLICES } from "@/components/AssetSummarySection";
 import {
+  ASSET_CLASS,
   LIABILITIES_MULTIPLIER,
   displayAssetLabel,
 } from "@/lib/client-utils";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import { getNineBoxCell } from "./NineBoxTab";
 import type { ProductSortKey, SortKey } from "./types";
 import type { Client, ProductRow, ProductHolder } from "@/types/domain";
@@ -45,13 +47,13 @@ export function getSortValue(client: Client, key: SortKey): number | string {
     case "id": return client.id;
     case "name": return client.name;
     case "aum": return client.aum;
-    case "thaiStock": return getClientSliceAmount(client, "หุ้นไทย");
-    case "foreignStock": return getClientSliceAmount(client, "หุ้นต่างประเทศ");
-    case "derivatives": return getClientSliceAmount(client, "อนุพันธ์");
-    case "mutualFund": return getClientSliceAmount(client, "กองทุนรวม");
-    case "bond": return getClientSliceAmount(client, "ตราสารหนี้");
-    case "foreignBond": return getClientSliceAmount(client, "ตราสารหนี้ต่างประเทศ");
-    case "structuredBond": return getClientSliceAmount(client, "หุ้นกู้ที่มีอนุพันธ์แฝง");
+    case "thaiStock": return getClientSliceAmount(client, ASSET_CLASS.thaiStock);
+    case "foreignStock": return getClientSliceAmount(client, ASSET_CLASS.foreignStock);
+    case "derivatives": return getClientSliceAmount(client, ASSET_CLASS.derivatives);
+    case "mutualFund": return getClientSliceAmount(client, ASSET_CLASS.mutualFund);
+    case "bond": return getClientSliceAmount(client, ASSET_CLASS.bond);
+    case "foreignBond": return getClientSliceAmount(client, ASSET_CLASS.foreignBond);
+    case "structuredBond": return getClientSliceAmount(client, ASSET_CLASS.structuredBond);
     case "plYtd": return client.plYtdPct;
     case "liabilities": return client.aum * LIABILITIES_MULTIPLIER;
     case "cashIdle": return client.aum * (client.cashIdlePct / 100);
@@ -68,9 +70,10 @@ export function getSortValue(client: Client, key: SortKey): number | string {
 export function getProductSortValue(
   row: ProductRow,
   key: Exclude<ProductSortKey, "rowIndex" | null>,
+  t: Pick<Dictionary, "assetClass">,
 ): number | string {
   switch (key) {
-    case "label": return displayAssetLabel(row.label);
+    case "label": return displayAssetLabel(row.label, t);
     case "clientCount": return row.clientCount;
     case "totalAmountThb": return row.totalAmountThb;
     case "avgAllocationPct": return row.avgAllocationPct;

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, CaretUpIcon, WalletIcon } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Tag, useIsMobile } from "@sarunyu/system-one";
 import { ProfitLossBadge, DashedDivider, StatCardRow } from "@/components/ui/finance-ui";
 import type {
@@ -11,8 +12,10 @@ import type {
   PositionSummary,
 } from "@/data/asset-account-details";
 import { displayAssetLabel, formatThbDecimal, parseAmount } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 
 function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
+  const t = useT();
   const allItems = sections.flatMap((s) => s.items);
   const totalValue = allItems.reduce((sum, item) => sum + parseAmount(item.value), 0);
   const totalChange = allItems.reduce((sum, item) => {
@@ -25,7 +28,7 @@ function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
     <StatCardRow
       stats={[
         {
-          label: "มูลค่ารวม",
+          label: t.client.assets.totalValue,
           value: (
             <>
               {formatThbDecimal(totalValue)}{" "}
@@ -34,7 +37,7 @@ function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
           ),
         },
         {
-          label: "กำไร/ขาดทุน",
+          label: t.client.assets.pl,
           value: (
             <span className={isPositive ? "text-[var(--text-success-primary)]" : "text-destructive"}>
               {isPositive ? "+" : ""}{formatThbDecimal(totalChange)}
@@ -47,19 +50,20 @@ function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
 }
 
 function PositionSummaryPanel({ position }: { position: PositionSummary }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2 px-1 pb-1 w-full">
       <p className="type-caption font-semibold text-[var(--text-default-secondary)] leading-4">
-        Position summary
+        {t.client.assets.positionSummary}
       </p>
       <div className="flex flex-wrap gap-2 w-full">
         {position.fields.map((field) => (
           <div
-            key={field.label}
+            key={field.id}
             className="flex flex-col h-9 items-start shrink-0 w-[calc(50%-4px)]"
           >
             <p className="type-caption text-[var(--text-default-placeholder)] leading-4 truncate w-full h-4">
-              {field.label}
+              {t.client.assets.position[field.id]}
             </p>
             <p className="type-body-2 text-[var(--text-default-primary)] leading-5 w-full">
               {field.value}
@@ -80,7 +84,8 @@ function HoldingCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const avgCost = item.position?.fields.find((f) => f.label.startsWith("Average Cost"))?.value;
+  const t = useT();
+  const avgCost = item.position?.fields.find((f) => f.id === "avgCost")?.value;
 
   const header = (
     <>
@@ -91,7 +96,7 @@ function HoldingCard({
               {item.symbol}
             </p>
             {item.collateral && (
-              <Tag text="Collateral" variant="blue" size="small" />
+              <Tag text={t.client.assets.collateral} variant="blue" size="small" />
             )}
           </div>
           <div className="flex gap-1 items-center text-right whitespace-nowrap shrink-0">
@@ -114,7 +119,7 @@ function HoldingCard({
         {avgCost && (
           <div className="flex items-center justify-end w-full">
             <p className="type-caption text-[var(--text-default-tertiary)] leading-4 whitespace-nowrap">
-              ราคาทุนเฉลี่ย {avgCost}
+              {t.client.assets.avgCost(avgCost)}
             </p>
           </div>
         )}
@@ -180,13 +185,14 @@ function HoldingSectionBlock({
   compactHorizontalPadding?: boolean;
   headerRight?: React.ReactNode;
 }) {
+  const t = useT();
   const sectionX = compactHorizontalPadding ? "px-4" : "px-6";
 
   return (
     <div className="flex flex-col w-full">
       <div className={`flex items-center ${sectionX} py-2 w-full`}>
         <p className="type-caption font-semibold text-[var(--text-default-tertiary)] leading-4 flex-1">
-          {displayAssetLabel(title)}
+          {displayAssetLabel(title, t)}
         </p>
         {headerRight}
       </div>
@@ -209,6 +215,7 @@ function HoldingSectionBlock({
 }
 
 export function HoldingDetailContent({ detail }: { detail: AssetAccountDetail }) {
+  const t = useT();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
 
@@ -227,6 +234,17 @@ export function HoldingDetailContent({ detail }: { detail: AssetAccountDetail })
   const handleExpandAll = () => {
     setExpandedIds(allExpanded ? new Set() : new Set(allIds));
   };
+
+  if (detail.sections.length === 0) {
+    return (
+      <EmptyState
+        size="compact"
+        icon={<WalletIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        title={t.client.assets.noHoldingsTitle}
+        body={t.client.assets.noHoldingsBody}
+      />
+    );
+  }
 
   return (
     <div className="pb-6">
@@ -248,7 +266,7 @@ export function HoldingDetailContent({ detail }: { detail: AssetAccountDetail })
                 onClick={handleExpandAll}
                 className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
               >
-                {allExpanded ? "Collapse All" : "Expand All"}
+                {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
               </button>
             ) : undefined
           }

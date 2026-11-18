@@ -6,6 +6,7 @@ import { SlidersHorizontalIcon, CheckIcon, LockSimpleIcon } from "@phosphor-icon
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import type { CustomerColumn } from "./columns";
 import type { ColumnId } from "./types";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * Show/Hide column control rendered three ways for one behaviour: a dropdown on
@@ -23,6 +24,7 @@ export function ColumnVisibilityMenu({
   onToggle: (id: ColumnId) => void;
   onReset: () => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ export function ColumnVisibilityMenu({
         leftIcon={<SlidersHorizontalIcon size={18} />}
         onClick={() => setOpen((p) => !p)}
       >
-        Columns
+        {t.client.hub.columnsButton}
         {hiddenCount > 0 && (
           <span className="ml-1 inline-flex items-center justify-center rounded-full bg-primary-action text-white text-meta font-bold w-4 h-4 leading-none">
             {hiddenCount}
@@ -61,10 +63,10 @@ export function ColumnVisibilityMenu({
         <div className="hidden lg:block absolute right-0 top-full mt-1 z-50 bg-white border border-[var(--border-default)] rounded-xl shadow-lg w-[260px] overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2.5 border-b border-[var(--border-default)]">
             <p className="text-label font-semibold text-muted-foreground uppercase tracking-wider">
-              Show / Hide Columns
+              {t.client.hub.showHideColumns}
             </p>
             <Button variant="plain" size="sm" onClick={onReset}>
-              Reset
+              {t.client.hub.resetColumns}
             </Button>
           </div>
           <div className="py-1 max-h-[360px] overflow-y-auto">
@@ -88,7 +90,7 @@ export function ColumnVisibilityMenu({
                     {checked && <CheckIcon size={10} weight="bold" color="white" />}
                   </span>
                   <span className="text-body-sm text-foreground leading-tight flex-1">
-                    {column.label}
+                    {t.clientHub.columns[column.id] ?? column.label}
                   </span>
                   {column.required && (
                     <LockSimpleIcon size={11} className="text-muted-foreground shrink-0" />
@@ -109,7 +111,7 @@ export function ColumnVisibilityMenu({
           <Modal
             variant="content"
             actionLayout="none"
-            title="Show / Hide Columns"
+            title={t.client.hub.showHideColumns}
             onClose={() => setOpen(false)}
           >
             <div className="w-[300px]">
@@ -118,7 +120,7 @@ export function ColumnVisibilityMenu({
                 className="text-label text-primary-action hover:underline font-medium mb-2 block"
                 onClick={onReset}
               >
-                Reset
+                {t.client.hub.resetColumns}
               </button>
               <div className="max-h-[calc(var(--vh)*50)] overflow-y-auto -mx-1">
                 {columns.map((column) => {
@@ -140,7 +142,7 @@ export function ColumnVisibilityMenu({
                         {checked && <CheckIcon size={10} weight="bold" color="white" />}
                       </span>
                       <span className="text-body-sm text-foreground leading-tight">
-                        {column.label}
+                        {t.clientHub.columns[column.id] ?? column.label}
                       </span>
                     </button>
                   );
@@ -156,10 +158,10 @@ export function ColumnVisibilityMenu({
         <SheetContent side="bottom" showCloseButton={false} className="md:hidden rounded-t-2xl px-0 pb-safe">
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
             <p className="text-label font-semibold text-muted-foreground uppercase tracking-wider">
-              Show / Hide Columns
+              {t.client.hub.showHideColumns}
             </p>
             <Button variant="plain" size="sm" onClick={onReset}>
-              Reset
+              {t.client.hub.resetColumns}
             </Button>
           </div>
           <div className="py-1 max-h-[calc(var(--vh)*60)] overflow-y-auto">
@@ -182,7 +184,7 @@ export function ColumnVisibilityMenu({
                     {checked && <CheckIcon size={12} weight="bold" color="white" />}
                   </span>
                   <span className="text-body text-foreground leading-tight">
-                    {column.label}
+                    {t.clientHub.columns[column.id] ?? column.label}
                   </span>
                 </button>
               );

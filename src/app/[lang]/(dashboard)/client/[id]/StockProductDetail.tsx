@@ -1,10 +1,14 @@
 "use client";
 
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatDateWith, formatTime } from "@/i18n/format";
+
 import { useEffect, useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppPathname } from "@/i18n/navigation";
 import { Button, Chip } from "@sarunyu/system-one";
-import { SendProposalButton } from "@/app/(dashboard)/orders/SendProposalButton";
-import { offeredProductId } from "@/app/(dashboard)/orders/offered-products";
+import { SendProposalButton } from "@/app/[lang]/(dashboard)/orders/SendProposalButton";
+import { offeredProductId } from "@/app/[lang]/(dashboard)/orders/offered-products";
 import {
   ArrowLeftIcon,
   CaretDownIcon,
@@ -59,6 +63,7 @@ import {
   useStockResearch,
   useStockTechnical,
 } from "@/hooks/use-catalog";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 const LINE = "#d92d3c";
 const FILL = "#f5212d";
@@ -106,6 +111,7 @@ function PriceIcon({ trend }: { trend: Trend }) {
 }
 
 function MarketStatusTag({ status }: { status: MarketStatusValue }) {
+  const t = useT();
   const s = MARKET_STATUS_STYLE[status];
   const isOpen = status === "Open";
   return (
@@ -119,7 +125,7 @@ function MarketStatusTag({ status }: { status: MarketStatusValue }) {
       ) : (
         <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: s.dot }} aria-hidden />
       )}
-      {status}
+      {t.stock.marketStatus[status] ?? status}
     </span>
   );
 }
@@ -156,24 +162,12 @@ function QuoteTooltip({
   );
 }
 
-function axisTick(range: StockChartRange) {
+function axisTick(range: StockChartRange, locale: Locale) {
   return (value: number) => {
-    const d = new Date(value);
-    if (range === "1D") {
-      return d.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Bangkok",
-      });
-    }
-    if (range === "5Y") {
-      return d.toLocaleDateString("en-GB", { year: "numeric", timeZone: "Asia/Bangkok" });
-    }
-    if (range === "5D") {
-      return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Bangkok" });
-    }
-    return d.toLocaleDateString("en-GB", { month: "short", year: "2-digit", timeZone: "Asia/Bangkok" });
+    if (range === "1D") return formatTime(locale, value);
+    if (range === "5Y") return formatDateWith(locale, value, { year: "numeric" });
+    if (range === "5D") return formatDate(locale, value, "dayMonth");
+    return formatDateWith(locale, value, { month: "short", year: "2-digit" });
   };
 }
 
@@ -186,6 +180,7 @@ function StockQuoteChart({
   range: StockChartRange;
   currency: string;
 }) {
+  const locale = useLocale();
   const domain = useMemo(() => {
     if (!points.length) return [0, 1] as [number, number];
     const values = points.map((p) => p.price);
@@ -237,7 +232,7 @@ function StockQuoteChart({
             scale="time"
             domain={["dataMin", "dataMax"]}
             ticks={ticks}
-            tickFormatter={axisTick(range)}
+            tickFormatter={axisTick(range, locale)}
             tickLine={false}
             axisLine={false}
             minTickGap={24}
@@ -343,19 +338,21 @@ function DepthSide({
 }
 
 function OrderBook({ detail }: { detail: StockProductDetail }) {
+  const t = useT();
+  const ob = t.stock.detail.orderBook;
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-4">
-      <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">Order Book</h2>
+      <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{ob.title}</h2>
       <div className="flex w-full flex-col overflow-hidden rounded-xl border border-black/10">
         <div className="flex flex-col gap-2.5 p-4">
           <div className="flex w-full items-center text-xs leading-[20px] text-[#6a7282]">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span>Volume</span>
-              <span>Best Bid</span>
+              <span>{ob.volume}</span>
+              <span>{ob.bestBid}</span>
             </div>
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span>Offer</span>
-              <span>Volume</span>
+              <span>{ob.offer}</span>
+              <span>{ob.volume}</span>
             </div>
           </div>
           <div className="flex w-full items-center overflow-hidden rounded">
@@ -372,17 +369,23 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
         <div className="flex flex-col gap-2.5 border-t border-black/10 p-4">
           <div className="flex w-full items-center text-xs leading-[20px] text-[#6a7282]">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span>Volume</span>
-              <span>Bid</span>
+              <span>{ob.volume}</span>
+              <span>{ob.bid}</span>
             </div>
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span>Offer</span>
-              <span>Volume</span>
+              <span>{ob.offer}</span>
+              <span>{ob.volume}</span>
             </div>
           </div>
           <div className="flex w-full flex-col">
-            {detail.bidLevels.map((bid, i) => {
-              const offer = detail.offerLevels[i];
+            {/* As many rows as the deeper side has; a side that runs out shows a
+                blank level rather than reading past the end of its array. */}
+            {Array.from(
+              { length: Math.max(detail.bidLevels.length, detail.offerLevels.length) },
+              (_, i) => i,
+            ).map((i) => {
+              const bid = detail.bidLevels[i] ?? EMPTY_LEVEL;
+              const offer = detail.offerLevels[i] ?? EMPTY_LEVEL;
               return (
                 <div key={`depth-${i}`} className="flex w-full items-center overflow-hidden">
                   <DepthSide
@@ -411,6 +414,9 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
   );
 }
 
+/** A depth row for the side that has run out of levels. */
+const EMPTY_LEVEL = { volume: "", price: "", barPct: 0 };
+
 function VolumeAnalysisBar({
   segments,
   maxVolumeM,
@@ -421,7 +427,7 @@ function VolumeAnalysisBar({
   return (
     <div className="flex h-3.5 min-w-0 flex-1 items-center">
       {segments.map((segment, index) => {
-        const widthPct = (segment.volumeM / maxVolumeM) * 100;
+        const widthPct = maxVolumeM > 0 ? (segment.volumeM / maxVolumeM) * 100 : 0;
         const isLast = index === segments.length - 1;
         return (
           <div
@@ -469,18 +475,22 @@ function VolumeAnalysisChart({ data }: { data: VolumeAnalysisData }) {
   );
 }
 
+const TIME_SALES_COLS = ["time", "price", "volume", "side"] as const;
+
 function TimeSalesTable({ rows }: { rows: TimeSalesRow[] }) {
+  const t = useT();
+  const ts = t.stock.detail.timeSales;
   return (
     <div className="flex max-h-[418px] w-full flex-col overflow-hidden rounded-xl border border-black/10">
       <div className="flex w-full items-center">
-        {["Time", "Price", "Volume", "Side"].map((label) => (
+        {TIME_SALES_COLS.map((col) => (
           <div
-            key={label}
+            key={col}
             className={`flex min-w-0 flex-1 items-center border-b border-black/10 px-4 py-3 text-sm leading-[24px] text-black/40 ${
-              label === "Side" ? "justify-center" : label === "Time" ? "justify-start" : "justify-end"
+              col === "side" ? "justify-center" : col === "time" ? "justify-start" : "justify-end"
             }`}
           >
-            {label}
+            {ts.cols[col]}
           </div>
         ))}
       </div>
@@ -506,7 +516,7 @@ function TimeSalesTable({ rows }: { rows: TimeSalesRow[] }) {
               className="flex min-w-0 flex-1 items-center justify-center border-b border-black/10 px-4 py-2 text-sm leading-[26px]"
               style={{ color: row.side === "Buy" ? UP : DOWN }}
             >
-              {row.side}
+              {ts.side[row.side]}
             </div>
           </div>
         ))}
@@ -516,23 +526,25 @@ function TimeSalesTable({ rows }: { rows: TimeSalesRow[] }) {
 }
 
 function TimeAndSales({ detail }: { detail: StockProductDetail }) {
+  const t = useT();
+  const ts = t.stock.detail.timeSales;
   const [mode, setMode] = useState<"tick" | "volume">("tick");
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-4">
       <div className="flex w-full items-end justify-between gap-2">
-        <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{`Time&Sales`}</h2>
+        <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{ts.title}</h2>
         <div className="flex items-center gap-2">
           <Chip
             type="single"
             size="small"
-            label="Tick by Tick"
+            label={ts.tick}
             selected={mode === "tick"}
             onClick={() => setMode("tick")}
           />
           <Chip
             type="single"
             size="small"
-            label="Volume Analysis"
+            label={ts.volumeAnalysis}
             selected={mode === "volume"}
             onClick={() => setMode("volume")}
           />
@@ -548,17 +560,19 @@ function TimeAndSales({ detail }: { detail: StockProductDetail }) {
 }
 
 function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
+  const t = useT();
+  const adv = t.stock.detail.advance;
   const left = data.dayBarLeftPct;
   const width = data.dayBarWidthPct;
   const right = left + width;
 
   return (
     <div className="relative h-[91px] w-full overflow-hidden rounded-lg border border-black/10 px-2">
-      <p className="pt-[7px] text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">Day&apos;s Range</p>
+      <p className="pt-[7px] text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">{adv.daysRange}</p>
       <div className="mt-1 flex items-start gap-1">
         <div className="flex w-10 shrink-0 flex-col">
           <span className="text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">{data.rangeLow}</span>
-          <span className="text-xs leading-[20px] text-black/40">52wk.</span>
+          <span className="text-xs leading-[20px] text-black/40">{adv.week52}</span>
         </div>
         <div className="relative mt-1.5 min-h-[40px] min-w-0 flex-1">
           <div className="h-2 overflow-hidden rounded-lg bg-[#f3f3f3]">
@@ -587,7 +601,7 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
         </div>
         <div className="flex w-10 shrink-0 flex-col items-end">
           <span className="text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">{data.rangeHigh}</span>
-          <span className="text-xs leading-[20px] text-black/40">52wk.</span>
+          <span className="text-xs leading-[20px] text-black/40">{adv.week52}</span>
         </div>
       </div>
     </div>
@@ -595,14 +609,15 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
 }
 
 function AdvanceStatColumn({ rows }: { rows: StockAdvanceData["left"] }) {
+  const t = useT();
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-1">
       {rows.map((row) => (
         <div
-          key={row.label}
+          key={row.key}
           className="flex w-full items-start justify-between border-b border-black/10 py-1.5 text-sm leading-[24px]"
         >
-          <span className="text-black/40">{row.label}</span>
+          <span className="text-black/40">{t.stock.detail.advance.stats[row.key] ?? row.key}</span>
           <span className="text-right text-[rgba(0,0,0,0.75)]">{row.value}</span>
         </div>
       ))}
@@ -617,6 +632,7 @@ function StockAdvanceDataModal({
   data: StockAdvanceData;
   onClose: () => void;
 }) {
+  const t = useT();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -642,7 +658,7 @@ function StockAdvanceDataModal({
       >
         <div className="flex w-full flex-col gap-2">
           <h2 id="stock-advance-data-title" className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">
-            Advance Data
+            {t.stock.detail.advance.title}
           </h2>
           <div className="flex w-full flex-col gap-4">
             <DaysRangeMeter data={data} />
@@ -653,7 +669,7 @@ function StockAdvanceDataModal({
           </div>
         </div>
         <Button variant="primary" className="w-full max-w-[343px]" onClick={onClose}>
-          Close
+          {t.stock.detail.advance.close}
         </Button>
       </div>
     </div>
@@ -661,6 +677,8 @@ function StockAdvanceDataModal({
 }
 
 function QuoteBlock({ detail }: { detail: StockProductDetail }) {
+  const t = useT();
+  const q = t.stock.detail.quote;
   const [advanceOpen, setAdvanceOpen] = useState(false);
   const changeColor = detail.trend === "up" ? "#2f952a" : detail.trend === "down" ? "#cf1421" : "#6a7282";
   const pillBg = detail.trend === "up" ? "#dbfce7" : detail.trend === "down" ? "#fff0f0" : "#f3f4f6";
@@ -689,7 +707,7 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon size={16} className="shrink-0 text-[#666]" />
-            <span className="text-xs leading-[20px] text-[#666]">{detail.lastUpdated}</span>
+            <span className="text-xs leading-[20px] text-[#666]">{t.stock.detail.lastUpdated(detail.lastUpdated)}</span>
           </div>
         </div>
         <div className="flex h-full shrink-0 flex-col items-end justify-end gap-4">
@@ -705,7 +723,7 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
             />
           </span>
           <div className="flex flex-col items-end gap-0.5">
-            <span className="text-sm leading-[24px] text-[rgba(0,0,0,0.75)]">Day&apos;s Range</span>
+            <span className="text-sm leading-[24px] text-[rgba(0,0,0,0.75)]">{q.daysRange}</span>
             <span className="inline-flex items-center gap-1 rounded-[34px] border border-black/10 px-2 py-0.5 text-sm leading-[24px] text-[rgba(0,0,0,0.75)]">
               {detail.dayLow}
               <span className="inline-block h-px w-5 bg-black/20" aria-hidden />
@@ -723,15 +741,15 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
       >
         <div className="flex items-center gap-[13px] text-sm leading-[24px]">
           <span className="flex items-center gap-1">
-            <span className="text-black/40">Volume</span>
+            <span className="text-black/40">{q.volume}</span>
             <span className="text-[rgba(0,0,0,0.85)]">{detail.volume}</span>
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-black/40">Value</span>
+            <span className="text-black/40">{q.value}</span>
             <span className="text-[rgba(0,0,0,0.85)]">{detail.value}</span>
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-black/40">Mkt Cap</span>
+            <span className="text-black/40">{q.mktCap}</span>
             <span className="text-[rgba(0,0,0,0.85)]">{detail.marketCap}</span>
           </span>
         </div>
@@ -765,11 +783,27 @@ function MarketInfoBody({ detail }: { detail: StockProductDetail }) {
   );
 }
 
-function NoticeTabBody({ notice }: { notice: StockTabNotice | null }) {
-  if (!notice) return <StockTabBodySkeleton />;
+function NoticeTabBody({
+  notice,
+  isLoading,
+}: {
+  notice: StockTabNotice | null;
+  isLoading: boolean;
+}) {
+  const t = useT();
+  // Loading and "nothing to say" were the same `null`, so a tab with no
+  // notice sat on its skeleton for good.
+  if (isLoading) return <StockTabBodySkeleton />;
+  if (!notice) {
+    return (
+      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+        {t.stock.detail.noTabData}
+      </div>
+    );
+  }
   return (
     <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
-      {notice.message}
+      {t.stock.detail.tabNotice(t.stock.detail.tabs[notice.tab] ?? notice.tab)}
     </div>
   );
 }
@@ -778,17 +812,17 @@ function NoticeTabBody({ notice }: { notice: StockTabNotice | null }) {
  * own resource, and only once that tab is open. */
 function StockResearchTab({ symbol }: { symbol: string }) {
   const { data, isLoading } = useStockResearch(symbol);
-  return <NoticeTabBody notice={isLoading ? null : data} />;
+  return <NoticeTabBody notice={data} isLoading={isLoading} />;
 }
 
 function StockTechnicalTab({ symbol }: { symbol: string }) {
   const { data, isLoading } = useStockTechnical(symbol);
-  return <NoticeTabBody notice={isLoading ? null : data} />;
+  return <NoticeTabBody notice={data} isLoading={isLoading} />;
 }
 
 function StockNewsTab({ symbol }: { symbol: string }) {
   const { data, isLoading } = useStockNews(symbol);
-  return <NoticeTabBody notice={isLoading ? null : data} />;
+  return <NoticeTabBody notice={data} isLoading={isLoading} />;
 }
 
 /**
@@ -812,8 +846,9 @@ export function StockProductDetail({
   isLoading: boolean;
   onBack: () => void;
 }) {
+  const t = useT();
   const detail = isLoading ? null : resolved;
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const searchParams = useSearchParams();
   const symbol = detail?.symbol ?? null;
   const relatedResource = useStockRelatedProducts(symbol);
@@ -851,7 +886,7 @@ export function StockProductDetail({
           <StockDetailHeaderSkeleton />
         ) : (
           <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
-            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label="กลับ" className="size-[30px] shrink-0 rounded-md p-[5px]">
+            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.common.back} className="size-[30px] shrink-0 rounded-md p-[5px]">
               <ArrowLeftIcon size={18} />
             </Button>
             <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -911,7 +946,7 @@ export function StockProductDetail({
                         : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
                     }`}
                   >
-                    {tab}
+                    {t.stock.detail.tabs[tab] ?? tab}
                   </button>
                 );
               })}
@@ -925,7 +960,15 @@ export function StockProductDetail({
           ) : activeTab === "Market Info" ? (
             <MarketInfoBody detail={detail} />
           ) : activeTab === "Related Product" ? (
-            related ? <StockRelatedProductTab related={related} /> : <StockTabBodySkeleton />
+            relatedResource.isLoading ? (
+              <StockTabBodySkeleton />
+            ) : related ? (
+              <StockRelatedProductTab related={related} />
+            ) : (
+              <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+                {t.stock.detail.noRelated}
+              </div>
+            )
           ) : activeTab === "Company" ? (
             <StockCompanyTab symbol={detail.symbol} companyName={detail.name} />
           ) : activeTab === "Research" ? (
@@ -939,7 +982,7 @@ export function StockProductDetail({
           {/* Offered, never booked — see `SendProposalButton`. */}
           {detail ? (
             <SendProposalButton
-              subject={{ id: offeredProductId("stock", detail.symbol), underlying: detail.symbol, documents: "บทวิเคราะห์หุ้น" }}
+              subject={{ id: offeredProductId("stock", detail.symbol), underlying: detail.symbol, documents: t.stock.detail.proposalDocuments }}
             />
           ) : (
             <StockProposalButtonSkeleton />

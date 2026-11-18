@@ -26,8 +26,9 @@ export function useCampaigns(): Resource<Campaign[]> {
 
 /** One campaign. `undefined` once loaded means the id isn't a campaign. */
 export function useCampaign(id: string): Resource<Campaign | undefined> {
-  const { data, isLoading } = useCampaigns();
+  const source = useCampaigns();
+  const { data } = source;
   const campaign = useMemo(() => data.find((c) => c.id === id), [data, id]);
-  return { data: campaign, isLoading };
+  return { ...source, data: campaign };
 }
 

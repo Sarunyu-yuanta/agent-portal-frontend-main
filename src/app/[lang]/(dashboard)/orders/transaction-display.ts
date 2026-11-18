@@ -9,13 +9,8 @@
  */
 
 import type { TransactionAsset, TransactionSide, TransactionStatus } from "@/types/domain";
-import { formatLogTime } from "./order-book";
-
-export const SIDE_LABEL: Record<TransactionSide, string> = {
-  buy: "ซื้อ",
-  sell: "ขาย",
-  switch: "สับเปลี่ยน",
-};
+import type { Locale } from "@/i18n/config";
+import { formatDate, formatTime } from "@/i18n/format";
 
 /** Green and red, as the rest of the app colours a rise and a fall. */
 export const SIDE_CLASS: Record<TransactionSide, string> = {
@@ -37,30 +32,18 @@ export const SIDE_PILL: Record<TransactionSide, string> = {
   switch: "bg-[var(--fill-blue-100)] text-[var(--fill-blue-700)]",
 };
 
+/** The tag colour per status; the word is `t.orders.tradeStatus`. */
 export const STATUS_TAG: Record<
   TransactionStatus,
-  { text: string; variant: "green" | "yellow" | "blue" | "gray" }
+  { variant: "green" | "yellow" | "blue" | "gray" }
 > = {
-  matched: { text: "สำเร็จ", variant: "green" },
-  partial: { text: "จับคู่บางส่วน", variant: "yellow" },
-  pending: { text: "รอดำเนินการ", variant: "blue" },
-  cancelled: { text: "ยกเลิก", variant: "gray" },
+  matched: { variant: "green" },
+  partial: { variant: "yellow" },
+  pending: { variant: "blue" },
+  cancelled: { variant: "gray" },
 };
 
 
-
-/** What a row's quantity counts, per asset. */
-export const QUANTITY_LABEL: Record<TransactionAsset, string> = {
-  stock: "จำนวน (หุ้น)",
-  tfex: "จำนวน (สัญญา)",
-  "mutual-fund": "จำนวน (หน่วย)",
-};
-
-export const PRICE_LABEL: Record<TransactionAsset, string> = {
-  stock: "ราคา",
-  tfex: "ราคา",
-  "mutual-fund": "NAV",
-};
 
 const number = (value: number, digits = 2) =>
   value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
@@ -79,17 +62,10 @@ export const formatAmount = (amount: number) => number(amount);
  * The timestamp as two values — the receipt gives the clock and the day a row
  * each, where the table runs them together.
  *
- * Split out of `formatLogTime` rather than formatted again here: that function
- * owns the rule that every seeded timestamp is read in UTC (see its note), and
- * a second `toLocaleString` call beside it is a second place for that rule to
- * be forgotten.
+ * Read in UTC, like `formatLogTime` (see its note on the seed data).
  */
-export function splitLogTime(iso: string): { date: string; time: string } {
-  const [date, time = ""] = formatLogTime(iso).split(" · ");
-  return { date, time };
-}
-
-/** "จำนวน (หุ้น)" → "หุ้น"; a label without brackets yields nothing. */
-export function unitOf(quantityLabel: string): string {
-  return quantityLabel.match(/\(([^)]+)\)/)?.[1] ?? "";
+export function splitLogTime(iso: string, locale: Locale): { date: string; time: string } {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { date: iso, time: "" };
+  return { date: formatDate(locale, d, "short", "UTC"), time: formatTime(locale, d, "UTC") };
 }

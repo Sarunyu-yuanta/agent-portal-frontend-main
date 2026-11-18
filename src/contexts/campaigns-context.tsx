@@ -52,6 +52,39 @@ import type {
   RsvpStatus,
   ShareLog,
 } from "@/types/domain";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+
+/** Which rule refused — a screen turns it into IC copy with {@link campaignRuleMessage}. */
+export type CampaignRuleCode =
+  | "materialMissing"
+  | "materialNotApproved"
+  | "campaignClosed"
+  | "notEnoughSeats";
+
+/**
+ * A share or registration the rules refuse. `code` (plus `seats` for the
+ * seat check) is what a screen localises for the toast; `message` is the
+ * English detail for logs.
+ */
+export class CampaignRuleError extends Error {
+  constructor(
+    readonly code: CampaignRuleCode,
+    detail: string,
+    readonly seats?: { open: number; requested: number },
+  ) {
+    super(detail);
+    this.name = "CampaignRuleError";
+  }
+}
+
+/** The IC-facing toast line for a refused share or registration. */
+export function campaignRuleMessage(error: CampaignRuleError, t: Dictionary): string {
+  const m = t.campaigns.rules;
+  if (error.code === "notEnoughSeats") {
+    return m.notEnoughSeats(error.seats?.open ?? 0, error.seats?.requested ?? 0);
+  }
+  return m[error.code];
+}
 
 type CampaignsContextValue = {
   campaignClients: CampaignClient[];
@@ -157,10 +190,14 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
       const campaign = mockCampaigns.find((c) => c.id === campaignId);
       const material = campaign?.materials.find((m) => m.id === materialId);
       if (!material) {
-        throw new Error(`No material ${materialId} on campaign ${campaignId}`);
+        throw new CampaignRuleError(
+          "materialMissing",
+          `No material ${materialId} on campaign ${campaignId}`,
+        );
       }
       if (!material.approved) {
-        throw new Error(
+        throw new CampaignRuleError(
+          "materialNotApproved",
           `Material ${materialId} is not approved and cannot be shared`,
         );
       }
@@ -168,7 +205,10 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
       // today is one the IC can still act on this afternoon. A null one never
       // closes, so there is nothing to refuse.
       if (campaign?.endDate != null && todayIsoDay() > campaign.endDate) {
-        throw new Error(`Campaign ${campaignId} has closed and takes no shares`);
+        throw new CampaignRuleError(
+          "campaignClosed",
+          `Campaign ${campaignId} has closed and takes no shares`,
+        );
       }
 
       const sentAt = new Date().toISOString();
@@ -237,8 +277,10 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 
       const open = seatsLeft(campaignId);
       if (open !== null && fresh.length > open) {
-        throw new Error(
+        throw new CampaignRuleError(
+          "notEnoughSeats",
           `Only ${open} seat(s) left on ${campaignId}; ${fresh.length} requested`,
+          { open, requested: fresh.length },
         );
       }
 

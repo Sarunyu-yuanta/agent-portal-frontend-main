@@ -7,6 +7,7 @@ import { useToasts } from "@/hooks/use-toasts";
 import type { Note } from "@/types/domain";
 import { NoteDetailPane } from "./NoteDetailPane";
 import { NoteModalShell, NoteDeleteConfirmModal } from "./note-modal-shell";
+import { useT } from "@/i18n/I18nProvider";
 
 /**
  * The modal an existing note opens into wherever a reminder points at it —
@@ -33,6 +34,7 @@ export function NoteEditModal({
   pinnedClientId?: string | null;
   onClose: () => void;
 }) {
+  const t = useT();
   const { notes, editNote, removeNote } = useNotes();
 
   const attributesOpenRef = useRef(false);
@@ -48,20 +50,39 @@ export function NoteEditModal({
 
   const open = noteId !== null;
 
-  const handleSave = () => {
+  const [saving, setSaving] = useState(false);
+
+  // Waits for the write before saying it worked. This used to toast "saved"
+  // and close straight away, so a failed save still looked like a success.
+  const handleSave = async () => {
+    if (!panelNote || saving) return;
     const values = modalValuesRef.current;
-    if (panelNote) {
-      editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+    setSaving(true);
+    try {
+      await editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+    } catch (err) {
+      console.warn("[NoteEditModal] save failed", err);
+      addToast({ status: "critical", message: t.planner.saveFailedKept });
+      return;
+    } finally {
+      setSaving(false);
     }
-    addToast({ status: "success", message: "Note saved" });
+    addToast({ status: "success", message: t.planner.saved });
     onClose();
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    await removeNote(deleteTarget.id);
-    addToast({ status: "success", message: "Note deleted" });
+    const target = deleteTarget;
     setDeleteTarget(null);
+    try {
+      await removeNote(target.id);
+    } catch (err) {
+      console.warn("[NoteEditModal] delete failed", err);
+      addToast({ status: "critical", message: t.states.deleteError });
+      return;
+    }
+    addToast({ status: "success", message: t.planner.deleted });
     onClose();
   };
 
@@ -78,10 +99,10 @@ export function NoteEditModal({
         footer={
           <>
             <Button variant="outline" size="sm" onClick={onClose}>
-              Cancel
+              {t.common.cancel}
             </Button>
-            <Button variant="primary" size="sm" onClick={handleSave} disabled={blank}>
-              Save
+            <Button variant="primary" size="sm" onClick={handleSave} disabled={blank || saving}>
+              {saving ? t.common.saving : t.common.save}
             </Button>
           </>
         }
@@ -106,7 +127,7 @@ export function NoteEditModal({
 
       <NoteDeleteConfirmModal
         open={deleteTarget !== null}
-        title="Delete reminder?"
+        title={t.planner.deleteReminderTitle}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
       />

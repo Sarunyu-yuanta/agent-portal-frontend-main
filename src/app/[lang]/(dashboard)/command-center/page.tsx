@@ -1,10 +1,13 @@
 "use client";
 
+import { formatDate } from "@/i18n/format";
+
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@sarunyu/system-one";
 import { useClientsResource } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
+import { ErrorState } from "@/components/ui/empty-state";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useStoredIds } from "@/hooks/use-stored-ids";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
@@ -45,6 +48,7 @@ import {
 } from "./dashboard-data";
 import { useNbaRows } from "./use-nba-rows";
 import { useRiskAlertRows } from "./use-risk-alert-rows";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
  * The page an IC opens first.
@@ -91,9 +95,17 @@ const DASHBOARD_RAIL_CSS = `
 `;
 
 function DashboardPageInner() {
+  const locale = useLocale();
+  const t = useT();
   const searchParams = useSearchParams();
-  const { data: clients, isLoading } = useClientsResource();
-  const { notes } = useNotes();
+  const clientsResource = useClientsResource();
+  const { data: clients } = clientsResource;
+  const {
+    notes,
+    isLoading: notesLoading,
+    error: notesError,
+    retry: retryNotes,
+  } = useNotes();
   const { isPrivate } = usePrivacy();
 
   /**
@@ -107,7 +119,17 @@ function DashboardPageInner() {
     isQueueId,
   );
   const { rows: nbaRows, dismiss: dismissNba } = useNbaRows();
-  const { rows: riskRows, acknowledge: acknowledgeRisk } = useRiskAlertRows();
+  const {
+    rows: riskRows,
+    acknowledge: acknowledgeRisk,
+    isLoading: riskLoading,
+    error: riskError,
+    retry: retryRisk,
+  } = useRiskAlertRows();
+  // Every card's first load, not just the client list's: with only that one
+  // gated, the risk and reminder cards would flash "nothing here" while their
+  // own data was still on its way.
+  const isLoading = clientsResource.isLoading || riskLoading || notesLoading;
 
   // The modals a queue row opens — the same pair the bell and a client's
   // Reminders tab open, from the one definition. No `pinnedClientId`: this page
@@ -146,8 +168,8 @@ function DashboardPageInner() {
   const viewDate = useMemo(() => addMonths(today, monthOffset), [today, monthOffset]);
 
   const queue = useMemo(
-    () => buildQueue({ clients, notes, today, isPrivate }),
-    [clients, notes, today, isPrivate],
+    () => buildQueue({ clients, notes, today, isPrivate, t, locale }),
+    [clients, notes, today, isPrivate, t, locale],
   );
   const live = useMemo(
     () => queue.filter((item) => !hiddenIds.has(item.id)),
@@ -156,12 +178,12 @@ function DashboardPageInner() {
 
   /** The card is always today. A day on the calendar opens its own popover. */
   const dayReminders = useMemo(
-    () => remindersOnDay(notes, today, today),
-    [notes, today],
+    () => remindersOnDay(notes, today, today, t),
+    [notes, today, t],
   );
   const monthReminders = useMemo(
-    () => remindersByDay(notes, viewDate, today),
-    [notes, viewDate, today],
+    () => remindersByDay(notes, viewDate, today, t),
+    [notes, viewDate, today, t],
   );
 
   /** The same array the KYC tile counts, filtered by source — so the count and
@@ -222,7 +244,7 @@ function DashboardPageInner() {
     () => [
     {
       id: "clients",
-      label: "จำนวน Client",
+      label: t.commandCenter.statTiles.clients,
       value: clients?.length ?? 0,
       tone: "violet",
       icon: "users",
@@ -230,7 +252,7 @@ function DashboardPageInner() {
     },
     {
       id: "aum",
-      label: "AUM รวมทั้งหมด",
+      label: t.commandCenter.statTiles.totalAum,
       value: totalAum,
       tone: "green",
       icon: "coins",
@@ -239,17 +261,19 @@ function DashboardPageInner() {
     },
     {
       id: "kyc",
-      label: "KYC ใกล้หมดอายุ",
+      label: t.commandCenter.kyc.title,
       value: kycSoon,
       tone: "warning",
       icon: "kyc",
       onClick: openKycAll,
     },
     ],
-    [clients, totalAum, kycSoon, openKycAll, openClients, openAsset],
+    [clients, totalAum, kycSoon, openKycAll, openClients, openAsset, t],
   );
 
   if (isLoading) return <DashboardSkeleton />;
+  // Without the client list nothing on this page means anything.
+  if (clientsResource.error) return <ErrorState onRetry={clientsResource.retry} />;
 
   return (
     <>
@@ -298,10 +322,10 @@ function DashboardPageInner() {
                   />
                 </div>
                 <h2 className="type-h5 font-bold text-primary-action">
-                  Hello, {NOTE_AUTHOR.split(" ")[0]}
+                  {t.commandCenter.greeting(NOTE_AUTHOR.split(" ")[0])}
                 </h2>
-                <p className="truncate text-label text-primary-action/70" title={thaiFullDate(today, "long")}>
-                  {thaiFullDate(today)}
+                <p className="truncate text-label text-primary-action/70" title={formatDate(locale, today, "weekdayLong")}>
+                  {formatDate(locale, today, "weekdayLongMonthShort")}
                 </p>
                 </Card>
               </div>
@@ -315,6 +339,9 @@ function DashboardPageInner() {
                 hero row gives about `system-one`'s `.grid-cols-1`. */}
             <div className="flex flex-col gap-4 xl:gap-5">
               <Card variant="default" className="gap-4">
+                {riskError ? (
+                  <ErrorState size="compact" title={t.commandCenter.risk.loadError} onRetry={retryRisk} />
+                ) : (
                 <RiskAlertsPanel
                   rows={riskRows}
                   onAcknowledge={acknowledgeRisk}
@@ -324,7 +351,9 @@ function DashboardPageInner() {
                   }
                   severity={riskSeverity}
                   onSeverityChange={(next) => updateQuery({ risk: next })}
+                  onClearFilters={() => updateQuery({ riskCat: null, risk: null })}
                 />
+                )}
               </Card>
 
               <NbaComingSoonCard
@@ -371,12 +400,16 @@ function DashboardPageInner() {
             >
               {/* Today's reminders first, then the month, then call log. */}
               <Card variant="default" className="gap-4">
-                <RemindersPanel
-                  dayItems={dayReminders}
-                  kycItems={todayKyc}
-                  clientNames={clientNames}
-                  onOpen={openDayItem}
-                />
+                {notesError ? (
+                  <ErrorState size="compact" title={t.commandCenter.reminders.loadError} onRetry={retryNotes} />
+                ) : (
+                  <RemindersPanel
+                    dayItems={dayReminders}
+                    kycItems={todayKyc}
+                    clientNames={clientNames}
+                    onOpen={openDayItem}
+                  />
+                )}
               </Card>
 
               <Card variant="default" className="gap-4">
@@ -425,18 +458,6 @@ function DashboardPageInner() {
       {modals}
     </>
   );
-}
-
-/** "พฤหัสบดี 24 ก.ย. 2569" — Buddhist era, matching the dates House View and
- *  the asset summaries are authored in. Short month by default so the hero
- *  card's date stays on one line; `"long"` spells it out for the tooltip. */
-function thaiFullDate(day: Date, month: "short" | "long" = "short"): string {
-  return day.toLocaleDateString("th-TH", {
-    weekday: "long",
-    day: "numeric",
-    month,
-    year: "numeric",
-  });
 }
 
 /**

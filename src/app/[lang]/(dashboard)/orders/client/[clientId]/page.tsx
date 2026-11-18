@@ -1,5 +1,8 @@
 "use client";
 
+import { useLocale, useT } from "@/i18n/I18nProvider";
+import { localizePath } from "@/i18n/locale-path";
+
 /**
  * One client's orders on one desk — see `ClientOrdersDetail` for why this rung
  * exists.
@@ -15,10 +18,13 @@
  */
 
 import { Suspense, use } from "react";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { catalogListHref } from "@/lib/product-catalog-routes";
-import { useClients } from "@/hooks/use-api";
+import { useClientsResource } from "@/hooks/use-api";
+import { ErrorState } from "@/components/ui/empty-state";
+import { OrdersPanelSkeleton } from "../../OrdersPanelSkeleton";
 import { CatalogNotFound } from "../../../product-catalog/CatalogNotFound";
 import { normalizeOrderTab } from "../../order-tabs";
 import { ClientOrdersDetail } from "./ClientOrdersDetail";
@@ -28,9 +34,10 @@ export default function ClientOrdersPage({
 }: {
   params: Promise<{ clientId: string }>;
 }) {
+  const locale = useLocale();
   // Same gate as the rest of Order Management — above every hook, so flipping
   // the flag cannot change the hook order.
-  if (!ORDER_BOOKING_ENABLED) redirect("/product-catalog");
+  if (!ORDER_BOOKING_ENABLED) redirect(localizePath("/product-catalog", locale));
   return (
     <Suspense fallback={null}>
       <ClientOrdersPageInner params={params} />
@@ -45,12 +52,17 @@ function ClientOrdersPageInner({
 }) {
   const { clientId } = use(params);
   const id = decodeURIComponent(clientId);
+  const t = useT();
   const searchParams = useSearchParams();
-  const clients = useClients();
-  const router = useRouter();
+  const { data: clients, isLoading, error, retry } = useClientsResource();
+  const router = useLocalizedRouter();
 
-  const client = clients.find((c) => c.id === id);
   const tab = normalizeOrderTab(searchParams.get("tab"));
+  // Loading before not-found, so a slow client list never flashes
+  // "ไม่พบลูกค้ารายนี้".
+  if (isLoading) return <OrdersPanelSkeleton />;
+  if (error) return <ErrorState onRetry={retry} />;
+  const client = clients.find((c) => c.id === id);
 
   // A client page only means something under a booking desk: the three
   // transaction tabs and "ทั้งหมด" have no one desk's bookings to list, and a
@@ -58,7 +70,7 @@ function ClientOrdersPageInner({
   if (tab.kind === "transactions" || tab.kind === "all" || !client) {
     return (
       <CatalogNotFound
-        message={client ? "หมวดนี้ไม่มีรายการจอง" : "ไม่พบลูกค้ารายนี้"}
+        message={client ? t.orders.clientPage.noBookingsInDesk : t.states.notFoundClient}
         onBack={() => router.push("/orders")}
       />
     );
