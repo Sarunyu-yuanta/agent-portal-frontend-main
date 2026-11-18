@@ -1,0 +1,83 @@
+/** `compliance` namespace — see th/index.ts for the rules. */
+const compliance = {
+  kpi: {
+    criticalAlerts: "การแจ้งเตือนวิกฤต",
+    criticalAlertsSub: "ต้องดำเนินการทันที",
+    pendingKyc: "KYC รอดำเนินการ",
+    pendingKycSub: "เอกสารยังไม่ครบ",
+    suitabilityFlags: "แจ้งเตือนความเหมาะสม",
+    suitabilityFlagsSub: "ระงับการซื้อขาย",
+    expiring30: "หมดอายุภายใน 30 วัน",
+  },
+  alerts: {
+    title: "การแจ้งเตือน Compliance ที่ยังเปิดอยู่",
+    openCount: (n: number) => `เปิดอยู่ ${n} รายการ`,
+    empty: "ยังไม่มีการแจ้งเตือนที่เปิดอยู่",
+    severity: { critical: "วิกฤต", warning: "เฝ้าระวัง" },
+    hoursAgo: (n: number) => `${n} ชม. ที่แล้ว`,
+    today: "วันนี้",
+  },
+  riskRating: { High: "สูง", Medium: "ปานกลาง", Low: "ต่ำ" } as Record<string, string>,
+  riskRatingLabel: (rating: string) => `ความเสี่ยง${rating}`,
+  kycStatus: {
+    stop: "หยุด",
+    success: "ยืนยันแล้ว",
+    hold: "ระงับไว้",
+    processing: "กำลังดำเนินการ",
+    error: "หมดอายุ",
+  },
+  table: {
+    title: "KYC และเอกสารที่รอดำเนินการ",
+    export: "ส่งออก",
+    filterBy: "กรองตาม:",
+    filters: {
+      all: "ทุกสถานะ",
+      success: "ยืนยันแล้ว",
+      processing: "กำลังดำเนินการ",
+      hold: "ระงับไว้",
+      error: "หมดอายุ",
+    },
+    columns: {
+      client: "ลูกค้า",
+      riskRating: "ระดับความเสี่ยง",
+      kycStatus: "สถานะ KYC",
+      nextReview: "ทบทวนครั้งถัดไป",
+      expiry: "หมดอายุ",
+    },
+    daysShort: (n: number) => `${n} วัน`,
+    emptyBody: "ลองเลือกตัวกรองอื่น หรือล้างตัวกรองเพื่อดูรายการทั้งหมด",
+    empty: "ยังไม่มีรายการ KYC",
+  },
+  detail: {
+    kycStatus: "สถานะ KYC",
+    riskRating: "ระดับความเสี่ยง",
+    nextReview: "ทบทวนครั้งถัดไป",
+    expiry: "หมดอายุ",
+    days: (n: number) => `${n} วัน`,
+    actions: { remind: "เตือน", upload: "อัปโหลด", schedule: "นัดหมาย", aiBrief: "AI Brief" },
+    expiresUrgent: "KYC จะหมดอายุภายใน 7 วัน ต้องดำเนินการทันที",
+    expiresSoon: (n: number) => `KYC จะหมดอายุในอีก ${n} วัน ควรนัดทบทวนเร็ว ๆ นี้`,
+    relatedAlerts: "การแจ้งเตือน Compliance",
+  },
+  guide: {
+    title: "AI Compliance Guide",
+    activeAlert: "การแจ้งเตือนปัจจุบัน",
+    activeAlertTitle: "ระงับการซื้อขายที่ไม่เหมาะสม",
+    riskMismatch: "ความเสี่ยงไม่ตรงกับโปรไฟล์",
+    resolutionSteps: "ขั้นตอนการแก้ไข",
+    steps: [
+      "ตรวจสอบประวัติธุรกรรมของลูกค้าเพื่อหาความผิดปกติ",
+      "ตรวจสอบเทียบกับฐานข้อมูล Sanctions และข่าวเชิงลบ",
+      "เตรียมและอัปโหลดรายการเอกสารที่ต้องใช้",
+      "ส่งเรื่องต่อเจ้าหน้าที่ Compliance พร้อมรายงานฉบับเต็ม",
+    ],
+    links: {
+      sanctions: { label: "ฐานข้อมูล Sanctions", sub: "ค้นหาข่าวเชิงลบ" },
+      docs: { label: "รายการเอกสาร", sub: "เอกสารที่ KYC ต้องใช้" },
+      escalation: { label: "แบบฟอร์มส่งเรื่อง", sub: "เจ้าหน้าที่ Compliance" },
+    },
+    askPlaceholder: "ถาม AI ด้าน Compliance…",
+  },
+};
+
+export default compliance;
