@@ -30,14 +30,7 @@
  *    compliance record and is append-only.
  */
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import {
   CAMPAIGN_ACTOR,
   mockCampaigns,
@@ -56,10 +49,7 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
 
 /** Which rule refused — a screen turns it into IC copy with {@link campaignRuleMessage}. */
 export type CampaignRuleCode =
-  | "materialMissing"
-  | "materialNotApproved"
-  | "campaignClosed"
-  | "notEnoughSeats";
+  "materialMissing" | "materialNotApproved" | "campaignClosed" | "notEnoughSeats";
 
 /**
  * A share or registration the rules refuse. `code` (plus `seats` for the
@@ -116,16 +106,9 @@ type CampaignsContextValue = {
    * Registers clients for an event. Rejects when the seats left won't cover
    * them, and silently skips anyone already holding a seat.
    */
-  registerClients: (input: {
-    campaignId: string;
-    clientIds: string[];
-  }) => Promise<CampaignRsvp[]>;
+  registerClients: (input: { campaignId: string; clientIds: string[] }) => Promise<CampaignRsvp[]>;
   /** Confirms a seat, or records attendance after the event. */
-  setRsvpStatus: (
-    campaignId: string,
-    clientId: string,
-    status: RsvpStatus,
-  ) => Promise<void>;
+  setRsvpStatus: (campaignId: string, clientId: string, status: RsvpStatus) => Promise<void>;
   /** Seats still open, after this session's registrations. */
   seatsLeft: (campaignId: string) => number | null;
 };
@@ -159,8 +142,7 @@ function statusAfterShare(current: CampaignClientStatus): CampaignClientStatus {
 }
 
 export function CampaignsProvider({ children }: { children: ReactNode }) {
-  const [campaignClients, setCampaignClients] =
-    useState<CampaignClient[]>(seedCampaignClients);
+  const [campaignClients, setCampaignClients] = useState<CampaignClient[]>(seedCampaignClients);
   const [rsvps, setRsvps] = useState<CampaignRsvp[]>(seedRsvps);
   const [shareLogs, setShareLogs] = useState<ShareLog[]>(seedShareLogs);
 
@@ -174,9 +156,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
     (campaignId: string) => {
       const campaign = mockCampaigns.find((c) => c.id === campaignId);
       if (campaign?.seatsLeftSeed === undefined) return null;
-      const seededHolders = seedRsvps.filter(
-        (r) => r.campaignId === campaignId,
-      ).length;
+      const seededHolders = seedRsvps.filter((r) => r.campaignId === campaignId).length;
       const holders = rsvps.filter((r) => r.campaignId === campaignId).length;
       // The seed figure already accounts for the seeded RSVPs, so only the
       // seats taken *since* come off it.
@@ -220,9 +200,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
         campaignClients
           .filter(
             (row) =>
-              row.campaignId === campaignId &&
-              row.eligible &&
-              clientIds.includes(row.clientId),
+              row.campaignId === campaignId && row.eligible && clientIds.includes(row.clientId),
           )
           .map((row) => row.clientId),
       );
@@ -269,9 +247,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 
   const registerClients = useCallback<CampaignsContextValue["registerClients"]>(
     async ({ campaignId, clientIds }) => {
-      const held = new Set(
-        rsvps.filter((r) => r.campaignId === campaignId).map((r) => r.clientId),
-      );
+      const held = new Set(rsvps.filter((r) => r.campaignId === campaignId).map((r) => r.clientId));
       const fresh = clientIds.filter((id) => !held.has(id));
       if (fresh.length === 0) return [];
 
@@ -302,9 +278,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
       const updatedAt = new Date().toISOString();
       setRsvps((prev) =>
         prev.map((r) =>
-          r.campaignId === campaignId && r.clientId === clientId
-            ? { ...r, status, updatedAt }
-            : r,
+          r.campaignId === campaignId && r.clientId === clientId ? { ...r, status, updatedAt } : r,
         ),
       );
     },
@@ -335,11 +309,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-  return (
-    <CampaignsContext.Provider value={value}>
-      {children}
-    </CampaignsContext.Provider>
-  );
+  return <CampaignsContext.Provider value={value}>{children}</CampaignsContext.Provider>;
 }
 
 export function useCampaignStore() {

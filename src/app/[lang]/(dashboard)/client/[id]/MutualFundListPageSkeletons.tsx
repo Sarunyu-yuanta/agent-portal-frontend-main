@@ -52,7 +52,13 @@ function HeroBandSkeleton({ innerClassName }: { innerClassName: string }) {
  * the trailing controls sit on the right on desktop and wrap to their own
  * full-width line on mobile — as `MutualFundTagLegend` lays them out.
  */
-function TagLegendSkeleton({ search = false, filter = false }: { search?: boolean; filter?: boolean }) {
+function TagLegendSkeleton({
+  search = false,
+  filter = false,
+}: {
+  search?: boolean;
+  filter?: boolean;
+}) {
   const chips = (
     <div className="flex items-center gap-2">
       <Skeleton className="h-8 w-[76px] rounded-full" />
@@ -140,7 +146,13 @@ function FundCardSkeleton() {
 }
 
 /** 2-column desktop grid of fund cards. */
-function FundGridSkeleton({ cards = 8, className = "grid" }: { cards?: number; className?: string }) {
+function FundGridSkeleton({
+  cards = 8,
+  className = "grid",
+}: {
+  cards?: number;
+  className?: string;
+}) {
   return (
     <div className={`w-full grid-cols-2 gap-x-4 gap-y-6 ${className}`}>
       {Array.from({ length: cards }).map((_, i) => (
@@ -235,7 +247,9 @@ export function MutualFundFilterResultsSkeleton() {
 /** One `MutualFundInsightCard` in its `list` form: title, date, rule, recommended funds. */
 function InsightCardSkeleton() {
   return (
-    <div className={`flex h-[174px] w-full flex-col gap-2.5 rounded-lg border border-black/10 bg-white p-3 ${CARD_SHADOW}`}>
+    <div
+      className={`flex h-[174px] w-full flex-col gap-2.5 rounded-lg border border-black/10 bg-white p-3 ${CARD_SHADOW}`}
+    >
       <div className="flex h-12 flex-col gap-2 pt-1">
         <Skeleton className="h-5 w-full" />
         <Skeleton className="h-5 w-2/3" />

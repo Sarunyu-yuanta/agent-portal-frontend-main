@@ -29,8 +29,18 @@ export const ORDER_TABS: OrderTab[] = [
   { id: "tfex", title: "TFEX", kind: "transactions", asset: "tfex" },
   { id: "mutual-fund", title: "Mutual Fund", kind: "transactions", asset: "mutual-fund" },
   { id: "fixed-income", title: "Fixed Income", kind: "quota", desk: "Fixed Income" },
-  { id: "thai-structured", title: "Thai Structured Product", kind: "basket", desk: "Thai Structured" },
-  { id: "structured", title: "Global Structured Product", kind: "basket", desk: "Global Structured" },
+  {
+    id: "thai-structured",
+    title: "Thai Structured Product",
+    kind: "basket",
+    desk: "Thai Structured",
+  },
+  {
+    id: "structured",
+    title: "Global Structured Product",
+    kind: "basket",
+    desk: "Global Structured",
+  },
   { id: "global-bond", title: "Global Bond", kind: "quota", desk: "Global Bond" },
 ];
 
@@ -43,7 +53,6 @@ export const DEFAULT_ORDER_TAB = "all";
 
 export function normalizeOrderTab(value: string | null | undefined): OrderTab {
   return (
-    ORDER_TABS.find((t) => t.id === value) ??
-    ORDER_TABS.find((t) => t.id === DEFAULT_ORDER_TAB)!
+    ORDER_TABS.find((t) => t.id === value) ?? ORDER_TABS.find((t) => t.id === DEFAULT_ORDER_TAB)!
   );
 }

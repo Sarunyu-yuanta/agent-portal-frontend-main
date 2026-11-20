@@ -72,26 +72,98 @@ const sky = (
 });
 
 /** Night is already dark, so both themes share it. */
-const NIGHT = sky(["#0f1640", "#262266", "#4d2f8a"], "#a5b4fc", 0.32, "#eef1ff", "#b9bfe6", "#a5b4fc", 0.16);
+const NIGHT = sky(
+  ["#0f1640", "#262266", "#4d2f8a"],
+  "#a5b4fc",
+  0.32,
+  "#eef1ff",
+  "#b9bfe6",
+  "#a5b4fc",
+  0.16,
+);
 
 /** The half-light either side of night. Blending night straight into morning
  *  (or evening) passes through a flat grey; real skies go via violet and
  *  salmon, so those get their own stop. Shared by both themes — they sit
  *  between a dark palette and a light one, and neither extreme suits them. */
-const DAWN = sky(["#43397f", "#b0689f", "#ffb38a"], "#ffd0a0", 0.6, "#fff4ea", "#f3dcec", "#ffe0c0", 0.2);
-const DUSK = sky(["#8a4a8f", "#4a3478", "#1c2058"], "#fb923c", 0.35, "#fff0e4", "#f3d9e6", "#ffb27a", 0.18);
+const DAWN = sky(
+  ["#43397f", "#b0689f", "#ffb38a"],
+  "#ffd0a0",
+  0.6,
+  "#fff4ea",
+  "#f3dcec",
+  "#ffe0c0",
+  0.2,
+);
+const DUSK = sky(
+  ["#8a4a8f", "#4a3478", "#1c2058"],
+  "#fb923c",
+  0.35,
+  "#fff0e4",
+  "#f3d9e6",
+  "#ffb27a",
+  0.18,
+);
 
 const MORNING = {
-  light: sky(["#ffe9a8", "#ffc58a", "#ff9c86"], "#fff2b8", 0.7, "#7c2d12", "#9a4a2a", "#ea580c", 0.14),
-  dark: sky(["#4d3a14", "#5c3818", "#5c2c24"], "#fbbf24", 0.22, "#fde68a", "#e8c9a0", "#f59e0b", 0.14),
+  light: sky(
+    ["#ffe9a8", "#ffc58a", "#ff9c86"],
+    "#fff2b8",
+    0.7,
+    "#7c2d12",
+    "#9a4a2a",
+    "#ea580c",
+    0.14,
+  ),
+  dark: sky(
+    ["#4d3a14", "#5c3818", "#5c2c24"],
+    "#fbbf24",
+    0.22,
+    "#fde68a",
+    "#e8c9a0",
+    "#f59e0b",
+    0.14,
+  ),
 };
 const DAY = {
-  light: sky(["#c4e3ff", "#8fc6ff", "#5eaaf5"], "#ffffff", 0.85, "#08336e", "#1d4f91", "#0a4aa8", 0.12),
-  dark: sky(["#12304f", "#1a4577", "#215c9c"], "#7db8ff", 0.2, "#c3e0ff", "#9cc3e8", "#7db8ff", 0.12),
+  light: sky(
+    ["#c4e3ff", "#8fc6ff", "#5eaaf5"],
+    "#ffffff",
+    0.85,
+    "#08336e",
+    "#1d4f91",
+    "#0a4aa8",
+    0.12,
+  ),
+  dark: sky(
+    ["#12304f", "#1a4577", "#215c9c"],
+    "#7db8ff",
+    0.2,
+    "#c3e0ff",
+    "#9cc3e8",
+    "#7db8ff",
+    0.12,
+  ),
 };
 const EVENING = {
-  light: sky(["#ffd49c", "#ff9c8c", "#c97fbd"], "#ffb35c", 0.55, "#6b1d3a", "#8a3a55", "#c2410c", 0.16),
-  dark: sky(["#4d2c18", "#5c2b30", "#44245a"], "#fb923c", 0.22, "#ffcdae", "#e8b8c4", "#ea580c", 0.16),
+  light: sky(
+    ["#ffd49c", "#ff9c8c", "#c97fbd"],
+    "#ffb35c",
+    0.55,
+    "#6b1d3a",
+    "#8a3a55",
+    "#c2410c",
+    0.16,
+  ),
+  dark: sky(
+    ["#4d2c18", "#5c2b30", "#44245a"],
+    "#fb923c",
+    0.22,
+    "#ffcdae",
+    "#e8b8c4",
+    "#ea580c",
+    0.16,
+  ),
 };
 
 const hm = (h: number, m = 0) => h * 60 + m;
@@ -166,7 +238,8 @@ function contrast(a: RGB, b: RGB): number {
  */
 function legible(fg: RGB, bg: RGB, min: number): RGB {
   if (contrast(fg, bg) >= min) return fg;
-  const target: RGB = contrast([255, 255, 255], bg) >= contrast([0, 0, 0], bg) ? [255, 255, 255] : [0, 0, 0];
+  const target: RGB =
+    contrast([255, 255, 255], bg) >= contrast([0, 0, 0], bg) ? [255, 255, 255] : [0, 0, 0];
   for (let t = 0.05; t <= 1; t += 0.05) {
     const next = mixRgb(fg, target, t);
     if (contrast(next, bg) >= min) return next;
@@ -208,9 +281,7 @@ function skyGradient(a: Palette, b: Palette, t: number): { css: string; left: RG
     strip.push([100 + JOIN, b.from], [155 + JOIN, b.mid], [200 + JOIN, b.to]);
     shift = t * (100 + JOIN);
   }
-  const css = strip
-    .map(([pos, c]) => `rgb(${css3(c)}) ${(pos - shift).toFixed(1)}%`)
-    .join(", ");
+  const css = strip.map(([pos, c]) => `rgb(${css3(c)}) ${(pos - shift).toFixed(1)}%`).join(", ");
   // The greeting sits over the left quarter or so of the window.
   return { css: `linear-gradient(115deg, ${css})`, left: sample(strip, shift + 25) };
 }

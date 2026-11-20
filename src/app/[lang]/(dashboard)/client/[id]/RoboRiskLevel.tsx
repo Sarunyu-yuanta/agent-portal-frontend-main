@@ -14,7 +14,7 @@ export function RoboRiskLevel({ tier }: { tier: RoboRiskTier }) {
 
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <p className="whitespace-nowrap text-xs font-bold leading-[20px] text-black/75">{label}</p>
+      <p className="text-xs leading-[20px] font-bold whitespace-nowrap text-black/75">{label}</p>
       <div
         className="flex h-2 w-[60px] shrink-0 items-stretch overflow-hidden rounded border border-black/10"
         style={{ backgroundColor: ROBO_RISK_TRACK_COLOR }}

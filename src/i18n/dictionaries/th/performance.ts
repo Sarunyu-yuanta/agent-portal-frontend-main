@@ -12,7 +12,10 @@ const performance = {
     overall: "ภาพรวม",
     progressTarget: (progress: number, target: string) => `${progress}% · เป้าหมาย ${target}`,
   },
-  status: { "On Track": "ตามเป้า", Exceeded: "เกินเป้า", Lagging: "ต่ำกว่าเป้า" } as Record<string, string>,
+  status: { "On Track": "ตามเป้า", Exceeded: "เกินเป้า", Lagging: "ต่ำกว่าเป้า" } as Record<
+    string,
+    string
+  >,
   gap: {
     title: "Gap Analysis",
     items: {

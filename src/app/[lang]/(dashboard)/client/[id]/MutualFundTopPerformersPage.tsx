@@ -2,12 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, SearchInput } from "@sarunyu/system-one";
-import {
-  ArrowLeftIcon,
-} from "@phosphor-icons/react";
-import {
-  MutualFundListCard,
-} from "./MutualFundCard";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { MutualFundListCard } from "./MutualFundCard";
 import { MutualFundGroupHeroGraphic } from "./MutualFundGroupHero";
 import { MutualFundTopPerformersMobile } from "./MutualFundTopPerformersMobile";
 import { MutualFundLegendModal } from "./MutualFundLegendSheet";
@@ -51,10 +47,8 @@ function CategoryTabs({
               key={group.id}
               type="button"
               onClick={() => onSelect(group.id)}
-              className={`flex min-w-[80px] flex-1 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap ${
-                active
-                  ? "border-[#0a6ee7] text-[#0a6ee7]"
-                  : "border-black/10 text-[#6a7282]"
+              className={`flex min-w-[80px] flex-1 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap ${
+                active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
               }`}
             >
               {t.fund.groups[group.id]}
@@ -83,7 +77,7 @@ function PerformancePeriodTabs({
               key={period}
               type="button"
               onClick={() => onChange(period)}
-              className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs font-semibold leading-[20px] ${
+              className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-semibold ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                   : "text-[#4a5565]"
@@ -133,10 +127,7 @@ export function MutualFundTopPerformersPage({
   // per-category resource, so once the universe is in, switching category
   // has nothing to wait for.
   const { isLoading } = useMutualFundUniverse();
-  const funds = useMemo(
-    () => getMobileGroupGridFunds(groupId, false, 16),
-    [groupId],
-  );
+  const funds = useMemo(() => getMobileGroupGridFunds(groupId, false, 16), [groupId]);
 
   const bothOrNeitherTag = viewActive === highlightActive;
   const showViewTag = bothOrNeitherTag || viewActive;
@@ -147,111 +138,121 @@ export function MutualFundTopPerformersPage({
   return (
     <>
       <div className="lg:hidden">
-        <MutualFundTopPerformersMobile isLoading={isLoading} onBack={onBack} onFundSelect={onFundSelect} />
+        <MutualFundTopPerformersMobile
+          isLoading={isLoading}
+          onBack={onBack}
+          onFundSelect={onFundSelect}
+        />
       </div>
 
       <div className="hidden w-full flex-1 flex-col bg-white pb-20 lg:flex">
         <div className="w-full bg-white">
-          <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pb-2 pt-8 md:px-8 lg:px-0">
-          <Button
-            variant="plain"
-            size="icon-sm"
-            onClick={onBack}
-            aria-label={t.common.back}
-            className="size-[30px] shrink-0 rounded-md p-[5px]"
-          >
-            <ArrowLeftIcon size={20} />
-          </Button>
-          <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">
-            {t.fund.topPerformers.title}
-          </h1>
-        </div>
-
-        <div className="mx-auto w-full max-w-[996px] px-4 md:px-8 lg:px-0">
-          {isLoading ? (
-            <TabsSkeleton count={MOBILE_FUND_GROUPS.length} />
-          ) : (
-            <CategoryTabs activeId={groupId} onSelect={setGroupId} />
-          )}
-        </div>
-      </div>
-
-      <div className="relative w-full overflow-hidden bg-[#f9fafb]">
-        {isLoading ? (
-          <MutualFundTabbedListHeroSkeleton />
-        ) : (
-          <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pb-2.5 pt-2.5 md:px-8 lg:px-0">
-            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{heroTitle}</p>
-              <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{t.fund.topPerformers.heroSubtitle}</p>
-              <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
-                {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
-              </p>
-            </div>
-            <MutualFundGroupHeroGraphic groupId={groupId} scale={1.15} />
+          <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-8 pb-2 md:px-8 lg:px-0">
+            <Button
+              variant="plain"
+              size="icon-sm"
+              onClick={onBack}
+              aria-label={t.common.back}
+              className="size-[30px] shrink-0 rounded-md p-[5px]"
+            >
+              <ArrowLeftIcon size={20} />
+            </Button>
+            <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+              {t.fund.topPerformers.title}
+            </h1>
           </div>
-        )}
-        <div className="relative z-20 h-3 w-full bg-gradient-to-r from-[#00a1e9] to-[#004eba]" />
-      </div>
 
-      <div className="relative z-10 w-full rounded-xl bg-gradient-to-r from-[#00a1e9] to-[#004eba]">
-        <div className="w-full rounded-t-xl bg-white pt-4 pb-6">
-          <div className="mx-auto flex w-full max-w-[996px] flex-col gap-6 px-4 md:px-8 lg:px-0">
+          <div className="mx-auto w-full max-w-[996px] px-4 md:px-8 lg:px-0">
             {isLoading ? (
-              <>
-                <div className="flex w-full flex-col gap-3">
-                  <MutualFundTabbedListControlsSkeleton search />
-                </div>
-                <MutualFundTabbedListGridSkeleton count={false} />
-              </>
+              <TabsSkeleton count={MOBILE_FUND_GROUPS.length} />
             ) : (
-              <>
-                <div className="flex w-full flex-col gap-3">
-                  <MutualFundTagLegend
-                    viewActive={viewActive}
-                    highlightActive={highlightActive}
-                    onToggleView={() => setViewActive((v) => !v)}
-                    onToggleHighlight={() => setHighlightActive((v) => !v)}
-                    onShowLegend={() => setLegendOpen(true)}
-                    trailing={
-                      <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
-                        <SearchInput
-                          value={query}
-                          onChange={setQuery}
-                          onClear={() => setQuery("")}
-                          placeholder={t.fund.list.searchPlaceholder}
-                          size="sm"
-                          className="w-full"
-                        />
-                      </div>
-                    }
-                  />
-                  <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">{listCountLabel}</p>
-                  <PerformancePeriodTabs active={period} onChange={setPeriod} />
-                </div>
-
-                <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
-                  {tagFunds.map((fund, index) => (
-                    <div key={`${fund.id}-${index}`} className="min-w-0">
-                      <MutualFundListCard
-                        fund={fund}
-                        onSelect={onFundSelect}
-                        showView={showViewTag && fundHasViewTag(fund)}
-                        showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {tagFunds.length === 0 ? (
-                  <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
-                    {query.trim() ? t.fund.list.noMatchForQuery(query.trim()) : t.fund.list.noFundsInCategory}
-                  </p>
-                ) : null}
-              </>
+              <CategoryTabs activeId={groupId} onSelect={setGroupId} />
             )}
           </div>
         </div>
+
+        <div className="relative w-full overflow-hidden bg-[#f9fafb]">
+          {isLoading ? (
+            <MutualFundTabbedListHeroSkeleton />
+          ) : (
+            <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pt-2.5 pb-2.5 md:px-8 lg:px-0">
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <p className="text-xl leading-[34px] font-bold text-[#074ea4]">{heroTitle}</p>
+                <p className="text-sm leading-[24px] font-normal text-[#4a5565]">
+                  {t.fund.topPerformers.heroSubtitle}
+                </p>
+                <p className="text-micro leading-[18px] font-normal text-[#6a7282]">
+                  {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
+                </p>
+              </div>
+              <MutualFundGroupHeroGraphic groupId={groupId} scale={1.15} />
+            </div>
+          )}
+          <div className="relative z-20 h-3 w-full bg-gradient-to-r from-[#00a1e9] to-[#004eba]" />
+        </div>
+
+        <div className="relative z-10 w-full rounded-xl bg-gradient-to-r from-[#00a1e9] to-[#004eba]">
+          <div className="w-full rounded-t-xl bg-white pt-4 pb-6">
+            <div className="mx-auto flex w-full max-w-[996px] flex-col gap-6 px-4 md:px-8 lg:px-0">
+              {isLoading ? (
+                <>
+                  <div className="flex w-full flex-col gap-3">
+                    <MutualFundTabbedListControlsSkeleton search />
+                  </div>
+                  <MutualFundTabbedListGridSkeleton count={false} />
+                </>
+              ) : (
+                <>
+                  <div className="flex w-full flex-col gap-3">
+                    <MutualFundTagLegend
+                      viewActive={viewActive}
+                      highlightActive={highlightActive}
+                      onToggleView={() => setViewActive((v) => !v)}
+                      onToggleHighlight={() => setHighlightActive((v) => !v)}
+                      onShowLegend={() => setLegendOpen(true)}
+                      trailing={
+                        <div className="min-w-0 flex-1 lg:w-[320px] lg:flex-none">
+                          <SearchInput
+                            value={query}
+                            onChange={setQuery}
+                            onClear={() => setQuery("")}
+                            placeholder={t.fund.list.searchPlaceholder}
+                            size="sm"
+                            className="w-full"
+                          />
+                        </div>
+                      }
+                    />
+                    <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
+                      {listCountLabel}
+                    </p>
+                    <PerformancePeriodTabs active={period} onChange={setPeriod} />
+                  </div>
+
+                  <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6">
+                    {tagFunds.map((fund, index) => (
+                      <div key={`${fund.id}-${index}`} className="min-w-0">
+                        <MutualFundListCard
+                          fund={fund}
+                          onSelect={onFundSelect}
+                          showView={showViewTag && fundHasViewTag(fund)}
+                          showHighlight={showHighlightTag && fundHasHighlightTag(fund)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {tagFunds.length === 0 ? (
+                    <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
+                      {query.trim()
+                        ? t.fund.list.noMatchForQuery(query.trim())
+                        : t.fund.list.noFundsInCategory}
+                    </p>
+                  ) : null}
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

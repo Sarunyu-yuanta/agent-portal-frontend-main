@@ -31,9 +31,9 @@ import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
 import { STATUS_TAG, formatQuantity } from "./transaction-display";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 
-
 /** The asset column, and the filter on it — the seven tabs, by their own names. */
-export type AllAsset = TransactionAsset | "fixed-income" | "thai-structured" | "structured" | "global-bond";
+export type AllAsset =
+  TransactionAsset | "fixed-income" | "thai-structured" | "structured" | "global-bond";
 
 export const ALL_ASSET_LABEL: Record<AllAsset, string> = {
   stock: "Stock",
@@ -75,7 +75,6 @@ export type StatusBucket = "proposed" | "processing" | "done" | "cancelled";
 
 export const STATUS_BUCKETS: StatusBucket[] = ["proposed", "processing", "done", "cancelled"];
 
-
 const TRADE_BUCKET: Record<TransactionStatus, StatusBucket> = {
   pending: "processing",
   partial: "processing",
@@ -112,7 +111,12 @@ type Base = {
 
 export type AllRow =
   | (Base & { kind: "trade"; trade: ClientTransaction; status: { text: string; variant: string } })
-  | (Base & { kind: "booking"; book: OrderBook; booking: Booking; status: { text: string; variant: string } })
+  | (Base & {
+      kind: "booking";
+      book: OrderBook;
+      booking: Booking;
+      status: { text: string; variant: string };
+    })
   | (Base & { kind: "offer"; book: OrderBook; offer: ProposalLog })
   | (Base & { kind: "offered"; proposal: ProposalLog; channels: string[] });
 
@@ -222,7 +226,10 @@ export function buildAllRows(input: {
  * Ids are what {@link matchesStatus} compares: a bucket with no asset, the
  * row's `native` status with one.
  */
-export function statusChipsFor(asset: AllAsset | null, dict: Dictionary): { id: string; label: string }[] {
+export function statusChipsFor(
+  asset: AllAsset | null,
+  dict: Dictionary,
+): { id: string; label: string }[] {
   if (!asset) return STATUS_BUCKETS.map((b) => ({ id: b, label: dict.orders.statusBucket[b] }));
   if (asset === "stock" || asset === "tfex" || asset === "mutual-fund") {
     const statuses: TransactionStatus[] =

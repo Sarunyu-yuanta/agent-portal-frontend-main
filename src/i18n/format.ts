@@ -93,8 +93,14 @@ export function formatDateWith(
 }
 
 /** 14:30 in both languages (24-hour, which is how Thai readers read time too). */
-export function formatTime(locale: Locale, value: Date | string | number, timeZone: string = TIME_ZONE): string {
-  return dtf(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }, timeZone).format(toDate(value));
+export function formatTime(
+  locale: Locale,
+  value: Date | string | number,
+  timeZone: string = TIME_ZONE,
+): string {
+  return dtf(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }, timeZone).format(
+    toDate(value),
+  );
 }
 
 /** 18 พ.ย. 2569 14:30 · 18 Nov 2026 14:30 */
@@ -113,7 +119,10 @@ export function monthNames(locale: Locale, width: "long" | "short" = "long"): st
 }
 
 /** Weekday names, Sunday first — for calendar headers. */
-export function weekdayNames(locale: Locale, width: "long" | "short" | "narrow" = "short"): string[] {
+export function weekdayNames(
+  locale: Locale,
+  width: "long" | "short" | "narrow" = "short",
+): string[] {
   const f = dtf(locale, { weekday: width }, "UTC");
   // 2026-11-15 is a Sunday.
   return Array.from({ length: 7 }, (_, d) => f.format(new Date(Date.UTC(2026, 10, 15 + d))));
@@ -153,9 +162,11 @@ export function createFormat(locale: Locale) {
     date: (value: Date | string | number, style?: DateStyle, timeZone?: string) =>
       formatDate(locale, value, style, timeZone),
     time: (value: Date | string | number, timeZone?: string) => formatTime(locale, value, timeZone),
-    dateTime: (value: Date | string | number, timeZone?: string) => formatDateTime(locale, value, timeZone),
+    dateTime: (value: Date | string | number, timeZone?: string) =>
+      formatDateTime(locale, value, timeZone),
     relativeDays: (days: number) => formatRelativeDays(locale, days),
-    number: (value: number, options?: Intl.NumberFormatOptions) => formatNumber(locale, value, options),
+    number: (value: number, options?: Intl.NumberFormatOptions) =>
+      formatNumber(locale, value, options),
     monthNames: (width?: "long" | "short") => monthNames(locale, width),
     weekdayNames: (width?: "long" | "short" | "narrow") => weekdayNames(locale, width),
   };

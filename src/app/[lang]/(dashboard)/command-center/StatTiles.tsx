@@ -25,10 +25,7 @@ import { useT } from "@/i18n/I18nProvider";
  */
 export type StatTone = "danger" | "warning" | "brand" | "violet" | "green";
 
-const TONE: Record<
-  StatTone,
-  { icon: string; watermark: string; glow: string; action: string }
-> = {
+const TONE: Record<StatTone, { icon: string; watermark: string; glow: string; action: string }> = {
   danger: {
     icon: "bg-[var(--fill-red-100)] text-[var(--fill-red-600)]",
     watermark: "text-[var(--fill-red-600)]",
@@ -123,9 +120,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
   const tone = TONE[tile.tone];
   const animated = useCountUp(tile.value);
   const quiet = tile.value === 0;
-  const display = tile.formatValue
-    ? tile.formatValue(animated)
-    : String(Math.round(animated));
+  const display = tile.formatValue ? tile.formatValue(animated) : String(Math.round(animated));
 
   const interactive = Boolean(tile.onClick);
   const t = useT();
@@ -152,7 +147,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 -z-10 size-[7rem] translate-x-[32%] translate-y-[32%] sm:size-[8rem] sm:translate-x-[34%] sm:translate-y-[34%]"
+        className="pointer-events-none absolute right-0 bottom-0 -z-10 size-[7rem] translate-x-[32%] translate-y-[32%] sm:size-[8rem] sm:translate-x-[34%] sm:translate-y-[34%]"
       >
         <div
           className={`absolute -inset-3 rounded-full blur-2xl ${quiet ? QUIET_GLOW : tone.glow}`}
@@ -176,7 +171,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
       </div>
 
       <p
-        className={`relative max-w-full truncate text-[22px] font-bold leading-none tabular-nums sm:text-[26px] ${
+        className={`relative max-w-full truncate text-[22px] leading-none font-bold tabular-nums sm:text-[26px] ${
           quiet ? "text-[var(--text-default-placeholder)]" : tone.watermark
         }`}
       >
@@ -184,7 +179,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
       </p>
 
       <p
-        className={`relative max-w-full text-label font-medium leading-snug line-clamp-2 sm:text-body-sm ${
+        className={`relative line-clamp-2 max-w-full text-label leading-snug font-medium sm:text-body-sm ${
           quiet ? "text-[var(--text-default-placeholder)]" : tone.watermark
         }`}
       >
@@ -199,7 +194,7 @@ function CompactStatTile({ tile }: { tile: StatTile }) {
             e.stopPropagation();
             tile.onClick?.();
           }}
-          className={`absolute right-3 top-4 z-10 flex size-6 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-transform group-hover:scale-105 active:scale-95 sm:right-3.5 sm:top-5 sm:size-7 ${tone.action}`}
+          className={`absolute top-4 right-3 z-10 flex size-6 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-transform group-hover:scale-105 active:scale-95 sm:top-5 sm:right-3.5 sm:size-7 ${tone.action}`}
         >
           <CaretRightIcon size={11} weight="bold" className="sm:hidden" />
           <CaretRightIcon size={13} weight="bold" className="hidden sm:block" />
@@ -214,9 +209,7 @@ function StatTileCard({ tile }: { tile: StatTile }) {
   const tone = TONE[tile.tone];
   const animated = useCountUp(tile.value);
   const quiet = tile.value === 0;
-  const display = tile.formatValue
-    ? tile.formatValue(animated)
-    : String(Math.round(animated));
+  const display = tile.formatValue ? tile.formatValue(animated) : String(Math.round(animated));
 
   return (
     <Card
@@ -245,15 +238,15 @@ function StatTileCard({ tile }: { tile: StatTile }) {
           }
         : {})}
     >
-      <div className="min-w-0 flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
         <p
-          className={`text-[28px] font-bold leading-none tabular-nums truncate ${
+          className={`truncate text-[28px] leading-none font-bold tabular-nums ${
             quiet ? "text-[var(--text-default-placeholder)]" : "text-foreground"
           }`}
         >
           {display}
         </p>
-        <p className="text-body font-medium text-muted-foreground leading-snug truncate">
+        <p className="truncate text-body leading-snug font-medium text-muted-foreground">
           {tile.label}
         </p>
       </div>

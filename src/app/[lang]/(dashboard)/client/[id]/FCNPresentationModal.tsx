@@ -34,13 +34,25 @@ function parseTickers(underlying: string): string[] {
 }
 
 function YuantaLogoMark() {
-  // eslint-disable-next-line @next/next/no-img-element -- SVG wordmark; the image optimizer rejects SVG
-  return <img src="/brand/yuanta-logo.svg" alt="Yuanta Securities" className="h-10 w-auto shrink-0" />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- SVG wordmark; the image optimizer rejects SVG
+    <img src="/brand/yuanta-logo.svg" alt="Yuanta Securities" className="h-10 w-auto shrink-0" />
+  );
 }
 
 function FooterIconCircle({ color, children }: { color: string; children: React.ReactNode }) {
   return (
-    <div style={{ flexShrink: 0, width: 24, height: 24, borderRadius: "50%", backgroundColor: color, position: "relative", marginTop: 2 }}>
+    <div
+      style={{
+        flexShrink: 0,
+        width: 24,
+        height: 24,
+        borderRadius: "50%",
+        backgroundColor: color,
+        position: "relative",
+        marginTop: 2,
+      }}
+    >
       {children}
     </div>
   );
@@ -68,19 +80,22 @@ function FCNCard({ product }: { product: StructuredProduct }) {
       style={{ background: "linear-gradient(140deg, #dbeafe 0%, #e0e7ff 45%, #fce7f3 100%)" }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.6)" }}>
+      <div
+        className="flex items-center justify-between px-5 py-4"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.6)" }}
+      >
         <YuantaLogoMark />
         <div className="text-right">
-          <p className="font-bold text-[#0a6ee7] text-sm leading-[24px]">FCN Pricing</p>
-          <p className="text-[#0a6ee7] text-xs leading-[20px]">{labels.asOf(product.offerDate)}</p>
+          <p className="text-sm leading-[24px] font-bold text-[#0a6ee7]">FCN Pricing</p>
+          <p className="text-xs leading-[20px] text-[#0a6ee7]">{labels.asOf(product.offerDate)}</p>
         </div>
       </div>
 
       {/* Two-column body */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-4 py-4">
+      <div className="grid grid-cols-1 gap-3 px-4 py-4 md:grid-cols-2">
         {/* Left: Underlying Assets */}
         <div className="flex flex-col gap-2">
-          <p className="font-bold text-[#0a6ee7] text-sm text-center">Underlying Assets</p>
+          <p className="text-center text-sm font-bold text-[#0a6ee7]">Underlying Assets</p>
           <div className="flex flex-col gap-2">
             {tickers.map((ticker, i) => {
               const info = TICKER_INFO[ticker];
@@ -88,17 +103,33 @@ function FCNCard({ product }: { product: StructuredProduct }) {
               const name = product.underlyingNames?.[i] ?? info?.name ?? ticker;
               const sector = product.underlyingSectors?.[i] ?? info?.sector ?? "";
               return (
-                <div key={`${ticker}-${i}`} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ backgroundColor: "rgba(255,255,255,0.72)" }}>
-                  <div className="relative shrink-0 size-9 rounded-lg overflow-hidden" style={{ border: "1px solid rgba(0,0,0,0.08)" }}>
+                <div
+                  key={`${ticker}-${i}`}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+                  style={{ backgroundColor: "rgba(255,255,255,0.72)" }}
+                >
+                  <div
+                    className="relative size-9 shrink-0 overflow-hidden rounded-lg"
+                    style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element -- placeholder fallback reassigns `currentTarget.src`, which `next/image` controls; also rendered into a jsPDF snapshot */}
-                    <img alt={name} className="absolute inset-0 size-full object-cover" src={logoSrc}
-                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/bond-logos/logo-placeholder.svg"; }} />
+                    <img
+                      alt={name}
+                      className="absolute inset-0 size-full object-cover"
+                      src={logoSrc}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/bond-logos/logo-placeholder.svg";
+                      }}
+                    />
                   </div>
-                  <div className="flex flex-1 min-w-0 flex-col gap-0.5">
-                    <p className="font-semibold text-[#101828] text-xs leading-[20px] truncate">{name}</p>
-                    <p className="text-[#6a7282] text-meta leading-[20px] truncate">{sector}</p>
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <p className="truncate text-xs leading-[20px] font-semibold text-[#101828]">
+                      {name}
+                    </p>
+                    <p className="truncate text-meta leading-[20px] text-[#6a7282]">{sector}</p>
                   </div>
-                  <span className="shrink-0 font-bold text-[#0a6ee7] text-xs">{ticker}</span>
+                  <span className="shrink-0 text-xs font-bold text-[#0a6ee7]">{ticker}</span>
                 </div>
               );
             })}
@@ -107,16 +138,23 @@ function FCNCard({ product }: { product: StructuredProduct }) {
 
         {/* Right: Fixed Coupon Note */}
         <div className="flex flex-col gap-2">
-          <p className="font-bold text-[#0a6ee7] text-sm text-center">Fixed Coupon Note</p>
-          <div className="flex flex-col rounded-xl overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.72)" }}>
+          <p className="text-center text-sm font-bold text-[#0a6ee7]">Fixed Coupon Note</p>
+          <div
+            className="flex flex-col overflow-hidden rounded-xl"
+            style={{ backgroundColor: "rgba(255,255,255,0.72)" }}
+          >
             {couponRows.map((row, i) => (
               <div
                 key={row.label}
                 className="flex items-center justify-between px-3 py-2"
-                style={{ borderBottom: i < couponRows.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}
+                style={{
+                  borderBottom: i < couponRows.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                }}
               >
-                <span className="text-[#4a5565] text-xs">{row.label}</span>
-                <span className="font-bold text-xs" style={{ color: row.valueColor }}>{row.value}</span>
+                <span className="text-xs text-[#4a5565]">{row.label}</span>
+                <span className="text-xs font-bold" style={{ color: row.valueColor }}>
+                  {row.value}
+                </span>
               </div>
             ))}
           </div>
@@ -124,23 +162,49 @@ function FCNCard({ product }: { product: StructuredProduct }) {
       </div>
 
       {/* Footer */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-4 pb-4">
-        <div className="flex items-start gap-2.5 rounded-xl px-3 py-2.5" style={{ backgroundColor: "rgba(255,255,255,0.72)" }}>
+      <div className="grid grid-cols-1 gap-3 px-4 pb-4 md:grid-cols-2">
+        <div
+          className="flex items-start gap-2.5 rounded-xl px-3 py-2.5"
+          style={{ backgroundColor: "rgba(255,255,255,0.72)" }}
+        >
           <FooterIconCircle color="#0a6ee7">
-            <PhoneIcon size={13} color="white" weight="fill" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+            <PhoneIcon
+              size={13}
+              color="white"
+              weight="fill"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
           </FooterIconCircle>
           <p className="text-meta leading-[20px] text-[#101828]">
-            {labels.contact((s) => <strong>{s}</strong>)}
+            {labels.contact((s) => (
+              <strong>{s}</strong>
+            ))}
           </p>
         </div>
 
-        <div className="flex items-start gap-2.5 rounded-xl px-3 py-2.5" style={{ backgroundColor: "rgba(255,255,255,0.72)" }}>
+        <div
+          className="flex items-start gap-2.5 rounded-xl px-3 py-2.5"
+          style={{ backgroundColor: "rgba(255,255,255,0.72)" }}
+        >
           <FooterIconCircle color="#e47200">
-            <WarningIcon size={13} color="white" weight="fill" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+            <WarningIcon
+              size={13}
+              color="white"
+              weight="fill"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
           </FooterIconCircle>
-          <p className="text-meta leading-[20px] text-[#6a7282]">
-            {labels.disclaimer}
-          </p>
+          <p className="text-meta leading-[20px] text-[#6a7282]">{labels.disclaimer}</p>
         </div>
       </div>
     </div>
@@ -162,10 +226,7 @@ export function FCNPresentationModal({ product, open, onClose }: FCNPresentation
     const card = cardRef.current;
     if (!card) return;
 
-    const [{ toPng }, { jsPDF }] = await Promise.all([
-      import("html-to-image"),
-      import("jspdf"),
-    ]);
+    const [{ toPng }, { jsPDF }] = await Promise.all([import("html-to-image"), import("jspdf")]);
 
     const PX_TO_MM = 25.4 / 96;
     const rect = card.getBoundingClientRect();
@@ -188,7 +249,9 @@ export function FCNPresentationModal({ product, open, onClose }: FCNPresentation
     return (
       <BottomSheet
         open={open}
-        onOpenChange={(next) => { if (!next) onClose(); }}
+        onOpenChange={(next) => {
+          if (!next) onClose();
+        }}
         headerType="text"
         title="FCN Presentation"
         rightSide="action"
@@ -220,7 +283,7 @@ export function FCNPresentationModal({ product, open, onClose }: FCNPresentation
           actionLayout="single"
           primaryLabel={t.products.fcn.downloadPdf}
           onPrimaryClick={handlePrintPDF}
-          className="!max-w-[720px] w-[calc(var(--vw)*100-2rem)]"
+          className="w-[calc(var(--vw)*100-2rem)] !max-w-[720px]"
         >
           {cardContent}
         </Modal>

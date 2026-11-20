@@ -68,25 +68,25 @@ function OrdersPageInner() {
       {!hasLoaded ? (
         <TabsSkeleton count={ORDER_TABS.length} />
       ) : (
-      <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
-        <TabGroup
-          items={ORDER_TABS.map((tab) => ({
-            id: tab.id,
-            title: tab.id === "all" ? t.orders.tabAll : tab.title,
-          }))}
-          activeId={tab.id}
-          // `push`: a tab is a destination, and the back button should walk out
-          // of it rather than off the page. Every other param belongs to one
-          // tab's own filters, so none is carried into the next.
-          onChange={(id) =>
-            setQueryState(
-              withQuery(pathname, "", { tab: id === DEFAULT_ORDER_TAB ? null : id }),
-              "push",
-            )
-          }
-          size="md"
-        />
-      </div>
+        <div className="transparent-tabs scrollable-tabs -mx-4 pl-4 xl:-mx-6 xl:pl-6">
+          <TabGroup
+            items={ORDER_TABS.map((tab) => ({
+              id: tab.id,
+              title: tab.id === "all" ? t.orders.tabAll : tab.title,
+            }))}
+            activeId={tab.id}
+            // `push`: a tab is a destination, and the back button should walk out
+            // of it rather than off the page. Every other param belongs to one
+            // tab's own filters, so none is carried into the next.
+            onChange={(id) =>
+              setQueryState(
+                withQuery(pathname, "", { tab: id === DEFAULT_ORDER_TAB ? null : id }),
+                "push",
+              )
+            }
+            size="md"
+          />
+        </div>
       )}
 
       <FadeIn key={tab.id}>

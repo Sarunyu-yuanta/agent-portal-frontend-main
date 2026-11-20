@@ -52,7 +52,11 @@ export const ALL_STRUCTURED_PRODUCTS_LIMIT = 12;
 export const ALL_STRUCTURED_PRODUCTS_POOL: StructuredProduct[] = [
   ...(structuredProductsRaw.allProductsBase as StructuredProduct[]),
   ...TOP_PICKS.map((p, i) => ({ ...p, id: `asp-repeat-${i}`, updatedAt: "25 Aug 2026 - 09:00" })),
-  ...STRUCTURED_PRODUCTS.map((p, i) => ({ ...p, id: `asp-repeat-sp-${i}`, updatedAt: "25 Aug 2026 - 09:00" })),
+  ...STRUCTURED_PRODUCTS.map((p, i) => ({
+    ...p,
+    id: `asp-repeat-sp-${i}`,
+    updatedAt: "25 Aug 2026 - 09:00",
+  })),
 ];
 
 export const ALL_STRUCTURED_PRODUCTS: StructuredProduct[] = ALL_STRUCTURED_PRODUCTS_POOL.slice(

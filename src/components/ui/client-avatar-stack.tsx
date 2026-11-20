@@ -84,7 +84,7 @@ export function ClientAvatarStack({
         <span
           role="img"
           aria-label={t.shell.avatarStack.more(hidden)}
-          className={`pointer-events-none absolute right-0 top-0 z-10 flex ${box} ${text} select-none items-center justify-center font-bold leading-none`}
+          className={`pointer-events-none absolute top-0 right-0 z-10 flex ${box} ${text} items-center justify-center leading-none font-bold select-none`}
           style={{ color: AVATAR_TEXT_COLOR }}
         >
           +{hidden}

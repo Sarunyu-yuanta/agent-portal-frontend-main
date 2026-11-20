@@ -10,7 +10,11 @@ import { useClients } from "@/hooks/use-api";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import type { Client } from "@/types/domain";
-import { advisoryAccountStatus, riskProfileLabel, type AdvisoryService } from "./portfolio-advisory-client";
+import {
+  advisoryAccountStatus,
+  riskProfileLabel,
+  type AdvisoryService,
+} from "./portfolio-advisory-client";
 import { AdvisoryAccountTag } from "./portfolio-advisory-ui";
 import { useT } from "@/i18n/I18nProvider";
 
@@ -46,7 +50,7 @@ function AccountFilterSegments({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(id)}
-            className={`min-w-0 flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-xs font-bold leading-[20px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] ${
+            className={`min-w-0 flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-xs leading-[20px] font-bold transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none ${
               active
                 ? "bg-white text-[#0a6ee7] shadow-sm"
                 : "text-[#4a5565] hover:bg-white/60 hover:text-[#101828]"
@@ -84,11 +88,11 @@ function ClientRow({
         selected
           ? "border-[#0a6ee7] bg-[#eff6ff]"
           : "border-black/10 bg-white hover:border-black/20 hover:bg-[#f9fafb]"
-      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7]`}
+      } focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none`}
     >
       <Avatar type="text" initials={getInitial(displayName)} size="m" />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="truncate text-sm font-bold leading-[24px] text-[#101828]">{displayName}</p>
+        <p className="truncate text-sm leading-[24px] font-bold text-[#101828]">{displayName}</p>
         <p className="truncate text-xs leading-[20px] text-[#4a5565]">
           {client.tier} · {riskProfileLabel(client, t)}
         </p>
@@ -97,7 +101,10 @@ function ClientRow({
       {selected ? (
         <CheckCircleIcon size={20} weight="fill" className="shrink-0 text-[#0a6ee7]" />
       ) : (
-        <CircleIcon size={20} className="shrink-0 text-black/20 transition-colors group-hover:text-black/40" />
+        <CircleIcon
+          size={20}
+          className="shrink-0 text-black/20 transition-colors group-hover:text-black/40"
+        />
       )}
     </button>
   );
@@ -163,8 +170,7 @@ function PickerBody({
     if (!query) return clients;
     return clients.filter(
       (client) =>
-        maskName(client.name, isPrivate).toLowerCase().includes(query) ||
-        client.id.includes(query),
+        maskName(client.name, isPrivate).toLowerCase().includes(query) || client.id.includes(query),
     );
   }, [clients, search, isPrivate]);
 
@@ -179,7 +185,7 @@ function PickerBody({
       : searched.filter((c) => advisoryAccountStatus(c, service) === accountFilter);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 px-4 pb-4 pt-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4">
       <p className="shrink-0 text-sm leading-[24px] text-[#4a5565]">
         {labels.intro(SERVICE_TITLE[service])}
       </p>
@@ -206,7 +212,9 @@ function PickerBody({
         ) : results.length === 0 ? (
           <EmptyState
             size="compact"
-            icon={<MagnifyingGlassIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+            icon={
+              <MagnifyingGlassIcon size={40} className="text-[var(--text-default-placeholder)]" />
+            }
             title={search.trim() ? t.states.noResultTitle : t.states.noFilterResultTitle}
             body={search.trim() ? t.states.noResultBody : t.states.noFilterResultBody}
             action={{

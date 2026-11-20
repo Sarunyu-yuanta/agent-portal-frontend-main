@@ -13,10 +13,7 @@ import {
   type StructuredProduct,
 } from "./structured-product-data";
 import { useOpenProducts } from "@/app/[lang]/(dashboard)/orders/use-order-books";
-import {
-  INVESTMENT_SOLUTIONS,
-  type InvestmentSolutionId,
-} from "./investment-solution-data";
+import { INVESTMENT_SOLUTIONS, type InvestmentSolutionId } from "./investment-solution-data";
 import {
   GRAD_BALANCED,
   GRAD_HIGH_CV,
@@ -54,12 +51,12 @@ export function TopIdeaStrip({
   const { ref, onMouseDown, onMouseMove, onMouseUp, onMouseLeave } = drag;
   return (
     <div
-      className="flex flex-col gap-4 items-start shrink-0 w-full"
+      className="flex w-full shrink-0 flex-col items-start gap-4"
       style={{ backgroundColor: "white", paddingTop: 16, paddingBottom: 16 }}
     >
-      <div className="flex gap-2 items-center shrink-0 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="mx-auto flex w-full max-w-[1280px] shrink-0 items-center gap-2 px-4 lg:px-6">
         <p
-          className="font-bold flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          className="flex-1 overflow-hidden font-bold text-ellipsis whitespace-nowrap"
           style={{ color: "#101828", fontSize: 22, lineHeight: "32px" }}
         >
           Top idea
@@ -77,33 +74,33 @@ export function TopIdeaStrip({
         )}
       </div>
       {TOP_IDEAS.length === 0 ? (
-        <div className="w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="mx-auto w-full max-w-[1280px] px-4 lg:px-6">
           <CatalogSectionEmpty title={t.products.states.noTopIdeas} />
         </div>
       ) : (
-      <div
-        ref={ref}
-        className="overflow-x-auto w-full pb-3 hide-scrollbar"
-        style={{
-          scrollbarWidth: "none",
-          cursor: "grab",
-          paddingLeft: "max(1rem, calc((100% - 1280px) / 2 + 1.5rem))",
-        }}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-      >
-        <div className="flex gap-3.5 min-w-max pr-4 lg:pr-6">
-          {TOP_IDEAS.map((idea, i) => (
-            <TopIdeaCard
-              key={i}
-              sector={idea.sector}
-              onClick={() => onTopIdeaSelect(idea.sector)}
-            />
-          ))}
+        <div
+          ref={ref}
+          className="hide-scrollbar w-full overflow-x-auto pb-3"
+          style={{
+            scrollbarWidth: "none",
+            cursor: "grab",
+            paddingLeft: "max(1rem, calc((100% - 1280px) / 2 + 1.5rem))",
+          }}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+        >
+          <div className="flex min-w-max gap-3.5 pr-4 lg:pr-6">
+            {TOP_IDEAS.map((idea, i) => (
+              <TopIdeaCard
+                key={i}
+                sector={idea.sector}
+                onClick={() => onTopIdeaSelect(idea.sector)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
@@ -120,7 +117,7 @@ export function InvestmentSolutionSection({
   const t = useT();
   return (
     <div
-      className="relative shrink-0 w-full"
+      className="relative w-full shrink-0"
       style={{
         paddingTop: 24,
         paddingBottom: 24,
@@ -130,9 +127,9 @@ export function InvestmentSolutionSection({
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="flex flex-col gap-4 items-start shrink-0 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-6">
+      <div className="mx-auto flex w-full max-w-[1280px] shrink-0 flex-col items-start gap-4 px-4 md:px-8 lg:px-6">
         <p
-          className="font-bold relative shrink-0 overflow-hidden text-ellipsis w-full whitespace-nowrap"
+          className="relative w-full shrink-0 overflow-hidden font-bold text-ellipsis whitespace-nowrap"
           style={{ color: "#101828", fontSize: 22, lineHeight: "32px" }}
         >
           Investment Solution
@@ -142,52 +139,48 @@ export function InvestmentSolutionSection({
             <CatalogSectionEmpty title={t.products.states.noInvestmentSolutions} />
           </div>
         ) : (
-        <div className="flex flex-col gap-6 items-start relative shrink-0 w-full">
-          <div className="flex flex-col lg:flex-row gap-4 shrink-0 w-full">
-            {INVESTMENT_SOLUTIONS.map((solution) => {
-              const isHighConviction = solution.id === "high-conviction";
-              const isBalanced = solution.id === "balanced-growth";
-              return (
-                <InvestmentCard
-                  key={solution.id}
-                  name={solution.name}
-                  desc={solution.desc}
-                  coupon={solution.couponRange}
-                  tenor={solution.tenor}
-                  imgSrc={
-                    isHighConviction
-                      ? IMG_HIGH_CONVICTION
-                      : isBalanced
-                        ? IMG_BALANCED_GROWTH
-                        : IMG_SECURE_INCOME
-                  }
-                  gradient={
-                    isHighConviction
-                      ? GRAD_HIGH_CV
-                      : isBalanced
-                        ? GRAD_BALANCED
-                        : GRAD_SECURE
-                  }
-                  imgLeft={isHighConviction ? -67 : 12}
-                  imgW={isHighConviction ? 198 : 72}
-                  imgH={isHighConviction ? 132 : isBalanced ? 103 : 92}
-                  highConviction={isHighConviction}
-                  crop={
-                    !isHighConviction
-                      ? {
-                          scaleX: isBalanced ? 0.7006 : 0.439,
-                          scaleY: 1.0,
-                          tx: isBalanced ? 0.1464 : 0,
-                          ty: 0,
-                        }
-                      : undefined
-                  }
-                  onClick={() => onInvestmentSolutionSelect(solution.id)}
-                />
-              );
-            })}
+          <div className="relative flex w-full shrink-0 flex-col items-start gap-6">
+            <div className="flex w-full shrink-0 flex-col gap-4 lg:flex-row">
+              {INVESTMENT_SOLUTIONS.map((solution) => {
+                const isHighConviction = solution.id === "high-conviction";
+                const isBalanced = solution.id === "balanced-growth";
+                return (
+                  <InvestmentCard
+                    key={solution.id}
+                    name={solution.name}
+                    desc={solution.desc}
+                    coupon={solution.couponRange}
+                    tenor={solution.tenor}
+                    imgSrc={
+                      isHighConviction
+                        ? IMG_HIGH_CONVICTION
+                        : isBalanced
+                          ? IMG_BALANCED_GROWTH
+                          : IMG_SECURE_INCOME
+                    }
+                    gradient={
+                      isHighConviction ? GRAD_HIGH_CV : isBalanced ? GRAD_BALANCED : GRAD_SECURE
+                    }
+                    imgLeft={isHighConviction ? -67 : 12}
+                    imgW={isHighConviction ? 198 : 72}
+                    imgH={isHighConviction ? 132 : isBalanced ? 103 : 92}
+                    highConviction={isHighConviction}
+                    crop={
+                      !isHighConviction
+                        ? {
+                            scaleX: isBalanced ? 0.7006 : 0.439,
+                            scaleY: 1.0,
+                            tx: isBalanced ? 0.1464 : 0,
+                            ty: 0,
+                          }
+                        : undefined
+                    }
+                    onClick={() => onInvestmentSolutionSelect(solution.id)}
+                  />
+                );
+              })}
+            </div>
           </div>
-        </div>
         )}
       </div>
     </div>
@@ -216,12 +209,9 @@ export function TopPickSection({
   const t = useT();
   const { topPicks } = useStructuredShelf();
   return (
-    <div
-      className="w-full"
-      style={{ backgroundColor: "white", paddingTop: 24, paddingBottom: 24 }}
-    >
-      <div className="flex flex-col gap-4 items-center shrink-0 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-6">
-        <div className="flex gap-1 items-center shrink-0 w-full">
+    <div className="w-full" style={{ backgroundColor: "white", paddingTop: 24, paddingBottom: 24 }}>
+      <div className="mx-auto flex w-full max-w-[1280px] shrink-0 flex-col items-center gap-4 px-4 md:px-8 lg:px-6">
+        <div className="flex w-full shrink-0 items-center gap-1">
           <FireIcon
             size={24}
             weight="fill"
@@ -232,10 +222,10 @@ export function TopPickSection({
             size={20}
             weight="fill"
             color="#f97316"
-            className="shrink-0 hidden md:block lg:hidden"
+            className="hidden shrink-0 md:block lg:hidden"
           />
           <p
-            className="font-bold overflow-hidden text-ellipsis whitespace-nowrap text-xl leading-[34px] md:text-lg md:leading-[28px] lg:text-xl lg:leading-[34px]"
+            className="overflow-hidden text-xl leading-[34px] font-bold text-ellipsis whitespace-nowrap md:text-lg md:leading-[28px] lg:text-xl lg:leading-[34px]"
             style={{ color: "#101828" }}
           >
             Top pick
@@ -245,15 +235,11 @@ export function TopPickSection({
           // Every product on the shelf can be booked out.
           <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
         ) : (
-        <div className="grid grid-cols-1 md:flex md:flex-col lg:grid lg:grid-cols-3 gap-4 shrink-0 w-full">
-          {topPicks.map((p) => (
-            <StructuredProductCard
-              key={p.id}
-              {...p}
-              onClick={() => onProductSelect(p)}
-            />
-          ))}
-        </div>
+          <div className="grid w-full shrink-0 grid-cols-1 gap-4 md:flex md:flex-col lg:grid lg:grid-cols-3">
+            {topPicks.map((p) => (
+              <StructuredProductCard key={p.id} {...p} onClick={() => onProductSelect(p)} />
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -274,40 +260,31 @@ export function StructuredProductGridSection({
   const { grid } = useStructuredShelf();
   return (
     <div
-      className="flex flex-col gap-4 items-center relative shrink-0 w-full"
+      className="relative flex w-full shrink-0 flex-col items-center gap-4"
       style={{ backgroundColor: "#f9fafb", paddingTop: 24, paddingBottom: 24 }}
     >
-      <div className="flex gap-2 items-center shrink-0 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="mx-auto flex w-full max-w-[1280px] shrink-0 items-center gap-2 px-4 lg:px-6">
         <p
-          className="font-bold flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          className="flex-1 overflow-hidden font-bold text-ellipsis whitespace-nowrap"
           style={{ color: "#101828", fontSize: 22, lineHeight: "32px" }}
         >
           {title}
         </p>
       </div>
       {grid.length === 0 ? (
-        <div className="w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="mx-auto w-full max-w-[1280px] px-4 lg:px-6">
           <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
         </div>
       ) : (
         <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
-        {grid.map((p) => (
-          <StructuredProductCard
-            key={p.id}
-            {...p}
-            onClick={() => onProductSelect(p)}
-          />
-        ))}
-      </div>
-      <Button
-        variant="plain"
-        size="sm"
-        className="shrink-0"
-        onClick={onAllProductsView}
-      >
-        {t.products.common.viewAll}
-      </Button>
+          <div className="mx-auto grid w-full max-w-[1280px] shrink-0 grid-cols-1 gap-4 px-4 lg:grid-cols-3 lg:px-6">
+            {grid.map((p) => (
+              <StructuredProductCard key={p.id} {...p} onClick={() => onProductSelect(p)} />
+            ))}
+          </div>
+          <Button variant="plain" size="sm" className="shrink-0" onClick={onAllProductsView}>
+            {t.products.common.viewAll}
+          </Button>
         </>
       )}
     </div>

@@ -43,8 +43,8 @@ function useResetToggle(token: number | undefined, off: () => void) {
 /** Small icon + text heading above each control. */
 function FieldLabel({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
-    <span className="flex items-center gap-1.5 type-body-2 text-muted-foreground">
-      <span className="shrink-0 flex items-center">{icon}</span>
+    <span className="type-body-2 flex items-center gap-1.5 text-muted-foreground">
+      <span className="flex shrink-0 items-center">{icon}</span>
       {children}
     </span>
   );
@@ -84,8 +84,7 @@ export function ClientField({
   const options = clients.map((c) => ({ label: c.name, value: c.id }));
 
   if (pinnedClientId) {
-    const pinnedName =
-      clients.find((c) => c.id === pinnedClientId)?.name ?? pinnedClientId;
+    const pinnedName = clients.find((c) => c.id === pinnedClientId)?.name ?? pinnedClientId;
     return (
       <div className="flex flex-col gap-1.5">
         {/* No switch here: the note always has at least the pinned client, so
@@ -117,7 +116,9 @@ export function ClientField({
           // note stays general until at least one is actually chosen.
           if (!next) onChange([]);
         }}
-        label={<FieldLabel icon={<UserIcon size={16} />}>{t.planner.notes.fields.client}</FieldLabel>}
+        label={
+          <FieldLabel icon={<UserIcon size={16} />}>{t.planner.notes.fields.client}</FieldLabel>
+        }
       />
       {enabled && (
         <DropdownMultiple
@@ -141,9 +142,7 @@ export function ReminderField({
   resetToken?: number;
 }) {
   const t = useT();
-  const [date, setDate] = useState<Date | undefined>(
-    reminderAt ? new Date(reminderAt) : undefined,
-  );
+  const [date, setDate] = useState<Date | undefined>(reminderAt ? new Date(reminderAt) : undefined);
   /**
    * The switch's own state rather than `Boolean(reminderAt)`, so it responds to
    * the click itself instead of waiting on a round trip through the note.
@@ -175,7 +174,9 @@ export function ReminderField({
           setDate(target);
           onChange(reminderAtFromDate(target));
         }}
-        label={<FieldLabel icon={<BellIcon size={16} />}>{t.planner.notes.fields.reminder}</FieldLabel>}
+        label={
+          <FieldLabel icon={<BellIcon size={16} />}>{t.planner.notes.fields.reminder}</FieldLabel>
+        }
       />
       {enabled && (
         <DateInput

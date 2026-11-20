@@ -35,7 +35,7 @@ export function AdvisoryDetailSkeleton({
   return (
     <div
       aria-busy="true"
-      className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pb-20 lg:pt-2"
+      className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20"
     >
       {/* Mobile + tablet */}
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
@@ -44,7 +44,7 @@ export function AdvisoryDetailSkeleton({
         </div>
 
         <div className="flex w-full flex-1 flex-col gap-3 pb-20">
-          <HeroCopySkeleton className="h-[170px] py-4 pl-5 pr-4 md:px-8 md:py-6" />
+          <HeroCopySkeleton className="h-[170px] py-4 pr-4 pl-5 md:px-8 md:py-6" />
           <div className="flex w-full flex-col gap-3 px-4 md:gap-4 md:px-8">
             <ClientBarSkeleton />
             <PlanCountSkeleton showFilterButton={showFilterButton} />
@@ -62,7 +62,10 @@ export function AdvisoryDetailSkeleton({
           <Skeleton className="h-6 w-40" />
         </div>
 
-        <div className="w-full overflow-clip rounded-xl bg-white" style={{ boxShadow: SECTION_SHADOW }}>
+        <div
+          className="w-full overflow-clip rounded-xl bg-white"
+          style={{ boxShadow: SECTION_SHADOW }}
+        >
           <div className="flex w-full flex-col items-center px-14 pb-12">
             <HeroCopySkeleton className="px-10 py-8" illustrationClassName="h-[153px] w-[101px]" />
             <div className="flex w-full flex-col gap-4">

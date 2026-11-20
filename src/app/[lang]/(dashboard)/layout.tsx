@@ -2,10 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
-import {
-  NavHeaderIconButton,
-  type NotificationItem,
-} from "@sarunyu/system-one";
+import { NavHeaderIconButton, type NotificationItem } from "@sarunyu/system-one";
 import { ListIcon } from "@phosphor-icons/react";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NotificationBell } from "@/components/layout/NotificationBell";
@@ -72,10 +69,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   // this modal doesn't already know whose page you're on.
   const { open: openReminder, modals: reminderModals } = useDayItemModals({ clients });
 
-  const { notificationRows, notificationTargets } =
-    useNotificationFeed(notes, clients);
-  const { kycNotificationRows, kycNotificationTargets } =
-    useKycNotificationFeed(clients);
+  const { notificationRows, notificationTargets } = useNotificationFeed(notes, clients);
+  const { kycNotificationRows, kycNotificationTargets } = useKycNotificationFeed(clients);
   const { orderNotificationRows, orderNotificationTargets, orderSubmissionTargets } =
     useOrderNotificationFeed();
   // The bell's rows are derived from clients (KYC, reminder holders) and
@@ -108,8 +103,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     ].filter((r) => r.daysLeft <= 0);
     // Newest first: by day, then by exact moment where the source has one.
     const sorted = [...rows].sort(
-      (a, b) =>
-        b.daysLeft - a.daysLeft || (b.at?.getTime() ?? 0) - (a.at?.getTime() ?? 0),
+      (a, b) => b.daysLeft - a.daysLeft || (b.at?.getTime() ?? 0) - (a.at?.getTime() ?? 0),
     );
     return PAST_BUCKETS.map((bucket) => ({
       label: t.buckets.past[bucket],
@@ -154,18 +148,15 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     <>
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetOverlay className="bg-black/50" />
-        <SheetContent
-          side="left"
-          className="w-60 p-0 bg-slate-900 border-slate-700"
-        >
+        <SheetContent side="left" className="w-60 border-slate-700 bg-slate-900 p-0">
           <AppSidebar onClose={() => setSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
 
-      <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex h-screen overflow-hidden bg-background">
         {/* Sidebar — hidden on mobile/tablet, visible on xl+ (desktop only) */}
         <aside
-          className={`hidden xl:flex shrink-0 bg-slate-900 overflow-hidden flex-col transition-[width] duration-300 ease-in-out ${sidebarCollapsed ? "w-[50px]" : "w-60"}`}
+          className={`hidden shrink-0 flex-col overflow-hidden bg-slate-900 transition-[width] duration-300 ease-in-out xl:flex ${sidebarCollapsed ? "w-[50px]" : "w-60"}`}
         >
           <AppSidebar
             collapsed={sidebarCollapsed}
@@ -174,46 +165,41 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Content area */}
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col">
           {/* Top bar */}
           <header
-            className={`shrink-0 min-h-[60px] flex items-center justify-between gap-4 px-4 border-b border-border bg-background z-40 relative ${
+            className={`relative z-40 flex min-h-[60px] shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 ${
               headerSlot ? "xl:grid xl:grid-cols-[1fr_minmax(0,28rem)_1fr]" : ""
             }`}
           >
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex min-w-0 items-center gap-3">
               {/* Logo — mobile + tablet (sidebar hidden below xl) */}
-              <div className="flex items-center gap-2.5 xl:hidden shrink-0">
+              <div className="flex shrink-0 items-center gap-2.5 xl:hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size icon, no responsive sizes needed */}
                 <img
                   src="/brand/logo-ic-portal-blue.svg"
                   alt="Yuanta"
-                  className="w-auto h-8 shrink-0"
+                  className="h-8 w-auto shrink-0"
                 />
-
               </div>
               {/* Title in header — desktop only */}
               {breadcrumb ? (
                 // `flex-1` gives it a width that doesn't depend on its own
                 // content, which is what makes the measurement inside stable.
-                <div className="hidden xl:block min-w-0 flex-1">
+                <div className="hidden min-w-0 flex-1 xl:block">
                   <ResponsiveBreadcrumb items={breadcrumb} />
                 </div>
               ) : (
-                <div className="hidden xl:flex items-center gap-3">
+                <div className="hidden items-center gap-3 xl:flex">
                   {PageTitleIcon && (
                     <PageTitleIcon
                       size={20}
                       weight="fill"
-                      className="text-foreground shrink-0"
+                      className="shrink-0 text-foreground"
                       aria-hidden
                     />
                   )}
-                  {pageTitle && (
-                    <h1 className="type-subtitle-1 text-foreground">
-                      {pageTitle}
-                    </h1>
-                  )}
+                  {pageTitle && <h1 className="type-subtitle-1 text-foreground">{pageTitle}</h1>}
                 </div>
               )}
             </div>
@@ -257,8 +243,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               isFullWidth || isEdgeToEdge ? "" : isMobileFullBleed ? "xl:p-6" : "p-4 xl:p-6"
             } ${
               isFullHeight
-                ? "flex flex-col min-h-0 overflow-y-hidden"
-                : "overflow-y-auto [scrollbar-gutter:stable]"
+                ? "flex min-h-0 flex-col overflow-y-hidden"
+                : "[scrollbar-gutter:stable] overflow-y-auto"
             }`}
           >
             {/* Mobile/tablet breadcrumb — the top bar has no room for it next
@@ -284,42 +270,35 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               key={pathname}
               className={`${
                 isFullWidth
-                  ? "w-full min-h-full"
+                  ? "min-h-full w-full"
                   : isEdgeToEdge
                     ? "w-full"
-                    : "max-w-[1280px] mx-auto"
-              } flex flex-col gap-3 xl:gap-6 ${isFullHeight ? "w-full flex-1 min-h-0" : ""}`}
+                    : "mx-auto max-w-[1280px]"
+              } flex flex-col gap-3 xl:gap-6 ${isFullHeight ? "min-h-0 w-full flex-1" : ""}`}
             >
-              {!breadcrumb &&
-                !isFullWidth &&
-                !isMobileFullBleed &&
-                pageTitle && (
-                  <div className="flex items-center justify-between gap-3 xl:hidden">
-                    <div className="flex items-center gap-3">
-                      {PageTitleIcon && (
-                        <PageTitleIcon
-                          size={20}
-                          weight="fill"
-                          className="text-foreground shrink-0"
-                          aria-hidden
-                        />
-                      )}
-                      {pageTitle && (
-                        <h1 className="type-h5 text-foreground">{pageTitle}</h1>
-                      )}
-                    </div>
-                    {isPerformance && (
-                      <div
-                        className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 shrink-0"
-                        style={{ background: "#1e2337" }}
-                      >
-                        <span className="text-body-sm font-bold text-white leading-none">
-                          B+
-                        </span>
-                      </div>
+              {!breadcrumb && !isFullWidth && !isMobileFullBleed && pageTitle && (
+                <div className="flex items-center justify-between gap-3 xl:hidden">
+                  <div className="flex items-center gap-3">
+                    {PageTitleIcon && (
+                      <PageTitleIcon
+                        size={20}
+                        weight="fill"
+                        className="shrink-0 text-foreground"
+                        aria-hidden
+                      />
                     )}
+                    {pageTitle && <h1 className="type-h5 text-foreground">{pageTitle}</h1>}
                   </div>
-                )}
+                  {isPerformance && (
+                    <div
+                      className="flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1"
+                      style={{ background: "#1e2337" }}
+                    >
+                      <span className="text-body-sm leading-none font-bold text-white">B+</span>
+                    </div>
+                  )}
+                </div>
+              )}
               {children}
             </FadeIn>
           </main>
@@ -348,11 +327,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <PrivacyProvider>
       <NotesProvider>

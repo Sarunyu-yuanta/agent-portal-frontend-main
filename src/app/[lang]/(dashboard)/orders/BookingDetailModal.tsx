@@ -68,10 +68,7 @@ import { useLocale } from "@/i18n/I18nProvider";
  * keeps the app's own blue, and a bookmark rather than a magnifying glass:
  * nothing is under review, the booking is simply placed.
  */
-const PHASE_DISC: Record<
-  BookingPhase,
-  { tone: Tone; glyph: React.ReactNode }
-> = {
+const PHASE_DISC: Record<BookingPhase, { tone: Tone; glyph: React.ReactNode }> = {
   pending: { tone: "primary", glyph: <BookmarkSimpleIcon size={28} weight="fill" /> },
   processing: { tone: "yellow", glyph: <HourglassMediumIcon size={28} weight="fill" /> },
   completed: { tone: "green", glyph: <CheckIcon size={30} weight="bold" /> },
@@ -236,13 +233,15 @@ function Body({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
+        <div className="flex flex-col items-center px-6 pt-2 pb-6 text-center">
           {/* The disc, in the status's own colour, with the step it is at
               named under it. A stepper lived here for a while and said more
               than the sheet needed: three labels and two connectors to answer
               "where is this", which one circle and one word answer. */}
           <StatusDisc variant={PHASE_DISC[phase].tone}>{PHASE_DISC[phase].glyph}</StatusDisc>
-          <p className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[PHASE_DISC[phase].tone].text}`}>
+          <p
+            className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[PHASE_DISC[phase].tone].text}`}
+          >
             {t.orders.phase[book.mode][phase]}
           </p>
           {/* The product, with the desk as its badge — the sheet is reached
@@ -265,11 +264,14 @@ function Body({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
+        <div className="flex flex-col gap-3 px-5 pt-2 pb-5 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
             <SheetBlock title={words.detailSection}>
               <ClientRow clientId={booking.clientId} name={name} />
-              <SheetRow label={t.orders.field.fullNameTh} value={maskName(profile.nameTh, isPrivate)} />
+              <SheetRow
+                label={t.orders.field.fullNameTh}
+                value={maskName(profile.nameTh, isPrivate)}
+              />
               <SheetRow label={t.orders.field.accountNo} value={profile.accountNo} />
               <SheetRow label={t.orders.field.icName} value={booking.createdBy} />
               <SheetRow label={words.placedAt} value={formatLogTime(booking.createdAt, locale)} />
@@ -304,7 +306,13 @@ function Body({
                     <span className="inline-flex items-center gap-1.5 text-body-sm font-bold text-foreground">
                       {(() => {
                         const Icon = EVIDENCE_CHANNEL[booking.evidence.channel].icon;
-                        return <Icon size={15} weight="fill" className="shrink-0 text-muted-foreground" />;
+                        return (
+                          <Icon
+                            size={15}
+                            weight="fill"
+                            className="shrink-0 text-muted-foreground"
+                          />
+                        );
                       })()}
                       {t.orders.evidence[booking.evidence.channel].label}
                     </span>
@@ -335,7 +343,10 @@ function Body({
                         </span>
                       </SheetRow>
                       {booking.evidence.fileSize != null && (
-                        <SheetRow label={t.orders.evidenceSheet.size} value={formatFileSize(booking.evidence.fileSize)} />
+                        <SheetRow
+                          label={t.orders.evidenceSheet.size}
+                          value={formatFileSize(booking.evidence.fileSize)}
+                        />
                       )}
                     </>
                   )}
@@ -346,7 +357,10 @@ function Body({
                       </span>
                     </SheetRow>
                   )}
-                  <SheetRow label={t.orders.evidenceSheet.attachedAt} value={formatLogTime(booking.evidence.attachedAt, locale)} />
+                  <SheetRow
+                    label={t.orders.evidenceSheet.attachedAt}
+                    value={formatLogTime(booking.evidence.attachedAt, locale)}
+                  />
                 </SheetBlock>
               </>
             )}
@@ -402,7 +416,9 @@ function Body({
               cancelled ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">{t.orders.field.notionalAmount}</p>
+            <p className="text-body-sm font-bold text-foreground">
+              {t.orders.field.notionalAmount}
+            </p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 cancelled ? "text-muted-foreground line-through" : "text-primary-action"

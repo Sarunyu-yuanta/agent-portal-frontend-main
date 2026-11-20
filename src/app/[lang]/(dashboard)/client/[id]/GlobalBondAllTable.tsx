@@ -43,10 +43,13 @@ export function GlobalBondAllTable({
   if (bonds.length === 0) {
     return (
       <div
-        className="w-full rounded-xl overflow-hidden bg-white px-4"
+        className="w-full overflow-hidden rounded-xl bg-white px-4"
         style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_CARD_STYLE.boxShadow }}
       >
-        <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
+        <CatalogSectionEmpty
+          title={t.products.states.noGlobalBonds}
+          onClearFilters={onClearFilters}
+        />
       </div>
     );
   }
@@ -64,34 +67,64 @@ export function GlobalBondAllTable({
         style={{ scrollbarWidth: "none" }}
       >
         <div className="flex items-stretch">
-          <div className={`flex h-11 shrink-0 items-center w-[400px] ${BONDS_COL_MIN_CLS} px-4 ${stickyColCls}`} style={headerBorderStyle()}>
+          <div
+            className={`flex h-11 w-[400px] shrink-0 items-center ${BONDS_COL_MIN_CLS} px-4 ${stickyColCls}`}
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.bonds}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center w-[138px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[138px] shrink-0 items-center px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.isin}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-center w-[80px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[80px] shrink-0 items-center justify-center px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.currency}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-end w-[128px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[128px] shrink-0 items-center justify-end px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-end w-[81px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[81px] shrink-0 items-center justify-end px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.price}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-end w-[180px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[180px] shrink-0 items-center justify-end px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-center w-[122px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[122px] shrink-0 items-center justify-center px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-end w-[112px] px-4" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[112px] shrink-0 items-center justify-end px-4"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-center w-[122px] px-3" style={headerBorderStyle()}>
+          <div
+            className="flex h-11 w-[122px] shrink-0 items-center justify-center px-3"
+            style={headerBorderStyle()}
+          >
             <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.documents}</span>
           </div>
-          <div className="flex h-11 shrink-0 items-center justify-center w-[138px] px-4" style={headerBorderStyle({ right: false })} />
+          <div
+            className="flex h-11 w-[138px] shrink-0 items-center justify-center px-4"
+            style={headerBorderStyle({ right: false })}
+          />
         </div>
       </div>
 
@@ -104,40 +137,69 @@ export function GlobalBondAllTable({
             return (
               <div key={row.id} className="flex items-stretch">
                 <div
-                  className={`flex items-center gap-2 min-w-0 w-[400px] ${BONDS_COL_MIN_CLS} shrink-0 px-4 py-3.5 h-[65px] overflow-hidden ${stickyColCls}`}
+                  className={`flex w-[400px] min-w-0 items-center gap-2 ${BONDS_COL_MIN_CLS} h-[65px] shrink-0 overflow-hidden px-4 py-3.5 ${stickyColCls}`}
                   style={border}
                 >
                   <IssuerLogo src={row.logo} />
                   <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                    <span className="min-w-0 truncate text-sm leading-[24px] text-[#101828]">{row.name}</span>
+                    <span className="min-w-0 truncate text-sm leading-[24px] text-[#101828]">
+                      {row.name}
+                    </span>
                     {row.topPick && <TopPickTag />}
                   </div>
                 </div>
-                <div className="flex items-center w-[138px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[138px] shrink-0 items-center px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
                 </div>
-                <div className="flex items-center justify-center w-[80px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[80px] shrink-0 items-center justify-center px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
                 </div>
-                <div className="flex items-center justify-end w-[128px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[128px] shrink-0 items-center justify-end px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
                 </div>
-                <div className="flex items-center justify-end w-[81px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[81px] shrink-0 items-center justify-end px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
                 </div>
-                <div className="flex items-center justify-end w-[180px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[180px] shrink-0 items-center justify-end px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
                 </div>
-                <div className="flex items-center justify-center w-[122px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[122px] shrink-0 items-center justify-center px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
                 </div>
-                <div className="flex items-center justify-end w-[112px] shrink-0 px-4 py-3.5 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[112px] shrink-0 items-center justify-end px-4 py-3.5"
+                  style={border}
+                >
                   <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
                 </div>
-                <div className="flex items-center justify-center w-[122px] shrink-0 px-3 py-[11px] h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[122px] shrink-0 items-center justify-center px-3 py-[11px]"
+                  style={border}
+                >
                   <FactsheetButton />
                 </div>
-                <div className="flex items-center justify-center w-[138px] shrink-0 px-4 py-3 h-[65px]" style={border}>
+                <div
+                  className="flex h-[65px] w-[138px] shrink-0 items-center justify-center px-4 py-3"
+                  style={border}
+                >
                   <GlobalBondListCta row={row} href={INVEST_URL} />
                 </div>
               </div>

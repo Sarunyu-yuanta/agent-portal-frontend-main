@@ -70,11 +70,17 @@ export function OrderSubmissionDetailModal({
     >
       {target !== null &&
         (isLoading ? (
-          <p className="px-6 py-16 text-center type-body-2 text-muted-foreground">{t.common.loading}</p>
+          <p className="type-body-2 px-6 py-16 text-center text-muted-foreground">
+            {t.common.loading}
+          </p>
         ) : book && submission ? (
           <Body book={book} submission={submission} onClose={onClose} />
         ) : (
-          <NotFoundState message={t.states.notFoundOrder} onBack={onClose} backLabel={t.common.close} />
+          <NotFoundState
+            message={t.states.notFoundOrder}
+            onBack={onClose}
+            backLabel={t.common.close}
+          />
         ))}
     </ResponsiveBottomSheetModal>
   );
@@ -120,7 +126,7 @@ function Body({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
+        <div className="flex flex-col items-center px-6 pt-2 pb-6 text-center">
           <StatusDisc variant={tone}>
             {rejected ? <XIcon size={30} weight="bold" /> : <CheckIcon size={30} weight="bold" />}
           </StatusDisc>
@@ -137,15 +143,20 @@ function Body({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
+        <div className="flex flex-col gap-3 px-5 pt-2 pb-5 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
             <SheetBlock title={t.orders.submission.title}>
               <CopyRow label={t.orders.orderRef} value={submission.backendRef} />
-              <SheetRow label={t.orders.submission.sentAt} value={formatLogTime(submission.submittedAt, locale)} />
+              <SheetRow
+                label={t.orders.submission.sentAt}
+                value={formatLogTime(submission.submittedAt, locale)}
+              />
               <SheetRow label={t.orders.submission.sentBy} value={submission.submittedBy} />
               {submission.settledAt && (
                 <SheetRow
-                  label={rejected ? t.orders.submission.rejectedAt : t.orders.submission.completedAt}
+                  label={
+                    rejected ? t.orders.submission.rejectedAt : t.orders.submission.completedAt
+                  }
                   value={formatLogTime(submission.settledAt, locale)}
                 />
               )}
@@ -170,7 +181,7 @@ function Body({
                         </span>
                         <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
                       </Link>
-                      <span className="shrink-0 text-body-sm font-semibold tabular-nums text-foreground">
+                      <span className="shrink-0 text-body-sm font-semibold text-foreground tabular-nums">
                         {formatOrderAmount(b.amount, book.currency)}
                       </span>
                     </div>
@@ -185,7 +196,9 @@ function Body({
               rejected ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">{t.orders.field.notionalAmount}</p>
+            <p className="text-body-sm font-bold text-foreground">
+              {t.orders.field.notionalAmount}
+            </p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 rejected ? "text-muted-foreground line-through" : "text-primary-action"

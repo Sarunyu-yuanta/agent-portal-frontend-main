@@ -22,11 +22,7 @@
  */
 
 import { useMemo, useState } from "react";
-import {
-  ArrowLeftIcon,
-  CaretRightIcon,
-  ClipboardTextIcon,
-} from "@phosphor-icons/react";
+import { ArrowLeftIcon, CaretRightIcon, ClipboardTextIcon } from "@phosphor-icons/react";
 import {
   Avatar,
   Button,
@@ -67,7 +63,12 @@ import {
 } from "../../bookable-products";
 
 /** Stands in while no booking is open — see `OrderRecordsTable`. */
-const FALLBACK_PRODUCT = { id: "", tags: [], currency: "", minInvestment: "0" } as unknown as BookableProduct;
+const FALLBACK_PRODUCT = {
+  id: "",
+  tags: [],
+  currency: "",
+  minInvestment: "0",
+} as unknown as BookableProduct;
 import { BookingDetailModal } from "../../BookingDetailModal";
 import { useClientReadiness } from "../../use-order-books";
 import { useToasts } from "@/hooks/use-toasts";
@@ -108,7 +109,12 @@ export function ClientOrdersDetail({
     : null;
   const openedProduct = opened ? findBookableProduct(opened.book.productId) : undefined;
   const readiness = useClientReadiness(client, openedProduct ?? FALLBACK_PRODUCT);
-  const { data: books, isLoading: booksLoading, error: booksError, retry: retryBooks } = useOrderBooks();
+  const {
+    data: books,
+    isLoading: booksLoading,
+    error: booksError,
+    retry: retryBooks,
+  } = useOrderBooks();
   const back = useSectionBack(() => `${ordersListHref(tabId)}`);
 
   const profile = getAccountIdentity(client.id);
@@ -181,9 +187,7 @@ export function ClientOrdersDetail({
               {/* The client's own rating, which is a fact about the person and
                   so belongs on the person's page. What any one product asks of
                   it is on that product's booking form. */}
-              {client.riskProfile && (
-                <Tag text={client.riskProfile} variant="blue" size="large" />
-              )}
+              {client.riskProfile && <Tag text={client.riskProfile} variant="blue" size="large" />}
             </div>
             <p className="type-caption truncate text-muted-foreground">
               {t.orders.clientPage.subtitle(client.id, profile.accountNo, desk)}
@@ -205,7 +209,7 @@ export function ClientOrdersDetail({
               [...totals].map(([currency, amount]) => (
                 <span
                   key={currency}
-                  className="type-h5 font-bold whitespace-nowrap tabular-nums text-foreground"
+                  className="type-h5 font-bold whitespace-nowrap text-foreground tabular-nums"
                 >
                   {formatOrderAmount(amount, currency)}
                 </span>
@@ -215,8 +219,10 @@ export function ClientOrdersDetail({
         </div>
 
         <div className="flex flex-col justify-center gap-0.5 self-stretch border-l border-border px-6">
-          <span className="type-caption whitespace-nowrap text-muted-foreground">{t.orders.clientPage.products}</span>
-          <span className="type-body-2 !font-semibold whitespace-nowrap tabular-nums text-foreground">
+          <span className="type-caption whitespace-nowrap text-muted-foreground">
+            {t.orders.clientPage.products}
+          </span>
+          <span className="type-body-2 !font-semibold whitespace-nowrap text-foreground tabular-nums">
             {t.orders.clientPage.productCount(holdings.length)}
           </span>
         </div>
@@ -251,15 +257,25 @@ export function ClientOrdersDetail({
           }
         />
       ) : (
-        <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
-          <Table className="table-fixed min-w-[880px]">
+        <div className="table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)]">
+          <Table className="min-w-[880px] table-fixed">
             <TableHead>
               <TableRow>
-                <TableHeaderCell className="w-[34%]">{t.orders.clientPage.col.product}</TableHeaderCell>
-                <TableHeaderCell className="w-[18%] whitespace-nowrap">{t.orders.clientPage.col.booked}</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.deal}</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.payment}</TableHeaderCell>
-                <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.clientPage.col.updated}</TableHeaderCell>
+                <TableHeaderCell className="w-[34%]">
+                  {t.orders.clientPage.col.product}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[18%] whitespace-nowrap">
+                  {t.orders.clientPage.col.booked}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">
+                  {t.orders.clientPage.col.deal}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">
+                  {t.orders.clientPage.col.payment}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[16%] whitespace-nowrap">
+                  {t.orders.clientPage.col.updated}
+                </TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -281,7 +297,7 @@ export function ClientOrdersDetail({
                       hoverable
                       tabIndex={0}
                       aria-label={t.orders.clientPage.openDealAria(book.productName)}
-                      className="cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
+                      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
                       // The booking's own receipt, over this page rather than
                       // away from it — the same sheet the list opens.
                       onClick={() => setOpened({ book, booking: b })}
@@ -300,13 +316,11 @@ export function ClientOrdersDetail({
                             </p>
                             <p className="type-caption truncate text-muted-foreground">
                               {book.productType} · {book.currency} ·{" "}
-                              {t.orders.words[book.mode].placedAt} {formatLogTime(b.createdAt, locale)}
+                              {t.orders.words[book.mode].placedAt}{" "}
+                              {formatLogTime(b.createdAt, locale)}
                             </p>
                           </div>
-                          <CaretRightIcon
-                            size={14}
-                            className="shrink-0 text-muted-foreground"
-                          />
+                          <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
                         </div>
                       </TableCell>
                       <TableCell>
@@ -324,7 +338,7 @@ export function ClientOrdersDetail({
                       </TableCell>
                       <TableCell>
                         <div className="flex min-w-0 flex-col gap-1">
-                          <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
+                          <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">
                             {formatLogTime(book.logs[0]?.at ?? b.createdAt, locale)}
                           </p>
                           {/* The pre-confirmation, which has nowhere else to go

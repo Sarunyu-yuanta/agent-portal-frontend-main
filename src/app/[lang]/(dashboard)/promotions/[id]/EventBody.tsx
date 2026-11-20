@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CheckIcon,
-  LinkSimpleIcon,
-  MapPinIcon,
-  VideoCameraIcon,
-} from "@phosphor-icons/react";
+import { CheckIcon, LinkSimpleIcon, MapPinIcon, VideoCameraIcon } from "@phosphor-icons/react";
 import { Tag } from "@sarunyu/system-one";
 import type { Campaign } from "@/types/domain";
 import { campaignDay } from "../campaign-data";
@@ -35,10 +30,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
             banner directly above this section. */}
         <div className="flex flex-col gap-3">
           {campaign.description.map((paragraph) => (
-            <p
-              key={paragraph}
-              className="text-body leading-relaxed text-foreground"
-            >
+            <p key={paragraph} className="text-body leading-relaxed text-foreground">
               {paragraph}
             </p>
           ))}
@@ -57,23 +49,20 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         <DetailSubsection title={t.campaigns.body.agenda}>
           <div className="flex flex-col">
             {campaign.agenda.map((item, index) => (
-              <div
-                key={`${item.time}-${item.title}`}
-                className="flex gap-3 sm:gap-4"
-              >
+              <div key={`${item.time}-${item.title}`} className="flex gap-3 sm:gap-4">
                 <div className="flex w-[82px] shrink-0 flex-col items-end pt-0.5 sm:w-[104px]">
-                  <span className="text-label font-semibold tabular-nums text-accent-orange">
+                  <span className="text-accent-orange text-label font-semibold tabular-nums">
                     {item.time}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary-action" />
+                  <span className="bg-primary-action mt-1.5 size-2 shrink-0 rounded-full" />
                   {index < (campaign.agenda?.length ?? 0) - 1 && (
                     <span className="w-px flex-1 bg-border" />
                   )}
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-5">
-                  <p className="text-body-sm font-semibold leading-snug text-foreground">
+                  <p className="text-body-sm leading-snug font-semibold text-foreground">
                     {item.title}
                   </p>
                   {item.speaker && (
@@ -92,10 +81,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
         <DetailSubsection title={t.campaigns.body.speakers}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {campaign.speakers.map((speaker) => (
-              <div
-                key={speaker.name}
-                className="flex items-center gap-3"
-              >
+              <div key={speaker.name} className="flex items-center gap-3">
                 {speaker.photo ? (
                   // eslint-disable-next-line @next/next/no-img-element -- fixed-size headshot, no responsive sizes needed
                   <img
@@ -112,12 +98,10 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
                   </span>
                 )}
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="text-body-sm font-bold leading-snug text-foreground">
+                  <p className="text-body-sm leading-snug font-bold text-foreground">
                     {speaker.name}
                   </p>
-                  <p className="text-label leading-snug text-muted-foreground">
-                    {speaker.title}
-                  </p>
+                  <p className="text-label leading-snug text-muted-foreground">{speaker.title}</p>
                 </div>
               </div>
             ))}
@@ -139,14 +123,10 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
               )}
             </span>
             <div className="flex min-w-0 flex-col gap-0.5">
-              <p className="text-body-sm font-semibold text-foreground">
-                {campaign.venue ?? "—"}
-              </p>
+              <p className="text-body-sm font-semibold text-foreground">{campaign.venue ?? "—"}</p>
               <p className="text-label text-muted-foreground">
                 {campaign.eventDate ? campaignDay(campaign.eventDate, locale) : "—"}
-                {campaign.seatsTotal
-                  ? t.campaigns.body.totalSeats(campaign.seatsTotal)
-                  : ""}
+                {campaign.seatsTotal ? t.campaigns.body.totalSeats(campaign.seatsTotal) : ""}
               </p>
             </div>
           </div>
@@ -156,7 +136,7 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
               href={campaign.joinUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 break-all text-label font-medium text-primary-action hover:underline"
+              className="text-primary-action flex items-center gap-1.5 text-label font-medium break-all hover:underline"
             >
               <LinkSimpleIcon size={14} weight="bold" className="shrink-0" />
               {campaign.joinUrl}
@@ -168,20 +148,15 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
       <DetailSubsection title={t.campaigns.body.conditions}>
         <ul className="flex list-none flex-col gap-3 p-0">
           {campaign.conditions.map((condition) => (
-            <li
-              key={condition}
-              className="flex items-start gap-3 text-body-sm leading-relaxed"
-            >
+            <li key={condition} className="flex items-start gap-3 text-body-sm leading-relaxed">
               {/* One line tall, so the badge centres on the first line of
                   text rather than sitting on its top edge. */}
               <span aria-hidden className="flex h-lh shrink-0 items-center">
-                <span className="flex size-6 items-center justify-center rounded-full bg-primary-action-light text-primary-action">
+                <span className="bg-primary-action-light text-primary-action flex size-6 items-center justify-center rounded-full">
                   <CheckIcon size={13} weight="bold" />
                 </span>
               </span>
-              <span className="text-foreground">
-                {condition}
-              </span>
+              <span className="text-foreground">{condition}</span>
             </li>
           ))}
         </ul>
@@ -190,18 +165,13 @@ export function EventBody({ campaign }: { campaign: Campaign }) {
       <DetailSubsection title={t.campaigns.body.terms}>
         <ol className="flex list-none flex-col gap-3 p-0">
           {campaign.terms.map((term, index) => (
-            <li
-              key={term}
-              className="flex items-start gap-3 text-body-sm leading-relaxed"
-            >
+            <li key={term} className="flex items-start gap-3 text-body-sm leading-relaxed">
               <span className="flex h-lh shrink-0 items-center">
-                <span className="flex size-6 items-center justify-center rounded-full bg-primary-action-light text-meta font-bold tabular-nums text-primary-action">
+                <span className="bg-primary-action-light text-primary-action flex size-6 items-center justify-center rounded-full text-meta font-bold tabular-nums">
                   {index + 1}
                 </span>
               </span>
-              <span className="text-foreground">
-                {term}
-              </span>
+              <span className="text-foreground">{term}</span>
             </li>
           ))}
         </ol>

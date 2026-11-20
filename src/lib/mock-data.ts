@@ -13,12 +13,12 @@ import notificationsRaw from "@/data/notifications.json";
 
 // ── Narrow string-literal types that JSON cannot express ──────────────────────
 
-type ClientStatus    = "success" | "error" | "hold" | "processing";
+type ClientStatus = "success" | "error" | "hold" | "processing";
 type PriorityVariant = "red" | "yellow" | "blue";
-type ComplianceType  = "critical" | "warning";
-type KYCStatus       = "success" | "error" | "hold" | "processing";
+type ComplianceType = "critical" | "warning";
+type KYCStatus = "success" | "error" | "hold" | "processing";
 type ConvictionVariant = "green" | "yellow" | "red";
-type NotificationType  = "icon";
+type NotificationType = "icon";
 type PerformanceStatus = "Lagging" | "On Track";
 
 // ── Single source of truth: client name lives only in clients.json ────────────
@@ -126,35 +126,78 @@ export const mockComplianceAlerts = complianceAlertsRaw.map((a) => ({
 }));
 
 export const mockHouseViewStrategies = houseViewStrategiesRaw as Array<
-  Omit<(typeof houseViewStrategiesRaw)[number], "convictionVariant"> & { convictionVariant: ConvictionVariant }
+  Omit<(typeof houseViewStrategiesRaw)[number], "convictionVariant"> & {
+    convictionVariant: ConvictionVariant;
+  }
 >;
 
 export type AnalystItem = { id: string; name: string; title: string; photo: string };
 
 export const mockAnalysts: AnalystItem[] = [
-  { id: "a01", name: "ธนกร ศิริวัฒน์",    title: "หัวหน้าฝ่ายวิเคราะห์หลักทรัพย์", photo: "/avatars/analyst-01.jpg" },
-  { id: "a02", name: "ปิยะ เจริญสุข",      title: "นักกลยุทธ์การลงทุน และนักวิเคราะห์ปัจจัยพื้นฐาน กลุ่มธนาคารและอสังหาริมทรัพย์", photo: "/avatars/analyst-02.jpg" },
-  { id: "a03", name: "วรากร ทองสุข",       title: "นักวิเคราะห์ปัจจัยทางเทคนิค", photo: "/avatars/analyst-03.jpg" },
-  { id: "a04", name: "อรรถพล ไชยวงศ์",     title: "นักวิเคราะห์ปัจจัยทางเทคนิค", photo: "/avatars/analyst-04.jpg" },
-  { id: "a05", name: "สุพจน์ มั่นคง",      title: "นักวิเคราะห์ปัจจัยพื้นฐาน กลุ่มพลังงานและปิโตรเคมี", photo: "/avatars/analyst-05.jpg" },
+  {
+    id: "a01",
+    name: "ธนกร ศิริวัฒน์",
+    title: "หัวหน้าฝ่ายวิเคราะห์หลักทรัพย์",
+    photo: "/avatars/analyst-01.jpg",
+  },
+  {
+    id: "a02",
+    name: "ปิยะ เจริญสุข",
+    title: "นักกลยุทธ์การลงทุน และนักวิเคราะห์ปัจจัยพื้นฐาน กลุ่มธนาคารและอสังหาริมทรัพย์",
+    photo: "/avatars/analyst-02.jpg",
+  },
+  {
+    id: "a03",
+    name: "วรากร ทองสุข",
+    title: "นักวิเคราะห์ปัจจัยทางเทคนิค",
+    photo: "/avatars/analyst-03.jpg",
+  },
+  {
+    id: "a04",
+    name: "อรรถพล ไชยวงศ์",
+    title: "นักวิเคราะห์ปัจจัยทางเทคนิค",
+    photo: "/avatars/analyst-04.jpg",
+  },
+  {
+    id: "a05",
+    name: "สุพจน์ มั่นคง",
+    title: "นักวิเคราะห์ปัจจัยพื้นฐาน กลุ่มพลังงานและปิโตรเคมี",
+    photo: "/avatars/analyst-05.jpg",
+  },
   { id: "a06", name: "ชัยวัฒน์ พูนทรัพย์", title: "นักวิเคราะห์อนุพันธ์", photo: "/avatars/analyst-06.jpg" },
-  { id: "a07", name: "กิตติพงษ์ รุ่งเรือง", title: "นักวิเคราะห์ตราสารหนี้", photo: "/avatars/analyst-07.jpg" },
-  { id: "a08", name: "ณัฐวุฒิ แสงทอง",     title: "ผู้เชี่ยวชาญกองทุนและผลิตภัณฑ์การลงทุน", photo: "/avatars/analyst-08.jpg" },
+  {
+    id: "a07",
+    name: "กิตติพงษ์ รุ่งเรือง",
+    title: "นักวิเคราะห์ตราสารหนี้",
+    photo: "/avatars/analyst-07.jpg",
+  },
+  {
+    id: "a08",
+    name: "ณัฐวุฒิ แสงทอง",
+    title: "ผู้เชี่ยวชาญกองทุนและผลิตภัณฑ์การลงทุน",
+    photo: "/avatars/analyst-08.jpg",
+  },
 ];
 
 export const mockPerformanceData = performanceRaw as typeof performanceRaw & {
-  revenueYtd:         { status: PerformanceStatus };
-  aumGrowth:          { status: PerformanceStatus };
-  netNewMoney:        { status: PerformanceStatus };
+  revenueYtd: { status: PerformanceStatus };
+  aumGrowth: { status: PerformanceStatus };
+  netNewMoney: { status: PerformanceStatus };
   productPenetration: { status: PerformanceStatus };
 };
 
 // ── ClientDetail types (kept here for page imports) ───────────────────────────
 
 type AllocationSlice = { name: string; value: number; fill: string };
-type AllocationKpi   = { label: string; value: string; ytd: string; ytdPositive: boolean; warning?: string };
+type AllocationKpi = {
+  label: string;
+  value: string;
+  ytd: string;
+  ytdPositive: boolean;
+  warning?: string;
+};
 type AssetAllocationSlice = { label: string; percent: number; statusIcon: string };
-type AssetSummary    = {
+type AssetSummary = {
   netValue: string;
   changeAmount: string;
   changePercent: string;
@@ -165,19 +208,26 @@ type AssetSummary    = {
   lastUpdatedTime: string;
   allocationSlices?: AssetAllocationSlice[];
 };
-type Holding         = { asset: string; value: string; pnl: string; pnlPct: string; positive: boolean; pct: string };
-type AIAlert         = { title: string; message: string; primaryAction: string; secondaryAction: string };
+type Holding = {
+  asset: string;
+  value: string;
+  pnl: string;
+  pnlPct: string;
+  positive: boolean;
+  pct: string;
+};
+type AIAlert = { title: string; message: string; primaryAction: string; secondaryAction: string };
 
 export type ClientDetail = {
-  assetSummary?:     AssetSummary;
-  allocationData:    AllocationSlice[];
+  assetSummary?: AssetSummary;
+  allocationData: AllocationSlice[];
   allocationBreakdown: AllocationKpi[];
-  topHoldings:       Holding[];
+  topHoldings: Holding[];
   behavioralProfile: { label: string; value: string }[];
-  tasks:             { id: string; done: boolean; task: string; urgent: boolean }[];
-  recentActivity:    { label: string; description: string; date: string; dotColor: string }[];
-  aiHighPriority:    AIAlert | null;
-  aiRiskAlert:       { title: string; message: string; action: string } | null;
+  tasks: { id: string; done: boolean; task: string; urgent: boolean }[];
+  recentActivity: { label: string; description: string; date: string; dotColor: string }[];
+  aiHighPriority: AIAlert | null;
+  aiRiskAlert: { title: string; message: string; action: string } | null;
 };
 
 export const mockClientDetails = clientDetailsRaw as Record<string, ClientDetail>;
@@ -185,7 +235,11 @@ export const mockClientDetails = clientDetailsRaw as Record<string, ClientDetail
 export const notificationGroups = notificationsRaw as Array<{
   label: string;
   items: Array<{
-    id: string; title: string; description: string;
-    time: string; unread: boolean; type: NotificationType;
+    id: string;
+    title: string;
+    description: string;
+    time: string;
+    unread: boolean;
+    type: NotificationType;
   }>;
 }>;

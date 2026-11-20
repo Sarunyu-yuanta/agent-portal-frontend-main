@@ -2,19 +2,12 @@
 
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useState } from "react";
-import {
-  CaretRightIcon,
-  IdentificationCardIcon,
-  ShieldCheckIcon,
-} from "@phosphor-icons/react";
+import { CaretRightIcon, IdentificationCardIcon, ShieldCheckIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SlideSteps } from "@/components/ui/slide-steps";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { HolderContact, HolderContactOverlay } from "../calendar/HolderContact";
-import {
-  kycCheckpointTextTone,
-  kycCheckpointTone,
-} from "../use-kyc-notification-feed";
+import { kycCheckpointTextTone, kycCheckpointTone } from "../use-kyc-notification-feed";
 import { CardCount, RowIcon } from "./CardHeader";
 import { groupQueueByBucket, type QueueItem } from "./dashboard-data";
 import { useT } from "@/i18n/I18nProvider";
@@ -160,16 +153,12 @@ export function KycAlertsPanel({
 
           {/* One surface with rules inside, matching the Call Log card across the
               page: the border and fill belong to the list, a row only hovers. */}
-          <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+          <div className="divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
             {visible.map((row) => (
               <KycRow key={row.id} row={row} onOpen={() => openContact(row)} />
             ))}
             {hidden.length > 0 && (
-              <MoreRow
-                rows={hidden}
-                sole={visible.length === 0}
-                onOpen={() => setAllOpen(true)}
-              />
+              <MoreRow rows={hidden} sole={visible.length === 0} onOpen={() => setAllOpen(true)} />
             )}
           </div>
         </div>
@@ -198,13 +187,9 @@ export function KycAlertsPanel({
                     <p className="type-caption font-semibold text-muted-foreground">
                       {t.buckets.reminder[group.bucket]}
                     </p>
-                    <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+                    <div className="divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
                       {group.items.map((row) => (
-                        <KycRow
-                          key={row.id}
-                          row={row}
-                          onOpen={() => openSheetContact(row)}
-                        />
+                        <KycRow key={row.id} row={row} onOpen={() => openSheetContact(row)} />
                       ))}
                     </div>
                   </div>
@@ -310,15 +295,7 @@ export function countdownLabel(daysLeft: number, t: Dictionary): string {
  * today's data the two on show are ten days over and due today, and the first
  * one cut is due *tomorrow*. Urgency does not stop at the fold.
  */
-function MoreRow({
-  rows,
-  sole,
-  onOpen,
-}: {
-  rows: QueueItem[];
-  sole: boolean;
-  onOpen: () => void;
-}) {
+function MoreRow({ rows, sole, onOpen }: { rows: QueueItem[]; sole: boolean; onOpen: () => void }) {
   const t = useT();
   const next = rows[0];
   return (
@@ -329,20 +306,17 @@ function MoreRow({
     >
       <p className="min-w-0 flex-1 truncate text-body-sm text-foreground">
         <span className="font-bold">
-          {sole ? t.commandCenter.viewAllItems(rows.length) : t.commandCenter.moreItems(rows.length)}
+          {sole
+            ? t.commandCenter.viewAllItems(rows.length)
+            : t.commandCenter.moreItems(rows.length)}
         </span>
         <span className="text-muted-foreground">{t.commandCenter.kyc.nearestSeparator}</span>
-        <span
-          className={`font-semibold ${kycCheckpointTextTone(next.daysLeft)}`}
-        >
+        <span className={`font-semibold ${kycCheckpointTextTone(next.daysLeft)}`}>
           {countdownLabel(next.daysLeft, t)}
         </span>
       </p>
 
-      <CaretRightIcon
-        size={16}
-        className="shrink-0 text-[var(--text-default-placeholder)]"
-      />
+      <CaretRightIcon size={16} className="shrink-0 text-[var(--text-default-placeholder)]" />
     </button>
   );
 }
@@ -371,19 +345,15 @@ export function KycRow({
           onOpen();
         }
       }}
-      className="flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-[var(--fill-p1-100)]"
+      className="flex cursor-pointer items-center gap-3 p-3 transition-colors hover:bg-[var(--fill-p1-100)]"
     >
       <RowIcon tone={tone}>
         <IdentificationCardIcon size={18} weight="duotone" />
       </RowIcon>
 
-      <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-        <p className="truncate text-body font-bold text-foreground">
-          {row.title}
-        </p>
-        <p className="truncate text-meta text-muted-foreground">
-          {row.detail}
-        </p>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <p className="truncate text-body font-bold text-foreground">{row.title}</p>
+        <p className="truncate text-meta text-muted-foreground">{row.detail}</p>
       </div>
 
       {showBadge ? (

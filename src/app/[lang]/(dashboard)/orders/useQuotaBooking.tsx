@@ -38,10 +38,7 @@ export function useQuotaBooking(options?: {
    * Opens the order modal on this product. `onBack` gives the client list a
    * back arrow to the step that opened it — see `CreateOrderButton`.
    */
-  book: (
-    product: BookableProduct,
-    options?: { onBack?: () => void; clientId?: string },
-  ) => void;
+  book: (product: BookableProduct, options?: { onBack?: () => void; clientId?: string }) => void;
   /**
    * Reports into this page's one toast stack.
    *
@@ -111,10 +108,7 @@ export function useQuotaBooking(options?: {
     </>
   );
 
-  const book = (
-    next: BookableProduct,
-    options?: { onBack?: () => void; clientId?: string },
-  ) => {
+  const book = (next: BookableProduct, options?: { onBack?: () => void; clientId?: string }) => {
     // Wrapped: a function handed to a state setter is called as an updater.
     setOnBack(() => options?.onBack ?? null);
     setFixedClientId(options?.clientId);

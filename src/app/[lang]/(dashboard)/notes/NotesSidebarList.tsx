@@ -226,8 +226,7 @@ export function NotesSidebarList({
   const filtered = useMemo(() => {
     let result = notes;
     if (filter === "clients") result = result.filter((n) => n.clientIds.length > 0);
-    if (filter === "reminders")
-      result = result.filter((n) => n.reminderAt && !n.reminderDone);
+    if (filter === "reminders") result = result.filter((n) => n.reminderAt && !n.reminderDone);
     const q = search.trim().toLowerCase();
     if (q) {
       result = result.filter(
@@ -285,8 +284,8 @@ export function NotesSidebarList({
   );
 
   return (
-    <div className="flex flex-col h-full min-h-0">
-      <div className="flex flex-col gap-2 p-3 shrink-0">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 flex-col gap-2 p-3">
         {/* Escape clears, from anywhere in the field. The wrapper carries the
             handler because `SearchInput` takes no `onKeyDown` — the event
             bubbles out of the input either way. */}
@@ -325,7 +324,7 @@ export function NotesSidebarList({
       <Tabs
         value={filter}
         onValueChange={(v) => setFilter(v as Filter)}
-        className="px-3 pb-2 shrink-0"
+        className="shrink-0 px-3 pb-2"
       >
         <TabsList aria-label={copy.filterNotes} className="w-full">
           {FILTERS.map((id) => (
@@ -348,16 +347,14 @@ export function NotesSidebarList({
        * before you have to wonder.
        */}
       {searchActive && (
-        <div className="px-3 pb-2 shrink-0">
+        <div className="shrink-0 px-3 pb-2">
           <button
             type="button"
             onClick={() => setSearch("")}
-            className="flex w-full items-center gap-1.5 rounded-lg bg-[var(--bg-default-secondary)] px-2.5 py-1.5 type-caption text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--fill-gray-200)]! hover:text-foreground"
+            className="type-caption flex w-full cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--bg-default-secondary)] px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-[var(--fill-gray-200)]! hover:text-foreground"
           >
             <XIcon size={12} weight="bold" className="shrink-0" />
-            <span className="truncate">
-              {copy.clearSearch(filtered.length, notes.length)}
-            </span>
+            <span className="truncate">{copy.clearSearch(filtered.length, notes.length)}</span>
           </button>
         </div>
       )}
@@ -378,22 +375,18 @@ export function NotesSidebarList({
           was only ever guarding a one-off shift when the list crosses its scroll
           threshold, and the jitter that prompted it turned out to be a
           state-ordering bug in `NotesSplitView`. Not worth the trade. */}
-      <div className="group/list flex-1 min-h-0 overflow-y-auto [overflow-anchor:none]">
+      <div className="group/list min-h-0 flex-1 overflow-y-auto [overflow-anchor:none]">
         {groups.length === 0 ? (
           <div className="flex flex-col gap-1 px-6 py-10 text-center">
             <p className="type-body-2 text-muted-foreground">{empty.title}</p>
-            {empty.hint && (
-              <p className="type-caption text-muted-foreground/70">{empty.hint}</p>
-            )}
+            {empty.hint && <p className="type-caption text-muted-foreground/70">{empty.hint}</p>}
           </div>
         ) : (
           groups.map((group) => {
             // Discarding the only note in a group would otherwise leave its
             // header hanging for a frame and then pop out, which is a second
             // jump right after the row's. Collapse the whole block instead.
-            const groupExiting = group.notes.every((n) =>
-              discardingIds.includes(n.id),
-            );
+            const groupExiting = group.notes.every((n) => discardingIds.includes(n.id));
             /**
              * The mirror image on the way in: the first note of a new day brings
              * a header with it, and that header should expand in alongside the
@@ -417,18 +410,14 @@ export function NotesSidebarList({
              * keeps page load quiet: notes that arrived from the server shouldn't
              * animate in as though they had just been written.
              */
-            const groupEntering = group.notes.some((n) =>
-              n.id.startsWith(LOCAL_ID_PREFIX),
-            );
+            const groupEntering = group.notes.some((n) => n.id.startsWith(LOCAL_ID_PREFIX));
             return (
               <div
                 key={group.label}
                 aria-hidden={groupExiting || undefined}
                 style={{ transitionDuration: `${DISCARD_EXIT_MS}ms` }}
                 className={`grid transition-[grid-template-rows] ease-out ${
-                  groupExiting
-                    ? "grid-rows-[0fr] pointer-events-none"
-                    : "grid-rows-[1fr]"
+                  groupExiting ? "pointer-events-none grid-rows-[0fr]" : "grid-rows-[1fr]"
                 }`}
               >
                 <div className="overflow-hidden">
@@ -442,7 +431,7 @@ export function NotesSidebarList({
                       <div className="overflow-hidden">
                         <p
                           style={{ transitionDuration: `${DISCARD_EXIT_MS}ms` }}
-                          className={`type-caption text-muted-foreground px-4 pt-3 pb-1 transition-opacity ease-out ${
+                          className={`type-caption px-4 pt-3 pb-1 text-muted-foreground transition-opacity ease-out ${
                             groupEntering ? "starting:opacity-0" : ""
                           }`}
                         >
@@ -512,41 +501,39 @@ export function NotesSidebarList({
                             } ${expandRow ? "starting:grid-rows-[0fr]" : ""}`}
                           >
                             <div className="overflow-hidden">
-                            <div
-                              role="button"
-                              tabIndex={isDiscarding ? -1 : 0}
-                              aria-hidden={isDiscarding || undefined}
-                              onClick={() => onSelect(note.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") onSelect(note.id);
-                              }}
-                              style={{
-                                transitionDuration: `${DISCARD_EXIT_MS}ms`,
-                              }}
-                              className={`relative flex items-start mx-2 px-2.5 py-2 rounded-lg transition-[opacity,background-color] ease-out ${
-                                isDiscarding
-                                  ? "opacity-0 pointer-events-none"
-                                  : "cursor-pointer"
-                              } ${expandRow ? "starting:opacity-0" : ""} ${
-                                isSelected
-                                  ? SELECTED_ROW
-                                  : "hover:bg-[var(--bg-default-secondary)]"
-                              } ${
-                                showDivider
-                                  ? "after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-border/60"
-                                  : ""
-                              }`}
-                            >
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <p
-                                    className={`type-body-2 font-semibold truncate flex-1 text-foreground ${
-                                      isSelected ? SELECTED_TITLE : ""
-                                    }`}
-                                  >
-                                    {note.title || t.planner.notes.newNoteTitle}
-                                  </p>
-                                  {/* What's attached to the note, at a glance.
+                              <div
+                                role="button"
+                                tabIndex={isDiscarding ? -1 : 0}
+                                aria-hidden={isDiscarding || undefined}
+                                onClick={() => onSelect(note.id)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") onSelect(note.id);
+                                }}
+                                style={{
+                                  transitionDuration: `${DISCARD_EXIT_MS}ms`,
+                                }}
+                                className={`relative mx-2 flex items-start rounded-lg px-2.5 py-2 transition-[opacity,background-color] ease-out ${
+                                  isDiscarding ? "pointer-events-none opacity-0" : "cursor-pointer"
+                                } ${expandRow ? "starting:opacity-0" : ""} ${
+                                  isSelected
+                                    ? SELECTED_ROW
+                                    : "hover:bg-[var(--bg-default-secondary)]"
+                                } ${
+                                  showDivider
+                                    ? "after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-border/60"
+                                    : ""
+                                }`}
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <p
+                                      className={`type-body-2 flex-1 truncate font-semibold text-foreground ${
+                                        isSelected ? SELECTED_TITLE : ""
+                                      }`}
+                                    >
+                                      {note.title || t.planner.notes.newNoteTitle}
+                                    </p>
+                                    {/* What's attached to the note, at a glance.
                                       Pinned right on the title line — the title
                                       truncates, these never do.
 
@@ -565,45 +552,45 @@ export function NotesSidebarList({
                                       selected row a red or yellow glyph fights
                                       the fill, and the detail pane already
                                       carries that state on its chip. */}
-                                  {(note.clientIds.length > 0 || note.reminderAt) && (
-                                    <span className="flex shrink-0 items-center gap-1.5">
-                                      <ClientAvatarStack
-                                        names={note.clientIds.map(nameFor)}
-                                        slots={3}
-                                        size="small"
-                                      />
-                                      {note.reminderAt && (
-                                        <BellIcon
-                                          size={13}
-                                          role="img"
-                                          aria-label={copy.hasReminder}
-                                          className={`text-muted-foreground ${
-                                            isSelected ? SELECTED_SECONDARY : ""
-                                          }`}
+                                    {(note.clientIds.length > 0 || note.reminderAt) && (
+                                      <span className="flex shrink-0 items-center gap-1.5">
+                                        <ClientAvatarStack
+                                          names={note.clientIds.map(nameFor)}
+                                          slots={3}
+                                          size="small"
                                         />
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                                <p
-                                  className={`type-caption flex items-baseline gap-1.5 text-muted-foreground ${
-                                    isSelected ? SELECTED_SECONDARY : ""
-                                  }`}
-                                >
-                                  {/* Stamp holds its width; the snippet is what gives. */}
-                                  <span
-                                    className={`shrink-0 text-foreground/70 ${
-                                      isSelected ? SELECTED_STAMP : ""
+                                        {note.reminderAt && (
+                                          <BellIcon
+                                            size={13}
+                                            role="img"
+                                            aria-label={copy.hasReminder}
+                                            className={`text-muted-foreground ${
+                                              isSelected ? SELECTED_SECONDARY : ""
+                                            }`}
+                                          />
+                                        )}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p
+                                    className={`type-caption flex items-baseline gap-1.5 text-muted-foreground ${
+                                      isSelected ? SELECTED_SECONDARY : ""
                                     }`}
                                   >
-                                    {formatListStamp(note.updatedAt, locale)}
-                                  </span>
-                                  <span className="truncate">
-                                    {snippet(note.body, undefined, t.planner.noAdditionalText)}
-                                  </span>
-                                </p>
+                                    {/* Stamp holds its width; the snippet is what gives. */}
+                                    <span
+                                      className={`shrink-0 text-foreground/70 ${
+                                        isSelected ? SELECTED_STAMP : ""
+                                      }`}
+                                    >
+                                      {formatListStamp(note.updatedAt, locale)}
+                                    </span>
+                                    <span className="truncate">
+                                      {snippet(note.body, undefined, t.planner.noAdditionalText)}
+                                    </span>
+                                  </p>
+                                </div>
                               </div>
-                            </div>
                             </div>
                           </div>
                         </div>

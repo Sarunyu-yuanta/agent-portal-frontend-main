@@ -131,7 +131,9 @@ export function NotesSplitView({
     () =>
       notes.length === 0
         ? null
-        : [...notes].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0],
+        : [...notes].sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+          )[0],
     [notes],
   );
   // The draft is checked first and skips the fallback: it is a deliberate
@@ -432,7 +434,7 @@ export function NotesSplitView({
      * centre it, since the primitive brings a 400px floor rather than filling
      * its parent.
      */
-    <div className="flex items-center justify-center h-full p-4">
+    <div className="flex h-full items-center justify-center p-4">
       <EmptyState
         icon={<NotePencilIcon size={40} className="text-[var(--text-default-placeholder)]" />}
         title={t.planner.notes.emptyTitle}
@@ -459,7 +461,7 @@ export function NotesSplitView({
 
       <div
         className={cn(
-          "flex overflow-hidden bg-card rounded-xl border border-border",
+          "flex overflow-hidden rounded-xl border border-border bg-card",
           isMobile ? "flex-col" : "flex-row",
           heightClassName,
           surfaceClassName,
@@ -494,8 +496,8 @@ export function NotesSplitView({
           </div>
         ) : (
           <>
-            <div className="w-[280px] shrink-0 h-full border-r border-border">{sidebarPane}</div>
-            <div className="flex-1 min-w-0 h-full">{detailPane}</div>
+            <div className="h-full w-[280px] shrink-0 border-r border-border">{sidebarPane}</div>
+            <div className="h-full min-w-0 flex-1">{detailPane}</div>
           </>
         )}
 

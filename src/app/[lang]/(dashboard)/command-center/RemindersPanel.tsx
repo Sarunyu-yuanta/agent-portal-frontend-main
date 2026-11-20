@@ -61,8 +61,7 @@ export function RemindersPanel({
 
   const kycShown = kycItems.slice(0, REMINDER_ROW_LIMIT);
   const dayShown = dayItems.slice(0, Math.max(0, REMINDER_ROW_LIMIT - kycShown.length));
-  const hiddenCount =
-    kycItems.length + dayItems.length - kycShown.length - dayShown.length;
+  const hiddenCount = kycItems.length + dayItems.length - kycShown.length - dayShown.length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -82,7 +81,7 @@ export function RemindersPanel({
       {dayItems.length === 0 && kycItems.length === 0 ? (
         <RemindersPreviewEmpty />
       ) : (
-        <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05] flex flex-col">
+        <div className="flex flex-col divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
           {/* KYC first: it is the only deadline in here with a rule behind it,
               which is the order `SOURCE_WEIGHT` in `dashboard-data` puts the
               same sources in. A card, not a bell — nobody set an alarm on a KYC
@@ -92,9 +91,7 @@ export function RemindersPanel({
               key={row.id}
               row={row}
               showBadge={false}
-              onOpen={() =>
-                setContact({ clientId: row.clientIds[0], name: row.title })
-              }
+              onOpen={() => setContact({ clientId: row.clientIds[0], name: row.title })}
             />
           ))}
           {dayShown.map((row) => (
@@ -149,11 +146,9 @@ function ReminderRow({
         <BellIcon size={18} weight="fill" />
       </RowIcon>
 
-      <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="truncate text-body font-bold text-foreground">{title}</p>
-        {meta ? (
-          <p className="truncate text-meta text-muted-foreground">{meta}</p>
-        ) : null}
+        {meta ? <p className="truncate text-meta text-muted-foreground">{meta}</p> : null}
       </div>
     </div>
   );
@@ -169,10 +164,7 @@ function MoreRow({ count }: { count: number }) {
       <p className="min-w-0 flex-1 truncate text-body-sm font-bold text-foreground">
         {t.commandCenter.moreItems(count)}
       </p>
-      <CaretRightIcon
-        size={16}
-        className="shrink-0 text-[var(--text-default-placeholder)]"
-      />
+      <CaretRightIcon size={16} className="shrink-0 text-[var(--text-default-placeholder)]" />
     </Link>
   );
 }

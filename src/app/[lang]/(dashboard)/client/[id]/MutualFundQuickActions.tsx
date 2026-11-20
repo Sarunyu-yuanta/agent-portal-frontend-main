@@ -40,9 +40,16 @@ function QuickActionArt({ variant }: { variant: QuickActionVariant }) {
         className={`pointer-events-none absolute bottom-[-26px] block size-[68px] max-w-none ${isSearch ? "right-[-17.5px]" : "right-[-18px]"}`}
       />
       {isSearch ? (
-        <span className="pointer-events-none absolute bottom-0 right-[4.5px] size-[42px] overflow-hidden origin-bottom-right transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100" aria-hidden>
+        <span
+          className="pointer-events-none absolute right-[4.5px] bottom-0 size-[42px] origin-bottom-right overflow-hidden transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          aria-hidden
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={a.search} alt="" className="absolute left-[-45.3%] top-[-44.7%] block size-[190%] max-w-none" />
+          <img
+            src={a.search}
+            alt=""
+            className="absolute top-[-44.7%] left-[-45.3%] block size-[190%] max-w-none"
+          />
         </span>
       ) : (
         <Image
@@ -50,7 +57,7 @@ function QuickActionArt({ variant }: { variant: QuickActionVariant }) {
           alt=""
           width={45}
           height={45}
-          className="pointer-events-none absolute bottom-[3px] right-[6px] size-[45px] max-w-none object-cover object-bottom origin-bottom-right transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="pointer-events-none absolute right-[6px] bottom-[3px] size-[45px] max-w-none origin-bottom-right object-cover object-bottom transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
       )}
     </>
@@ -76,7 +83,7 @@ function QuickActionCard({
       }`}
     >
       <QuickActionArt variant={variant} />
-      <p className="relative text-sm font-bold leading-[24px] text-[#101828]">
+      <p className="relative text-sm leading-[24px] font-bold text-[#101828]">
         {title[0]}
         <br />
         {title[1]}

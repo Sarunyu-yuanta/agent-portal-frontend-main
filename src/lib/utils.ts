@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx"
-import { extendTailwindMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { extendTailwindMerge } from "tailwind-merge";
 
 // The app's type scale (`globals.css`) and system-one's `text-xxs` are font
 // sizes. Without this, tailwind-merge reads an unknown `text-*` as a colour and
@@ -25,8 +25,8 @@ const twMerge = extendTailwindMerge({
       ],
     },
   },
-})
+});
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }

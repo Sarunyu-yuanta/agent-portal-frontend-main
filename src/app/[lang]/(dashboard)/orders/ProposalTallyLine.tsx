@@ -28,7 +28,9 @@ export function ProposalTallyLine({ productId }: { productId: string }) {
     const offered = new Set(proposalsFor(proposals, productId).map((p) => p.clientId)).size;
     if (offered === 0) return null;
     return (
-      <p className="text-xs leading-[20px] text-[#6a7282] text-center">{t.orders.proposal.tallyOffered(offered)}</p>
+      <p className="text-center text-xs leading-[20px] text-[#6a7282]">
+        {t.orders.proposal.tallyOffered(offered)}
+      </p>
     );
   }
 
@@ -36,7 +38,7 @@ export function ProposalTallyLine({ productId }: { productId: string }) {
   if (clients === 0) return null;
 
   return (
-    <p className="text-xs leading-[20px] text-[#6a7282] text-center">
+    <p className="text-center text-xs leading-[20px] text-[#6a7282]">
       {t.orders.proposal.tallyBooked(clients)}{" "}
       <span className={won > 0 ? "font-semibold text-[var(--fill-green-700)]" : undefined}>
         {won}

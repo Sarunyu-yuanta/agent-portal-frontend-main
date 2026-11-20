@@ -72,7 +72,8 @@ const campaigns = {
     clearPicked: "Clear selection",
     pickAll: "Select all",
     noneEligible: "No clients in this campaign can receive it",
-    backendNote: "The back office will email the selected clients and keep a log of the send for audit.",
+    backendNote:
+      "The back office will email the selected clients and keep a log of the send for audit.",
     sending: "Sending…",
     inviteCount: (n: number) => `Invite ${clients(n)}`,
     shareCount: (n: number) => `Share with ${clients(n)}`,

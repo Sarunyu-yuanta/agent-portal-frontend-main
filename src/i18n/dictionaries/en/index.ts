@@ -72,7 +72,8 @@ const en = {
     notFoundOrder: "Order not found",
     backToClientHub: "Back to Client 360",
     pageErrorTitle: "This page couldn't be displayed",
-    pageErrorBody: "Something went wrong while showing this page. Try again, or pick another page from the menu.",
+    pageErrorBody:
+      "Something went wrong while showing this page. Try again, or pick another page from the menu.",
   },
 
   nav: {
@@ -169,20 +170,21 @@ const en = {
       doneTitle: "Password changed",
       doneBody: "You can sign in with your new password now.",
       invalidTitle: "This link is invalid or has expired",
-      invalidBody: "A reset link works once and only for a limited time. Request a new one to set your password.",
+      invalidBody:
+        "A reset link works once and only for a limited time. Request a new one to set your password.",
       requestNew: "Request a new link",
     },
   },
 
   assetClass: {
-    "หุ้นไทย": "Thai equities",
-    "หุ้นต่างประเทศ": "Foreign equities",
-    "อนุพันธ์": "Derivatives",
-    "กองทุนรวม": "Mutual funds",
-    "ตราสารหนี้": "Fixed income",
-    "ตราสารหนี้ต่างประเทศ": "Foreign fixed income",
-    "หุ้นกู้ที่มีอนุพันธ์แฝง": "Structured notes",
-    "เงินสด": "Cash",
+    หุ้นไทย: "Thai equities",
+    หุ้นต่างประเทศ: "Foreign equities",
+    อนุพันธ์: "Derivatives",
+    กองทุนรวม: "Mutual funds",
+    ตราสารหนี้: "Fixed income",
+    ตราสารหนี้ต่างประเทศ: "Foreign fixed income",
+    หุ้นกู้ที่มีอนุพันธ์แฝง: "Structured notes",
+    เงินสด: "Cash",
   } as Record<string, string>,
 
   clientHub: {
@@ -205,7 +207,13 @@ const en = {
 
   promotions: {
     seatState: { available: "Seats left", full: "Full", past: "Past" },
-    product: { stock: "Stocks", "mutual-fund": "Funds", global: "Global", fcn: "FCN", bond: "Bond" },
+    product: {
+      stock: "Stocks",
+      "mutual-fund": "Funds",
+      global: "Global",
+      fcn: "FCN",
+      bond: "Bond",
+    },
     status: { upcoming: "Coming soon", active: "Running", ended: "Ended" },
     segment: {
       uhnw: "UHNW",
@@ -217,8 +225,18 @@ const en = {
     },
     format: { online: "Online", onsite: "Onsite" },
     type: { promotion: "Promotions", event: "Seminars & events" },
-    clientStatus: { "not-sent": "Not sent", sent: "Sent", interested: "Interested", redeemed: "Redeemed" },
-    rsvp: { registered: "Registered", confirmed: "Confirmed", attended: "Attended", "no-show": "No-show" },
+    clientStatus: {
+      "not-sent": "Not sent",
+      sent: "Sent",
+      interested: "Interested",
+      redeemed: "Redeemed",
+    },
+    rsvp: {
+      registered: "Registered",
+      confirmed: "Confirmed",
+      attended: "Attended",
+      "no-show": "No-show",
+    },
     noPeriod: "No set period",
     statusLine: {
       running: "Running",
@@ -242,7 +260,12 @@ const en = {
   },
 
   catalog: {
-    fundDetailTabs: { overview: "Overview", returns: "Returns", allocation: "Allocation", info: "Fund info" },
+    fundDetailTabs: {
+      overview: "Overview",
+      returns: "Returns",
+      allocation: "Allocation",
+      info: "Fund info",
+    },
   },
 
   insights: {

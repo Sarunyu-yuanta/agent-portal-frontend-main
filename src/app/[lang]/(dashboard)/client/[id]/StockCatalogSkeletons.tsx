@@ -32,7 +32,7 @@ function TextTabSkeleton({ fill, width }: { fill: boolean; width: string }) {
       }`}
     >
       <Skeleton className="size-5 shrink-0 rounded-full" />
-      <Skeleton className={`h-4 my-1 ${width}`} />
+      <Skeleton className={`my-1 h-4 ${width}`} />
     </div>
   );
 }
@@ -135,7 +135,15 @@ function StockDetailListSkeleton() {
   );
 }
 
-function DrillInSkeleton({ tabs, fillTabs, heroChart }: { tabs: number; fillTabs: boolean; heroChart: boolean }) {
+function DrillInSkeleton({
+  tabs,
+  fillTabs,
+  heroChart,
+}: {
+  tabs: number;
+  fillTabs: boolean;
+  heroChart: boolean;
+}) {
   return (
     <div aria-busy="true" className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb]">
       <div className="bg-white pb-2">
@@ -200,7 +208,7 @@ export function StockCrossSellDetailSkeleton() {
 /** One side of the Order Book / Time&Sales row: heading + bordered box. */
 function MarketPanelSkeleton({ rows }: { rows: number }) {
   return (
-    <div className="flex min-w-0 w-full flex-1 flex-col gap-4">
+    <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
       <Skeleton className="my-1 h-5 w-28" />
       <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 p-4">
         {Array.from({ length: rows }).map((_, i) => (
@@ -224,7 +232,7 @@ function MarketPanelSkeleton({ rows }: { rows: number }) {
 /** Symbol + name row and the market-status tag above the white card. */
 export function StockDetailHeaderSkeleton() {
   return (
-    <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
+    <div className="flex items-center gap-2 pt-1 pr-2 pb-2 lg:pt-0">
       <Skeleton className="size-[30px] shrink-0 rounded-md" />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <Skeleton className="my-1 h-5 w-56 max-w-full" />
@@ -237,7 +245,7 @@ export function StockDetailHeaderSkeleton() {
 /** `QuoteBlock`: price, change, timestamp, market pill, day's range, stats. */
 export function StockQuoteBlockSkeleton() {
   return (
-    <div className="flex w-full flex-col gap-4 pb-4 pt-3">
+    <div className="flex w-full flex-col gap-4 pt-3 pb-4">
       <div className="flex w-full items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <Skeleton className="my-2 h-11 w-40" />

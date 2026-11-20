@@ -9,13 +9,7 @@ import { useT } from "@/i18n/I18nProvider";
  * pointer device, at the top of the pane on a phone, whose sheet header takes
  * no icon.
  */
-export function BackButton({
-  onClick,
-  label,
-}: {
-  onClick: () => void;
-  label?: string;
-}) {
+export function BackButton({ onClick, label }: { onClick: () => void; label?: string }) {
   const t = useT();
   label ??= t.orders.backToClientPicker;
   return (

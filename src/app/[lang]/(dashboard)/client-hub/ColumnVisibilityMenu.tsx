@@ -52,7 +52,7 @@ export function ColumnVisibilityMenu({
       >
         {t.client.hub.columnsButton}
         {hiddenCount > 0 && (
-          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-primary-action text-white text-meta font-bold w-4 h-4 leading-none">
+          <span className="bg-primary-action ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-meta leading-none font-bold text-white">
             {hiddenCount}
           </span>
         )}
@@ -60,16 +60,16 @@ export function ColumnVisibilityMenu({
 
       {/* Desktop dropdown (lg+) */}
       {open && (
-        <div className="hidden lg:block absolute right-0 top-full mt-1 z-50 bg-white border border-[var(--border-default)] rounded-xl shadow-lg w-[260px] overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2.5 border-b border-[var(--border-default)]">
-            <p className="text-label font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="absolute top-full right-0 z-50 mt-1 hidden w-[260px] overflow-hidden rounded-xl border border-[var(--border-default)] bg-white shadow-lg lg:block">
+          <div className="flex items-center justify-between border-b border-[var(--border-default)] px-3 py-2.5">
+            <p className="text-label font-semibold tracking-wider text-muted-foreground uppercase">
               {t.client.hub.showHideColumns}
             </p>
             <Button variant="plain" size="sm" onClick={onReset}>
               {t.client.hub.resetColumns}
             </Button>
           </div>
-          <div className="py-1 max-h-[360px] overflow-y-auto">
+          <div className="max-h-[360px] overflow-y-auto py-1">
             {columns.map((column) => {
               const checked = visibleColumns.has(column.id);
               return (
@@ -77,11 +77,11 @@ export function ColumnVisibilityMenu({
                   key={column.id}
                   type="button"
                   disabled={column.required}
-                  className="flex items-center gap-2.5 w-full px-3 py-2 text-left hover:bg-[var(--bg-default-secondary)] transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                  className="flex w-full cursor-pointer items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[var(--bg-default-secondary)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent"
                   onClick={() => !column.required && onToggle(column.id)}
                 >
                   <span
-                    className={`flex items-center justify-center w-4 h-4 rounded border transition-colors shrink-0 ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
                       checked
                         ? "bg-primary-action border-primary-action"
                         : "border-[rgba(0,0,0,0.2)] bg-white"
@@ -89,11 +89,11 @@ export function ColumnVisibilityMenu({
                   >
                     {checked && <CheckIcon size={10} weight="bold" color="white" />}
                   </span>
-                  <span className="text-body-sm text-foreground leading-tight flex-1">
+                  <span className="flex-1 text-body-sm leading-tight text-foreground">
                     {t.clientHub.columns[column.id] ?? column.label}
                   </span>
                   {column.required && (
-                    <LockSimpleIcon size={11} className="text-muted-foreground shrink-0" />
+                    <LockSimpleIcon size={11} className="shrink-0 text-muted-foreground" />
                   )}
                 </button>
               );
@@ -105,8 +105,10 @@ export function ColumnVisibilityMenu({
       {/* Tablet modal (md–lg) */}
       {open && (
         <div
-          className="hidden md:flex lg:hidden fixed inset-0 z-50 items-center justify-center bg-black/30 p-4"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+          className="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 md:flex lg:hidden"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
         >
           <Modal
             variant="content"
@@ -117,23 +119,23 @@ export function ColumnVisibilityMenu({
             <div className="w-[300px]">
               <button
                 type="button"
-                className="text-label text-primary-action hover:underline font-medium mb-2 block"
+                className="text-primary-action mb-2 block text-label font-medium hover:underline"
                 onClick={onReset}
               >
                 {t.client.hub.resetColumns}
               </button>
-              <div className="max-h-[calc(var(--vh)*50)] overflow-y-auto -mx-1">
+              <div className="-mx-1 max-h-[calc(var(--vh)*50)] overflow-y-auto">
                 {columns.map((column) => {
                   const checked = visibleColumns.has(column.id);
                   return (
                     <button
                       key={column.id}
                       type="button"
-                      className="flex items-center gap-2.5 w-full px-1 py-2 text-left hover:bg-[var(--bg-default-secondary)] rounded transition-colors"
+                      className="flex w-full items-center gap-2.5 rounded px-1 py-2 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                       onClick={() => onToggle(column.id)}
                     >
                       <span
-                        className={`flex items-center justify-center w-4 h-4 rounded border transition-colors shrink-0 ${
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
                           checked
                             ? "bg-primary-action border-primary-action"
                             : "border-[rgba(0,0,0,0.2)] bg-white"
@@ -141,7 +143,7 @@ export function ColumnVisibilityMenu({
                       >
                         {checked && <CheckIcon size={10} weight="bold" color="white" />}
                       </span>
-                      <span className="text-body-sm text-foreground leading-tight">
+                      <span className="text-body-sm leading-tight text-foreground">
                         {t.clientHub.columns[column.id] ?? column.label}
                       </span>
                     </button>
@@ -155,27 +157,31 @@ export function ColumnVisibilityMenu({
 
       {/* Mobile bottom sheet (< md) */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" showCloseButton={false} className="md:hidden rounded-t-2xl px-0 pb-safe">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
-            <p className="text-label font-semibold text-muted-foreground uppercase tracking-wider">
+        <SheetContent
+          side="bottom"
+          showCloseButton={false}
+          className="pb-safe rounded-t-2xl px-0 md:hidden"
+        >
+          <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
+            <p className="text-label font-semibold tracking-wider text-muted-foreground uppercase">
               {t.client.hub.showHideColumns}
             </p>
             <Button variant="plain" size="sm" onClick={onReset}>
               {t.client.hub.resetColumns}
             </Button>
           </div>
-          <div className="py-1 max-h-[calc(var(--vh)*60)] overflow-y-auto">
+          <div className="max-h-[calc(var(--vh)*60)] overflow-y-auto py-1">
             {columns.map((column) => {
               const checked = visibleColumns.has(column.id);
               return (
                 <button
                   key={column.id}
                   type="button"
-                  className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-[var(--bg-default-secondary)] transition-colors"
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                   onClick={() => onToggle(column.id)}
                 >
                   <span
-                    className={`flex items-center justify-center w-5 h-5 rounded border transition-colors shrink-0 ${
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
                       checked
                         ? "bg-primary-action border-primary-action"
                         : "border-[rgba(0,0,0,0.2)] bg-white"
@@ -183,7 +189,7 @@ export function ColumnVisibilityMenu({
                   >
                     {checked && <CheckIcon size={12} weight="bold" color="white" />}
                   </span>
-                  <span className="text-body text-foreground leading-tight">
+                  <span className="text-body leading-tight text-foreground">
                     {t.clientHub.columns[column.id] ?? column.label}
                   </span>
                 </button>

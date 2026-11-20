@@ -14,13 +14,7 @@ import {
   HOLIDAY_PALETTE,
   HolidayIcon,
 } from "./market-taxonomy";
-import {
-  dayLabel,
-  dayRelation,
-  isSameMonth,
-  WEEKS_SHOWN,
-  type DayRelation,
-} from "./calendar-grid";
+import { dayLabel, dayRelation, isSameMonth, WEEKS_SHOWN, type DayRelation } from "./calendar-grid";
 import { useLocale, useT } from "@/i18n/I18nProvider";
 
 /**
@@ -84,8 +78,7 @@ const PILL_SHELL =
 
 /** One line of the stack: a whole group of corporate actions, or a single row. */
 type CellRow =
-  | { type: "group"; key: string; group: ActionGroup }
-  | { type: "item"; key: string; item: DayItem };
+  { type: "group"; key: string; group: ActionGroup } | { type: "item"; key: string; item: DayItem };
 
 export function DayCell({
   day,
@@ -176,8 +169,7 @@ export function DayCell({
   // grow down and the bottom row can only grow up, so those two anchor to the
   // edge they have room from — otherwise the panel runs off the calendar and
   // Radix shunts it back to somewhere unrelated to the cell that opened it.
-  const align =
-    rowIndex === 0 ? "start" : rowIndex === WEEKS_SHOWN - 1 ? "end" : "center";
+  const align = rowIndex === 0 ? "start" : rowIndex === WEEKS_SHOWN - 1 ? "end" : "center";
 
   /**
    * The same list either way; only the shell around it changes.
@@ -220,7 +212,9 @@ export function DayCell({
    * day — which is the cell's own job, and the reason a group pill hands back
    * `undefined` rather than a target of its own.
    */
-  const rowContent = (row: CellRow): {
+  const rowContent = (
+    row: CellRow,
+  ): {
     body: ReactNode;
     title: string;
     /** Absent when the row has no single target of its own. */
@@ -249,9 +243,7 @@ export function DayCell({
             {/* Outside the truncation, so a day with nine XDs still says nine
                 even when the cell can only print the first two symbols. */}
             {symbols.length > 1 && (
-              <span className="ml-auto shrink-0 font-semibold tabular-nums">
-                {symbols.length}
-              </span>
+              <span className="ml-auto shrink-0 font-semibold tabular-nums">{symbols.length}</span>
             )}
           </>
         ),
@@ -284,27 +276,27 @@ export function DayCell({
 
   return (
     <>
-    {/* The `Popover` wrapper stays mounted on a phone even though it never
+      {/* The `Popover` wrapper stays mounted on a phone even though it never
         opens there. Dropping it would change the trigger's markup between the
         server render (which can't know the viewport) and the client, since
         Radix's `asChild` trigger writes its own attributes onto this div —
         holding it open at `false` keeps one DOM for both. */}
-    <Popover
-      open={!isMobile && open}
-      onOpenChange={setOpen}
-      side={side}
-      align={align}
-      sideOffset={8}
-      // `p-0`: the content lays out its own header/list/footer sections and
-      // wants their rules and hover fills to reach the bubble's edges, which the
-      // component's default `p-3` would inset. `overflow-hidden` keeps the first
-      // and last of those from squaring off the bubble's rounded corners.
-      className="p-0 overflow-hidden shadow-lg"
-      // The popover has no exit animation to protect, so it dismisses by
-      // flipping `open` directly.
-      content={!isMobile && open ? dayContent(() => setOpen(false)) : null}
-    >
-      {/* `border-[rgba(0,0,0,0.12)]` rather than `border-border`: the same
+      <Popover
+        open={!isMobile && open}
+        onOpenChange={setOpen}
+        side={side}
+        align={align}
+        sideOffset={8}
+        // `p-0`: the content lays out its own header/list/footer sections and
+        // wants their rules and hover fills to reach the bubble's edges, which the
+        // component's default `p-3` would inset. `overflow-hidden` keeps the first
+        // and last of those from squaring off the bubble's rounded corners.
+        className="overflow-hidden p-0 shadow-lg"
+        // The popover has no exit animation to protect, so it dismisses by
+        // flipping `open` directly.
+        content={!isMobile && open ? dayContent(() => setOpen(false)) : null}
+      >
+        {/* `border-[rgba(0,0,0,0.12)]` rather than `border-border`: the same
           10%-black-opacity-reads-as-invisible issue `globals.css` already
           documents for `system-one`'s `<Table>` (~2-3% perceived contrast on
           a white cell). Not much darker than that 10%, though — a whole grid
@@ -320,14 +312,14 @@ export function DayCell({
           fix for exactly that (see `SELECTED_TITLE` in `NotesSidebarList.tsx`),
           and an explicit colour sidesteps the token entirely rather than
           fighting to make the reference win too. */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") setOpen(true);
-        }}
-        /* Today gets a light step of the primary ramp behind the whole
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") setOpen(true);
+          }}
+          /* Today gets a light step of the primary ramp behind the whole
            cell, not just the circled number — a filled 24px disc is easy to
            miss in a grid this dense. Only while today is in the month on
            screen: paged away it lands in the leading or trailing band, whose
@@ -337,75 +329,75 @@ export function DayCell({
 
            The `!` on both hovers is this repo's standing cascade fix — see the
            note above about `bg-card` outranking an app-level `hover:`. */
-        className={`flex h-full min-h-0 flex-col gap-1 overflow-hidden p-1.5 text-left transition-colors cursor-pointer ${
-          columnIndex === COLUMNS_PER_WEEK - 1 ? "" : "border-r border-[rgba(0,0,0,0.12)]"
-        } ${
-          isToday && inMonth
-            ? "bg-[var(--fill-p1-200)] hover:bg-[var(--fill-p1-300)]!"
-            : `${
-                // A market closure tints the whole cell; its strip goes a shade
-                // deeper (below) so it still reads on top of it. Ahead
-                // of the weekend grey: a closure is the rarer, louder fact.
-                holiday
-                  ? inMonth
-                    ? "bg-[var(--fill-rose-100)]"
-                    : "bg-[var(--fill-rose-100)]/60"
-                  : // Weekends keep their grey in the leading and trailing weeks
-                    // too, so the columns read straight down the grid; only the
-                    // date fades there.
-                    isWeekend
-                    ? "bg-[var(--fill-gray-100)]"
-                    : !inMonth
-                      ? "bg-[var(--bg-default-secondary)]/60"
-                      : "bg-card"
-              } hover:bg-[rgba(0,0,0,0.045)]!`
-        }`}
-      >
-        {/* The date itself carries the closure as well as the strip below it.
+          className={`flex h-full min-h-0 cursor-pointer flex-col gap-1 overflow-hidden p-1.5 text-left transition-colors ${
+            columnIndex === COLUMNS_PER_WEEK - 1 ? "" : "border-r border-[rgba(0,0,0,0.12)]"
+          } ${
+            isToday && inMonth
+              ? "bg-[var(--fill-p1-200)] hover:bg-[var(--fill-p1-300)]!"
+              : `${
+                  // A market closure tints the whole cell; its strip goes a shade
+                  // deeper (below) so it still reads on top of it. Ahead
+                  // of the weekend grey: a closure is the rarer, louder fact.
+                  holiday
+                    ? inMonth
+                      ? "bg-[var(--fill-rose-100)]"
+                      : "bg-[var(--fill-rose-100)]/60"
+                    : // Weekends keep their grey in the leading and trailing weeks
+                      // too, so the columns read straight down the grid; only the
+                      // date fades there.
+                      isWeekend
+                      ? "bg-[var(--fill-gray-100)]"
+                      : !inMonth
+                        ? "bg-[var(--bg-default-secondary)]/60"
+                        : "bg-card"
+                } hover:bg-[rgba(0,0,0,0.045)]!`
+          }`}
+        >
+          {/* The date itself carries the closure as well as the strip below it.
             Scanning a month for "which days is the market shut" is a glance at
             the numbers, not a read of every cell, and a rose date answers it
             without the reader entering the cell at all. Today still outranks
             it: there is only ever one of those. */}
-        {/* The date, and in the top-right corner the closure's mark when the
+          {/* The date, and in the top-right corner the closure's mark when the
             market is shut.
             An icon rather than a strip: the cell's tint already says "closed",
             and a strip spent one of the few rows a cell has on saying it again.
             The name is in the tooltip and in the day's popover. */}
-        <div className="flex shrink-0 items-center justify-between gap-1">
-          <span
-            className={`flex size-6 shrink-0 items-center justify-center rounded-full type-caption font-semibold ${
-              isToday
-                ? "bg-primary-action text-white"
-                : inMonth
-                  ? "text-foreground"
-                  : "text-muted-foreground/50"
-            }`}
-            style={
-              !isToday && holiday
-                ? { color: HOLIDAY_PALETTE.text, opacity: inMonth ? 1 : 0.5 }
-                : undefined
-            }
-          >
-            {day.getDate()}
-          </span>
-          {holiday && (
+          <div className="flex shrink-0 items-center justify-between gap-1">
             <span
-              role="img"
-              aria-label={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
-              title={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
-              className="flex shrink-0"
-              // `-800`: a step darker than the date beside it, so the mark
-              // holds its own on the rose cell rather than melting into it.
-              // Not faded outside the month, unlike the date: a closure on a
-              // leading or trailing day is still worth seeing at a glance.
-              style={{ color: "var(--fill-rose-800)" }}
+              className={`type-caption flex size-6 shrink-0 items-center justify-center rounded-full font-semibold ${
+                isToday
+                  ? "bg-primary-action text-white"
+                  : inMonth
+                    ? "text-foreground"
+                    : "text-muted-foreground/50"
+              }`}
+              style={
+                !isToday && holiday
+                  ? { color: HOLIDAY_PALETTE.text, opacity: inMonth ? 1 : 0.5 }
+                  : undefined
+              }
             >
-              <HolidayIcon size={16} weight="fill" />
+              {day.getDate()}
             </span>
-          )}
-        </div>
-        <div ref={stackRef} className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden">
-          {/* On a pointer device a pill goes straight to what it names, and
+            {holiday && (
+              <span
+                role="img"
+                aria-label={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
+                title={t.planner.calendar.day.holidayLabel(holiday.name, holiday.market)}
+                className="flex shrink-0"
+                // `-800`: a step darker than the date beside it, so the mark
+                // holds its own on the rose cell rather than melting into it.
+                // Not faded outside the month, unlike the date: a closure on a
+                // leading or trailing day is still worth seeing at a glance.
+                style={{ color: "var(--fill-rose-800)" }}
+              >
+                <HolidayIcon size={16} weight="fill" />
+              </span>
+            )}
+          </div>
+          <div ref={stackRef} className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden">
+            {/* On a pointer device a pill goes straight to what it names, and
               `stopPropagation` keeps that click off the cell behind it — landing
               on a day list you'd only have to click through is a wasted step
               when you already named the thing you want. A group pill is the one
@@ -417,85 +409,85 @@ export function DayCell({
               hitting a pill, or the reverse, would be luck, and the two do
               different things. One target per cell, and the sheet it opens lists
               the same rows at a size worth tapping. */}
-          {visible.map((row) => {
-            const { body, title, onOpen, className, style } = rowContent(row);
-            // A note's own tone already carries the relation ramp; everything
-            // else spends its hue on taxonomy and only borrows the fade.
-            const isNote = row.type === "item" && row.item.source === "note";
-            const shell = `${PILL_SHELL} ${className ?? ""} ${
-              !isNote && isPast ? PAST_FADE : ""
-            }`;
+            {visible.map((row) => {
+              const { body, title, onOpen, className, style } = rowContent(row);
+              // A note's own tone already carries the relation ramp; everything
+              // else spends its hue on taxonomy and only borrows the fade.
+              const isNote = row.type === "item" && row.item.source === "note";
+              const shell = `${PILL_SHELL} ${className ?? ""} ${
+                !isNote && isPast ? PAST_FADE : ""
+              }`;
 
-            if (isMobile || !onOpen) {
+              if (isMobile || !onOpen) {
+                return (
+                  <span key={row.key} className={shell} style={style} title={title}>
+                    {body}
+                  </span>
+                );
+              }
+
               return (
-                <span key={row.key} className={shell} style={style} title={title}>
-                  {body}
-                </span>
-              );
-            }
-
-            return (
-              <button
-                key={row.key}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Close this cell's own popover before handing off. It may
-                  // well be open — a pill is inside the trigger, so Radix
-                  // neither treats the click as "outside" nor lets its trigger
-                  // handler see it through the `stopPropagation` above. Left
-                  // alone the popover stays up beside the panel that just
-                  // opened, which is two answers to one click.
-                  setOpen(false);
-                  onOpen();
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                title={title}
-                style={style}
-                /* `shrink-0` (in `PILL_SHELL`): a flex child that compresses
+                <button
+                  key={row.key}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Close this cell's own popover before handing off. It may
+                    // well be open — a pill is inside the trigger, so Radix
+                    // neither treats the click as "outside" nor lets its trigger
+                    // handler see it through the `stopPropagation` above. Left
+                    // alone the popover stays up beside the panel that just
+                    // opened, which is two answers to one click.
+                    setOpen(false);
+                    onOpen();
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  title={title}
+                  style={style}
+                  /* `shrink-0` (in `PILL_SHELL`): a flex child that compresses
                    would report a smaller `offsetHeight` to the measurement
                    above, which would then fit more rows and compress it
                    further. */
-                className={`${shell} text-left cursor-pointer transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-p1-600)] ${
-                  style ? "hover:brightness-95" : ""
-                }`}
-              >
-                {body}
-              </button>
-            );
-          })}
-          {/* Sits in the pill stack, so it takes the pills' geometry and hover —
+                  className={`${shell} cursor-pointer text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-p1-600)] ${
+                    style ? "hover:brightness-95" : ""
+                  }`}
+                >
+                  {body}
+                </button>
+              );
+            })}
+            {/* Sits in the pill stack, so it takes the pills' geometry and hover —
               a plain grey line among three tinted buttons reads as a caption
               rather than the thing that reveals the rest. On a pointer device it
               opens the panel itself rather than letting the click reach the
               cell: same result, but it doesn't depend on the trigger behind it
               to be the target. On a phone it goes back to being a caption, since
               the cell around it already does exactly this. */}
-          {overflow > 0 &&
-            (isMobile ? (
-              <span className="shrink-0 truncate px-1 py-0.5 type-caption leading-tight font-medium text-muted-foreground">
-                {t.planner.calendar.day.more(overflow)}
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(true);
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                className="shrink-0 truncate rounded-[3px] px-1 py-0.5 type-caption leading-tight text-left font-medium text-muted-foreground cursor-pointer transition-colors hover:bg-[var(--fill-gray-200)]! hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-blue-500)]"
-              >
-                {t.planner.calendar.day.more(overflow)}
-              </button>
-            ))}
+            {overflow > 0 &&
+              (isMobile ? (
+                <span className="type-caption shrink-0 truncate px-1 py-0.5 leading-tight font-medium text-muted-foreground">
+                  {t.planner.calendar.day.more(overflow)}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(true);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="type-caption shrink-0 cursor-pointer truncate rounded-[3px] px-1 py-0.5 text-left leading-tight font-medium text-muted-foreground transition-colors hover:bg-[var(--fill-gray-200)]! hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-blue-500)]"
+                >
+                  {t.planner.calendar.day.more(overflow)}
+                </button>
+              ))}
+          </div>
         </div>
-      </div>
-    </Popover>
+      </Popover>
 
-    {/* Mounted for the whole time the viewport is a phone, not only while open:
+      {/* Mounted for the whole time the viewport is a phone, not only while open:
         `BottomSheet` is a vaul drawer and plays its own slide-out off the `open`
         prop, so unmounting on close would cut the animation. It renders nothing
         until first opened.
@@ -507,20 +499,20 @@ export function DayCell({
         and a long day only stays inside that cap if the box between the two can
         shrink. No header, because the content leads with its own date and
         weekday — the design system's would be a second title above it. */}
-    {isMobile && (
-      <BottomSheet
-        open={open}
-        onOpenChange={setOpen}
-        showHeader={false}
-        // Not rendered — it goes to the drawer's `sr-only` title, which vaul
-        // requires and screen readers announce on open.
-        title={dayLabel(day, locale)}
-        className="px-0 pb-0"
-        contentClassName="flex min-h-0 flex-col pt-0"
-      >
-        {dayContent(() => setOpen(false))}
-      </BottomSheet>
-    )}
+      {isMobile && (
+        <BottomSheet
+          open={open}
+          onOpenChange={setOpen}
+          showHeader={false}
+          // Not rendered — it goes to the drawer's `sr-only` title, which vaul
+          // requires and screen readers announce on open.
+          title={dayLabel(day, locale)}
+          className="px-0 pb-0"
+          contentClassName="flex min-h-0 flex-col pt-0"
+        >
+          {dayContent(() => setOpen(false))}
+        </BottomSheet>
+      )}
     </>
   );
 }

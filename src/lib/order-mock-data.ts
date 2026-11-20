@@ -98,9 +98,7 @@ export function clientNameById(clientId: string): string | undefined {
 export function stampFromDaysAgo(daysAgo: number, id: string): string {
   const seed = [...id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const now = new Date();
-  const at = new Date(
-    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - daysAgo),
-  );
+  const at = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - daysAgo));
   at.setUTCHours(9 + (seed % 9), seed % 60, 0, 0);
   return at.toISOString();
 }
@@ -154,11 +152,7 @@ const EVIDENCE_TYPE: Record<string, string> = {
   png: "image/png",
 };
 
-function evidenceFor(
-  id: string,
-  clientId: string,
-  createdAt: string,
-): OrderEvidence {
+function evidenceFor(id: string, clientId: string, createdAt: string): OrderEvidence {
   const seed = [...id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const { channel, ext, bytes } = EVIDENCE_SEED[seed % EVIDENCE_SEED.length];
   const day = createdAt.slice(0, 10);
@@ -218,27 +212,24 @@ function settledAfter(submittedAt: string, id: string): string {
   return new Date(new Date(submittedAt).getTime() + hours * 3_600_000).toISOString();
 }
 
-export const seedSubmissions: OrderSubmission[] = orderBooksRaw.books.flatMap(
-  (book) =>
-    (book.submissions as SubmissionSeed[]).map((s) => {
-      const submittedAt = stampFromDaysAgo(s.daysAgo, s.id);
-      return {
-        id: s.id,
-        productId: book.productId,
-        bookingIds: s.bookingIds,
-        submittedAt,
-        submittedBy: ORDER_ACTOR,
-        status: s.status as OrderSubmission["status"],
-        backendRef: s.backendRef,
-        // One the back office has not answered has no settlement date to show,
-        // which is what the in-flight rows on the book read off. `sent` as well
-        // as `processing`: it has not even reached them yet.
-        settledAt:
-          s.status === "processing" || s.status === "sent"
-            ? null
-            : settledAfter(submittedAt, s.id),
-      };
-    }),
+export const seedSubmissions: OrderSubmission[] = orderBooksRaw.books.flatMap((book) =>
+  (book.submissions as SubmissionSeed[]).map((s) => {
+    const submittedAt = stampFromDaysAgo(s.daysAgo, s.id);
+    return {
+      id: s.id,
+      productId: book.productId,
+      bookingIds: s.bookingIds,
+      submittedAt,
+      submittedBy: ORDER_ACTOR,
+      status: s.status as OrderSubmission["status"],
+      backendRef: s.backendRef,
+      // One the back office has not answered has no settlement date to show,
+      // which is what the in-flight rows on the book read off. `sent` as well
+      // as `processing`: it has not even reached them yet.
+      settledAt:
+        s.status === "processing" || s.status === "sent" ? null : settledAfter(submittedAt, s.id),
+    };
+  }),
 );
 
 type ProposalSeed = {
@@ -282,11 +273,41 @@ const OFFERED_SEEDS: {
   daysAgo: number;
   channels: ProposalLog["channels"];
 }[] = [
-  { id: "prp-stk-01", productId: offeredProductId("stock", STOCK_TOP_PICK[0].symbol), clientIndex: 0, daysAgo: 0, channels: ["app", "line"] },
-  { id: "prp-stk-02", productId: offeredProductId("stock", STOCK_TOP_PICK[1].symbol), clientIndex: 2, daysAgo: 1, channels: ["app", "email"] },
-  { id: "prp-stk-03", productId: offeredProductId("stock", STOCK_TOP_PICK[0].symbol), clientIndex: 4, daysAgo: 3, channels: ["app", "voice-ai"] },
-  { id: "prp-mf-01", productId: offeredProductId("mutual-fund", getTopPerformers("global-equity")[0].symbol), clientIndex: 1, daysAgo: 0, channels: ["app", "email", "line"] },
-  { id: "prp-mf-02", productId: offeredProductId("mutual-fund", getTopPerformers("global-equity")[1].symbol), clientIndex: 3, daysAgo: 2, channels: ["app"] },
+  {
+    id: "prp-stk-01",
+    productId: offeredProductId("stock", STOCK_TOP_PICK[0].symbol),
+    clientIndex: 0,
+    daysAgo: 0,
+    channels: ["app", "line"],
+  },
+  {
+    id: "prp-stk-02",
+    productId: offeredProductId("stock", STOCK_TOP_PICK[1].symbol),
+    clientIndex: 2,
+    daysAgo: 1,
+    channels: ["app", "email"],
+  },
+  {
+    id: "prp-stk-03",
+    productId: offeredProductId("stock", STOCK_TOP_PICK[0].symbol),
+    clientIndex: 4,
+    daysAgo: 3,
+    channels: ["app", "voice-ai"],
+  },
+  {
+    id: "prp-mf-01",
+    productId: offeredProductId("mutual-fund", getTopPerformers("global-equity")[0].symbol),
+    clientIndex: 1,
+    daysAgo: 0,
+    channels: ["app", "email", "line"],
+  },
+  {
+    id: "prp-mf-02",
+    productId: offeredProductId("mutual-fund", getTopPerformers("global-equity")[1].symbol),
+    clientIndex: 3,
+    daysAgo: 2,
+    channels: ["app"],
+  },
 ];
 
 export const seedOfferedProposals: ProposalLog[] = OFFERED_SEEDS.flatMap((s) => {
@@ -305,8 +326,8 @@ export const seedOfferedProposals: ProposalLog[] = OFFERED_SEEDS.flatMap((s) => 
   ];
 });
 
-export const seedRequirementRequests: RequirementRequest[] =
-  orderBooksRaw.requirementRequests.map((r) => ({
+export const seedRequirementRequests: RequirementRequest[] = orderBooksRaw.requirementRequests.map(
+  (r) => ({
     id: r.id,
     clientId: r.clientId,
     clientName: nameById[r.clientId] ?? r.clientId,
@@ -316,7 +337,8 @@ export const seedRequirementRequests: RequirementRequest[] =
     sentBy: ORDER_ACTOR,
     status: r.status as RequirementRequest["status"],
     completedAt: null,
-  }));
+  }),
+);
 
 /**
  * Per-client declaration status, keyed by client id.

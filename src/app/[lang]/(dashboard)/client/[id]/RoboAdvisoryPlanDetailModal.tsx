@@ -47,10 +47,14 @@ function StatItem({
         style={labelWidth != null ? { width: labelWidth } : undefined}
       >
         <div className="text-center leading-none">
-          <p className="mb-0 text-xs font-bold leading-[20px] text-[#101828]">{labelLines[0]}</p>
-          <p className="text-xs font-bold leading-[20px] text-[#101828]">{labelLines[1]}</p>
+          <p className="mb-0 text-xs leading-[20px] font-bold text-[#101828]">{labelLines[0]}</p>
+          <p className="text-xs leading-[20px] font-bold text-[#101828]">{labelLines[1]}</p>
         </div>
-        <p className={`whitespace-nowrap text-xs leading-[20px] ${valueClassName ?? "text-[#4a5565]"}`}>{value}</p>
+        <p
+          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-[#4a5565]"}`}
+        >
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -69,7 +73,7 @@ function DetailRow({
     <div className="flex w-full gap-3 rounded-lg bg-[#f9fafb] px-3 py-2">
       <Image src={iconSrc} alt="" width={24} height={24} className="size-6 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold leading-[24px] text-[#101828]">{title}</p>
+        <p className="text-sm leading-[24px] font-bold text-[#101828]">{title}</p>
         {children}
       </div>
     </div>
@@ -77,7 +81,7 @@ function DetailRow({
 }
 
 function ModalBodyPadding({ isMobile, children }: { isMobile: boolean; children: ReactNode }) {
-  return <div className={`pb-6 pt-4 ${isMobile ? "" : MODAL_BODY_PX_DESKTOP}`}>{children}</div>;
+  return <div className={`pt-4 pb-6 ${isMobile ? "" : MODAL_BODY_PX_DESKTOP}`}>{children}</div>;
 }
 
 function DownloadDocumentsButton({ className }: { className?: string }) {
@@ -132,9 +136,9 @@ function PlanDetailContent({
     <div className="flex w-full flex-col gap-4">
       <div className="flex w-full flex-col gap-1">
         <div className="flex w-full items-start justify-between gap-3">
-          <div className="min-w-0 flex flex-1 flex-col gap-1">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
             <p className="text-micro leading-[18px] text-black/60">{plan.provider}</p>
-            <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg font-bold leading-[28px] text-transparent">
+            <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg leading-[28px] font-bold text-transparent">
               {plan.name}
             </p>
           </div>
@@ -145,16 +149,24 @@ function PlanDetailContent({
           <RoboRiskLevel tier={plan.riskTier} />
           {suitability ? <PlanSuitabilityBadge suitability={suitability} /> : null}
           <div className="flex min-w-0 flex-[1_0_0] items-center justify-end gap-1 whitespace-nowrap">
-            <p className="text-xs font-bold leading-[20px] text-black/75">Available Room</p>
+            <p className="text-xs leading-[20px] font-bold text-black/75">Available Room</p>
             <p className="text-xs leading-[20px] text-black/60">{plan.availableRoom}</p>
           </div>
         </div>
       </div>
 
       <div className="flex w-full items-end">
-        <StatItem iconSrc={ROBO_ASSETS.iconMoney} labelLines={stats.minInvestmentLines} value={plan.minInvestment} />
+        <StatItem
+          iconSrc={ROBO_ASSETS.iconMoney}
+          labelLines={stats.minInvestmentLines}
+          value={plan.minInvestment}
+        />
         <div className="h-[58px] w-px shrink-0 bg-black/10" />
-        <StatItem iconSrc={ROBO_ASSETS.iconClock} labelLines={stats.holdingPeriodLines} value={plan.holdingPeriod} />
+        <StatItem
+          iconSrc={ROBO_ASSETS.iconClock}
+          labelLines={stats.holdingPeriodLines}
+          value={plan.holdingPeriod}
+        />
         {presentation.showDividendStat && plan.dividendPerYear ? (
           <>
             <div className="h-[58px] w-px shrink-0 bg-black/10" />
@@ -213,9 +225,9 @@ function PlanDetailContent({
           }}
         >
           <div className="bg-[#f3f4f6] px-3 py-2">
-            <p className="text-sm font-bold leading-[24px] text-[#101828]">{labels.allocation}</p>
+            <p className="text-sm leading-[24px] font-bold text-[#101828]">{labels.allocation}</p>
           </div>
-          <div className="flex flex-col items-center gap-3 px-3 pb-4 pt-3">
+          <div className="flex flex-col items-center gap-3 px-3 pt-3 pb-4">
             <p className="w-full text-xs leading-[20px] text-[#4a5565]">{labels.allocationTotal}</p>
             <div className="flex w-full items-center justify-between px-2 max-sm:flex-col max-sm:gap-4">
               <AllocationDonut slices={detail.allocation} className="size-[120px]" />
@@ -223,7 +235,10 @@ function PlanDetailContent({
                 {detail.allocation.map((item) => (
                   <div key={item.label} className="flex items-start gap-2">
                     <div className="flex w-[115px] items-center gap-1 px-2 py-1">
-                      <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+                      <span
+                        className="size-3 shrink-0 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
                       <span className="text-xs leading-[20px] text-[#4a5565]">{item.label}</span>
                     </div>
                     <span className="text-xs leading-[20px] text-[#4a5565]">{item.percent}%</span>
@@ -237,8 +252,14 @@ function PlanDetailContent({
 
       <div className="flex w-full flex-col gap-2">
         <div className="flex items-center gap-1">
-          <p className="text-sm font-bold leading-[24px] text-[#101828]">{labels.fees}</p>
-          <Image src={ROBO_ASSETS.modalIconInfo} alt="" width={16} height={16} className="size-4 shrink-0" />
+          <p className="text-sm leading-[24px] font-bold text-[#101828]">{labels.fees}</p>
+          <Image
+            src={ROBO_ASSETS.modalIconInfo}
+            alt=""
+            width={16}
+            height={16}
+            className="size-4 shrink-0"
+          />
         </div>
         <div className="flex w-full flex-col gap-1">
           <div className="overflow-hidden rounded-lg bg-[#eff6ff]">
@@ -250,7 +271,9 @@ function PlanDetailContent({
                 }`}
               >
                 <p className="min-w-0 flex-1 text-xs leading-[20px] text-[#101828]">{fee.label}</p>
-                <p className="shrink-0 text-sm font-bold leading-[24px] text-[#0a6ee7]">{fee.value}</p>
+                <p className="shrink-0 text-sm leading-[24px] font-bold text-[#0a6ee7]">
+                  {fee.value}
+                </p>
               </div>
             ))}
           </div>
@@ -268,7 +291,13 @@ function PlanDetailContent({
 }
 
 /** Pinned below the scroll area so the CTA stays reachable however long the plan is. */
-function PlanDetailFooter({ cta, paddingClassName }: { cta: AdvisoryCta; paddingClassName: string }) {
+function PlanDetailFooter({
+  cta,
+  paddingClassName,
+}: {
+  cta: AdvisoryCta;
+  paddingClassName: string;
+}) {
   return (
     <div className={`shrink-0 border-t border-black/10 bg-white py-4 ${paddingClassName}`}>
       <AdvisoryCtaButton cta={cta} className="w-full" />
@@ -331,19 +360,22 @@ export function PortfolioAdvisoryPlanDetailModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="max-h-[calc(var(--vh)*100-8rem)] w-full max-w-[720px] overflow-hidden" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className="max-h-[calc(var(--vh)*100-8rem)] w-full max-w-[720px] overflow-hidden"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <Modal
           variant="content"
           title={t.products.common.details}
           showClose
           onClose={onClose}
           actionLayout="none"
-          className="!max-w-[720px] w-full"
+          className="w-full !max-w-[720px]"
         >
           {/* -mb-6 cancels Modal's own body padding so the footer sits on the modal's bottom edge. */}
           <div className={`${MODAL_BODY_BLEED} ${cta ? "-mb-6" : ""} flex flex-col`}>
             <div
-              className={`${cta ? "max-h-[calc(var(--vh)*100-19rem)]" : "max-h-[calc(var(--vh)*100-14rem)]"} overflow-y-auto [scrollbar-gutter:stable]`}
+              className={`${cta ? "max-h-[calc(var(--vh)*100-19rem)]" : "max-h-[calc(var(--vh)*100-14rem)]"} [scrollbar-gutter:stable] overflow-y-auto`}
             >
               {content}
             </div>

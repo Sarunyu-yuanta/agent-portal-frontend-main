@@ -58,17 +58,11 @@ export const cellBorderStyle = (opts?: { bottom?: boolean }) => ({
 
 // ─── Shared components ────────────────────────────────────────────────────────
 
-export function StatusTag({
-  status,
-  label,
-}: {
-  status: FixedIncomeStatus;
-  label: string;
-}) {
+export function StatusTag({ status, label }: { status: FixedIncomeStatus; label: string }) {
   const isOpen = status === "open";
   return (
     <span
-      className="inline-flex items-center justify-center overflow-hidden px-2 py-1 rounded shrink-0 text-xs font-bold leading-[20px] whitespace-nowrap"
+      className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded px-2 py-1 text-xs leading-[20px] font-bold whitespace-nowrap"
       style={{
         backgroundColor: isOpen ? "#dbfce7" : "#f3f4f6",
         color: isOpen ? "#008236" : "#6a7282",
@@ -84,7 +78,8 @@ export function StatusTag({
  * Pass a `className` to control container size and border-radius,
  * e.g. "size-5 rounded" (default), "size-8 rounded", "size-12 rounded-md".
  */
-const LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='32' fill='%239ca3af'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E";
+const LOGO_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='32' fill='%239ca3af'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E";
 
 function handleLogoError(e: React.SyntheticEvent<HTMLImageElement>) {
   e.currentTarget.onerror = null;
@@ -114,7 +109,7 @@ export function BondLogo({
         // eslint-disable-next-line @next/next/no-img-element -- see above
         <img
           alt=""
-          className="absolute h-[149.62%] left-[-92.5%] max-w-none top-[-24.81%] w-[285%]"
+          className="absolute top-[-24.81%] left-[-92.5%] h-[149.62%] w-[285%] max-w-none"
           src={src || LOGO_PLACEHOLDER}
           onError={handleLogoError}
         />
@@ -122,7 +117,7 @@ export function BondLogo({
         // eslint-disable-next-line @next/next/no-img-element -- see above
         <img
           alt=""
-          className="absolute inset-0 size-full object-cover rounded pointer-events-none"
+          className="pointer-events-none absolute inset-0 size-full rounded object-cover"
           src={src || LOGO_PLACEHOLDER}
           onError={handleLogoError}
         />
@@ -137,7 +132,7 @@ export function TopPickTag({ small }: { small?: boolean }) {
   const t = useT();
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded bg-[#fff7ed] text-[#f54a00] whitespace-nowrap ${
+      className={`inline-flex shrink-0 items-center justify-center rounded bg-[#fff7ed] whitespace-nowrap text-[#f54a00] ${
         small ? "px-1 py-0.5 text-micro leading-[18px]" : "px-1 py-0.5 text-xs leading-[20px]"
       }`}
     >
@@ -148,9 +143,9 @@ export function TopPickTag({ small }: { small?: boolean }) {
 
 export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex gap-3 items-start w-full text-sm leading-[24px]">
+    <div className="flex w-full items-start gap-3 text-sm leading-[24px]">
       <span className="flex-1 text-[#4a5565]">{label}</span>
-      <span className="shrink-0 text-[#101828] text-right whitespace-nowrap">{value}</span>
+      <span className="shrink-0 text-right whitespace-nowrap text-[#101828]">{value}</span>
     </div>
   );
 }
@@ -176,13 +171,7 @@ export function FactsheetButton() {
  * - `href`: opens URL in new tab and shows external-link icon.
  * - neither: compact table-row button that just stops propagation.
  */
-export function InvestButton({
-  fullWidth,
-  href,
-}: {
-  fullWidth?: boolean;
-  href?: string;
-}) {
+export function InvestButton({ fullWidth, href }: { fullWidth?: boolean; href?: string }) {
   const t = useT();
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -190,12 +179,7 @@ export function InvestButton({
   };
   if (fullWidth) {
     return (
-      <Button
-        variant="primary"
-        size="xl"
-        className="w-full max-w-[343px]"
-        onClick={handleClick}
-      >
+      <Button variant="primary" size="xl" className="w-full max-w-[343px]" onClick={handleClick}>
         {t.products.common.createOrder}
       </Button>
     );

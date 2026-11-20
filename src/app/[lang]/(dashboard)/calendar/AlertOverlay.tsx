@@ -100,7 +100,7 @@ export function AlertOverlay({
           }}
           showHeader={false}
           title={shown?.item.title ?? t.planner.calendar.alert.fallbackTitle}
-          className="px-0 overflow-hidden"
+          className="overflow-hidden px-0"
           contentClassName="pt-0"
         >
           {shown && (

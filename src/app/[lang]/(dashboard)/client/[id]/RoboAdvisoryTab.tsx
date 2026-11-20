@@ -25,7 +25,9 @@ const ADVISORY_CARD_CLASS = [
 /** Figma 33787:150672 — arrow-right 24×24 */
 function ArrowRightIcon() {
   return (
-    <span className={`relative inline-flex size-6 shrink-0 transition-transform ${HOVER_TRANSITION} group-hover:translate-x-1 group-active:translate-x-0 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0`}>
+    <span
+      className={`relative inline-flex size-6 shrink-0 transition-transform ${HOVER_TRANSITION} group-hover:translate-x-1 group-active:translate-x-0 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0`}
+    >
       <Image src={ROBO_ASSETS.arrowRight} alt="" fill className="object-contain" />
     </span>
   );
@@ -112,14 +114,16 @@ function RoboAdvisoryCard({ onSelect }: { onSelect?: () => void }) {
           alt=""
           width={101}
           height={153}
-          className={`pointer-events-none absolute z-0 object-contain object-bottom transition-transform ${HOVER_TRANSITION} group-hover:scale-[1.03] max-lg:!bottom-[-29.13px] max-lg:!h-[129px] max-lg:!w-[92px] motion-reduce:transition-none motion-reduce:group-hover:scale-100`}
+          className={`pointer-events-none absolute z-0 object-contain object-bottom transition-transform ${HOVER_TRANSITION} group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 max-lg:!bottom-[-29.13px] max-lg:!h-[129px] max-lg:!w-[92px]`}
           style={{ right: 15.76, bottom: -20.13, width: 101, height: 153 }}
         />
       }
     >
       <div className="relative z-[1] flex w-full min-w-0 flex-1 flex-col gap-2 lg:gap-[7.864px]">
         <div className="flex w-full min-w-0 items-start justify-between">
-          <p className={`min-w-0 flex-1 text-base font-bold leading-[28px] text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629] lg:text-black/75 lg:group-hover:text-black/85`}>
+          <p
+            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629] lg:text-black/75 lg:group-hover:text-black/85`}
+          >
             Robo Advisory
           </p>
           <ArrowRightIcon />
@@ -160,7 +164,9 @@ function DefinitCard({ onSelect }: { onSelect?: () => void }) {
     >
       <div className="relative z-[1] flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex w-full min-w-0 items-start justify-between gap-2">
-          <p className={`min-w-0 flex-1 text-base font-bold leading-[28px] text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629]`}>
+          <p
+            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629]`}
+          >
             Definit by finnomena.
           </p>
           <ArrowRightIcon />
@@ -196,12 +202,10 @@ function PortfolioAdvisoryHeader() {
   const t = useT();
   return (
     <div className="flex flex-col">
-      <h2 className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg font-bold leading-[28px] text-transparent lg:text-xl lg:leading-[34px]">
+      <h2 className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg leading-[28px] font-bold text-transparent lg:text-xl lg:leading-[34px]">
         {t.products.advisory.sectionTitle}
       </h2>
-      <p className="text-sm leading-[24px] text-black/60">
-        {t.products.advisory.sectionSubtitle}
-      </p>
+      <p className="text-sm leading-[24px] text-black/60">{t.products.advisory.sectionSubtitle}</p>
     </div>
   );
 }
@@ -233,7 +237,7 @@ function PortfolioAdvisorySkeleton() {
         {Array.from({ length: 2 }).map((_, i) => (
           <div
             key={i}
-            className="flex w-full flex-col gap-3 rounded-lg border border-black/5 p-4 h-[124px] md:flex-1 lg:h-[135px]"
+            className="flex h-[124px] w-full flex-col gap-3 rounded-lg border border-black/5 p-4 md:flex-1 lg:h-[135px]"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-6 w-40" />
@@ -262,11 +266,9 @@ export function RoboAdvisoryTab({
   const { isLoading: clientsLoading } = useClientsResource();
 
   return (
-    <div className="w-full bg-white px-4 py-3 md:px-8 md:pb-10 md:pt-3 lg:bg-[#f9fafb] lg:py-10">
+    <div className="w-full bg-white px-4 py-3 md:px-8 md:pt-3 md:pb-10 lg:bg-[#f9fafb] lg:py-10">
       <div className="mx-auto w-full max-w-[1280px] lg:px-6">
-        <div
-          className="flex flex-col gap-3 md:gap-6 lg:rounded-xl lg:bg-white lg:px-14 lg:py-8 lg:shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]"
-        >
+        <div className="flex flex-col gap-3 md:gap-6 lg:rounded-xl lg:bg-white lg:px-14 lg:py-8 lg:shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]">
           {/* The cards' copy is static, but both open a client picker — so
               until the client list is in, there is nothing to pick from and
               the section stands as a skeleton rather than a dead click. */}

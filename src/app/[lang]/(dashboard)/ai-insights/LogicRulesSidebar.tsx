@@ -18,7 +18,9 @@ export function LogicRulesSidebar() {
     revenue: true,
     engagement: true,
   });
-  const [toasts, setToasts] = useState<Array<{ id: string; message: string; status: "success" }>>([]);
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; status: "success" }>>(
+    [],
+  );
 
   const triggerSave = () => {
     const id = Math.random().toString(36).slice(2);
@@ -31,64 +33,68 @@ export function LogicRulesSidebar() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       {/* Header */}
-      <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border">
+      <div className="flex items-center gap-2.5 border-b border-border px-4 py-3.5">
         <GearSixIcon size={15} className="text-muted-foreground" />
-        <p className="text-body-sm font-semibold text-foreground flex-1">{r.title}</p>
+        <p className="flex-1 text-body-sm font-semibold text-foreground">{r.title}</p>
         <Tag text={r.active} variant="green" size="small" />
       </div>
 
       {/* Rules */}
       <div className="flex flex-col">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div className="min-w-0 flex-1">
             <p className="text-label font-medium text-foreground">{r.highPriority}</p>
             <p className="text-meta text-muted-foreground">{r.highPrioritySub}</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex shrink-0 items-center gap-3">
             <input
               type="text"
               value={highPriorityThreshold}
               onChange={(e) => setHighPriorityThreshold(e.target.value)}
               onBlur={triggerSave}
-              className="w-12 text-center text-body-sm font-semibold border border-border rounded-lg py-1.5 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-12 rounded-lg border border-border bg-background py-1.5 text-center text-body-sm font-semibold text-foreground focus:ring-1 focus:ring-ring focus:outline-none"
             />
             <Toggle label="" checked={toggles.high} onChange={() => handleToggle("high")} />
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div className="min-w-0 flex-1">
             <p className="text-label font-medium text-foreground">{r.revenueMin}</p>
             <p className="text-meta text-muted-foreground">{r.revenueMinSub}</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex shrink-0 items-center gap-3">
             <input
               type="text"
               value={revenueMin}
               onChange={(e) => setRevenueMin(e.target.value)}
               onBlur={triggerSave}
-              className="w-12 text-center text-body-sm font-semibold border border-border rounded-lg py-1.5 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-12 rounded-lg border border-border bg-background py-1.5 text-center text-body-sm font-semibold text-foreground focus:ring-1 focus:ring-ring focus:outline-none"
             />
             <Toggle label="" checked={toggles.revenue} onChange={() => handleToggle("revenue")} />
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-3 px-4 py-3">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-label font-medium text-foreground">{r.engagement}</p>
             <p className="text-meta text-muted-foreground">{r.engagementSub}</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex shrink-0 items-center gap-3">
             <input
               type="text"
               value={engagementDays}
               onChange={(e) => setEngagementDays(e.target.value)}
               onBlur={triggerSave}
-              className="w-12 text-center text-body-sm font-semibold border border-border rounded-lg py-1.5 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-12 rounded-lg border border-border bg-background py-1.5 text-center text-body-sm font-semibold text-foreground focus:ring-1 focus:ring-ring focus:outline-none"
             />
-            <Toggle label="" checked={toggles.engagement} onChange={() => handleToggle("engagement")} />
+            <Toggle
+              label=""
+              checked={toggles.engagement}
+              onChange={() => handleToggle("engagement")}
+            />
           </div>
         </div>
       </div>

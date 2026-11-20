@@ -139,7 +139,7 @@ export function NoteComposer({
             // A step darker than the attributes pill's gray-50 — this one is the
             // way out of the panel, so it holds its own rather than blending
             // into the header.
-            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-default-tertiary)] text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--fill-gray-200)] hover:text-foreground"
+            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--bg-default-tertiary)] text-muted-foreground transition-colors hover:bg-[var(--fill-gray-200)] hover:text-foreground"
           >
             <MinusIcon size={16} />
           </button>
@@ -187,12 +187,7 @@ export function NoteComposer({
               {t.planner.notes.composer.discard}
             </Button>
           )}
-          <Button
-            variant="primary"
-            size="sm"
-            disabled={!canSubmit || saving}
-            onClick={onSubmit}
-          >
+          <Button variant="primary" size="sm" disabled={!canSubmit || saving} onClick={onSubmit}>
             {saving ? t.common.saving : t.planner.addNote}
           </Button>
         </div>

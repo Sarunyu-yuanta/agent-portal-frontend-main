@@ -19,11 +19,7 @@ function isTopIdeaSector(value: string): value is TopIdeaSector {
  * their record. It is a static table, so there is no loading to wait out
  * first; the product list's own loading is `TopIdeaDetail`'s.
  */
-export default function TopIdeaDetailPage({
-  params,
-}: {
-  params: Promise<{ sector: string }>;
-}) {
+export default function TopIdeaDetailPage({ params }: { params: Promise<{ sector: string }> }) {
   const t = useT();
   const { sector: rawSector } = use(params);
   const router = useLocalizedRouter();
@@ -38,9 +34,7 @@ export default function TopIdeaDetailPage({
     <TopIdeaDetail
       sector={sector}
       onBack={goBack}
-      onProductSelect={(p: StructuredProduct) =>
-        router.push(`/product-catalog/product/${p.id}`)
-      }
+      onProductSelect={(p: StructuredProduct) => router.push(`/product-catalog/product/${p.id}`)}
     />
   );
 }

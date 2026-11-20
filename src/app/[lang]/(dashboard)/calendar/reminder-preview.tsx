@@ -55,7 +55,7 @@ export function ReminderPreviewRow({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-3 p-3 text-left transition-colors cursor-pointer ${hoverClassName} ${
+      className={`flex cursor-pointer items-center gap-3 p-3 text-left transition-colors ${hoverClassName} ${
         flush ? "w-full" : "rounded-xl bg-[var(--bg-default-secondary)]"
       }`}
     >
@@ -66,15 +66,15 @@ export function ReminderPreviewRow({
       >
         {icon ?? <BellIcon size={16} weight="fill" />}
       </span>
-      <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-        <p className="type-body-2 font-semibold text-foreground truncate">{title}</p>
-        {meta ? <p className="type-caption text-muted-foreground truncate">{meta}</p> : null}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <p className="type-body-2 truncate font-semibold text-foreground">{title}</p>
+        {meta ? <p className="type-caption truncate text-muted-foreground">{meta}</p> : null}
         {!showDate ? null : dueToday ? (
           <p className="type-caption text-muted-foreground/70">
             {t.dates.reminderTag.dueToday(formatDayOnly(dayIso, locale))}
           </p>
         ) : (
-          <p className="flex items-center gap-1 type-caption text-muted-foreground/70">
+          <p className="type-caption flex items-center gap-1 text-muted-foreground/70">
             <CalendarBlankIcon size={12} />
             {formatDayOnly(dayIso, locale)}
           </p>

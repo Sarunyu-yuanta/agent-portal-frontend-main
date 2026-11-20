@@ -41,7 +41,7 @@ function IndexHeroBand({ page }: { page: MarketIndexPage }) {
         src="/products/stock/sector-hero-bg.png"
         alt=""
         fill
-        className="object-cover pointer-events-none"
+        className="pointer-events-none object-cover"
         sizes="100vw"
         priority
       />
@@ -54,14 +54,12 @@ function IndexHeroBand({ page }: { page: MarketIndexPage }) {
           className="relative size-16 shrink-0 rounded-full"
         />
         <div className="relative flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-2xl font-bold leading-9 text-[#101828]">{index.code}</p>
-          {description && (
-            <p className="text-base leading-[24px] text-[#4a5565]">{description}</p>
-          )}
+          <p className="truncate text-2xl leading-9 font-bold text-[#101828]">{index.code}</p>
+          {description && <p className="text-base leading-[24px] text-[#4a5565]">{description}</p>}
         </div>
         <div className="relative flex shrink-0 flex-col items-end gap-2">
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-2xl font-bold leading-9 text-[#101828]">{index.price}</span>
+            <span className="text-2xl leading-9 font-bold text-[#101828]">{index.price}</span>
             <span className="text-base leading-[24px]" style={{ color: HERO_TREND_TEXT[trend] }}>
               {index.changeAmount}
             </span>
@@ -83,13 +81,7 @@ function IndexHeroBand({ page }: { page: MarketIndexPage }) {
 /** Market-index drill-in: the board's indices as tabs, the clicked one as the
  *  hero, its members as the list. Shares every part below the hero with
  *  `SetIndustrySectorDetail` — see `stock-detail-list.tsx`. */
-export function MarketIndexDetail({
-  slug,
-  onBack,
-}: {
-  slug: string;
-  onBack: () => void;
-}) {
+export function MarketIndexDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
   const t = useT();
   const router = useLocalizedRouter();
   const { data: page, isLoading } = useMarketIndexPage(slug);
@@ -104,7 +96,11 @@ export function MarketIndexDetail({
   if (!page) {
     return (
       <div className="flex min-h-full w-full flex-1 flex-col bg-white">
-        <CatalogDetailBackHeader title={t.stock.indexDetail.fallbackTitle} onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader
+          title={t.stock.indexDetail.fallbackTitle}
+          onBack={onBack}
+          className="!pt-8"
+        />
         <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
@@ -127,7 +123,9 @@ export function MarketIndexDetail({
         items={page.indices.map((i) => ({
           id: i.code,
           label: i.code,
-          icon: <Image src={i.icon} alt="" width={20} height={20} className="size-5 rounded-full" />,
+          icon: (
+            <Image src={i.icon} alt="" width={20} height={20} className="size-5 rounded-full" />
+          ),
         }))}
         activeId={page.index.code}
         onSelect={(code) => {

@@ -37,13 +37,13 @@ export function NoteEditorFields({
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
         placeholder={t.planner.notes.fields.title}
-        className="type-h5 text-foreground bg-transparent outline-none border-none placeholder:text-muted-foreground/50 w-full"
+        className="type-h5 w-full border-none bg-transparent text-foreground outline-none placeholder:text-muted-foreground/50"
       />
       <textarea
         value={body}
         onChange={(e) => onBodyChange(e.target.value)}
         placeholder={t.planner.notes.fields.body}
-        className="type-body-2 text-foreground bg-transparent outline-none border-none resize-none flex-1 min-h-[200px] placeholder:text-muted-foreground/50 w-full"
+        className="type-body-2 min-h-[200px] w-full flex-1 resize-none border-none bg-transparent text-foreground outline-none placeholder:text-muted-foreground/50"
       />
     </>
   );

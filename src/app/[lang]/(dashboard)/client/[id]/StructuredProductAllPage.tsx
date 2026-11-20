@@ -19,7 +19,7 @@ import { useT } from "@/i18n/I18nProvider";
 /** Labelled at render from `t.products.structured.couponFilter`. */
 const COUPON_FILTERS = ["all", "low", "medium", "high", "ultra"] as const;
 
-type CouponFilter = typeof COUPON_FILTERS[number];
+type CouponFilter = (typeof COUPON_FILTERS)[number];
 
 export function StructuredProductAllPage({
   onBack,
@@ -54,42 +54,51 @@ export function StructuredProductAllPage({
   });
 
   return (
-    <div className="flex flex-col items-center w-full pt-4 pb-10 md:pt-4 md:pb-10 lg:pt-6 lg:pb-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
-      <div className="flex flex-col gap-4 lg:gap-6 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
+    <div className="flex w-full flex-col items-center bg-gradient-to-b from-white from-[43.451%] to-transparent pt-4 pb-10 md:pt-4 md:pb-10 lg:pt-6 lg:pb-20">
+      <div className="flex w-full max-w-[1280px] flex-col gap-4 px-4 md:px-8 lg:gap-6 lg:px-20">
         {/* Header */}
-        <div className="flex gap-2 items-center h-[46px] py-2">
-          <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+        <div className="flex h-[46px] items-center gap-2 py-2">
+          <Button
+            variant="plain"
+            size="icon-sm"
+            onClick={onBack}
+            aria-label={t.products.common.back}
+            className="shrink-0"
+          >
             <ArrowLeftIcon size={20} />
           </Button>
-          <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
+          <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
             {labels.title}
           </h1>
         </div>
 
         {/* Hero banner — tablet: H4 24px / Subtitle2 14px; desktop: H3 32px / Subtitle1 16px */}
-        <div className="relative flex w-full flex-col gap-2 items-start overflow-hidden rounded-xl p-4 lg:h-[144px] lg:p-8">
+        <div className="relative flex w-full flex-col items-start gap-2 overflow-hidden rounded-xl p-4 lg:h-[144px] lg:p-8">
           <Image
             alt=""
             aria-hidden
             fill
             priority
             sizes="(max-width: 1280px) 100vw, 1280px"
-            className="max-w-none object-cover pointer-events-none rounded-xl"
+            className="pointer-events-none max-w-none rounded-xl object-cover"
             src="/products/structured-product/structured-products-all-banner-bg.webp"
           />
           <div className="relative z-[1] flex max-w-[220px] flex-col gap-2 md:max-w-none">
-            <p className="text-2xl font-bold leading-9 text-[#101828] lg:text-[32px] lg:leading-[48px] lg:text-[rgba(0,0,0,0.85)]">
+            <p className="text-2xl leading-9 font-bold text-[#101828] lg:text-[32px] lg:leading-[48px] lg:text-[rgba(0,0,0,0.85)]">
               {labels.title}
             </p>
-            <p className="text-sm font-bold leading-[24px] text-[#4a5565] lg:text-base lg:leading-[28px] lg:text-[rgba(0,0,0,0.75)]">
+            <p className="text-sm leading-[24px] font-bold text-[#4a5565] lg:text-base lg:leading-[28px] lg:text-[rgba(0,0,0,0.75)]">
               {labels.subtitle}
             </p>
           </div>
         </div>
 
         {/* Filter chips */}
-        <div className="-mx-4 md:-mx-8 lg:mx-0 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          <div className="flex gap-2 min-w-max pl-4 md:pl-8 lg:pl-0 pr-4 md:pr-8 lg:pr-0">
+        <div
+          className="-mx-4 overflow-x-auto pb-1 md:-mx-8 lg:mx-0"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <div className="flex min-w-max gap-2 pr-4 pl-4 md:pr-8 md:pl-8 lg:pr-0 lg:pl-0">
             {COUPON_FILTERS.map((key) => (
               <Chip
                 key={key}
@@ -103,17 +112,21 @@ export function StructuredProductAllPage({
         </div>
 
         {/* Product list — mobile/tablet: single-col vertical cards; desktop: 3-col grid */}
-        <div className="flex flex-col gap-3 lg:gap-4 w-full">
-          <div className="flex items-center justify-between w-full text-xs leading-[20px] lg:text-sm lg:leading-[24px] text-[#6a7282]">
+        <div className="flex w-full flex-col gap-3 lg:gap-4">
+          <div className="flex w-full items-center justify-between text-xs leading-[20px] text-[#6a7282] lg:text-sm lg:leading-[24px]">
             {/* The feed's total unfiltered; what the chip left once one is picked. */}
             <span>
               {t.products.common.itemCount(
                 couponFilter === "all" ? ALL_STRUCTURED_PRODUCTS_COUNT : filteredProducts.length,
               )}
             </span>
-            <span className="text-right shrink-0 ml-2">
-              <span className="lg:hidden">{t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT_TABLET)}</span>
-              <span className="hidden lg:inline">{t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT)}</span>
+            <span className="ml-2 shrink-0 text-right">
+              <span className="lg:hidden">
+                {t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT_TABLET)}
+              </span>
+              <span className="hidden lg:inline">
+                {t.products.common.updatedAt(ALL_STRUCTURED_PRODUCTS_UPDATED_AT)}
+              </span>
             </span>
           </div>
 
@@ -127,18 +140,17 @@ export function StructuredProductAllPage({
               }
             />
           ) : (
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-4 w-full">
-            {filteredProducts.map((product) => (
-              <StructuredProductCard
-                key={product.id}
-                {...product}
-                variant="catalog"
-                onClick={() => onProductSelect(product)}
-              />
-            ))}
-          </div>
+            <div className="flex w-full flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-4">
+              {filteredProducts.map((product) => (
+                <StructuredProductCard
+                  key={product.id}
+                  {...product}
+                  variant="catalog"
+                  onClick={() => onProductSelect(product)}
+                />
+              ))}
+            </div>
           )}
-
         </div>
       </div>
     </div>

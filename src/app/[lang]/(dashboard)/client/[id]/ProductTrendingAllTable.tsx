@@ -46,7 +46,7 @@ export function RankBadge({ rank }: { rank: number }) {
   const style = RANK_STYLE[rank] ?? RANK_DEFAULT;
   return (
     <span
-      className="shrink-0 flex items-center justify-center size-6 rounded-full text-label font-bold"
+      className="flex size-6 shrink-0 items-center justify-center rounded-full text-label font-bold"
       style={{ backgroundColor: style.bg, color: style.text }}
     >
       {rank}
@@ -77,12 +77,12 @@ export function TrendingFill({ book }: { book: OrderBook }) {
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2">
       <LinearProgress value={pct} className="min-w-[40px] flex-1" />
-      <span className="type-caption text-muted-foreground whitespace-nowrap">
+      <span className="type-caption whitespace-nowrap text-muted-foreground">
         {money(taken)} / {money(book.targetAmount)} {book.currency}
       </span>
       {/* Bold and last, where the eye lands after the bar — the bar is the
           shape of the answer, this is the answer. */}
-      <span className="type-caption font-bold text-foreground whitespace-nowrap tabular-nums">
+      <span className="type-caption font-bold whitespace-nowrap text-foreground tabular-nums">
         {pct}%
       </span>
     </span>
@@ -117,8 +117,12 @@ export function TrendingSortChips({
 }) {
   const t = useT();
   return (
-    <div role="group" aria-labelledby="trending-sort-label" className="flex flex-wrap items-center gap-2">
-      <span id="trending-sort-label" className="text-sm text-muted-foreground whitespace-nowrap">
+    <div
+      role="group"
+      aria-labelledby="trending-sort-label"
+      className="flex flex-wrap items-center gap-2"
+    >
+      <span id="trending-sort-label" className="text-sm whitespace-nowrap text-muted-foreground">
         {t.products.trending.sortBy}
       </span>
       {TRENDING_SORTS.map((id) => (
@@ -143,12 +147,12 @@ type ColDef = {
 };
 
 const COLS: ColDef[] = [
-  { key: "rank",    width: "w-[80px]",              align: "justify-center" },
-  { key: "product", width: "flex-1 min-w-[300px]",  align: "" },
-  { key: "fill",    width: "w-[280px]",             align: "" },
-  { key: "sales",   width: "w-[140px]",             align: "justify-end" },
-  { key: "orders",  width: "w-[120px]",             align: "justify-end" },
-  { key: "change",  width: "w-[150px]",             align: "justify-end" },
+  { key: "rank", width: "w-[80px]", align: "justify-center" },
+  { key: "product", width: "flex-1 min-w-[300px]", align: "" },
+  { key: "fill", width: "w-[280px]", align: "" },
+  { key: "sales", width: "w-[140px]", align: "justify-end" },
+  { key: "orders", width: "w-[120px]", align: "justify-end" },
+  { key: "change", width: "w-[150px]", align: "justify-end" },
 ];
 
 function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: OrderBook | null }) {
@@ -165,9 +169,11 @@ function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: Orde
       );
     case "product":
       return (
-        <span className="flex flex-col min-w-0">
-          <span className="text-sm font-bold leading-[24px] text-[#101828] truncate">{item.title}</span>
-          <span className="type-caption text-muted-foreground truncate">{item.subtitle}</span>
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+            {item.title}
+          </span>
+          <span className="type-caption truncate text-muted-foreground">{item.subtitle}</span>
         </span>
       );
     // The three sales columns are only mounted on a `"sales"` group (see
@@ -175,13 +181,13 @@ function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: Orde
     // list and a measure that disagree — render nothing rather than a zero.
     case "sales":
       return item.salesThb === undefined ? null : (
-        <span className="text-sm font-bold leading-[24px] text-[#101828] whitespace-nowrap">
+        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
           {formatAumThb(item.salesThb)}
         </span>
       );
     case "orders":
       return item.orders === undefined ? null : (
-        <span className="text-sm leading-[24px] text-[#101828] whitespace-nowrap">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
           {item.orders.toLocaleString("en-US")}
         </span>
       );
@@ -232,8 +238,9 @@ export function ProductTrendingAllTable({
     c.key === "rank"
       ? isRankedSort(sort)
       : c.key === "fill"
-      ? fill
-      : group.measure === "sales" || (c.key !== "sales" && c.key !== "orders" && c.key !== "change"),
+        ? fill
+        : group.measure === "sales" ||
+          (c.key !== "sales" && c.key !== "orders" && c.key !== "change"),
   );
   // Wider when the fill column is in: the bar needs room to be a bar, and the
   // table scrolls sideways rather than crushing it.
@@ -245,13 +252,22 @@ export function ProductTrendingAllTable({
 
   return (
     <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }}>
-      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
-        <div className="flex flex-col gap-2 w-full">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
+        <div className="flex w-full flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+            <Button
+              variant="plain"
+              size="icon-sm"
+              onClick={onBack}
+              aria-label={t.products.common.back}
+              className="shrink-0"
+            >
               <ArrowLeftIcon size={20} />
             </Button>
-            <p className="flex-1 min-w-0 font-bold text-title leading-[28px] truncate" style={{ color: "rgba(0,0,0,0.75)" }}>
+            <p
+              className="min-w-0 flex-1 truncate text-title leading-[28px] font-bold"
+              style={{ color: "rgba(0,0,0,0.75)" }}
+            >
               {group.title}
             </p>
           </div>
@@ -279,13 +295,15 @@ export function ProductTrendingAllTable({
                     className={`flex ${col.width} shrink-0 items-center ${col.align} px-3`}
                     style={headerBorderStyle(i === cols.length - 1 ? { right: false } : undefined)}
                   >
-                    <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{t.products.trending.columns[col.key]}</span>
+                    <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>
+                      {t.products.trending.columns[col.key]}
+                    </span>
                   </div>
                 ))}
               </div>
               <div className={`flex flex-col ${minWidth}`}>
                 {paged.length === 0 && (
-                  <p className="type-caption text-muted-foreground text-center py-10">
+                  <p className="type-caption py-10 text-center text-muted-foreground">
                     {emptyTrendingMessage(sort, t)}
                   </p>
                 )}
@@ -294,12 +312,12 @@ export function ProductTrendingAllTable({
                     key={item.rank}
                     type="button"
                     onClick={() => onSelect(item.target)}
-                    className="flex items-stretch w-full text-left bg-white cursor-pointer transition-colors hover:bg-[#f9fafb]"
+                    className="flex w-full cursor-pointer items-stretch bg-white text-left transition-colors hover:bg-[#f9fafb]"
                   >
                     {cols.map((col) => (
                       <div
                         key={col.key}
-                        className={`flex ${col.width} shrink-0 items-center ${col.align} px-3 py-3 min-w-0`}
+                        className={`flex ${col.width} shrink-0 items-center ${col.align} min-w-0 px-3 py-3`}
                         style={cellBorderStyle({ bottom: i < paged.length - 1 })}
                       >
                         <Cell item={item} col={col} book={bookForItem(item, books)} />
@@ -313,27 +331,46 @@ export function ProductTrendingAllTable({
 
           {/* Hidden with no rows, as on GlobalBondAllPage */}
           {total > 0 && (
-          <div className="flex flex-wrap-reverse items-center justify-end gap-3">
-            <div className="flex items-center gap-2">
-              <p className="text-label text-muted-foreground whitespace-nowrap">{t.products.pagination.perPage}</p>
-              <select
-                value={pageSize}
-                onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-                className="text-label border border-border rounded-md px-2 py-1 bg-background text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-action"
-              >
-                {PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
+            <div className="flex flex-wrap-reverse items-center justify-end gap-3">
+              <div className="flex items-center gap-2">
+                <p className="text-label whitespace-nowrap text-muted-foreground">
+                  {t.products.pagination.perPage}
+                </p>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
+                >
+                  {PAGE_SIZE_OPTIONS.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-label text-muted-foreground">
+                  {t.products.pagination.showing(
+                    {
+                      from: (safePage - 1) * pageSize + 1,
+                      to: Math.min(safePage * pageSize, total),
+                      total,
+                    },
+                    (n) => (
+                      <span className="font-medium text-foreground">{n}</span>
+                    ),
+                  )}
+                </p>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={safePage}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-label text-muted-foreground">
-                {t.products.pagination.showing(
-                  { from: (safePage - 1) * pageSize + 1, to: Math.min(safePage * pageSize, total), total },
-                  (n) => <span className="font-medium text-foreground">{n}</span>,
-                )}
-              </p>
-              <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setCurrentPage} />
-            </div>
-          </div>
           )}
         </div>
       </div>
@@ -346,7 +383,7 @@ export function ProductTrendingAllTable({
 export function ProductTrendingAllTableSkeleton() {
   return (
     <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }} aria-busy="true">
-      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Skeleton className="size-8 shrink-0 rounded-lg" />

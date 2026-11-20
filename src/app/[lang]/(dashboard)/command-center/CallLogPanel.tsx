@@ -67,7 +67,13 @@ export function CallLogPanel({ rows, limit }: { rows: CallLogRow[]; limit: numbe
       <div className="flex flex-col gap-4">
         <CardHeader title={t.commandCenter.callLog.title} />
         <EmptyState
-        icon={<PhoneIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          icon={
+            <PhoneIcon
+              size={40}
+              weight="duotone"
+              className="text-[var(--text-default-placeholder)]"
+            />
+          }
           title={t.commandCenter.callLog.emptyTitle}
           body={t.commandCenter.callLog.emptyBodyAll}
         />
@@ -87,13 +93,11 @@ export function CallLogPanel({ rows, limit }: { rows: CallLogRow[]; limit: numbe
           boxes: a log is a continuous record, and five outlined cards in a
           column made each call look like its own object. The container carries
           the border and the fill; a row only draws its own hover. */}
-      <div className="overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+      <div className="divide-y divide-black/[0.05] overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)]">
         {rows.slice(0, limit).map((row) => (
           <CallRow key={row.id} row={row} onOpen={() => setDetail(row)} />
         ))}
-        {rows.length > limit && (
-          <MoreRow count={rows.length - limit} />
-        )}
+        {rows.length > limit && <MoreRow count={rows.length - limit} />}
       </div>
 
       <CallDetailModal
@@ -138,7 +142,9 @@ export function CallDetailModal({
     >
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
         <div className="flex items-center gap-3">
-          <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${tone}`}>
+          <span
+            className={`flex size-10 shrink-0 items-center justify-center rounded-full ${tone}`}
+          >
             <Icon size={20} weight="bold" />
           </span>
           <div className="min-w-0 flex-1">
@@ -195,10 +201,7 @@ function MoreRow({ count }: { count: number }) {
       <p className="min-w-0 flex-1 truncate text-body-sm font-bold text-foreground">
         {t.commandCenter.moreItems(count)}
       </p>
-      <CaretRightIcon
-        size={16}
-        className="shrink-0 text-[var(--text-default-placeholder)]"
-      />
+      <CaretRightIcon size={16} className="shrink-0 text-[var(--text-default-placeholder)]" />
     </Link>
   );
 }
@@ -219,17 +222,11 @@ export function CallRow({ row, onOpen }: { row: CallLogRow; onOpen: () => void }
           onOpen();
         }
       }}
-      className="flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-[var(--fill-p1-100)]"
+      className="flex cursor-pointer items-center gap-3 p-3 transition-colors hover:bg-[var(--fill-p1-100)]"
     >
-      <Icon
-        size={18}
-        weight="bold"
-        role="img"
-        aria-label={label}
-        className={`shrink-0 ${color}`}
-      />
+      <Icon size={18} weight="bold" role="img" aria-label={label} className={`shrink-0 ${color}`} />
 
-      <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="truncate text-body font-bold text-foreground">{row.clientName}</p>
         {/* One line. It does cut most summaries mid-sentence, so the full text
             is on the row's tooltip and the whole row opens the client's own

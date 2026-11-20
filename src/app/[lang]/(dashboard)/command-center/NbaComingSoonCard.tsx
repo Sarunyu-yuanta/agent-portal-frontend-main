@@ -49,10 +49,7 @@ export function NbaComingSoonCard({
 }) {
   const t = useT();
   return (
-    <Card
-      variant="default"
-      className={`gap-4 ${paired ? "flex h-full flex-col" : ""}`}
-    >
+    <Card variant="default" className={`gap-4 ${paired ? "flex h-full flex-col" : ""}`}>
       {/* No count while the card is held behind the blur — a number promises
           rows you can read, and these are a preview of a shape, not things
           waiting to be done. */}
@@ -68,7 +65,7 @@ export function NbaComingSoonCard({
         {rows.length > 0 ? (
           <div
             aria-hidden
-            className={`pointer-events-none select-none blur-[3px] ${
+            className={`pointer-events-none blur-[3px] select-none ${
               paired ? "absolute inset-0 overflow-hidden" : ""
             }`}
           >
@@ -88,13 +85,13 @@ export function NbaComingSoonCard({
               the feature, so this says what it will do rather than repeating
               it. */}
           <div className="flex max-w-[400px] flex-col items-center gap-2 rounded-2xl border border-border bg-card px-5 py-3.5 text-center shadow-[0px_4px_16px_rgba(0,0,0,0.06)]">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary-action-light">
+            <span className="bg-primary-action-light flex size-9 items-center justify-center rounded-xl">
               <SparkleIcon size={18} weight="fill" className="text-primary-action" />
             </span>
             <p className="type-body-2 leading-relaxed text-muted-foreground">
               {t.commandCenter.nba.comingSoonMessage[message]}
             </p>
-            <p className="text-meta font-semibold uppercase tracking-widest text-primary-action">
+            <p className="text-primary-action text-meta font-semibold tracking-widest uppercase">
               {t.commandCenter.nba.comingSoon}
             </p>
           </div>

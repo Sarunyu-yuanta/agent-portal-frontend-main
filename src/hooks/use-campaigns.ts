@@ -31,4 +31,3 @@ export function useCampaign(id: string): Resource<Campaign | undefined> {
   const campaign = useMemo(() => data.find((c) => c.id === id), [data, id]);
   return { ...source, data: campaign };
 }
-

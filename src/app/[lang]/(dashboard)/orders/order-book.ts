@@ -345,12 +345,7 @@ export function bookingPhase(booking: Booking, book: OrderBook): BookingPhase {
 }
 
 /** In the order a booking moves through them — the chips' order. */
-export const BOOKING_PHASES: BookingPhase[] = [
-  "pending",
-  "processing",
-  "completed",
-  "cancelled",
-];
+export const BOOKING_PHASES: BookingPhase[] = ["pending", "processing", "completed", "cancelled"];
 
 /**
  * What each phase is called on each desk.
@@ -371,10 +366,7 @@ export const BOOKING_PHASES: BookingPhase[] = [
  * bell already rings "ครบยอดแล้ว" in — see `use-order-notification-feed`. The
  * one variant left over goes to proposals; see `PROPOSAL_VARIANT`.
  */
-export const BOOKING_PHASE_VARIANT: Record<
-  BookingPhase,
-  "lime" | "yellow" | "green" | "gray"
-> = {
+export const BOOKING_PHASE_VARIANT: Record<BookingPhase, "lime" | "yellow" | "green" | "gray"> = {
   // `lime`, and the proposals' tag took the blue — the pair was the other way
   // round and was swapped deliberately. Nothing about either colour is load
   // bearing on its own; what matters is that `pending` and a proposal do not
@@ -384,7 +376,6 @@ export const BOOKING_PHASE_VARIANT: Record<
   completed: "green",
   cancelled: "gray",
 };
-
 
 /**
  * Order Management's filter chips, in this desk's own wording.
@@ -436,7 +427,6 @@ export function bookingPhaseSteps(
  * wording turns on the client not having acted rather than on what they were
  * offered.
  */
-
 
 /**
  * Whether the product still takes bookings.
@@ -547,15 +537,15 @@ export function bookAvailabilityLabel(
   availability: BookAvailability,
   t: Dictionary,
 ): string {
-  return availability === "open" ? t.orders.words[book.mode].availabilityOpen : t.orders.availabilityClosed;
+  return availability === "open"
+    ? t.orders.words[book.mode].availabilityOpen
+    : t.orders.availabilityClosed;
 }
 
 export const BOOK_AVAILABILITY_VARIANT: Record<BookAvailability, "green" | "gray"> = {
   open: "green",
   closed: "gray",
 };
-
-
 
 /** How full a quota book is, capped at 100. */
 export function quotaUsedPct(book: OrderBook): number {
@@ -594,8 +584,6 @@ export function bookFill(book: OrderBook): { taken: number; pct: number } {
 export function bookFillThb(book: OrderBook): number {
   return bookFill(book).taken * (book.currency === "USD" ? USD_THB : 1);
 }
-
-
 
 /**
  * The round a book's headline figures should describe.

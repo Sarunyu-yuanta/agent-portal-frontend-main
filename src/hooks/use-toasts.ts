@@ -10,8 +10,7 @@ export function useToasts() {
   const addToast = (props: Omit<ToastProps, "onClose">) =>
     setToasts((prev) => [...prev, { ...props, id: crypto.randomUUID() }]);
 
-  const removeToast = (id: string) =>
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  const removeToast = (id: string) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
   return { toasts, addToast, removeToast };
 }

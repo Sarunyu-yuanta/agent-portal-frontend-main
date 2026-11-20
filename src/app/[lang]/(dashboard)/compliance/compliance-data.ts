@@ -16,9 +16,9 @@ export type SortDir = "none" | "asc" | "desc";
 
 /** Labels live in `t.compliance.table.filters[id]`. */
 export const kycFilterOpts = [
-  { value: "",           id: "all" },
-  { value: "success",    id: "success" },
+  { value: "", id: "all" },
+  { value: "success", id: "success" },
   { value: "processing", id: "processing" },
-  { value: "hold",       id: "hold" },
-  { value: "error",      id: "error" },
+  { value: "hold", id: "hold" },
+  { value: "error", id: "error" },
 ] as const;

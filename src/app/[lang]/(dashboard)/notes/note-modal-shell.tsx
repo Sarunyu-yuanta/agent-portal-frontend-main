@@ -36,8 +36,8 @@ export function NoteModalShell({
         onBackdropDismiss();
       }}
     >
-      <div className="relative w-full max-w-4xl h-[calc(var(--vh)*75)] rounded-xl border border-border bg-card flex flex-col overflow-hidden shadow-xl">
-        <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
+      <div className="relative flex h-[calc(var(--vh)*75)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+        <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
         <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
           {footer}
         </div>

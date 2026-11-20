@@ -24,21 +24,24 @@ export function CatalogDetailThemeHero({
   trailing?: ReactNode;
 }) {
   return (
-    <div className="relative w-full overflow-hidden" style={{ backgroundColor: THEME_HERO_COLOR.glow }}>
-      <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pb-2.5 pt-2.5 md:px-8 lg:px-0">
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ backgroundColor: THEME_HERO_COLOR.glow }}
+    >
+      <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pt-2.5 pb-2.5 md:px-8 lg:px-0">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             {icon}
             <p
-              className="min-w-0 flex-1 truncate text-xl font-bold leading-[34px]"
+              className="min-w-0 flex-1 truncate text-xl leading-[34px] font-bold"
               style={{ color: THEME_HERO_COLOR.title }}
             >
               {title}
             </p>
           </div>
-          <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{description}</p>
+          <p className="text-sm leading-[24px] font-normal text-[#4a5565]">{description}</p>
           {meta ? (
-            <p className="text-micro font-normal leading-[18px] text-[#6a7282]">{meta}</p>
+            <p className="text-micro leading-[18px] font-normal text-[#6a7282]">{meta}</p>
           ) : null}
         </div>
         {trailing}
@@ -79,7 +82,12 @@ export function CatalogTabbedDetailView<T extends string>({
   const body = (
     <>
       <CatalogDetailBackHeader title={title} onBack={onBack} className="!pt-8" />
-      <CatalogDetailTextTabs sticky items={tabItems} activeId={activeTabId} onSelect={onTabSelect} />
+      <CatalogDetailTextTabs
+        sticky
+        items={tabItems}
+        activeId={activeTabId}
+        onSelect={onTabSelect}
+      />
       {hero}
       <div
         className="relative z-10 w-full rounded-xl"
@@ -91,7 +99,9 @@ export function CatalogTabbedDetailView<T extends string>({
           <div className={`flex flex-col gap-6 ${CATALOG_DETAIL_WIDTH.narrow}`}>
             {listControls ? <div className="flex w-full flex-col gap-3">{listControls}</div> : null}
             {countLabel ? (
-              <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">{countLabel}</p>
+              <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
+                {countLabel}
+              </p>
             ) : null}
             {children}
           </div>

@@ -8,13 +8,7 @@ import { useNotes } from "@/contexts/notes-context";
 import { useClients } from "@/hooks/use-api";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useToasts } from "@/hooks/use-toasts";
-import {
-  dayFromKey,
-  dayKey,
-  isSameMonth,
-  monthGrid,
-  weeksOf,
-} from "../calendar/calendar-grid";
+import { dayFromKey, dayKey, isSameMonth, monthGrid, weeksOf } from "../calendar/calendar-grid";
 import type { DayItem } from "../calendar/day-items";
 import { ReminderPreviewRow, RemindersPreviewEmpty } from "../calendar/reminder-preview";
 import { NOTE_AUTHOR } from "../notes/note-constants";
@@ -119,177 +113,186 @@ export function MiniCalendar({
 
   return (
     <>
-    <PopoverPrimitive.Root
-      open={!isMobile && openDay !== null}
-      onOpenChange={(next) => {
-        if (!next) setOpenKey(null);
-      }}
-    >
-    <PopoverPrimitive.Anchor asChild>
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <p className="type-subtitle-1 font-bold text-foreground">
-          {formatDate(locale, viewDate, "monthYear")}
-        </p>
-        <div className="flex items-center gap-0.5">
-          <MonthNavButton label={t.commandCenter.calendar.prevMonth} onClick={() => onMonthChange(-1)}>
-            <CaretLeftIcon size={14} weight="bold" />
-          </MonthNavButton>
-          <MonthNavButton label={t.commandCenter.calendar.nextMonth} onClick={() => onMonthChange(1)}>
-            <CaretRightIcon size={14} weight="bold" />
-          </MonthNavButton>
-        </div>
-      </div>
-
-      <div>
-        <div className="grid grid-cols-7">
-          {weekdayNames(locale, "narrow").map((label, i) => (
-            <div
-              key={weekdayNames(locale, "short")[i]}
-              className="pb-1.5 text-center text-meta font-semibold text-[var(--text-default-placeholder)]"
-            >
-              {label}
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          {weeks.map((week) => {
-            const currentWeek = week.some((day) => dayKey(day) === todayKey);
-            return (
-              <div
-                key={dayKey(week[0])}
-                className={`grid grid-cols-7 rounded-lg ${
-                  currentWeek ? "bg-primary-action-light py-1.5" : ""
-                }`}
-              >
-                {week.map((day) => {
-                  const key = dayKey(day);
-                  const items = remindersByDay.get(key) ?? [];
-                  return (
-                    <DayCell
-                      key={key}
-                      day={day}
-                      outside={!isSameMonth(day, viewDate)}
-                      isToday={key === todayKey}
-                      hasReminder={items.length > 0}
-                      open={openKey === key}
-                      onTint={currentWeek}
-                      onSelect={() => setOpenKey(openKey === key ? null : key)}
-                    />
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-    </div>
-    </PopoverPrimitive.Anchor>
-
-    {/* Sits on the side of the calendar card, not over the days. The card
-        pads its content by 16px, so the offset clears that plus a small gap. */}
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        side="left"
-        align="start"
-        alignOffset={-16}
-        sideOffset={28}
-        collisionPadding={16}
-        onOpenAutoFocus={(event) => event.preventDefault()}
-        onInteractOutside={(event) => {
-          const target = event.target;
-          if (target instanceof Element && target.closest("[data-cal-day]")) {
-            event.preventDefault();
-          }
-        }}
-        className="z-50 w-[280px] rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-popover outline-none"
-      >
-        {openDay && (
-          <DayPopoverBody
-            day={openDay.day}
-            items={openDay.items}
-            today={today}
-            clientNames={clientNames}
-            onOpenItem={(item) => {
-              const day = openDay.day;
-              setOpenKey(null);
-              onOpen(item, day);
-            }}
-            onAddReminder={openCreate}
-          />
-        )}
-      </PopoverPrimitive.Content>
-    </PopoverPrimitive.Portal>
-
-    {isMobile && (
-      <BottomSheet
-        open={openKey !== null}
+      <PopoverPrimitive.Root
+        open={!isMobile && openDay !== null}
         onOpenChange={(next) => {
           if (!next) setOpenKey(null);
         }}
-        title={openDay ? formatDate(locale, openDay.day, "dayMonth") : t.commandCenter.reminders.title}
-        showHandle
       >
-        {openDay && (
-          <DayPopoverBody
-            day={openDay.day}
-            items={openDay.items}
-            today={today}
-            clientNames={clientNames}
-            onOpenItem={(item) => {
-              const day = openDay.day;
-              setOpenKey(null);
-              onOpen(item, day);
-            }}
-            onAddReminder={openCreate}
-          />
-        )}
-      </BottomSheet>
-    )}
-    </PopoverPrimitive.Root>
+        <PopoverPrimitive.Anchor asChild>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="type-subtitle-1 font-bold text-foreground">
+                {formatDate(locale, viewDate, "monthYear")}
+              </p>
+              <div className="flex items-center gap-0.5">
+                <MonthNavButton
+                  label={t.commandCenter.calendar.prevMonth}
+                  onClick={() => onMonthChange(-1)}
+                >
+                  <CaretLeftIcon size={14} weight="bold" />
+                </MonthNavButton>
+                <MonthNavButton
+                  label={t.commandCenter.calendar.nextMonth}
+                  onClick={() => onMonthChange(1)}
+                >
+                  <CaretRightIcon size={14} weight="bold" />
+                </MonthNavButton>
+              </div>
+            </div>
 
-    <NoteModalShell
-      open={createOpen}
-      onBackdropDismiss={() => {
-        if (attributesOpenRef.current) return;
-        setCreateOpen(false);
-      }}
-      footer={
-        <>
-          <Button variant="outline" size="sm" onClick={() => setCreateOpen(false)}>
-            {t.common.cancel}
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleCreateSave}
-            disabled={blank || saving}
+            <div>
+              <div className="grid grid-cols-7">
+                {weekdayNames(locale, "narrow").map((label, i) => (
+                  <div
+                    key={weekdayNames(locale, "short")[i]}
+                    className="pb-1.5 text-center text-meta font-semibold text-[var(--text-default-placeholder)]"
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                {weeks.map((week) => {
+                  const currentWeek = week.some((day) => dayKey(day) === todayKey);
+                  return (
+                    <div
+                      key={dayKey(week[0])}
+                      className={`grid grid-cols-7 rounded-lg ${
+                        currentWeek ? "bg-primary-action-light py-1.5" : ""
+                      }`}
+                    >
+                      {week.map((day) => {
+                        const key = dayKey(day);
+                        const items = remindersByDay.get(key) ?? [];
+                        return (
+                          <DayCell
+                            key={key}
+                            day={day}
+                            outside={!isSameMonth(day, viewDate)}
+                            isToday={key === todayKey}
+                            hasReminder={items.length > 0}
+                            open={openKey === key}
+                            onTint={currentWeek}
+                            onSelect={() => setOpenKey(openKey === key ? null : key)}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </PopoverPrimitive.Anchor>
+
+        {/* Sits on the side of the calendar card, not over the days. The card
+        pads its content by 16px, so the offset clears that plus a small gap. */}
+        <PopoverPrimitive.Portal>
+          <PopoverPrimitive.Content
+            side="left"
+            align="start"
+            alignOffset={-16}
+            sideOffset={28}
+            collisionPadding={16}
+            onOpenAutoFocus={(event) => event.preventDefault()}
+            onInteractOutside={(event) => {
+              const target = event.target;
+              if (target instanceof Element && target.closest("[data-cal-day]")) {
+                event.preventDefault();
+              }
+            }}
+            className="z-50 w-[280px] rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-popover outline-none"
           >
-            {t.commandCenter.calendar.addNote}
-          </Button>
-        </>
-      }
-    >
-      <NoteDetailPane
-        key="__draft__"
-        note={draftNote}
-        clients={clients}
-        onSave={(patch) => setDraftAttrs((prev) => ({ ...prev, ...patch }))}
-        onEmptyChange={setBlank}
-        onValuesChange={(values) => {
-          modalValuesRef.current = values;
+            {openDay && (
+              <DayPopoverBody
+                day={openDay.day}
+                items={openDay.items}
+                today={today}
+                clientNames={clientNames}
+                onOpenItem={(item) => {
+                  const day = openDay.day;
+                  setOpenKey(null);
+                  onOpen(item, day);
+                }}
+                onAddReminder={openCreate}
+              />
+            )}
+          </PopoverPrimitive.Content>
+        </PopoverPrimitive.Portal>
+
+        {isMobile && (
+          <BottomSheet
+            open={openKey !== null}
+            onOpenChange={(next) => {
+              if (!next) setOpenKey(null);
+            }}
+            title={
+              openDay
+                ? formatDate(locale, openDay.day, "dayMonth")
+                : t.commandCenter.reminders.title
+            }
+            showHandle
+          >
+            {openDay && (
+              <DayPopoverBody
+                day={openDay.day}
+                items={openDay.items}
+                today={today}
+                clientNames={clientNames}
+                onOpenItem={(item) => {
+                  const day = openDay.day;
+                  setOpenKey(null);
+                  onOpen(item, day);
+                }}
+                onAddReminder={openCreate}
+              />
+            )}
+          </BottomSheet>
+        )}
+      </PopoverPrimitive.Root>
+
+      <NoteModalShell
+        open={createOpen}
+        onBackdropDismiss={() => {
+          if (attributesOpenRef.current) return;
+          setCreateOpen(false);
         }}
-        manualSave
-        layout="side"
-        autoFocusTitle
-        onAttributesOpenChange={(open) => {
-          attributesOpenRef.current = open;
-        }}
-      />
-    </NoteModalShell>
-    <Toaster items={toasts} onRemove={removeToast} />
+        footer={
+          <>
+            <Button variant="outline" size="sm" onClick={() => setCreateOpen(false)}>
+              {t.common.cancel}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleCreateSave}
+              disabled={blank || saving}
+            >
+              {t.commandCenter.calendar.addNote}
+            </Button>
+          </>
+        }
+      >
+        <NoteDetailPane
+          key="__draft__"
+          note={draftNote}
+          clients={clients}
+          onSave={(patch) => setDraftAttrs((prev) => ({ ...prev, ...patch }))}
+          onEmptyChange={setBlank}
+          onValuesChange={(values) => {
+            modalValuesRef.current = values;
+          }}
+          manualSave
+          layout="side"
+          autoFocusTitle
+          onAttributesOpenChange={(open) => {
+            attributesOpenRef.current = open;
+          }}
+        />
+      </NoteModalShell>
+      <Toaster items={toasts} onRemove={removeToast} />
     </>
   );
 }
@@ -338,7 +341,7 @@ function DayCell({
       aria-expanded={open}
       aria-haspopup="dialog"
       onClick={onSelect}
-      className="group flex w-full flex-col items-center gap-0.5 py-0.5 cursor-pointer"
+      className="group flex w-full cursor-pointer flex-col items-center gap-0.5 py-0.5"
     >
       {/* `size-6`, not the 28px this started at. The dot below reads as
           belonging to the number, and what separated them was mostly the disc's
@@ -353,7 +356,7 @@ function DayCell({
           isToday
             ? "bg-primary-action font-bold text-white group-hover:bg-[var(--primary-action-hover)]!"
             : open
-              ? "bg-[rgba(10,110,231,0.16)] font-semibold text-primary-action"
+              ? "text-primary-action bg-[rgba(10,110,231,0.16)] font-semibold"
               : outside
                 ? `text-[var(--text-default-placeholder)] ${hoverFill}`
                 : `text-foreground ${hoverFill}`
@@ -364,7 +367,7 @@ function DayCell({
       <span className="flex h-1.5 items-center justify-center">
         {hasReminder && (
           <span
-            className={`size-1.5 rounded-full bg-primary-action ${outside ? "opacity-40" : ""}`}
+            className={`bg-primary-action size-1.5 rounded-full ${outside ? "opacity-40" : ""}`}
           />
         )}
       </span>

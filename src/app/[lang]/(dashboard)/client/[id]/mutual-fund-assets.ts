@@ -1,4 +1,8 @@
-import type { MobileFundGroupId, MutualFundCategoryId, MutualFundThemeId } from "./mutual-fund-data";
+import type {
+  MobileFundGroupId,
+  MutualFundCategoryId,
+  MutualFundThemeId,
+} from "./mutual-fund-data";
 
 /** Figma-exported assets for the Mutual Fund catalog tab. */
 export const MF_ASSETS = {
@@ -192,25 +196,57 @@ const MOBILE_GROUP_HERO: Record<MobileFundGroupId, MobileGroupHero> = {
   },
   "thai-equity": {
     glow: { bottom: -61, right: 21, size: 124 },
-    layers: [{ src: MF_ASSETS.mobileGroupHero["thai-equity"], bottom: -11, right: 39, width: 85, height: 110 }],
+    layers: [
+      {
+        src: MF_ASSETS.mobileGroupHero["thai-equity"],
+        bottom: -11,
+        right: 39,
+        width: 85,
+        height: 110,
+      },
+    ],
   },
   "foreign-equity": {
     glow: { bottom: -61, right: 21, size: 124 },
-    layers: [{ src: MF_ASSETS.mobileGroupHero["foreign-equity"], bottom: -11, right: 37, width: 91, height: 110 }],
+    layers: [
+      {
+        src: MF_ASSETS.mobileGroupHero["foreign-equity"],
+        bottom: -11,
+        right: 37,
+        width: 91,
+        height: 110,
+      },
+    ],
   },
   "commodities-group": {
     glow: { bottom: -61, right: 21, size: 124 },
     layers: [
-      { src: MF_ASSETS.mobileGroupHero["commodities-group"], bottom: -11, right: 37, width: 91, height: 112 },
+      {
+        src: MF_ASSETS.mobileGroupHero["commodities-group"],
+        bottom: -11,
+        right: 37,
+        width: 91,
+        height: 112,
+      },
     ],
   },
   "tax-saving": {
     glow: { bottom: -61, right: 21, size: 124 },
-    layers: [{ src: MF_ASSETS.mobileGroupHero["tax-saving"], bottom: 16, right: 41, width: 81, height: 81 }],
+    layers: [
+      {
+        src: MF_ASSETS.mobileGroupHero["tax-saving"],
+        bottom: 16,
+        right: 41,
+        width: 81,
+        height: 81,
+      },
+    ],
   },
   others: {
     glow: { bottom: -61, right: 21, size: 124 },
-    layers: [{ src: MF_ASSETS.mobileGroupHero.others, bottom: -3, right: 43, width: 66, height: 90 }],
+    layers: [
+      { src: MF_ASSETS.mobileGroupHero.others, bottom: -3, right: 43, width: 66, height: 90 },
+    ],
   },
 };
 

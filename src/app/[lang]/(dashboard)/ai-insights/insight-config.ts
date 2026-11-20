@@ -1,9 +1,4 @@
-import {
-  ChartBarIcon,
-  SparkleIcon,
-  UsersIcon,
-  WarningIcon,
-} from "@phosphor-icons/react";
+import { ChartBarIcon, SparkleIcon, UsersIcon, WarningIcon } from "@phosphor-icons/react";
 import type { mockInsights } from "@/lib/mock-data";
 
 export type SortOption = "priority" | "recent";
@@ -24,13 +19,13 @@ export const CATEGORY_CONFIG = {
     Icon: WarningIcon,
     tagVariant: "red" as const,
   },
-  "Engagement": {
+  Engagement: {
     color: "var(--text-warning-primary)",
     bg: "var(--bg-warning-light)",
     Icon: UsersIcon,
     tagVariant: "yellow" as const,
   },
-  "Portfolio": {
+  Portfolio: {
     color: "var(--text-brand-secondary)",
     bg: "var(--bg-brand-light)",
     Icon: ChartBarIcon,

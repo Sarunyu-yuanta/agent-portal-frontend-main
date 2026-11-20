@@ -47,11 +47,7 @@ export function StockLargeAssetCard({
   onSelect?: () => void;
 }) {
   const amountColor =
-    trend === "flat"
-      ? "#6a7282"
-      : figmaSectorAmountColors
-        ? "#008236"
-        : TREND_TEXT[trend];
+    trend === "flat" ? "#6a7282" : figmaSectorAmountColors ? "#008236" : TREND_TEXT[trend];
 
   // `group-hover:` rather than `hover:` — the hover belongs to the whole card
   // but the button below is the element that receives it, and the fill has to
@@ -62,15 +58,23 @@ export function StockLargeAssetCard({
   // Nothing fires when the card is not clickable — there is no `group` ancestor
   // then.
   const card = (
-    <div className="flex min-w-[343px] w-full items-center gap-6 rounded-lg border-b border-black/10 bg-white p-6 transition-[background-color,box-shadow] group-hover:bg-[#fafafa]! group-hover:shadow-[0px_2px_8px_rgba(0,0,0,0.06)]">
+    <div className="flex w-full min-w-[343px] items-center gap-6 rounded-lg border-b border-black/10 bg-white p-6 transition-[background-color,box-shadow] group-hover:bg-[#fafafa]! group-hover:shadow-[0px_2px_8px_rgba(0,0,0,0.06)]">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="max-w-[119px] truncate text-sm font-bold leading-[24px] text-[#101828]">{symbol}</p>
+          <p className="max-w-[119px] truncate text-sm leading-[24px] font-bold text-[#101828]">
+            {symbol}
+          </p>
           <p className="truncate text-sm leading-[24px] text-[#6a7282]">{subtitle}</p>
         </div>
-        <StockMiniChart series={series} trend={trend} width={96} height={42} className="h-[42px] w-24 shrink-0" />
+        <StockMiniChart
+          series={series}
+          trend={trend}
+          width={96}
+          height={42}
+          className="h-[42px] w-24 shrink-0"
+        />
         <div className="flex w-[120px] max-w-[170px] shrink-0 flex-col items-end gap-0.5">
-          <div className="flex items-center gap-1 text-sm font-bold leading-[24px] text-[#101828]">
+          <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-[#101828]">
             <span>{price}</span>
             <span>{currency}</span>
           </div>

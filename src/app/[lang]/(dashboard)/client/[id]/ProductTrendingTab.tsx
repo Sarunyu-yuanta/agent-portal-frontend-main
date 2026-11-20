@@ -50,26 +50,26 @@ function TrendingRow({
     <button
       type="button"
       onClick={onSelect}
-      className={`flex flex-col gap-2 py-3 px-3 w-full text-left cursor-pointer transition-colors hover:bg-black/[0.02] ${
+      className={`flex w-full cursor-pointer flex-col gap-2 px-3 py-3 text-left transition-colors hover:bg-black/[0.02] ${
         showBorder ? "border-b border-black/10" : ""
       }`}
     >
-      <span className="flex gap-3 items-center w-full">
+      <span className="flex w-full items-center gap-3">
         {ranked && <RankBadge rank={item.rank} />}
-        <span className="flex flex-col min-w-0 flex-1">
-          <span className="text-body font-bold text-foreground truncate">{item.title}</span>
-          <span className="type-caption text-muted-foreground truncate">{item.subtitle}</span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-body font-bold text-foreground">{item.title}</span>
+          <span className="type-caption truncate text-muted-foreground">{item.subtitle}</span>
         </span>
         {/* Sales figures only where there are sales — on a booked desk the
             fill line below is the whole of the right-hand side. */}
         {item.salesThb !== undefined && (
-          <span className="flex flex-col items-end shrink-0 gap-0.5">
-            <span className="text-body font-bold text-foreground whitespace-nowrap">
+          <span className="flex shrink-0 flex-col items-end gap-0.5">
+            <span className="text-body font-bold whitespace-nowrap text-foreground">
               {formatAumThb(item.salesThb)}
             </span>
             <span className="flex items-center gap-1.5">
               {item.orders !== undefined && (
-                <span className="type-caption text-muted-foreground whitespace-nowrap">
+                <span className="type-caption whitespace-nowrap text-muted-foreground">
                   {t.products.trending.orderCount(item.orders)}
                 </span>
               )}
@@ -110,12 +110,12 @@ function TrendingGroupCard({
   const t = useT();
   const shown = items.slice(0, TRENDING_CARD_ROWS);
   return (
-    <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
+    <div className={`flex flex-col overflow-hidden rounded-lg bg-white ${CARD_SHADOW}`}>
       <div
-        className="flex gap-2 items-center justify-between px-6 h-12 shrink-0"
+        className="flex h-12 shrink-0 items-center justify-between gap-2 px-6"
         style={{ backgroundColor: "#f9f9f9" }}
       >
-        <p className="font-bold text-base truncate" style={{ color: "rgba(0,0,0,0.75)" }}>
+        <p className="truncate text-base font-bold" style={{ color: "rgba(0,0,0,0.75)" }}>
           {group.title}
         </p>
         {items.length > TRENDING_CARD_ROWS && (
@@ -124,9 +124,9 @@ function TrendingGroupCard({
           </Button>
         )}
       </div>
-      <div className="flex flex-col p-3 w-full">
+      <div className="flex w-full flex-col p-3">
         {shown.length === 0 && (
-          <p className="type-caption text-muted-foreground text-center py-8">
+          <p className="type-caption py-8 text-center text-muted-foreground">
             {emptyTrendingMessage(sort, t)}
           </p>
         )}
@@ -217,11 +217,14 @@ export function ProductTrendingTab({
 
   return (
     <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }}>
-      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
-        <div className="flex flex-col gap-2 w-full">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
+        <div className="flex w-full flex-col gap-2">
           <div className="flex items-center gap-2">
             <FireIcon size={20} weight="fill" style={{ color: "#f54a00" }} />
-            <p className="font-bold text-title leading-[28px]" style={{ color: "rgba(0,0,0,0.75)" }}>
+            <p
+              className="text-title leading-[28px] font-bold"
+              style={{ color: "rgba(0,0,0,0.75)" }}
+            >
               {t.products.trending.title}
             </p>
           </div>
@@ -238,22 +241,22 @@ export function ProductTrendingTab({
         {groups.length === 0 ? (
           <CatalogSectionEmpty title={t.products.states.noTrendingGroups} />
         ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-          {groups.map(({ group, items }) => (
-            <TrendingGroupCard
-              key={group.id}
-              group={group}
-              items={items}
-              books={books}
-              sort={sort}
-              onSelect={select}
-              onViewAll={() => nav.onTrendingSeeAll(group.id, sort)}
-            />
-          ))}
-        </div>
+          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+            {groups.map(({ group, items }) => (
+              <TrendingGroupCard
+                key={group.id}
+                group={group}
+                items={items}
+                books={books}
+                sort={sort}
+                onSelect={select}
+                onViewAll={() => nav.onTrendingSeeAll(group.id, sort)}
+              />
+            ))}
+          </div>
         )}
 
-        <p className="type-caption text-muted-foreground text-center">
+        <p className="type-caption text-center text-muted-foreground">
           {productTrendingUpdatedAt(t)}
         </p>
       </div>
@@ -264,8 +267,11 @@ export function ProductTrendingTab({
 /** One `TrendingGroupCard`: grey header strip, then ranked rows. */
 function TrendingGroupCardSkeleton() {
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden border border-black/5">
-      <div className="flex items-center justify-between px-6 h-12" style={{ backgroundColor: "#f9f9f9" }}>
+    <div className="flex flex-col overflow-hidden rounded-lg border border-black/5 bg-white">
+      <div
+        className="flex h-12 items-center justify-between px-6"
+        style={{ backgroundColor: "#f9f9f9" }}
+      >
         <Skeleton className="h-5 w-28" />
         <Skeleton className="h-5 w-16" />
       </div>
@@ -275,12 +281,12 @@ function TrendingGroupCardSkeleton() {
             key={i}
             className={`flex items-center gap-3 px-3 py-4 ${i < TRENDING_CARD_ROWS - 1 ? "border-b border-black/10" : ""}`}
           >
-            <Skeleton className="size-7 rounded-full shrink-0" />
-            <div className="flex flex-col gap-2 flex-1 min-w-0">
+            <Skeleton className="size-7 shrink-0 rounded-full" />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
               <Skeleton className="h-5 w-20" />
               <Skeleton className="h-4 w-full max-w-[240px]" />
             </div>
-            <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="flex shrink-0 flex-col items-end gap-2">
               <Skeleton className="h-5 w-16" />
               <Skeleton className="h-4 w-28" />
             </div>
@@ -298,7 +304,7 @@ function TrendingGroupCardSkeleton() {
 function ProductTrendingTabSkeleton() {
   return (
     <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }} aria-busy="true">
-      <div className="flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
         <div className="flex flex-col gap-2">
           <Skeleton className="h-7 w-60" />
           <Skeleton className="h-5 w-full max-w-[640px]" />
@@ -309,7 +315,7 @@ function ProductTrendingTabSkeleton() {
           <Skeleton className="h-9 w-36 rounded-full" />
           <Skeleton className="h-9 w-28 rounded-full" />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <TrendingGroupCardSkeleton key={i} />
           ))}

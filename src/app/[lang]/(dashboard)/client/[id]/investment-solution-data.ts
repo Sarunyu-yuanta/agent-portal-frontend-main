@@ -117,7 +117,14 @@ const BANNER_UI: Record<InvestmentSolutionId, BannerUIData> = {
       topOffset: 9,
       imgLeft: "-20.9%",
       imgWidth: "142.74%",
-      mobile: { bannerHeight: 96, leftPx: 20, topPx: 5.394, width: 42.885, height: 61.214, gap: 16 },
+      mobile: {
+        bannerHeight: 96,
+        leftPx: 20,
+        topPx: 5.394,
+        width: 42.885,
+        height: 61.214,
+        gap: 16,
+      },
       tablet: { bannerHeight: 96, leftPx: 25.948, topPx: 5.394, width: 42.885, height: 61.214 },
     },
   },
@@ -142,7 +149,12 @@ const BANNER_UI: Record<InvestmentSolutionId, BannerUIData> = {
 // ─── Merge business data (JSON) with UI constants ─────────────────────────────
 
 export const INVESTMENT_SOLUTIONS: InvestmentSolution[] = (
-  investmentSolutionsRaw as Array<Omit<InvestmentSolution, "heroGradient" | "heroGradientMobile" | "heroGradientTablet" | "heroBannerImage">>
+  investmentSolutionsRaw as Array<
+    Omit<
+      InvestmentSolution,
+      "heroGradient" | "heroGradientMobile" | "heroGradientTablet" | "heroBannerImage"
+    >
+  >
 ).map((s) => ({ ...s, ...BANNER_UI[s.id] }));
 
 export const INVESTMENT_SOLUTION_UPDATED_AT = "10 September 2026 - 09:00";
@@ -152,4 +164,3 @@ export const INVESTMENT_SOLUTION_UPDATED_AT_MOBILE = "10 Sep 2026 - 09:00";
 export function getInvestmentSolution(id: string): InvestmentSolution | undefined {
   return INVESTMENT_SOLUTIONS.find((s) => s.id === id);
 }
-

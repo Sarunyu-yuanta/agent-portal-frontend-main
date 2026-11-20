@@ -76,10 +76,7 @@ const PATH = "/promotions";
  * the first word in the section's own name.
  */
 /** Titles: `t.promotions.type[id]`. */
-const TABS: { id: CampaignTab }[] = [
-  { id: "promotion" },
-  { id: "event" },
-];
+const TABS: { id: CampaignTab }[] = [{ id: "promotion" }, { id: "event" }];
 
 const DEFAULT_TAB: CampaignTab = "promotion";
 
@@ -121,14 +118,10 @@ function PromotionsPageInner() {
       // Each tab reads only the axes its dialog offers, so a stale param from
       // the other tab can't narrow the list with no chip to show for it.
       status:
-        tab === "promotion"
-          ? ((searchParams.get("status") as Filters["status"]) ?? null)
-          : null,
+        tab === "promotion" ? ((searchParams.get("status") as Filters["status"]) ?? null) : null,
       segment: (searchParams.get("segment") as ClientSegment | null) ?? null,
       format:
-        tab === "event"
-          ? ((searchParams.get("format") as CampaignFormat | null) ?? null)
-          : null,
+        tab === "event" ? ((searchParams.get("format") as CampaignFormat | null) ?? null) : null,
       search: searchParams.get("q") ?? "",
     }),
     [searchParams, tab],
@@ -195,19 +188,15 @@ function PromotionsPageInner() {
         label: t.promotions.status[value],
         count: filtered.filter((c) => campaignStatus(c, today) === value).length,
         selected: filters.status === value,
-        onClick: () =>
-          updateQuery({ status: filters.status === value ? null : value, new: null }),
+        onClick: () => updateQuery({ status: filters.status === value ? null : value, new: null }),
       }));
     }
     return SEAT_STATES.map((value) => ({
       key: value,
       label: t.promotions.seatState[value],
-      count: filtered.filter(
-        (c) => seatState(c, today, seatsLeft(c.id)) === value,
-      ).length,
+      count: filtered.filter((c) => seatState(c, today, seatsLeft(c.id)) === value).length,
       selected: seats === value,
-      onClick: () =>
-        updateQuery({ seats: seats === value ? null : value, new: null }),
+      onClick: () => updateQuery({ seats: seats === value ? null : value, new: null }),
     }));
   }, [tab, filtered, today, filters.status, seats, seatsLeft, updateQuery, t]);
 
@@ -262,7 +251,10 @@ function PromotionsPageInner() {
         <CampaignFilters
           tabs={
             <TabGroup
-              items={TABS.map((tabItem) => ({ id: tabItem.id, title: t.promotions.type[tabItem.id] }))}
+              items={TABS.map((tabItem) => ({
+                id: tabItem.id,
+                title: t.promotions.type[tabItem.id],
+              }))}
               activeId={tab}
               // `push`: a tab is a destination, and the back button should walk
               // out of it rather than off the page.
@@ -287,9 +279,7 @@ function PromotionsPageInner() {
           filters={filters}
           onChange={setFilters}
           // The dialog's axes only — the status chips over the grid keep theirs.
-          onClear={() =>
-            updateQuery({ product: null, segment: null, format: null, q: null })
-          }
+          onClear={() => updateQuery({ product: null, segment: null, format: null, q: null })}
           previewCount={previewCount}
         />
 
@@ -306,9 +296,7 @@ function PromotionsPageInner() {
             type="single"
             size="small"
             selected={newOnly}
-            onClick={() =>
-              updateQuery({ new: newOnly ? null : "1", status: null, seats: null })
-            }
+            onClick={() => updateQuery({ new: newOnly ? null : "1", status: null, seats: null })}
           />
           {statusChips.map((chip) => (
             <Chip
@@ -330,12 +318,7 @@ function PromotionsPageInner() {
         <FadeIn key={tab}>
           {visible.length === 0 ? (
             <EmptyState
-              icon={
-                <MegaphoneIcon
-                  size={40}
-                  className="text-[var(--text-default-placeholder)]"
-                />
-              }
+              icon={<MegaphoneIcon size={40} className="text-[var(--text-default-placeholder)]" />}
               title={emptyTitle(tab, narrowed, t)}
               body={emptyBody(tab, narrowed, t)}
               action={
@@ -374,9 +357,7 @@ function emptyBody(tab: CampaignTab, narrowed: boolean, t: Dictionary): string {
     // Scoped to the tab now that there is no combined view to fall back to —
     // telling someone to clear filters "to see everything" would promise a
     // list that no longer exists.
-    return tab === "promotion"
-      ? m.emptyNarrowedPromotionBody
-      : m.emptyNarrowedEventBody;
+    return tab === "promotion" ? m.emptyNarrowedPromotionBody : m.emptyNarrowedEventBody;
   }
   return m.emptyBody;
 }

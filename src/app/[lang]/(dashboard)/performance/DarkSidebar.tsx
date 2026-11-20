@@ -15,7 +15,7 @@ function GapAnalysisSidebar() {
           <p className="text-body-sm font-semibold text-white">{t.performance.gap.title}</p>
         </div>
         <span
-          className="text-meta font-semibold px-2 py-0.5 rounded-full"
+          className="rounded-full px-2 py-0.5 text-meta font-semibold"
           style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)" }}
         >
           Q2 2025
@@ -27,7 +27,7 @@ function GapAnalysisSidebar() {
         {GAP_ITEMS.map((g) => (
           <div
             key={g.id}
-            className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+            className="flex items-center justify-between gap-4 rounded-xl px-4 py-3.5"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div className="flex flex-col gap-0.5">
@@ -38,7 +38,10 @@ function GapAnalysisSidebar() {
                 {t.performance.gap.items[g.id].sub}
               </p>
             </div>
-            <p className="text-[22px] font-semibold leading-none shrink-0" style={{ color: g.color }}>
+            <p
+              className="shrink-0 text-[22px] leading-none font-semibold"
+              style={{ color: g.color }}
+            >
               {g.value}
             </p>
           </div>
@@ -51,13 +54,18 @@ function GapAnalysisSidebar() {
 function AiActionPlan() {
   const t = useT();
   return (
-    <div className="flex flex-col gap-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+    <div
+      className="flex flex-col gap-4 pt-4"
+      style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+    >
       <div>
         <div className="flex items-center gap-2">
           <SparkleIcon size={13} weight="fill" style={{ color: "var(--text-brand-primary)" }} />
           <p className="text-body-sm font-semibold text-white">{t.performance.actionPlan.title}</p>
         </div>
-        <p className="text-meta mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{t.performance.actionPlan.subtitle("฿5.8M")}</p>
+        <p className="mt-0.5 text-meta" style={{ color: "rgba(255,255,255,0.4)" }}>
+          {t.performance.actionPlan.subtitle("฿5.8M")}
+        </p>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -65,25 +73,45 @@ function AiActionPlan() {
           <div key={s.n} className="flex gap-3">
             {/* Number bubble */}
             <div
-              className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-              style={{ background: "rgba(129,140,248,0.2)", border: "1px solid rgba(129,140,248,0.3)" }}
+              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+              style={{
+                background: "rgba(129,140,248,0.2)",
+                border: "1px solid rgba(129,140,248,0.3)",
+              }}
             >
-              <span className="text-meta font-bold" style={{ color: "var(--text-brand-primary)" }}>{s.n}</span>
+              <span className="text-meta font-bold" style={{ color: "var(--text-brand-primary)" }}>
+                {s.n}
+              </span>
             </div>
 
-            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-              <p className="text-label font-semibold text-white leading-snug">{s.title}</p>
-              <p className="text-meta leading-snug" style={{ color: "rgba(255,255,255,0.45)" }}>{s.detail}</p>
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <p className="text-label leading-snug font-semibold text-white">{s.title}</p>
+              <p className="text-meta leading-snug" style={{ color: "rgba(255,255,255,0.45)" }}>
+                {s.detail}
+              </p>
               <div className="flex items-center gap-2">
                 <button
-                  className="text-meta font-semibold rounded-lg px-3 py-1.5 transition-colors cursor-pointer"
-                  style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.12)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.13)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                  className="cursor-pointer rounded-lg px-3 py-1.5 text-meta font-semibold transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = "rgba(255,255,255,0.13)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "rgba(255,255,255,0.08)")
+                  }
                 >
                   {s.cta}
                 </button>
-                <span className="text-meta font-semibold" style={{ color: "var(--text-success-primary)" }}>{s.impact}</span>
+                <span
+                  className="text-meta font-semibold"
+                  style={{ color: "var(--text-success-primary)" }}
+                >
+                  {s.impact}
+                </span>
               </div>
             </div>
           </div>
@@ -96,7 +124,10 @@ function AiActionPlan() {
 /** Dark navy sidebar: gap analysis + AI action plan. */
 export function DarkSidebar() {
   return (
-    <div className="rounded-2xl p-5 flex flex-col gap-4 lg:sticky lg:top-6" style={{ background: "#1e2337" }}>
+    <div
+      className="flex flex-col gap-4 rounded-2xl p-5 lg:sticky lg:top-6"
+      style={{ background: "#1e2337" }}
+    >
       <GapAnalysisSidebar />
       <AiActionPlan />
     </div>

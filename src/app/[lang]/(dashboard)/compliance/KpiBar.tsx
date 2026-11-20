@@ -1,12 +1,7 @@
 "use client";
 
 import { Card, Tag } from "@sarunyu/system-one";
-import {
-  ShieldCheckIcon,
-  FileTextIcon,
-  ClockIcon,
-  XCircleIcon,
-} from "@phosphor-icons/react";
+import { ShieldCheckIcon, FileTextIcon, ClockIcon, XCircleIcon } from "@phosphor-icons/react";
 import { useT } from "@/i18n/I18nProvider";
 
 export function KpiBar() {
@@ -48,7 +43,7 @@ export function KpiBar() {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+    <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
       {kpis.map((k) => (
         <Card key={k.label} variant="default" className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">

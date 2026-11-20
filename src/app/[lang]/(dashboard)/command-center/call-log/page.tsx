@@ -163,7 +163,13 @@ export default function CallLogPage() {
           </div>
         ) : visible.length === 0 ? (
           <EmptyState
-            icon={<PhoneIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+            icon={
+              <PhoneIcon
+                size={40}
+                weight="duotone"
+                className="text-[var(--text-default-placeholder)]"
+              />
+            }
             title={t.commandCenter.callLog.emptyTitle}
             // Whose log is empty is the useful half of the message, so the
             // filtered case says so rather than repeating the global copy.
@@ -193,7 +199,7 @@ export default function CallLogPage() {
                 pager stays on the top line when the two cannot share one. */}
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
-                <p className="whitespace-nowrap text-label text-muted-foreground">
+                <p className="text-label whitespace-nowrap text-muted-foreground">
                   {t.commandCenter.callLog.perPage}
                 </p>
                 <select
@@ -202,7 +208,7 @@ export default function CallLogPage() {
                     setPageSize(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:outline-none focus:ring-1 focus:ring-primary-action"
+                  className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => (
                     <option key={n} value={n}>
@@ -220,7 +226,9 @@ export default function CallLogPage() {
                     <span key="to" className="font-medium text-foreground">
                       {Math.min(safePage * pageSize, visible.length)}
                     </span>,
-                    <span key="total" className="font-medium text-foreground">{visible.length}</span>,
+                    <span key="total" className="font-medium text-foreground">
+                      {visible.length}
+                    </span>,
                   )}
                 </p>
                 <Pagination
@@ -318,11 +326,7 @@ function CallLogBookTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <TableRow
-                key={row.id}
-                onClick={() => onOpen(row)}
-                className="cursor-pointer"
-              >
+              <TableRow key={row.id} onClick={() => onOpen(row)} className="cursor-pointer">
                 <TableCell className="min-w-0 whitespace-nowrap">
                   <span className="type-body-2 font-medium text-foreground">{row.clientName}</span>
                 </TableCell>

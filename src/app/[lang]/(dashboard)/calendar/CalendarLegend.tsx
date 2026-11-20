@@ -159,7 +159,7 @@ export function KeyPill({
   return (
     <span
       style={swatchStyle}
-      className={`flex h-[18px] min-w-[18px] shrink-0 items-center justify-center gap-1 rounded-[3px] px-1 type-caption font-semibold leading-none ${swatchClassName}`}
+      className={`type-caption flex h-[18px] min-w-[18px] shrink-0 items-center justify-center gap-1 rounded-[3px] px-1 leading-none font-semibold ${swatchClassName}`}
     >
       {swatch}
     </span>

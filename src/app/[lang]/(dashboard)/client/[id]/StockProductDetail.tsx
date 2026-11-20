@@ -9,12 +9,7 @@ import { useAppPathname } from "@/i18n/navigation";
 import { Button, Chip } from "@sarunyu/system-one";
 import { SendProposalButton } from "@/app/[lang]/(dashboard)/orders/SendProposalButton";
 import { offeredProductId } from "@/app/[lang]/(dashboard)/orders/offered-products";
-import {
-  ArrowLeftIcon,
-  CaretDownIcon,
-  CaretUpIcon,
-  ClockIcon,
-} from "@phosphor-icons/react";
+import { ArrowLeftIcon, CaretDownIcon, CaretUpIcon, ClockIcon } from "@phosphor-icons/react";
 import {
   Area,
   AreaChart,
@@ -24,11 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  MARKET_STATUS_STYLE,
-  type MarketStatusValue,
-  type Trend,
-} from "./stock-data";
+import { MARKET_STATUS_STYLE, type MarketStatusValue, type Trend } from "./stock-data";
 import {
   getStockQuoteHistory,
   relatedProductKinds,
@@ -45,7 +36,10 @@ import {
   type VolumeAnalysisRow,
   type VolumeAnalysisSegmentKind,
 } from "./stock-product-detail-data";
-import { CATALOG_DETAIL_WIDTH, useCatalogDetailScrollTop } from "./ProductCatalogTabbedDetailLayout";
+import {
+  CATALOG_DETAIL_WIDTH,
+  useCatalogDetailScrollTop,
+} from "./ProductCatalogTabbedDetailLayout";
 import { StockCompanyTab } from "./StockCompanyTab";
 import { StockRelatedProductTab } from "./StockRelatedProductTab";
 import {
@@ -123,7 +117,11 @@ function MarketStatusTag({ status }: { status: MarketStatusValue }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img src={ASSETS.statusOpen} alt="" width={12} height={12} className="shrink-0" />
       ) : (
-        <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: s.dot }} aria-hidden />
+        <span
+          className="size-3 shrink-0 rounded-full"
+          style={{ backgroundColor: s.dot }}
+          aria-hidden
+        />
       )}
       {t.stock.marketStatus[status] ?? status}
     </span>
@@ -277,7 +275,7 @@ function ChartRangeSelector({
             key={range}
             type="button"
             onClick={() => onChange(range)}
-            className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs font-bold leading-[20px] transition-colors ${
+            className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-bold transition-colors ${
               selected
                 ? "bg-white text-[#101828] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                 : "text-black/75"
@@ -342,7 +340,7 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
   const ob = t.stock.detail.orderBook;
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-4">
-      <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{ob.title}</h2>
+      <h2 className="text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]">{ob.title}</h2>
       <div className="flex w-full flex-col overflow-hidden rounded-xl border border-black/10">
         <div className="flex flex-col gap-2.5 p-4">
           <div className="flex w-full items-center text-xs leading-[20px] text-[#6a7282]">
@@ -357,12 +355,20 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
           </div>
           <div className="flex w-full items-center overflow-hidden rounded">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span className="w-[68px] text-sm leading-[24px] text-[#6a7282]">{detail.bestBid.volume}</span>
-              <span className="text-sm font-bold leading-[24px] text-[#2f952a]">{detail.bestBid.price}</span>
+              <span className="w-[68px] text-sm leading-[24px] text-[#6a7282]">
+                {detail.bestBid.volume}
+              </span>
+              <span className="text-sm leading-[24px] font-bold text-[#2f952a]">
+                {detail.bestBid.price}
+              </span>
             </div>
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span className="text-sm font-bold leading-[24px] text-[#f5212d]">{detail.bestOffer.price}</span>
-              <span className="text-sm leading-[24px] text-[#6a7282]">{detail.bestOffer.volume}</span>
+              <span className="text-sm leading-[24px] font-bold text-[#f5212d]">
+                {detail.bestOffer.price}
+              </span>
+              <span className="text-sm leading-[24px] text-[#6a7282]">
+                {detail.bestOffer.volume}
+              </span>
             </div>
           </div>
         </div>
@@ -432,7 +438,7 @@ function VolumeAnalysisBar({
         return (
           <div
             key={`${segment.kind}-${index}`}
-            className={`h-full shrink-0 ${isLast ? "rounded-br rounded-tr" : ""}`}
+            className={`h-full shrink-0 ${isLast ? "rounded-tr rounded-br" : ""}`}
             style={{
               width: `${widthPct}%`,
               backgroundColor: VOL_SEGMENT[segment.kind],
@@ -532,7 +538,7 @@ function TimeAndSales({ detail }: { detail: StockProductDetail }) {
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-4">
       <div className="flex w-full items-end justify-between gap-2">
-        <h2 className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{ts.title}</h2>
+        <h2 className="text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]">{ts.title}</h2>
         <div className="flex items-center gap-2">
           <Chip
             type="single"
@@ -576,7 +582,10 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
         </div>
         <div className="relative mt-1.5 min-h-[40px] min-w-0 flex-1">
           <div className="h-2 overflow-hidden rounded-lg bg-[#f3f3f3]">
-            <div className="h-full bg-[#0a6ee7]" style={{ marginLeft: `${left}%`, width: `${width}%` }} />
+            <div
+              className="h-full bg-[#0a6ee7]"
+              style={{ marginLeft: `${left}%`, width: `${width}%` }}
+            />
           </div>
           <span
             className="absolute -top-3.5 text-micro leading-[18px] text-[#0a6ee7]"
@@ -596,8 +605,14 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
           >
             1D
           </span>
-          <span className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]" style={{ left: `${left}%` }} />
-          <span className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]" style={{ left: `${right}%` }} />
+          <span
+            className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]"
+            style={{ left: `${left}%` }}
+          />
+          <span
+            className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]"
+            style={{ left: `${right}%` }}
+          />
         </div>
         <div className="flex w-10 shrink-0 flex-col items-end">
           <span className="text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">{data.rangeHigh}</span>
@@ -625,13 +640,7 @@ function AdvanceStatColumn({ rows }: { rows: StockAdvanceData["left"] }) {
   );
 }
 
-function StockAdvanceDataModal({
-  data,
-  onClose,
-}: {
-  data: StockAdvanceData;
-  onClose: () => void;
-}) {
+function StockAdvanceDataModal({ data, onClose }: { data: StockAdvanceData; onClose: () => void }) {
   const t = useT();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -657,7 +666,10 @@ function StockAdvanceDataModal({
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex w-full flex-col gap-2">
-          <h2 id="stock-advance-data-title" className="text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">
+          <h2
+            id="stock-advance-data-title"
+            className="text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]"
+          >
             {t.stock.detail.advance.title}
           </h2>
           <div className="flex w-full flex-col gap-4">
@@ -680,17 +692,21 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
   const t = useT();
   const q = t.stock.detail.quote;
   const [advanceOpen, setAdvanceOpen] = useState(false);
-  const changeColor = detail.trend === "up" ? "#2f952a" : detail.trend === "down" ? "#cf1421" : "#6a7282";
-  const pillBg = detail.trend === "up" ? "#dbfce7" : detail.trend === "down" ? "#fff0f0" : "#f3f4f6";
+  const changeColor =
+    detail.trend === "up" ? "#2f952a" : detail.trend === "down" ? "#cf1421" : "#6a7282";
+  const pillBg =
+    detail.trend === "up" ? "#dbfce7" : detail.trend === "down" ? "#fff0f0" : "#f3f4f6";
   const sign = detail.trend === "up" ? "+" : detail.trend === "down" ? "-" : "";
 
   return (
-    <div className="flex w-full flex-col gap-4 pb-4 pt-3">
+    <div className="flex w-full flex-col gap-4 pt-3 pb-4">
       <div className="flex w-full items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex items-center gap-1">
             <PriceIcon trend={detail.trend} />
-            <span className="text-[40px] font-bold leading-[60px] text-[rgba(0,0,0,0.85)]">{detail.price}</span>
+            <span className="text-[40px] leading-[60px] font-bold text-[rgba(0,0,0,0.85)]">
+              {detail.price}
+            </span>
             <span className="text-sm leading-[24px] text-black/40">{detail.currency}</span>
           </div>
           <div className="flex items-center gap-1.5" style={{ color: changeColor }}>
@@ -707,11 +723,13 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon size={16} className="shrink-0 text-[#666]" />
-            <span className="text-xs leading-[20px] text-[#666]">{t.stock.detail.lastUpdated(detail.lastUpdated)}</span>
+            <span className="text-xs leading-[20px] text-[#666]">
+              {t.stock.detail.lastUpdated(detail.lastUpdated)}
+            </span>
           </div>
         </div>
         <div className="flex h-full shrink-0 flex-col items-end justify-end gap-4">
-          <span className="inline-flex items-center justify-center gap-1 rounded-[80px] border border-black/10 bg-white py-0.5 pl-1.5 pr-0.5">
+          <span className="inline-flex items-center justify-center gap-1 rounded-[80px] border border-black/10 bg-white py-0.5 pr-0.5 pl-1.5">
             <span className="text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">{detail.market}</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -737,7 +755,7 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
         aria-expanded={advanceOpen}
         aria-haspopup="dialog"
         onClick={() => setAdvanceOpen(true)}
-        className="inline-flex w-fit cursor-pointer items-center gap-4 rounded-2xl bg-[#f9f9f9] py-1.5 pl-3 pr-2 transition-colors hover:bg-[#ececec] active:bg-[#e4e4e4] aria-expanded:bg-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2"
+        className="inline-flex w-fit cursor-pointer items-center gap-4 rounded-2xl bg-[#f9f9f9] py-1.5 pr-2 pl-3 transition-colors hover:bg-[#ececec] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2 focus-visible:outline-none active:bg-[#e4e4e4] aria-expanded:bg-[#ececec]"
       >
         <div className="flex items-center gap-[13px] text-sm leading-[24px]">
           <span className="flex items-center gap-1">
@@ -758,7 +776,9 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
           className={`shrink-0 text-[#6a7282] transition-transform ${advanceOpen ? "rotate-180" : ""}`}
         />
       </button>
-      {advanceOpen ? <StockAdvanceDataModal data={detail.advance} onClose={() => setAdvanceOpen(false)} /> : null}
+      {advanceOpen ? (
+        <StockAdvanceDataModal data={detail.advance} onClose={() => setAdvanceOpen(false)} />
+      ) : null}
     </div>
   );
 }
@@ -876,24 +896,34 @@ export function StockProductDetail({
   }
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pb-20 pt-4 md:pt-6 lg:pt-8">
+    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pt-4 pb-20 md:pt-6 lg:pt-8">
       <div className={`flex flex-col gap-2 ${CATALOG_DETAIL_WIDTH.narrow}`}>
         {!detail ? (
           <StockDetailHeaderSkeleton />
         ) : (
-          <div className="flex items-center gap-2 pb-2 pr-2 pt-1 lg:pt-0">
-            <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.common.back} className="size-[30px] shrink-0 rounded-md p-[5px]">
+          <div className="flex items-center gap-2 pt-1 pr-2 pb-2 lg:pt-0">
+            <Button
+              variant="plain"
+              size="icon-sm"
+              onClick={onBack}
+              aria-label={t.common.back}
+              className="size-[30px] shrink-0 rounded-md p-[5px]"
+            >
               <ArrowLeftIcon size={18} />
             </Button>
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <div className="flex min-w-0 items-center gap-1">
-                  <p className="shrink-0 text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.8)]">{detail.symbol}</p>
+                  <p className="shrink-0 text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.8)]">
+                    {detail.symbol}
+                  </p>
                   {detail.featured ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={ASSETS.sparkle} alt="" width={16} height={16} className="shrink-0" />
                   ) : null}
-                  <p className="min-w-0 truncate text-base leading-[24px] text-[rgba(0,0,0,0.75)]">{detail.name}</p>
+                  <p className="min-w-0 truncate text-base leading-[24px] text-[rgba(0,0,0,0.75)]">
+                    {detail.name}
+                  </p>
                 </div>
                 <MarketStatusTag status={detail.status} />
               </div>
@@ -936,7 +966,7 @@ export function StockProductDetail({
                     // Matches `CatalogDetailTextTabs`: hover paint on the inactive
                     // tabs only. Trailing `!` because system-one ships its base
                     // utilities unlayered, where they outrank a `hover:` variant.
-                    className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
+                    className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
                       active
                         ? "border-[#0a6ee7] text-[#0a6ee7]"
                         : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
@@ -952,7 +982,11 @@ export function StockProductDetail({
           {/* Level 1 gate is `!detail` (the page resource); each branch below
               it gates on its own tab's resource. */}
           {!detail ? (
-            activeTab === "Market Info" ? <StockMarketInfoBodySkeleton /> : <StockTabBodySkeleton />
+            activeTab === "Market Info" ? (
+              <StockMarketInfoBodySkeleton />
+            ) : (
+              <StockTabBodySkeleton />
+            )
           ) : activeTab === "Market Info" ? (
             <MarketInfoBody detail={detail} />
           ) : activeTab === "Related Product" ? (
@@ -978,7 +1012,11 @@ export function StockProductDetail({
           {/* Offered, never booked — see `SendProposalButton`. */}
           {detail ? (
             <SendProposalButton
-              subject={{ id: offeredProductId("stock", detail.symbol), underlying: detail.symbol, documents: t.stock.detail.proposalDocuments }}
+              subject={{
+                id: offeredProductId("stock", detail.symbol),
+                underlying: detail.symbol,
+                documents: t.stock.detail.proposalDocuments,
+              }}
             />
           ) : (
             <StockProposalButtonSkeleton />

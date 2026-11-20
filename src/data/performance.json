@@ -1,15 +1,15 @@
 {
-  "revenueYtd":         { "value": "฿ 24.2M", "target": "฿ 30.0M", "progress": 81, "status": "Lagging"  },
-  "aumGrowth":          { "value": "+8.4%",    "target": "+10.0%",   "progress": 84, "status": "Lagging"  },
-  "netNewMoney":        { "value": "฿ 180M",   "target": "฿ 200M",   "progress": 90, "status": "On Track" },
-  "productPenetration": { "value": "2.4",       "target": "3.0",      "progress": 80, "status": "Lagging"  },
+  "revenueYtd": { "value": "฿ 24.2M", "target": "฿ 30.0M", "progress": 81, "status": "Lagging" },
+  "aumGrowth": { "value": "+8.4%", "target": "+10.0%", "progress": 84, "status": "Lagging" },
+  "netNewMoney": { "value": "฿ 180M", "target": "฿ 200M", "progress": 90, "status": "On Track" },
+  "productPenetration": { "value": "2.4", "target": "3.0", "progress": 80, "status": "Lagging" },
   "overallGrade": "B+",
   "incomeByProduct": [
-    { "product": "Equity Funds",     "revenue": 8.4, "target": 10.0 },
-    { "product": "Fixed Income",     "revenue": 6.2, "target": 7.5  },
-    { "product": "Structured Notes", "revenue": 5.8, "target": 6.0  },
-    { "product": "REITs",            "revenue": 2.1, "target": 3.5  },
-    { "product": "Alternatives",     "revenue": 1.7, "target": 3.0  }
+    { "product": "Equity Funds", "revenue": 8.4, "target": 10.0 },
+    { "product": "Fixed Income", "revenue": 6.2, "target": 7.5 },
+    { "product": "Structured Notes", "revenue": 5.8, "target": 6.0 },
+    { "product": "REITs", "revenue": 2.1, "target": 3.5 },
+    { "product": "Alternatives", "revenue": 1.7, "target": 3.0 }
   ],
   "aiActionPlan": [
     "Close 2 pending Structured Note proposals (฿ 110M combined) — highest probability 85%/78%.",

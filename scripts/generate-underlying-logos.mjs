@@ -30,7 +30,10 @@ const SIZE = 80;
 
 /** "NVDA US" → "nvda". Must match `underlyingLogo()` in the data module. */
 const slug = (ticker) =>
-  ticker.split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  ticker
+    .split(/\s+/)[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
 
 const source = fs.readFileSync(SRC, "utf8");
 const tickers = [

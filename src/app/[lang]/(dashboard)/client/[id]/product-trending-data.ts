@@ -25,11 +25,7 @@ import {
 import { getTopPerformers } from "./mutual-fund-data";
 import { STOCK_TOP_PICK, type Trend } from "./stock-data";
 import { getSectorStockBatch } from "./stock-industry-sector-data";
-import {
-  STRUCTURED_PRODUCTS,
-  TOP_PICKS,
-  type StructuredProduct,
-} from "./structured-product-data";
+import { STRUCTURED_PRODUCTS, TOP_PICKS, type StructuredProduct } from "./structured-product-data";
 import {
   THAI_STRUCTURED_PRODUCTS,
   thaiBookableId,
@@ -147,7 +143,10 @@ export function trendingUpdatedAt(measure: TrendingMeasure, t: Dictionary): stri
  * it always agree. Scales differ by asset class on purpose: a structured note
  * sells in far fewer, far larger tickets than a mutual fund.
  */
-const SALES_LADDER: Record<string, [salesThb: number, orders: number, changePct: string, trend: Trend][]> = {
+const SALES_LADDER: Record<
+  string,
+  [salesThb: number, orders: number, changePct: string, trend: Trend][]
+> = {
   "mutual-fund": [
     [1_482_000_000, 2_418, "+18.4%", "up"],
     [1_126_000_000, 1_974, "+11.2%", "up"],
@@ -225,9 +224,8 @@ function group<T>(
   const measure = measureOf(id);
   const ladder = SALES_LADDER[id];
   const items = source.map((item, i) => {
-    const [salesThb, orders, changePct, trend] = measure === "sales"
-      ? rung(ladder, i)
-      : ([] as const);
+    const [salesThb, orders, changePct, trend] =
+      measure === "sales" ? rung(ladder, i) : ([] as const);
     return {
       rank: i + 1,
       salesThb,
@@ -274,10 +272,7 @@ const globalBondRows = (() => {
   return rows;
 })();
 
-const stockRows = dedupeBy(
-  [...STOCK_TOP_PICK, ...getSectorStockBatch(0, 10)],
-  (row) => row.symbol,
-);
+const stockRows = dedupeBy([...STOCK_TOP_PICK, ...getSectorStockBatch(0, 10)], (row) => row.symbol);
 
 const structuredRows = dedupeBy([...TOP_PICKS, ...STRUCTURED_PRODUCTS], (p) => p.id);
 
@@ -324,12 +319,17 @@ export const PRODUCT_TRENDING_GROUPS: TrendingGroup[] = [
       target: { kind: "mutual-fund", fundId: fund.id },
     }),
   ),
-  group("fixed-income", "Fixed Income", dedupeBy(FIXED_INCOME_BONDS, (b) => b.symbol), (bond) => ({
-    title: bond.symbol,
-    subtitle: `${bond.companyName} · YTM ${bond.ytm}`,
-    target: { kind: "fixed-income", bond },
-    bookableId: fixedIncomeBookableId(bond),
-  })),
+  group(
+    "fixed-income",
+    "Fixed Income",
+    dedupeBy(FIXED_INCOME_BONDS, (b) => b.symbol),
+    (bond) => ({
+      title: bond.symbol,
+      subtitle: `${bond.companyName} · YTM ${bond.ytm}`,
+      target: { kind: "fixed-income", bond },
+      bookableId: fixedIncomeBookableId(bond),
+    }),
+  ),
   // The basket leads and the theme follows, matching the Global Structured
   // rows above and the All Thai FCN table's own columns — "Chips" names a
   // shelf, AMD/NVDA/QCOM is the thing being sold.
@@ -428,7 +428,8 @@ export function isRankedSort(sort: TrendingSort): boolean {
  */
 export function sortTrendingItems(items: TrendingItem[], sort: TrendingSort): TrendingItem[] {
   if (sort === "best-seller") return reranked(items);
-  const picked = sort === "highlight" ? (i: TrendingItem) => i.highlight : (i: TrendingItem) => i.cioView;
+  const picked =
+    sort === "highlight" ? (i: TrendingItem) => i.highlight : (i: TrendingItem) => i.cioView;
   return reranked(items.filter(picked));
 }
 

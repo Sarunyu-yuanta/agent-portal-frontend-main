@@ -69,9 +69,7 @@ for (const campaign of campaigns) {
 
   const source = SOURCES[campaign.id];
   if (!source) {
-    throw new Error(
-      `${campaign.id}: cover is a .webp but no upstream file is recorded in SOURCES`,
-    );
+    throw new Error(`${campaign.id}: cover is a .webp but no upstream file is recorded in SOURCES`);
   }
 
   const response = await fetch(`${BASE}/${source}`, {
@@ -90,9 +88,7 @@ for (const campaign of campaigns) {
     .toBuffer();
 
   fs.writeFileSync(path.join("public", campaign.cover), out);
-  console.log(
-    `${campaign.id} ← ${source}  ${(out.length / 1024).toFixed(0)} KB`,
-  );
+  console.log(`${campaign.id} ← ${source}  ${(out.length / 1024).toFixed(0)} KB`);
   written += 1;
 }
 

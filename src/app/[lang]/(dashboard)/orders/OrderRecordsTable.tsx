@@ -74,11 +74,7 @@ import { ProposalChip } from "./ProposalChip";
 import { BookingDetailModal } from "./BookingDetailModal";
 import { ProposalDetailModal } from "./ProposalDetailModal";
 import { checksAtBooking, dealStatus, emailStatus, paymentStatus } from "./booking-status";
-import {
-  findBookableProduct,
-  type BookableProduct,
-  type BookingMode,
-} from "./bookable-products";
+import { findBookableProduct, type BookableProduct, type BookingMode } from "./bookable-products";
 import { useOrderBook, useRosterReadiness } from "./use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
@@ -96,7 +92,12 @@ const PAGE_SIZE = 12;
  * edit that *did* read it could not let anything through by accident. Same
  * bargain `PLACEHOLDER_CLIENT` strikes in the booking form.
  */
-const FALLBACK_PRODUCT = { id: "", tags: [], currency: "", minInvestment: "0" } as unknown as BookableProduct;
+const FALLBACK_PRODUCT = {
+  id: "",
+  tags: [],
+  currency: "",
+  minInvestment: "0",
+} as unknown as BookableProduct;
 
 /**
  * One line of the list.
@@ -186,13 +187,21 @@ function sortValue(row: OrderRow, key: SortKey): string | number {
 function fillLine(book: OrderBook, mode: BookingMode, t: Dictionary): string {
   const target = book.targetAmount.toLocaleString("en-US");
   if (mode === "quota") {
-    return t.orders.records.quotaFill(book.quotaUsed.toLocaleString("en-US"), target, Math.round(quotaUsedPct(book)));
+    return t.orders.records.quotaFill(
+      book.quotaUsed.toLocaleString("en-US"),
+      target,
+      Math.round(quotaUsedPct(book)),
+    );
   }
   // `headlineRound`, not `bookedAmount`: that counts only bookings no order has
   // carried yet, so a basket the back office has already collected reads
   // "0 / 100,000" — it filled, which is precisely why it is gone.
   const round = headlineRound(book);
-  return t.orders.records.basketFill(round.amount.toLocaleString("en-US"), target, Math.round(round.pct));
+  return t.orders.records.basketFill(
+    round.amount.toLocaleString("en-US"),
+    target,
+    Math.round(round.pct),
+  );
 }
 
 export function OrderRecordsTable({
@@ -332,8 +341,10 @@ export function OrderRecordsTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className={`relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
-        <Table className="table-fixed min-w-[880px]">
+      <div
+        className={`table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}
+      >
+        <Table className="min-w-[880px] table-fixed">
           <TableHead>
             <TableRow>
               <TableHeaderCell
@@ -358,13 +369,15 @@ export function OrderRecordsTable({
                 {t.orders.list.col.product}
               </TableHeaderCell>
               <TableHeaderCell
-                className="w-[15%] whitespace-nowrap text-right"
+                className="w-[15%] text-right whitespace-nowrap"
                 sortDirection={dirFor("amount")}
                 onSortChange={onSort("amount")}
               >
                 {t.orders.list.col.quantity}
               </TableHeaderCell>
-              <TableHeaderCell className="w-[16%] whitespace-nowrap">{t.orders.list.col.status}</TableHeaderCell>
+              <TableHeaderCell className="w-[16%] whitespace-nowrap">
+                {t.orders.list.col.status}
+              </TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -388,7 +401,9 @@ export function OrderRecordsTable({
                     hoverable={Boolean(open)}
                     tabIndex={open ? 0 : undefined}
                     aria-label={
-                      open ? t.orders.list.openRowAria(row.book.productName, row.clientName) : undefined
+                      open
+                        ? t.orders.list.openRowAria(row.book.productName, row.clientName)
+                        : undefined
                     }
                     onClick={open}
                     onKeyDown={
@@ -402,17 +417,19 @@ export function OrderRecordsTable({
                         : undefined
                     }
                     ref={row.id === firstFlashId ? flashRowRef : undefined}
-                    className={[
-                      open
-                        ? "cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
-                        : "",
-                      booking && flashBookingIds.has(booking.id) ? "row-just-added" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ") || undefined}
+                    className={
+                      [
+                        open
+                          ? "cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
+                          : "",
+                        booking && flashBookingIds.has(booking.id) ? "row-just-added" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
                   >
                     <TableCell>
-                      <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
+                      <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">
                         {formatLogTime(row.at, locale)}
                       </p>
                     </TableCell>
@@ -436,7 +453,7 @@ export function OrderRecordsTable({
                         {/* The deal's own fill under the product it belongs to,
                             so a figure about the deal never sits in a column
                             about the record. */}
-                        <p className="type-caption truncate tabular-nums text-muted-foreground">
+                        <p className="type-caption truncate text-muted-foreground tabular-nums">
                           {row.book.productType} · {fillLine(row.book, mode, t)}
                         </p>
                       </div>
@@ -487,7 +504,9 @@ export function OrderRecordsTable({
 
       {!isLoading && !isEmpty && (
         <div className="flex items-center justify-between gap-3">
-          <span className="type-body-2 text-muted-foreground">{t.orders.list.totalRows(rows.length)}</span>
+          <span className="type-body-2 text-muted-foreground">
+            {t.orders.list.totalRows(rows.length)}
+          </span>
           {totalPages > 1 && (
             <Pagination totalPages={totalPages} currentPage={current} onPageChange={setPage} />
           )}
@@ -500,10 +519,7 @@ export function OrderRecordsTable({
           booking={live.booking}
           book={live.book}
           product={openedProduct}
-          checks={checksAtBooking(
-            live.booking,
-            readiness.get(live.booking.clientId)?.items ?? [],
-          )}
+          checks={checksAtBooking(live.booking, readiness.get(live.booking.clientId)?.items ?? [])}
           deal={dealStatus(live.booking, live.book, t)}
           payment={paymentStatus(live.booking, live.book, t)}
           email={emailStatus(live.booking, live.book, t)}

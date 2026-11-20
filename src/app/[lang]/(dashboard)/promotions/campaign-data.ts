@@ -98,11 +98,7 @@ export function isEndingSoon(campaign: Campaign, today: Date): boolean {
   const left = daysLeft(campaign, today);
   // Nothing to run out of, so never soon — see {@link daysLeft}.
   if (left === null) return false;
-  return (
-    campaignStatus(campaign, today) === "active" &&
-    left >= 0 &&
-    left <= ENDING_SOON_DAYS
-  );
+  return campaignStatus(campaign, today) === "active" && left >= 0 && left <= ENDING_SOON_DAYS;
 }
 
 /** How long after opening a campaign still wears the "ใหม่" tag. */
@@ -145,11 +141,7 @@ export type SeatState = "available" | "full" | "past";
 
 export const SEAT_STATES: SeatState[] = ["available", "full", "past"];
 
-export function seatState(
-  campaign: Campaign,
-  today: Date,
-  seatsLeft: number | null,
-): SeatState {
+export function seatState(campaign: Campaign, today: Date, seatsLeft: number | null): SeatState {
   if (isPastEvent(campaign, today)) return "past";
   return seatsLeft === 0 ? "full" : "available";
 }
@@ -190,9 +182,7 @@ export function campaignClientRows(
 ): CampaignClientRow[] {
   const byId = new Map(clients.map((c) => [c.id, c]));
   const rsvpById = new Map(
-    rsvps
-      .filter((r) => r.campaignId === campaign.id)
-      .map((r) => [r.clientId, r.status]),
+    rsvps.filter((r) => r.campaignId === campaign.id).map((r) => [r.clientId, r.status]),
   );
 
   return rows
@@ -299,10 +289,7 @@ export function filterCampaigns(
  * it sits below every dated one but above the ended block: there is no deadline
  * to beat, and nothing is lost by reaching it last.
  */
-export function sortByEndingSoonest(
-  campaigns: Campaign[],
-  today: Date,
-): Campaign[] {
+export function sortByEndingSoonest(campaigns: Campaign[], today: Date): Campaign[] {
   return [...campaigns].sort((a, b) => {
     const aEnded = campaignStatus(a, today) === "ended";
     const bEnded = campaignStatus(b, today) === "ended";
@@ -324,7 +311,6 @@ export function sortByEndingSoonest(
 export function campaignDay(isoDay: string, locale: Locale): string {
   return formatDate(locale, dayFromIso(isoDay), "short");
 }
-
 
 /**
  * The one date line a card shows.

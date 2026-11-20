@@ -79,16 +79,24 @@ function YuantaWordmark() {
 function RelatedDrRowView({ row }: { row: RelatedDrRow }) {
   const amountColor = row.amountTone === "flat" ? "rgba(0,0,0,0.35)" : "#21761d";
   return (
-    <div className={`flex min-w-0 flex-1 items-center gap-3 border-b border-black/10 bg-white px-3 py-4 ${ROW_HOVER}`}>
+    <div
+      className={`flex min-w-0 flex-1 items-center gap-3 border-b border-black/10 bg-white px-3 py-4 ${ROW_HOVER}`}
+    >
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="h-6 max-w-[119px] truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">
+        <p className="h-6 max-w-[119px] truncate text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
           {row.symbol}
         </p>
         <p className="w-full truncate text-xs leading-[20px] text-black/40">{row.subtitle}</p>
       </div>
-      <StockMiniChart series={row.series} trend="up" width={48} height={30} className="h-[30px] w-12 shrink-0" />
+      <StockMiniChart
+        series={row.series}
+        trend="up"
+        width={48}
+        height={30}
+        className="h-[30px] w-12 shrink-0"
+      />
       <div className="flex w-24 max-w-[240px] shrink-0 flex-col items-end">
-        <div className="flex items-center gap-1 text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">
+        <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
           <span>{row.price}</span>
           <span>THB</span>
         </div>
@@ -110,7 +118,9 @@ function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
       {dr.yuanta ? (
         <div className="w-full max-w-[434px] rounded-lg bg-gradient-to-r from-[#00a1e9] to-[#004eba] p-1.5">
           <div className="flex items-center justify-between px-1.5">
-            <p className="truncate text-sm font-bold leading-[24px] text-white">{t.stock.related.drYuanta}</p>
+            <p className="truncate text-sm leading-[24px] font-bold text-white">
+              {t.stock.related.drYuanta}
+            </p>
             <YuantaWordmark />
           </div>
           <div className="mt-2 overflow-hidden rounded-lg">
@@ -122,7 +132,7 @@ function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
       {dr.others.length > 0 ? (
         <div className="flex w-full flex-col gap-4">
           <div className="flex items-center gap-3">
-            <p className="truncate text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">
+            <p className="truncate text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]">
               {t.stock.related.drOthers}
             </p>
             <span className="h-[22px] w-px shrink-0 bg-black/10" aria-hidden />
@@ -145,18 +155,26 @@ function RelatedDrBody({ dr }: { dr: RelatedDrBundle }) {
 function FutureCard({ contract }: { contract: RelatedFutureContract }) {
   const t = useT();
   return (
-    <div className={`flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 ${ROW_HOVER}`}>
+    <div
+      className={`flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 ${ROW_HOVER}`}
+    >
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{contract.symbol}</p>
-          <p className="truncate text-xs leading-[20px] text-black/40">{t.stock.related.im(contract.im)}</p>
+          <p className="truncate text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+            {contract.symbol}
+          </p>
+          <p className="truncate text-xs leading-[20px] text-black/40">
+            {t.stock.related.im(contract.im)}
+          </p>
         </div>
         <div className="flex max-w-24 min-w-0 flex-1 flex-col items-end justify-center gap-0.5">
           <div className="flex items-center justify-end gap-1">
-            <span className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">
+            <span className="truncate text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
               {contract.lastPrice}
             </span>
-            <span className="text-micro leading-[18px] text-black/40">{t.stock.related.points}</span>
+            <span className="text-micro leading-[18px] text-black/40">
+              {t.stock.related.points}
+            </span>
           </div>
           <div className="flex items-center justify-end gap-1 text-[#21761d]">
             <span className="truncate text-xs leading-[20px]">{contract.change}</span>
@@ -174,15 +192,15 @@ function FuturesRemark() {
   const r = t.stock.related.remark;
   return (
     <div className="flex max-w-[480px] flex-col gap-0.5 text-[rgba(0,0,0,0.75)]">
-      <p className="text-xs font-medium leading-[22px]">{r.title}</p>
+      <p className="text-xs leading-[22px] font-medium">{r.title}</p>
       <ul className="flex flex-col text-xs leading-[20px]">
         <li className="flex gap-1">
           <span className="font-semibold">{r.price}</span>
-          <span className="font-medium leading-[18px]">{r.priceBody}</span>
+          <span className="leading-[18px] font-medium">{r.priceBody}</span>
         </li>
         <li className="flex gap-1">
           <span className="font-semibold">{r.chg}</span>
-          <span className="font-medium leading-[18px]">{r.chgBody}</span>
+          <span className="leading-[18px] font-medium">{r.chgBody}</span>
         </li>
         <li>
           <span className="font-semibold">{r.oi}</span>
@@ -238,7 +256,7 @@ function FuturesTable({
       <table className="w-full min-w-[1080px] border-collapse text-sm leading-[26px]">
         <thead>
           <tr>
-            <th className="sticky left-0 z-[1] border-b border-r border-black/10 bg-white px-4 py-2 text-left font-normal text-black/40">
+            <th className="sticky left-0 z-[1] border-r border-b border-black/10 bg-white px-4 py-2 text-left font-normal text-black/40">
               {t.stock.related.symbol}
             </th>
             {TABLE_COLS.map((col) => (
@@ -255,8 +273,11 @@ function FuturesTable({
         </thead>
         <tbody>
           {contracts.map((row) => (
-            <tr key={row.symbol} className="group/row cursor-pointer hover:bg-[#f9fafb] transition-colors">
-              <td className="sticky left-0 z-[1] border-b border-r border-black/10 bg-white px-4 py-2.5 font-semibold whitespace-nowrap text-[#0a6ee7] group-hover/row:bg-[#f9fafb]">
+            <tr
+              key={row.symbol}
+              className="group/row cursor-pointer transition-colors hover:bg-[#f9fafb]"
+            >
+              <td className="sticky left-0 z-[1] border-r border-b border-black/10 bg-white px-4 py-2.5 font-semibold whitespace-nowrap text-[#0a6ee7] group-hover/row:bg-[#f9fafb]">
                 {row.symbol}
               </td>
               {TABLE_COLS.map((col) => {
@@ -333,11 +354,14 @@ function ViewModeMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-black/10 bg-white px-2 py-1 text-sm font-semibold leading-[26px] text-[#4a5565] transition-colors hover:bg-[#f9fafb]"
+        className="inline-flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-black/10 bg-white px-2 py-1 text-sm leading-[26px] font-semibold text-[#4a5565] transition-colors hover:bg-[#f9fafb]"
       >
         <TableIcon size={20} className="shrink-0" />
         {t.stock.related.viewMode}
-        <CaretDownIcon size={20} className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+        <CaretDownIcon
+          size={20}
+          className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open ? (
         <div
@@ -361,10 +385,15 @@ function ViewModeMenu({
                   setOpen(false);
                 }}
                 className={`flex h-12 w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm leading-[24px] ${
-                  selected ? "bg-[#eff6ff] text-[#101828]" : "bg-white text-[#101828] hover:bg-[#f9fafb]"
+                  selected
+                    ? "bg-[#eff6ff] text-[#101828]"
+                    : "bg-white text-[#101828] hover:bg-[#f9fafb]"
                 }`}
               >
-                <opt.Icon size={24} className={`shrink-0 ${selected ? "text-[#0a6ee7]" : "text-[#4a5565]"}`} />
+                <opt.Icon
+                  size={24}
+                  className={`shrink-0 ${selected ? "text-[#0a6ee7]" : "text-[#4a5565]"}`}
+                />
                 <span className="min-w-0 flex-1">{opt.label}</span>
               </button>
             );
@@ -384,7 +413,9 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
       <div className="flex w-full flex-col gap-6">
         <div className="flex w-full items-end justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h2 className="truncate text-lg font-bold leading-[28px] text-[rgba(0,0,0,0.85)]">{t.stock.related.relatedFutures}</h2>
+            <h2 className="truncate text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]">
+              {t.stock.related.relatedFutures}
+            </h2>
             <span className="h-4 w-px shrink-0 bg-black/10" aria-hidden />
             <p className="shrink-0 text-xs leading-[20px] text-[rgba(0,0,0,0.75)]">
               {t.stock.related.contracts(data.contracts.length)}
@@ -397,13 +428,21 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
           <div className="flex w-full flex-col gap-3">
             <div className="flex w-full max-w-[343px] items-start gap-6 overflow-hidden rounded-lg bg-[#f9f9f9] p-2">
               <div className="flex min-w-0 flex-1 flex-col items-center">
-                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">{t.stock.related.volumeContracts}</p>
-                <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{data.totals.volume}</p>
+                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">
+                  {t.stock.related.volumeContracts}
+                </p>
+                <p className="text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+                  {data.totals.volume}
+                </p>
               </div>
               <span className="w-px self-stretch bg-black/10" aria-hidden />
               <div className="flex min-w-0 flex-1 flex-col items-center">
-                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">{t.stock.related.oiContracts}</p>
-                <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{data.totals.openInterest}</p>
+                <p className="truncate text-micro leading-[18px] text-[rgba(0,0,0,0.75)]">
+                  {t.stock.related.oiContracts}
+                </p>
+                <p className="text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+                  {data.totals.openInterest}
+                </p>
               </div>
             </div>
             <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2">
@@ -411,12 +450,16 @@ function RelatedDerivativeBody({ data }: { data: RelatedDerivativeBundle }) {
                 <FutureCard key={contract.symbol} contract={contract} />
               ))}
             </div>
-            <p className="text-xs leading-[20px] text-black/40">{t.stock.related.futuresUpdated(data.updated)}</p>
+            <p className="text-xs leading-[20px] text-black/40">
+              {t.stock.related.futuresUpdated(data.updated)}
+            </p>
           </div>
         ) : (
           <div className="flex w-full flex-col gap-3">
             <FuturesTable contracts={data.contracts} totals={data.totals} />
-            <p className="text-xs leading-[20px] text-black/40">{t.stock.related.futuresUpdated(data.updated)}</p>
+            <p className="text-xs leading-[20px] text-black/40">
+              {t.stock.related.futuresUpdated(data.updated)}
+            </p>
           </div>
         )}
       </div>
@@ -453,7 +496,9 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center gap-1">
           <FireIcon size={24} weight="fill" color="#f97316" className="shrink-0" />
-          <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">{t.stock.related.topPick}</p>
+          <p className="truncate text-xl leading-[34px] font-bold text-[#101828]">
+            {t.stock.related.topPick}
+          </p>
         </div>
         <div className="grid w-full grid-cols-1 gap-4 md:flex md:flex-col lg:grid lg:grid-cols-3">
           {topPicks.map((product) => (
@@ -466,7 +511,9 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
         </div>
       </div>
       <div className="flex w-full flex-col gap-4">
-        <p className="truncate text-xl font-bold leading-[34px] text-[#101828]">{t.stock.related.allThaiFcn}</p>
+        <p className="truncate text-xl leading-[34px] font-bold text-[#101828]">
+          {t.stock.related.allThaiFcn}
+        </p>
         <ThaiStructuredProductTable products={products} getRowHref={thaiStructuredHref} />
       </div>
     </div>
@@ -488,11 +535,15 @@ function RelatedFixedIncomeBody({ bonds }: { bonds: FixedIncomeBond[] }) {
             className="size-10 rounded"
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{bond.symbol}</p>
+            <p className="truncate text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+              {bond.symbol}
+            </p>
             <p className="truncate text-xs leading-[20px] text-black/40">{bond.companyName}</p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{bond.couponRate}</p>
+            <p className="text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+              {bond.couponRate}
+            </p>
             <p className="text-xs leading-[20px] text-black/40">{bond.tenor}</p>
           </div>
         </Link>
@@ -511,20 +562,28 @@ function RelatedGlobalBondBody({ bonds }: { bonds: GlobalBondRow[] }) {
           <>
             <BondLogo src={bond.logo} className="size-10 rounded" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{bond.name}</p>
+              <p className="truncate text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+                {bond.name}
+              </p>
               <p className="truncate text-xs leading-[20px] text-black/40">
                 {bond.ticker ? `${bond.ticker} · ${bond.isin}` : bond.isin}
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">{bond.yieldPct}</p>
+              <p className="text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
+                {bond.yieldPct}
+              </p>
               <p className="text-xs leading-[20px] text-black/40">{t.stock.related.yield}</p>
             </div>
           </>
         );
         const className = `flex items-center gap-3 border-b border-black/10 px-1 py-3 text-inherit no-underline ${ROW_HOVER}`;
         return issuerId ? (
-          <Link key={bond.isin} href={`/product-catalog/global-bond/${issuerId}`} className={className}>
+          <Link
+            key={bond.isin}
+            href={`/product-catalog/global-bond/${issuerId}`}
+            className={className}
+          >
             {inner}
           </Link>
         ) : (
@@ -549,24 +608,38 @@ function RelatedMutualFundBody({ funds }: { funds: MutualFund[] }) {
   );
 }
 
-function RelatedProductPanel({ related, kind }: { related: RelatedProducts; kind: RelatedProductKind }) {
+function RelatedProductPanel({
+  related,
+  kind,
+}: {
+  related: RelatedProducts;
+  kind: RelatedProductKind;
+}) {
   switch (kind) {
     case "dr":
       return related.dr ? <RelatedDrBody dr={related.dr} /> : null;
     case "derivative":
       return related.derivative ? <RelatedDerivativeBody data={related.derivative} /> : null;
     case "structured":
-      return related.structured?.length ? <RelatedStructuredBody products={related.structured} /> : null;
+      return related.structured?.length ? (
+        <RelatedStructuredBody products={related.structured} />
+      ) : null;
     case "thai-structured":
       return related.thaiStructured?.length ? (
         <RelatedThaiStructuredBody products={related.thaiStructured} />
       ) : null;
     case "fixed-income":
-      return related.fixedIncome?.length ? <RelatedFixedIncomeBody bonds={related.fixedIncome} /> : null;
+      return related.fixedIncome?.length ? (
+        <RelatedFixedIncomeBody bonds={related.fixedIncome} />
+      ) : null;
     case "global-bond":
-      return related.globalBond?.length ? <RelatedGlobalBondBody bonds={related.globalBond} /> : null;
+      return related.globalBond?.length ? (
+        <RelatedGlobalBondBody bonds={related.globalBond} />
+      ) : null;
     case "mutual-fund":
-      return related.mutualFund?.length ? <RelatedMutualFundBody funds={related.mutualFund} /> : null;
+      return related.mutualFund?.length ? (
+        <RelatedMutualFundBody funds={related.mutualFund} />
+      ) : null;
   }
 }
 
@@ -584,9 +657,7 @@ export function StockRelatedProductTab({ related }: { related: RelatedProducts }
   useEffect(() => {
     if (!kinds.length) return;
     if (relatedParam && kinds.includes(relatedParam as RelatedProductKind)) return;
-    setQueryState(
-      withQuery(pathname, searchParams, { tab: "related", related: kinds[0] }),
-    );
+    setQueryState(withQuery(pathname, searchParams, { tab: "related", related: kinds[0] }));
   }, [kinds, relatedParam, pathname, searchParams]);
 
   if (kinds.length === 0) return null;

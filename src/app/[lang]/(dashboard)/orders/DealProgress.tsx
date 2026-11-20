@@ -30,9 +30,7 @@ export function DealProgress({ productId }: { productId: string }) {
     .filter((b) => b.createdBy === IC_NAME)
     .reduce((sum, b) => sum + b.amount, 0);
   const used =
-    book.mode === "basket"
-      ? book.bookings.reduce((sum, b) => sum + b.amount, 0)
-      : book.quotaUsed;
+    book.mode === "basket" ? book.bookings.reduce((sum, b) => sum + b.amount, 0) : book.quotaUsed;
   const others = Math.max(0, used - mine);
   const target = book.targetAmount;
   const remaining = Math.max(0, target - used);
@@ -44,8 +42,10 @@ export function DealProgress({ productId }: { productId: string }) {
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-white px-4 py-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-xs uppercase leading-[20px] tracking-wide text-[#6a7282]">{label}</span>
-        <span className="text-lg font-bold leading-[28px] tabular-nums text-[#101828]">
+        <span className="text-xs leading-[20px] tracking-wide text-[#6a7282] uppercase">
+          {label}
+        </span>
+        <span className="text-lg leading-[28px] font-bold text-[#101828] tabular-nums">
           {money(used)} / {money(target)}{" "}
           <span className="text-sm font-normal text-[#6a7282]">{book.currency}</span>
         </span>
@@ -53,14 +53,25 @@ export function DealProgress({ productId }: { productId: string }) {
       <div
         className="flex h-2.5 w-full overflow-hidden rounded-full bg-[var(--fill-gray-100)]"
         role="img"
-        aria-label={t.orders.progress.progressAria(label, money(mine), money(others), money(remaining), money(target), book.currency)}
+        aria-label={t.orders.progress.progressAria(
+          label,
+          money(mine),
+          money(others),
+          money(remaining),
+          money(target),
+          book.currency,
+        )}
       >
-        <div className="h-full bg-primary-action" style={{ width: pct(mine) }} />
+        <div className="bg-primary-action h-full" style={{ width: pct(mine) }} />
         <div className="h-full bg-[var(--fill-emerald-400)]" style={{ width: pct(others) }} />
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs leading-[20px] text-[#6a7282]">
         <Legend swatch="bg-primary-action" label={t.orders.progress.mine} value={money(mine)} />
-        <Legend swatch="bg-[var(--fill-emerald-400)]" label={t.orders.progress.otherIcs} value={money(others)} />
+        <Legend
+          swatch="bg-[var(--fill-emerald-400)]"
+          label={t.orders.progress.otherIcs}
+          value={money(others)}
+        />
         <Legend
           swatch="border border-[var(--fill-gray-300)] bg-[var(--fill-gray-100)]"
           label={t.orders.progress.remaining}
@@ -76,7 +87,7 @@ function Legend({ swatch, label, value }: { swatch: string; label: string; value
     <span className="flex items-center gap-1.5">
       <span className={`size-2.5 rounded-sm ${swatch}`} />
       {label}
-      <span className="font-semibold tabular-nums text-[#101828]">{value}</span>
+      <span className="font-semibold text-[#101828] tabular-nums">{value}</span>
     </span>
   );
 }

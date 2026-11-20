@@ -25,10 +25,7 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
               banner directly above this section. */}
           <div className="flex flex-col gap-3">
             {campaign.description.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="text-body leading-relaxed text-foreground"
-              >
+              <p key={paragraph} className="text-body leading-relaxed text-foreground">
                 {paragraph}
               </p>
             ))}
@@ -47,20 +44,15 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
         <DetailSubsection title={t.campaigns.body.conditions}>
           <ul className="flex list-none flex-col gap-3 p-0">
             {campaign.conditions.map((condition) => (
-              <li
-                key={condition}
-                className="flex items-start gap-3 text-body-sm leading-relaxed"
-              >
+              <li key={condition} className="flex items-start gap-3 text-body-sm leading-relaxed">
                 {/* One line tall, so the badge centres on the first line of
                     text rather than sitting on its top edge. */}
                 <span aria-hidden className="flex h-lh shrink-0 items-center">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-primary-action-light text-primary-action">
+                  <span className="bg-primary-action-light text-primary-action flex size-6 items-center justify-center rounded-full">
                     <CheckIcon size={13} weight="bold" />
                   </span>
                 </span>
-                <span className="text-foreground">
-                  {condition}
-                </span>
+                <span className="text-foreground">{condition}</span>
               </li>
             ))}
           </ul>
@@ -69,18 +61,13 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
         <DetailSubsection title={t.campaigns.body.terms}>
           <ol className="flex list-none flex-col gap-3 p-0">
             {campaign.terms.map((term, index) => (
-              <li
-                key={term}
-                className="flex items-start gap-3 text-body-sm leading-relaxed"
-              >
+              <li key={term} className="flex items-start gap-3 text-body-sm leading-relaxed">
                 <span className="flex h-lh shrink-0 items-center">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-primary-action-light text-meta font-bold tabular-nums text-primary-action">
+                  <span className="bg-primary-action-light text-primary-action flex size-6 items-center justify-center rounded-full text-meta font-bold tabular-nums">
                     {index + 1}
                   </span>
                 </span>
-                <span className="text-foreground">
-                  {term}
-                </span>
+                <span className="text-foreground">{term}</span>
               </li>
             ))}
           </ol>
@@ -97,7 +84,5 @@ export function PromotionBody({ campaign }: { campaign: Campaign }) {
 /** Regulatory disclaimer — shared by promotion and event detail bodies. */
 export function Disclaimer({ text }: { text: string }) {
   const t = useT();
-  return (
-    <Alert status="warning" title={t.campaigns.body.disclaimer} message={text} multiline />
-  );
+  return <Alert status="warning" title={t.campaigns.body.disclaimer} message={text} multiline />;
 }

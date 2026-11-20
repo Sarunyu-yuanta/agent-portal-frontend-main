@@ -37,13 +37,13 @@ const cellBorder = (opts?: { bottom?: boolean }) => ({
 function IssuerLogo({ src }: { src: string }) {
   return (
     <div
-      className="relative shrink-0 size-8 rounded overflow-hidden"
+      className="relative size-8 shrink-0 overflow-hidden rounded"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- 32px issuer logo, already ~2KB; matches the fixed-size-logo convention used across the catalog */}
       <img
         alt=""
-        className="absolute inset-0 size-full object-cover rounded pointer-events-none"
+        className="pointer-events-none absolute inset-0 size-full rounded object-cover"
         src={src}
       />
     </div>
@@ -55,9 +55,9 @@ function IssuerLogo({ src }: { src: string }) {
  * booking modal (`useQuotaBooking`). Without a provider the row keeps its old
  * "สนใจลงทุน" interest button.
  */
-export const GlobalBondBookingContext = createContext<
-  ((product: BookableProduct) => void) | null
->(null);
+export const GlobalBondBookingContext = createContext<((product: BookableProduct) => void) | null>(
+  null,
+);
 
 /**
  * Where a bond row's Proposal is sent from — provided by the page that owns the
@@ -68,9 +68,9 @@ export const GlobalBondBookingContext = createContext<
  * threaded this way, and a page can legitimately offer one without the other
  * (the catalogue lists offer a booking with no product page behind them).
  */
-export const GlobalBondProposalContext = createContext<
-  ((product: BookableProduct) => void) | null
->(null);
+export const GlobalBondProposalContext = createContext<((product: BookableProduct) => void) | null>(
+  null,
+);
 
 /**
  * Send this bond's Proposal, where the page offers it and the row resolves to
@@ -170,10 +170,13 @@ function EmptyBondsCard({ onClearFilters }: { onClearFilters?: () => void }) {
   const t = useT();
   return (
     <div
-      className="w-full rounded-xl overflow-hidden bg-white px-4"
+      className="w-full overflow-hidden rounded-xl bg-white px-4"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW }}
     >
-      <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
+      <CatalogSectionEmpty
+        title={t.products.states.noGlobalBonds}
+        onClearFilters={onClearFilters}
+      />
     </div>
   );
 }
@@ -187,9 +190,7 @@ type BondListProps = {
 export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListProps) {
   const t = useT();
   const cols = t.products.globalBond.columns;
-  const [expandedId, setExpandedId] = useState<string | null>(
-    bonds[0]?.id ?? null,
-  );
+  const [expandedId, setExpandedId] = useState<string | null>(bonds[0]?.id ?? null);
   const [prevBonds, setPrevBonds] = useState(bonds);
   if (prevBonds !== bonds) {
     setPrevBonds(bonds);
@@ -200,7 +201,7 @@ export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListPro
 
   return (
     <div
-      className="flex flex-col w-full rounded-xl overflow-hidden bg-white"
+      className="flex w-full flex-col overflow-hidden rounded-xl bg-white"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW }}
     >
       {bonds.map((row, i) => {
@@ -217,23 +218,19 @@ export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListPro
             <button
               type="button"
               onClick={() => setExpandedId(expanded ? null : row.id)}
-              className="flex w-full items-start gap-2 p-3 bg-white border-none cursor-pointer text-left"
+              className="flex w-full cursor-pointer items-start gap-2 border-none bg-white p-3 text-left"
             >
-              <div className="flex items-center py-0.5 shrink-0">
+              <div className="flex shrink-0 items-center py-0.5">
                 <IssuerLogo src={row.logo} />
               </div>
-              <div className="flex flex-1 min-w-0 flex-col gap-0.5">
-                <span className="text-sm font-semibold leading-[26px] text-[#101828] truncate">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate text-sm leading-[26px] font-semibold text-[#101828]">
                   {row.name}
                 </span>
-                <span className="text-xs leading-[22px] text-[#4a5565]">
-                  {row.isin}
-                </span>
+                <span className="text-xs leading-[22px] text-[#4a5565]">{row.isin}</span>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                <span className="text-sm leading-[26px] text-[#101828]">
-                  {row.yieldPct}
-                </span>
+                <span className="text-sm leading-[26px] text-[#101828]">{row.yieldPct}</span>
                 {expanded ? (
                   <CaretUpIcon size={22} className="text-[#101828]" />
                 ) : (
@@ -242,8 +239,8 @@ export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListPro
               </div>
             </button>
             {expanded && (
-              <div className="flex flex-col gap-3 items-center px-3 pb-3 w-full">
-                <div className="flex flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2 w-full">
+              <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
+                <div className="flex w-full flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2">
                   <DetailRow label={cols.currency} value={row.currency} />
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
                   <DetailRow label={cols.price} value={row.price} />
@@ -271,12 +268,12 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
 
   return (
     <div
-      className="w-full rounded-xl overflow-hidden bg-white"
+      className="w-full overflow-hidden rounded-xl bg-white"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW }}
     >
       <div className="overflow-x-auto">
-        <div className="flex items-stretch min-w-[1280px]">
-          <div className="flex flex-col flex-1 min-w-[220px]">
+        <div className="flex min-w-[1280px] items-stretch">
+          <div className="flex min-w-[220px] flex-1 flex-col">
             <div
               className="flex h-11 items-center px-4"
               style={headerBorder({ left: true, right: false })}
@@ -286,7 +283,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex items-center gap-2 min-w-0 px-4 py-3.5 min-h-[52px] overflow-hidden"
+                className="flex min-h-[52px] min-w-0 items-center gap-2 overflow-hidden px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <IssuerLogo src={row.logo} />
@@ -296,11 +293,8 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
               </div>
             ))}
           </div>
-          <div className={`flex flex-col shrink-0 ${TOP_PICK_COL_CLS}`}>
-            <div
-              className="flex h-11 items-center justify-center px-4"
-              style={headerBorder()}
-            >
+          <div className={`flex shrink-0 flex-col ${TOP_PICK_COL_CLS}`}>
+            <div className="flex h-11 items-center justify-center px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} opacity-0`} aria-hidden>
                 Top Pick
               </span>
@@ -308,147 +302,126 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-center px-4 py-3 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-center px-4 py-3"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 {row.topPick && <TopPickTag />}
               </div>
             ))}
           </div>
-          <div className="flex flex-col w-[138px] shrink-0">
+          <div className="flex w-[138px] shrink-0 flex-col">
             <div className="flex h-11 items-center px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.isin}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col w-[80px] shrink-0">
-            <div
-              className="flex h-11 items-center justify-center px-4"
-              style={headerBorder()}
-            >
+          <div className="flex w-[80px] shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-center px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.currency}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col shrink-0">
-            <div
-              className="flex h-11 items-center justify-end px-4"
-              style={headerBorder()}
-            >
+          <div className="flex shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-end px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col w-[76px] shrink-0">
-            <div
-              className="flex h-11 items-center justify-end px-4"
-              style={headerBorder()}
-            >
+          <div className="flex w-[76px] shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-end px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.price}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col w-[165px] shrink-0">
-            <div
-              className="flex h-11 items-center justify-end px-4"
-              style={headerBorder()}
-            >
+          <div className="flex w-[165px] shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-end px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col shrink-0">
-            <div
-              className="flex h-11 items-center justify-end px-4"
-              style={headerBorder()}
-            >
+          <div className="flex shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-end px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col shrink-0">
-            <div
-              className="flex h-11 items-center justify-end px-4"
-              style={headerBorder()}
-            >
+          <div className="flex shrink-0 flex-col">
+            <div className="flex h-11 items-center justify-end px-4" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-col shrink-0">
-            <div
-              className="flex items-center justify-center p-3"
-              style={headerBorder()}
-            >
+          <div className="flex shrink-0 flex-col">
+            <div className="flex items-center justify-center p-3" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.documents}</span>
             </div>
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-center px-3 py-[11px] min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-center px-3 py-[11px]"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <FactsheetButton />
               </div>
             ))}
           </div>
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div
               className="flex items-center justify-end p-3"
               style={headerBorder({ right: false })}
@@ -460,7 +433,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
             {bonds.map((row, i) => (
               <div
                 key={row.id}
-                className="flex flex-1 items-center justify-center gap-1.5 px-4 py-[11px] min-h-[52px]"
+                className="flex min-h-[52px] flex-1 items-center justify-center gap-1.5 px-4 py-[11px]"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 {/* The offer first, the order second — left to right in the

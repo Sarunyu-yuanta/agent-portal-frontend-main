@@ -66,21 +66,36 @@ export function CustomerTable({
   const clientIdOffset = NO_WIDTH;
   const clientOffset = NO_WIDTH + (clientIdVisible ? widthOf("clientId") : 0);
   // The last frozen column gets the separating shadow.
-  const lastPinned: "no" | "clientId" | "client" =
-    clientVisible ? "client" : clientIdVisible ? "clientId" : "no";
+  const lastPinned: "no" | "clientId" | "client" = clientVisible
+    ? "client"
+    : clientIdVisible
+      ? "clientId"
+      : "no";
 
   const noCellPin = pinningEnabled
-    ? { fixed: "left" as const, fixedOffset: 0, fixedShadow: lastPinned === "no" ? ("right" as const) : undefined }
+    ? {
+        fixed: "left" as const,
+        fixedOffset: 0,
+        fixedShadow: lastPinned === "no" ? ("right" as const) : undefined,
+      }
     : {};
 
   /** Sticky-column props for a pinnable column (empty on mobile / non-pinned columns). */
   const pinProps = (id: ColumnId) => {
     if (!pinningEnabled) return {};
     if (id === "clientId") {
-      return { fixed: "left" as const, fixedOffset: clientIdOffset, fixedShadow: lastPinned === "clientId" ? ("right" as const) : undefined };
+      return {
+        fixed: "left" as const,
+        fixedOffset: clientIdOffset,
+        fixedShadow: lastPinned === "clientId" ? ("right" as const) : undefined,
+      };
     }
     if (id === "client") {
-      return { fixed: "left" as const, fixedOffset: clientOffset, fixedShadow: lastPinned === "client" ? ("right" as const) : undefined };
+      return {
+        fixed: "left" as const,
+        fixedOffset: clientOffset,
+        fixedShadow: lastPinned === "client" ? ("right" as const) : undefined,
+      };
     }
     return {};
   };
@@ -90,8 +105,10 @@ export function CustomerTable({
   const isEmpty = !isLoading && rows.length === 0;
 
   return (
-    <div className={`relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
-      <Table className="table-fixed w-full" style={{ minWidth: tableWidth }}>
+    <div
+      className={`table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}
+    >
+      <Table className="w-full table-fixed" style={{ minWidth: tableWidth }}>
         <TableHead>
           <TableRow>
             <TableHeaderCell
@@ -130,7 +147,13 @@ export function CustomerTable({
                     press on another client apart from a press on the page: one
                     is a switch, the other a dismissal. See the drawer's
                     `onOpenChange` in `client-hub/page.tsx`. */}
-                <TableRow data-client-row="" ref={flipRef(client.id)} className="cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]" hoverable onClick={() => onRowClick(client)}>
+                <TableRow
+                  data-client-row=""
+                  ref={flipRef(client.id)}
+                  className="cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]"
+                  hoverable
+                  onClick={() => onRowClick(client)}
+                >
                   <TableCell {...noCellPin}>
                     <p className="text-body-sm text-muted-foreground">{rowNo}</p>
                   </TableCell>
@@ -145,16 +168,15 @@ export function CustomerTable({
           })}
         </TableBody>
       </Table>
-      {isEmpty && (
-        isFiltered ? (
+      {isEmpty &&
+        (isFiltered ? (
           <TableEmptyOverlay
             body={t.client.hub.noClientResultBody}
             onClearFilters={onClearFilters}
           />
         ) : (
           <TableEmptyOverlay variant="empty" title={t.client.hub.noClientsYet} />
-        )
-      )}
+        ))}
     </div>
   );
 }

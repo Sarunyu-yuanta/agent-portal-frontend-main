@@ -59,7 +59,11 @@ export function NoteEditModal({
     const values = modalValuesRef.current;
     setSaving(true);
     try {
-      await editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+      await editNote({
+        ...panelNote,
+        title: values?.title.trim() || null,
+        body: values?.body ?? panelNote.body,
+      });
     } catch (err) {
       console.warn("[NoteEditModal] save failed", err);
       addToast({ status: "critical", message: t.planner.saveFailedKept });
@@ -115,11 +119,15 @@ export function NoteEditModal({
             pinnedClientId={pinnedClientId}
             onSave={(patch) => editNote({ ...panelNote, ...patch })}
             onEmptyChange={setBlank}
-            onValuesChange={(values) => { modalValuesRef.current = values; }}
+            onValuesChange={(values) => {
+              modalValuesRef.current = values;
+            }}
             manualSave
             layout="side"
             autoFocusTitle={panelNote.title === null && panelNote.body === ""}
-            onAttributesOpenChange={(open) => { attributesOpenRef.current = open; }}
+            onAttributesOpenChange={(open) => {
+              attributesOpenRef.current = open;
+            }}
             onDelete={() => setDeleteTarget(panelNote)}
           />
         )}

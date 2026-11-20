@@ -43,8 +43,10 @@ export function ProductTable({
 
   const isEmpty = !isLoading && rows.length === 0;
   return (
-    <div className={`relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
-      <Table className="table-fixed min-w-[640px]">
+    <div
+      className={`table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}
+    >
+      <Table className="min-w-[640px] table-fixed">
         <TableHead>
           <TableRow>
             <TableHeaderCell
@@ -100,36 +102,41 @@ export function ProductTable({
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <span className="relative shrink-0 size-2">
+                  <span className="relative size-2 shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element -- SVG status dot; the image optimizer rejects SVG */}
                     <img alt="" className="block size-full max-w-none" src={row.statusIcon} />
                   </span>
-                  <p className="text-body font-semibold text-foreground truncate">{displayAssetLabel(row.label, t)}</p>
+                  <p className="truncate text-body font-semibold text-foreground">
+                    {displayAssetLabel(row.label, t)}
+                  </p>
                 </div>
               </TableCell>
               <TableCell>
                 <p className="text-body font-semibold text-foreground">{row.clientCount}</p>
               </TableCell>
               <TableCell>
-                <p className="text-body font-semibold text-foreground">{formatThbAmount(row.totalAmountThb)}</p>
+                <p className="text-body font-semibold text-foreground">
+                  {formatThbAmount(row.totalAmountThb)}
+                </p>
               </TableCell>
               <TableCell>
-                <p className="text-body font-semibold text-foreground">{row.avgAllocationPct.toFixed(1)}%</p>
+                <p className="text-body font-semibold text-foreground">
+                  {row.avgAllocationPct.toFixed(1)}%
+                </p>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {isEmpty && (
-        isFiltered ? (
+      {isEmpty &&
+        (isFiltered ? (
           <TableEmptyOverlay
             body={t.client.hub.noProductResultBody}
             onClearFilters={onClearFilters}
           />
         ) : (
           <TableEmptyOverlay variant="empty" title={t.client.hub.noProductsYet} />
-        )
-      )}
+        ))}
     </div>
   );
 }

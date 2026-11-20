@@ -19,9 +19,7 @@ export function CampaignDetailSkeleton() {
         <div className="hidden border-t border-border/50 xl:flex xl:items-stretch">
           {Array.from({ length: 4 }).map((_, i) => (
             <Fragment key={i}>
-              {i > 0 && (
-                <div aria-hidden className="w-px shrink-0 self-stretch bg-border/50" />
-              )}
+              {i > 0 && <div aria-hidden className="w-px shrink-0 self-stretch bg-border/50" />}
               <div className="flex min-w-0 flex-1 items-start gap-3 p-4 sm:p-5">
                 <Skeleton className="size-10 shrink-0 rounded-xl" />
                 <div className="flex w-full flex-col gap-1.5">

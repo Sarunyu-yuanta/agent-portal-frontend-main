@@ -3,14 +3,8 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Button, SearchInput, useIsMobile } from "@sarunyu/system-one";
-import {
-  ArrowLeftIcon,
-  FunnelSimpleIcon,
-} from "@phosphor-icons/react";
-import {
-  MutualFundListCard,
-  MutualFundListCardMobile,
-} from "./MutualFundCard";
+import { ArrowLeftIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
+import { MutualFundListCard, MutualFundListCardMobile } from "./MutualFundCard";
 import {
   MutualFundFilterBottomSheet,
   MutualFundFilterModal,
@@ -52,7 +46,7 @@ function PeriodTabs({
               key={period}
               type="button"
               onClick={() => onChange(period)}
-              className={`flex min-h-8 flex-1 shrink-0 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold leading-[20px] whitespace-nowrap ${
+              className={`flex min-h-8 flex-1 shrink-0 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-xs leading-[20px] font-semibold whitespace-nowrap ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                   : "text-[#4a5565]"
@@ -99,7 +93,10 @@ export function MutualFundFilterResultsPage({
   // tax-saving subset); the page waits on that.
   const { isLoading } = useMutualFundUniverse();
 
-  const visibleFunds = useMemo(() => applyMutualFundFilter(funds, filterState), [funds, filterState]);
+  const visibleFunds = useMemo(
+    () => applyMutualFundFilter(funds, filterState),
+    [funds, filterState],
+  );
   const showNoMatchesState = !isEmptyFilterState(filterState) && visibleFunds.length === 0;
 
   const bothOrNeitherTag = viewActive === highlightActive;
@@ -135,7 +132,7 @@ export function MutualFundFilterResultsPage({
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-20">
-      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pb-2 pt-4 md:px-8 lg:px-0 lg:pt-8">
+      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-4 pb-2 md:px-8 lg:px-0 lg:pt-8">
         <Button
           variant="plain"
           size="icon-sm"
@@ -145,7 +142,9 @@ export function MutualFundFilterResultsPage({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+          {title}
+        </h1>
       </div>
 
       {/* Tags + legend on the left, search + filter on the right. Rendered outside the
@@ -176,7 +175,7 @@ export function MutualFundFilterResultsPage({
             className="h-[120px] w-[202px] object-contain"
           />
           <div className="flex flex-col items-center gap-3">
-            <p className="text-center text-base font-bold leading-[28px] text-[#262626]">
+            <p className="text-center text-base leading-[28px] font-bold text-[#262626]">
               {t.fund.filter.noMatches}
             </p>
             <Button variant="primary" size="xl" onClick={() => setFilterState(EMPTY_FILTER_STATE)}>
@@ -186,7 +185,7 @@ export function MutualFundFilterResultsPage({
         </div>
       ) : (
         <div className="mx-auto flex w-full max-w-[996px] flex-col gap-3 px-4 pt-3 md:px-8 lg:px-0">
-          <p className="w-full px-3 text-sm font-normal leading-[24px] text-[#101828]">
+          <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
             {t.fund.list.count(tagFunds.length)}
           </p>
 

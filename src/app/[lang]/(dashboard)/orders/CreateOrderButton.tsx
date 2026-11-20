@@ -31,11 +31,7 @@ import {
   STOCK_TOP_LOSS,
   STOCK_TOP_PICK,
 } from "@/app/[lang]/(dashboard)/client/[id]/stock-data";
-import {
-  bookableProductsForDesk,
-  type BookableProduct,
-  type Desk,
-} from "./bookable-products";
+import { bookableProductsForDesk, type BookableProduct, type Desk } from "./bookable-products";
 import { offeredProductId } from "./offered-products";
 import { isBookingOpen } from "./order-book";
 import { useOrderBooks } from "./use-order-books";
@@ -233,8 +229,7 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   };
 
   const assets = mode === "order" ? DESKS : [...DESKS, ...OFFERED];
-  const assetLabel = (a: Asset) =>
-    [...DESKS, ...OFFERED].find((x) => x.asset === a)?.label ?? a;
+  const assetLabel = (a: Asset) => [...DESKS, ...OFFERED].find((x) => x.asset === a)?.label ?? a;
 
   /** Order or Proposal — the same pill toggle as the evidence step's. */
   const modeToggle = (
@@ -262,9 +257,11 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
   );
 
   const assetPane = (
-    <div className="flex flex-col gap-3 px-4 pb-4 pt-3 md:px-6">
+    <div className="flex flex-col gap-3 px-4 pt-3 pb-4 md:px-6">
       {modeToggle}
-      <p className="pt-1 text-label font-semibold text-muted-foreground">{t.orders.create.pickAsset}</p>
+      <p className="pt-1 text-label font-semibold text-muted-foreground">
+        {t.orders.create.pickAsset}
+      </p>
       <div className="flex flex-col gap-2">
         {assets.map(({ asset: a, label }) => {
           const count = itemsFor(a).length;
@@ -286,7 +283,11 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-body-sm font-semibold text-foreground">{label}</span>
                 <span className="text-label text-muted-foreground">
-                  {count > 0 ? (mode === "order" ? t.orders.create.openCount(count) : t.orders.create.availableCount(count)) : t.orders.create.noneOpen}
+                  {count > 0
+                    ? mode === "order"
+                      ? t.orders.create.openCount(count)
+                      : t.orders.create.availableCount(count)
+                    : t.orders.create.noneOpen}
                 </span>
               </span>
               <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
@@ -301,7 +302,7 @@ export function CreateOrderButton({ desk, clientId }: { desk?: Desk; clientId?: 
     <div className="flex flex-col pb-4">
       {/* Pinned to the modal's scroller, as the client list's search is — the
           list can run for screens and narrowing it is the reason to scroll up. */}
-      <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pb-2 pt-3 md:px-6">
+      <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pt-3 pb-2 md:px-6">
         {/* On a desk tab this is the first step, so the toggle is here. */}
         {desk && modeToggle}
         {/* A phone's sheet has no arrow in its title row. */}
@@ -410,10 +411,12 @@ function ProductRow({ item, onPick }: { item: PickItem; onPick: () => void }) {
         <span className="truncate text-body-sm font-semibold text-foreground">
           {item.title}
           {item.coupon && (
-            <span className="ml-1.5 font-semibold text-primary-action">{item.coupon}</span>
+            <span className="text-primary-action ml-1.5 font-semibold">{item.coupon}</span>
           )}
         </span>
-        {item.meta && <span className="truncate text-label text-muted-foreground">{item.meta}</span>}
+        {item.meta && (
+          <span className="truncate text-label text-muted-foreground">{item.meta}</span>
+        )}
       </span>
       <CaretRightIcon size={14} className="shrink-0 text-muted-foreground" />
     </button>

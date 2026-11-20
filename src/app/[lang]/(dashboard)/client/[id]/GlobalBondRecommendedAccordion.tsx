@@ -27,7 +27,7 @@ export function GlobalBondRecommendedAccordion({
 
   return (
     <div
-      className="flex flex-col w-full rounded-xl overflow-hidden bg-white"
+      className="flex w-full flex-col overflow-hidden rounded-xl bg-white"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       {RECOMMENDED_ISSUER_ROWS.map((row, i) => {
@@ -42,11 +42,11 @@ export function GlobalBondRecommendedAccordion({
             <button
               type="button"
               onClick={() => setExpandedIdx(expanded ? null : i)}
-              className="flex w-full items-center gap-2 p-3 bg-white border-none cursor-pointer text-left min-h-12"
+              className="flex min-h-12 w-full cursor-pointer items-center gap-2 border-none bg-white p-3 text-left"
             >
               <BondLogo src={row.logo} className="size-8 rounded" />
               <span
-                className={`flex-1 min-w-0 text-sm font-bold leading-[24px] truncate ${
+                className={`min-w-0 flex-1 truncate text-sm leading-[24px] font-bold ${
                   expanded ? "text-[#101828]" : "text-[#4a5565]"
                 }`}
               >
@@ -59,16 +59,22 @@ export function GlobalBondRecommendedAccordion({
               )}
             </button>
             {expanded && (
-              <div className="flex flex-col gap-3 items-center px-3 pb-3 w-full">
-                <div className="flex flex-col gap-1 rounded-lg bg-[#f3f4f6] px-3 py-2 w-full">
+              <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
+                <div className="flex w-full flex-col gap-1 rounded-lg bg-[#f3f4f6] px-3 py-2">
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
                   <DetailRow label={cols.maturity} value={row.maturity} />
-                  <hr className="w-full border-0 m-0" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+                  <hr
+                    className="m-0 w-full border-0"
+                    style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
+                  />
                   <span className="text-xs leading-[20px] text-[#6a7282]">{cols.creditRating}</span>
                   <DetailRow label="S&P" value={row.sp} />
                   <DetailRow label="Moody's" value={row.moodys} />
                   <DetailRow label="Fitch" value={row.fitch} />
-                  <hr className="w-full border-0 m-0" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+                  <hr
+                    className="m-0 w-full border-0"
+                    style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
+                  />
                   <DetailRow label={cols.estimatedYield} value={row.estimatedYield} />
                 </div>
                 <ViewInfoButton onClick={() => onIssuerSelect?.(row.id)} />

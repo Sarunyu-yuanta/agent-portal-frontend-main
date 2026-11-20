@@ -20,15 +20,17 @@ function LegendRow({
   description: string;
 }) {
   return (
-    <div className="flex w-full flex-col items-start gap-0.5 rounded-xl bg-[#f9fafb] py-2.5 pl-3 pr-4">
+    <div className="flex w-full flex-col items-start gap-0.5 rounded-xl bg-[#f9fafb] py-2.5 pr-4 pl-3">
       <div className="flex items-center gap-1.5">
-        <p className="text-sm font-bold leading-[24px] text-[#101828]">{label}</p>
+        <p className="text-sm leading-[24px] font-bold text-[#101828]">{label}</p>
         <div className={`flex items-center gap-0.5 rounded px-1 py-0.5 ${tagClassName}`}>
           <Image src={icon} alt="" width={14} height={14} className="size-3.5 shrink-0" />
-          <span className={`text-micro leading-[18px] whitespace-nowrap ${tagTextClassName}`}>{label}</span>
+          <span className={`text-micro leading-[18px] whitespace-nowrap ${tagTextClassName}`}>
+            {label}
+          </span>
         </div>
       </div>
-      <p className="text-sm font-normal leading-[24px] text-[#6a7282]">{description}</p>
+      <p className="text-sm leading-[24px] font-normal text-[#6a7282]">{description}</p>
     </div>
   );
 }
@@ -81,13 +83,7 @@ export function MutualFundLegendBottomSheet({
 }
 
 /** Figma 40555:363444 — "ดูคำอธิบาย" legend explainer, desktop centered modal. */
-export function MutualFundLegendModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function MutualFundLegendModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useT();
   if (!open) return null;
 
@@ -105,7 +101,7 @@ export function MutualFundLegendModal({
           title={t.fund.legend.title}
           showClose
           onClose={onClose}
-          className="!max-w-[440px] w-[calc(var(--vw)*100-3rem)]"
+          className="w-[calc(var(--vw)*100-3rem)] !max-w-[440px]"
         >
           <MutualFundLegendContent />
         </Modal>

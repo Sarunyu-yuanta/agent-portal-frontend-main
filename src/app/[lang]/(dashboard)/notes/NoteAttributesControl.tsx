@@ -78,72 +78,64 @@ export function NoteAttributesControl({
   const [resetKey, setResetKey] = useState(0);
 
   const fields = (
-        <div className={`flex flex-col gap-3 ${isMobile ? "w-full" : "w-64"}`}>
-          {/* Popover only. The sheet has a real header with an action slot and
+    <div className={`flex flex-col gap-3 ${isMobile ? "w-full" : "w-64"}`}>
+      {/* Popover only. The sheet has a real header with an action slot and
               uses that instead — same position, but the design system's own
               furniture rather than a button drawn to look like it. A popover has
               no header to put one in, so here it stays inline, top right, where
               a filter panel's reset goes. */}
-          {!isMobile && !nothingSet && (
-            <button
-              type="button"
-              onClick={() => {
-                onClear();
-                setResetKey((k) => k + 1);
-              }}
-              className="-mb-1 flex items-center gap-1.5 self-end rounded-lg px-2 py-1 type-caption text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
-            >
-              <XIcon size={12} weight="bold" className="shrink-0" />
-              {t.planner.notes.fields.clear}
-            </button>
-          )}
+      {!isMobile && !nothingSet && (
+        <button
+          type="button"
+          onClick={() => {
+            onClear();
+            setResetKey((k) => k + 1);
+          }}
+          className="type-caption -mb-1 flex cursor-pointer items-center gap-1.5 self-end rounded-lg px-2 py-1 text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+        >
+          <XIcon size={12} weight="bold" className="shrink-0" />
+          {t.planner.notes.fields.clear}
+        </button>
+      )}
 
-          <ClientField
-            resetToken={resetKey}
-            clientIds={clientIds}
-            clients={clients}
-            pinnedClientId={pinnedClientId}
-            onChange={onClientIdsChange}
-          />
-          <span className="h-px bg-border" />
-          <ReminderField
-            resetToken={resetKey}
-            reminderAt={reminderAt}
-            onChange={onReminderChange}
-          />
-        </div>
+      <ClientField
+        resetToken={resetKey}
+        clientIds={clientIds}
+        clients={clients}
+        pinnedClientId={pinnedClientId}
+        onChange={onClientIdsChange}
+      />
+      <span className="h-px bg-border" />
+      <ReminderField resetToken={resetKey} reminderAt={reminderAt} onChange={onReminderChange} />
+    </div>
   );
 
   const trigger = (
-      <button
-        type="button"
-        // `rounded-full` + a standing grey fill, so it reads as a control sitting
-        // there rather than something that only appears on hover.
-        className={`flex min-w-0 shrink items-center gap-2 rounded-full bg-[var(--bg-default-secondary)] px-3 py-1.5 type-caption transition-colors cursor-pointer hover:bg-[var(--bg-default-tertiary)] hover:text-foreground ${
-          open ? "bg-[var(--bg-default-tertiary)] text-foreground" : "text-muted-foreground"
-        }`}
-      >
-        <SlidersHorizontalIcon size={16} className="shrink-0" />
-        {nothingSet ? (
-          <span>{t.planner.notes.fields.attributes}</span>
-        ) : (
-          <>
-            <ClientAvatarStack
-              names={clientIds.map(nameFor)}
-              slots={3}
-              size="small"
-            />
-            {reminderAt && (
-              // The faces say "client" on their own; a bare date doesn't say
-              // "reminder", so it gets the bell to name it.
-              <span className="flex items-center gap-1 truncate">
-                <BellIcon size={14} className="shrink-0" />
-                {formatDayOnly(reminderAt, locale)}
-              </span>
-            )}
-          </>
-        )}
-      </button>
+    <button
+      type="button"
+      // `rounded-full` + a standing grey fill, so it reads as a control sitting
+      // there rather than something that only appears on hover.
+      className={`type-caption flex min-w-0 shrink cursor-pointer items-center gap-2 rounded-full bg-[var(--bg-default-secondary)] px-3 py-1.5 transition-colors hover:bg-[var(--bg-default-tertiary)] hover:text-foreground ${
+        open ? "bg-[var(--bg-default-tertiary)] text-foreground" : "text-muted-foreground"
+      }`}
+    >
+      <SlidersHorizontalIcon size={16} className="shrink-0" />
+      {nothingSet ? (
+        <span>{t.planner.notes.fields.attributes}</span>
+      ) : (
+        <>
+          <ClientAvatarStack names={clientIds.map(nameFor)} slots={3} size="small" />
+          {reminderAt && (
+            // The faces say "client" on their own; a bare date doesn't say
+            // "reminder", so it gets the bell to name it.
+            <span className="flex items-center gap-1 truncate">
+              <BellIcon size={14} className="shrink-0" />
+              {formatDayOnly(reminderAt, locale)}
+            </span>
+          )}
+        </>
+      )}
+    </button>
   );
 
   /**

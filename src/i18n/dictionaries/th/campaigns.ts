@@ -78,7 +78,8 @@ const campaigns = {
     materialMissing: "ไม่พบสื่อของแคมเปญนี้ รีเฟรชหน้าแล้วลองใหม่",
     materialNotApproved: "สื่อนี้ยังไม่ได้รับอนุมัติ จึงส่งให้ลูกค้าไม่ได้",
     campaignClosed: "แคมเปญนี้หมดเขตแล้ว ส่งให้ลูกค้าเพิ่มไม่ได้",
-    notEnoughSeats: (open: number, requested: number) => `ที่นั่งเหลือ ${open} ที่ แต่เลือกไว้ ${requested} คน`,
+    notEnoughSeats: (open: number, requested: number) =>
+      `ที่นั่งเหลือ ${open} ที่ แต่เลือกไว้ ${requested} คน`,
   },
 };
 

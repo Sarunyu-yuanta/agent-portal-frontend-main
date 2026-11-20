@@ -9,10 +9,12 @@ import {
   CatalogDetailDesktopShell,
   useCatalogDetailScrollTop,
 } from "./ProductCatalogTabbedDetailLayout";
+import { MutualFundListCard } from "./MutualFundCard";
 import {
-  MutualFundListCard,
-} from "./MutualFundCard";
-import { THEME_HERO_COLOR, THEME_ICON_COMPONENTS, ThemeHeroGraphic } from "./MutualFundThemesSection";
+  THEME_HERO_COLOR,
+  THEME_ICON_COMPONENTS,
+  ThemeHeroGraphic,
+} from "./MutualFundThemesSection";
 import { MutualFundThemeDetailMobile } from "./MutualFundThemeDetailMobile";
 import { MutualFundLegendModal } from "./MutualFundLegendSheet";
 
@@ -41,14 +43,22 @@ import {
 } from "./mutual-fund-data";
 import { useT } from "@/i18n/I18nProvider";
 
-function MutualFundThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme: MutualFundTheme }) {
+function MutualFundThemeHero({
+  themeId,
+  theme,
+}: {
+  themeId: MutualFundThemeId;
+  theme: MutualFundTheme;
+}) {
   // Falls back to no icon for a key the app doesn't know, rather than crashing.
   const t = useT();
   const Icon = THEME_ICON_COMPONENTS[theme.icon];
 
   return (
     <CatalogDetailThemeHero
-      icon={Icon ? <Icon size={24} weight="fill" style={{ color: THEME_HERO_COLOR.title }} /> : null}
+      icon={
+        Icon ? <Icon size={24} weight="fill" style={{ color: THEME_HERO_COLOR.title }} /> : null
+      }
       title={getThemeHeroTitle(themeId)}
       description={getThemeDescription(themeId)}
       meta={t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
@@ -74,7 +84,7 @@ function PerformancePeriodTabs({
               key={period}
               type="button"
               onClick={() => onChange(period)}
-              className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs font-semibold leading-[20px] ${
+              className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-semibold ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                   : "text-[#4a5565]"
@@ -144,12 +154,18 @@ export function MutualFundThemeDetailPage({
 
       {isPageLoading ? (
         <CatalogDetailDesktopShell>
-          <CatalogDetailBackHeader title={t.fund.themes.detailTitle} onBack={onBack} className="!pt-8" />
+          <CatalogDetailBackHeader
+            title={t.fund.themes.detailTitle}
+            onBack={onBack}
+            className="!pt-8"
+          />
           <TabsSkeleton count={themeTabItems.length} className={CATALOG_DETAIL_WIDTH.narrow} />
           <MutualFundTabbedListHeroSkeleton />
           <div
             className="relative z-10 w-full rounded-xl"
-            style={{ backgroundImage: `linear-gradient(to right, ${THEME_HERO_COLOR.from}, ${THEME_HERO_COLOR.to})` }}
+            style={{
+              backgroundImage: `linear-gradient(to right, ${THEME_HERO_COLOR.from}, ${THEME_HERO_COLOR.to})`,
+            }}
           >
             <div className="w-full rounded-t-xl bg-white pt-4 pb-6">
               <div className={`flex flex-col gap-6 ${CATALOG_DETAIL_WIDTH.narrow}`}>
@@ -168,7 +184,13 @@ export function MutualFundThemeDetailPage({
           tabItems={themeTabItems}
           activeTabId={themeId}
           onTabSelect={setThemeId}
-          hero={isLoading ? <MutualFundTabbedListHeroSkeleton /> : <MutualFundThemeHero themeId={themeId} theme={theme} />}
+          hero={
+            isLoading ? (
+              <MutualFundTabbedListHeroSkeleton />
+            ) : (
+              <MutualFundThemeHero themeId={themeId} theme={theme} />
+            )
+          }
           listControls={
             isLoading ? (
               <MutualFundTabbedListControlsSkeleton />
@@ -204,7 +226,9 @@ export function MutualFundThemeDetailPage({
                 ))}
               </div>
               {tagFunds.length === 0 ? (
-                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">{t.fund.list.noFundsInTheme}</p>
+                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
+                  {t.fund.list.noFundsInTheme}
+                </p>
               ) : null}
             </>
           )}

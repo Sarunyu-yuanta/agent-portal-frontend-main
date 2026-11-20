@@ -129,10 +129,7 @@ import {
   DEFINIT_PLANS,
   type DefinitPlan,
 } from "@/app/[lang]/(dashboard)/client/[id]/definit-plan-data";
-import {
-  RESEARCH_FEED,
-  type ResearchFeed,
-} from "@/app/[lang]/(dashboard)/insights/research-data";
+import { RESEARCH_FEED, type ResearchFeed } from "@/app/[lang]/(dashboard)/insights/research-data";
 import {
   MARKET_CATALOG,
   type MarketCatalog,
@@ -191,9 +188,7 @@ export function useStructuredProduct(id: string): Resource<StructuredProduct | u
 }
 
 /** One Thai structured product by theme, or `null` (its lookup returns `null`, not `undefined`). */
-export function useThaiStructuredProduct(
-  theme: string,
-): Resource<ThaiStructuredProduct | null> {
+export function useThaiStructuredProduct(theme: string): Resource<ThaiStructuredProduct | null> {
   return useStatic(getThaiStructuredProduct(theme));
 }
 
@@ -386,7 +381,9 @@ export function useMutualFundUniverse(): Resource<MutualFund[]> {
 }
 
 /** One page of the mutual-fund insights list. */
-export function useMutualFundInsights(page: number): Resource<ReturnType<typeof getMutualFundInsightsPage>> {
+export function useMutualFundInsights(
+  page: number,
+): Resource<ReturnType<typeof getMutualFundInsightsPage>> {
   const data = useMemo(() => getMutualFundInsightsPage(page), [page]);
   return useStatic(data);
 }

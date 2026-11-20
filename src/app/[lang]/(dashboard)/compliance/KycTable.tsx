@@ -41,7 +41,7 @@ export function KycTable() {
     setSortDir(dir);
   };
 
-  const dirFor = (key: SortKey): SortDir => sortKey === key ? sortDir : "none";
+  const dirFor = (key: SortKey): SortDir => (sortKey === key ? sortDir : "none");
 
   const filtered = filter ? mockKYCData.filter((r) => r.kycStatus === filter) : mockKYCData;
 
@@ -60,112 +60,181 @@ export function KycTable() {
 
   return (
     <>
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <p className="type-subtitle-1 text-foreground">{tt.title}</p>
-        <Button variant="outline-black" size="sm" leftIcon={<DownloadSimpleIcon size={14} />}>
-          {tt.export}
-        </Button>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="type-caption text-muted-foreground shrink-0">{tt.filterBy}</span>
-        <div className="relative flex-1 min-w-0">
-          <div
-            className="scrollable-tabs flex items-center gap-2"
-            onScroll={(e) => setChipsScrolled(e.currentTarget.scrollLeft > 0)}
-            style={chipsScrolled ? {
-              maskImage: "linear-gradient(to right, transparent 0px, black 40px)",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 40px)",
-            } : undefined}
-          >
-            {kycFilterOpts.map((opt) => (
-              <Chip
-                key={opt.value}
-                label={tt.filters[opt.id]}
-                type="single"
-                size="small"
-                selected={filter === opt.value}
-                onClick={() => setFilter(opt.value)}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <p className="type-subtitle-1 text-foreground">{tt.title}</p>
+          <Button variant="outline-black" size="sm" leftIcon={<DownloadSimpleIcon size={14} />}>
+            {tt.export}
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="type-caption shrink-0 text-muted-foreground">{tt.filterBy}</span>
+          <div className="relative min-w-0 flex-1">
+            <div
+              className="scrollable-tabs flex items-center gap-2"
+              onScroll={(e) => setChipsScrolled(e.currentTarget.scrollLeft > 0)}
+              style={
+                chipsScrolled
+                  ? {
+                      maskImage: "linear-gradient(to right, transparent 0px, black 40px)",
+                      WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 40px)",
+                    }
+                  : undefined
+              }
+            >
+              {kycFilterOpts.map((opt) => (
+                <Chip
+                  key={opt.value}
+                  label={tt.filters[opt.id]}
+                  type="single"
+                  size="small"
+                  selected={filter === opt.value}
+                  onClick={() => setFilter(opt.value)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`relative overflow-hidden overflow-x-auto rounded-xl border border-[var(--border-default)] ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}
+        >
+          <Table className="min-w-[560px] table-fixed">
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell
+                  className="w-[26%]"
+                  sortDirection={dirFor("client")}
+                  onSortChange={handleSort("client")}
+                >
+                  {tt.columns.client}
+                </TableHeaderCell>
+                <TableHeaderCell
+                  className="w-[18%]"
+                  sortDirection={dirFor("riskRating")}
+                  onSortChange={handleSort("riskRating")}
+                >
+                  {tt.columns.riskRating}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[16%]" sortable={false}>
+                  {tt.columns.kycStatus}
+                </TableHeaderCell>
+                <TableHeaderCell
+                  className="w-[22%]"
+                  sortDirection={dirFor("nextReview")}
+                  onSortChange={handleSort("nextReview")}
+                >
+                  {tt.columns.nextReview}
+                </TableHeaderCell>
+                <TableHeaderCell
+                  className="w-[18%]"
+                  sortDirection={dirFor("daysUntilExpiry")}
+                  onSortChange={handleSort("daysUntilExpiry")}
+                >
+                  {tt.columns.expiry}
+                </TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => {
+                const urgent = row.daysUntilExpiry <= 7;
+                const soon = row.daysUntilExpiry <= 30;
+                const maskedClient = maskName(row.client, isPrivate);
+                const initials = getInitialsFromWords(maskedClient);
+                const ratingLabel = t.compliance.riskRating[row.riskRating] ?? row.riskRating;
+
+                return (
+                  <TableRow
+                    key={row.id}
+                    hoverable
+                    className="cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]"
+                    onClick={() => {
+                      setSelectedRow(row);
+                      setDrawerOpen(true);
+                    }}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar type="text" initials={initials} size="s" />
+                        <div className="flex min-w-0 flex-col gap-0.5">
+                          <span className="type-body-2 truncate font-medium text-foreground">
+                            {maskedClient}
+                          </span>
+                          <span className="type-caption text-[var(--text-default-disabled)]">
+                            {t.compliance.riskRatingLabel(ratingLabel)}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Tag
+                        text={ratingLabel}
+                        variant={
+                          row.riskRating === "High"
+                            ? "red"
+                            : row.riskRating === "Medium"
+                              ? "yellow"
+                              : "green"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <StatusTag
+                        type={row.kycStatus}
+                        text={t.compliance.kycStatus[row.kycStatus]}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <span className="type-body-2 text-foreground">{row.nextReview}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        {urgent && (
+                          <ClockIcon
+                            size={12}
+                            weight="fill"
+                            className="shrink-0 text-destructive"
+                          />
+                        )}
+                        <span
+                          className={`type-body-2 font-medium tabular-nums ${
+                            urgent ? "text-destructive" : soon ? "text-warning" : "text-success"
+                          }`}
+                        >
+                          {tt.daysShort(row.daysUntilExpiry)}
+                        </span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          {isEmpty &&
+            (mockKYCData.length === 0 ? (
+              <TableEmptyOverlay variant="empty" title={tt.empty} />
+            ) : (
+              <TableEmptyOverlay
+                title={t.states.noFilterResultTitle}
+                body={tt.emptyBody}
+                onClearFilters={filter ? () => setFilter("") : undefined}
               />
             ))}
-          </div>
         </div>
       </div>
 
-      <div className={`relative rounded-xl border border-[var(--border-default)] overflow-hidden overflow-x-auto ${isEmpty ? TABLE_EMPTY_MIN_HEIGHT : ""}`}>
-        <Table className="table-fixed min-w-[560px]">
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell className="w-[26%]" sortDirection={dirFor("client")} onSortChange={handleSort("client")}>{tt.columns.client}</TableHeaderCell>
-              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("riskRating")} onSortChange={handleSort("riskRating")}>{tt.columns.riskRating}</TableHeaderCell>
-              <TableHeaderCell className="w-[16%]" sortable={false}>{tt.columns.kycStatus}</TableHeaderCell>
-              <TableHeaderCell className="w-[22%]" sortDirection={dirFor("nextReview")} onSortChange={handleSort("nextReview")}>{tt.columns.nextReview}</TableHeaderCell>
-              <TableHeaderCell className="w-[18%]" sortDirection={dirFor("daysUntilExpiry")} onSortChange={handleSort("daysUntilExpiry")}>{tt.columns.expiry}</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              const urgent = row.daysUntilExpiry <= 7;
-              const soon   = row.daysUntilExpiry <= 30;
-              const maskedClient = maskName(row.client, isPrivate);
-              const initials = getInitialsFromWords(maskedClient);
-              const ratingLabel = t.compliance.riskRating[row.riskRating] ?? row.riskRating;
-
-              return (
-                <TableRow key={row.id} hoverable className="cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]" onClick={() => { setSelectedRow(row); setDrawerOpen(true); }}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar type="text" initials={initials} size="s" />
-                      <div className="flex flex-col gap-0.5 min-w-0">
-                        <span className="type-body-2 font-medium text-foreground truncate">{maskedClient}</span>
-                        <span className="type-caption text-[var(--text-default-disabled)]">{t.compliance.riskRatingLabel(ratingLabel)}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Tag
-                      text={ratingLabel}
-                      variant={row.riskRating === "High" ? "red" : row.riskRating === "Medium" ? "yellow" : "green"}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <StatusTag type={row.kycStatus} text={t.compliance.kycStatus[row.kycStatus]} />
-                  </TableCell>
-                  <TableCell>
-                    <span className="type-body-2 text-foreground">{row.nextReview}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      {urgent && <ClockIcon size={12} weight="fill" className="text-destructive shrink-0" />}
-                      <span className={`type-body-2 font-medium tabular-nums ${
-                        urgent ? "text-destructive" : soon ? "text-warning" : "text-success"
-                      }`}>
-                        {tt.daysShort(row.daysUntilExpiry)}
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        {isEmpty &&
-          (mockKYCData.length === 0 ? (
-            <TableEmptyOverlay variant="empty" title={tt.empty} />
-          ) : (
-            <TableEmptyOverlay
-              title={t.states.noFilterResultTitle}
-              body={tt.emptyBody}
-              onClearFilters={filter ? () => setFilter("") : undefined}
-            />
-          ))}
-      </div>
-    </div>
-
-    <DetailDrawer size="narrow" className="overflow-y-auto" open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open); if (!open) setSelectedRow(null); }}>
-      {selectedRow && <KycDetailPanel row={selectedRow} onClose={() => setDrawerOpen(false)} />}
-    </DetailDrawer>
+      <DetailDrawer
+        size="narrow"
+        className="overflow-y-auto"
+        open={drawerOpen}
+        onOpenChange={(open) => {
+          setDrawerOpen(open);
+          if (!open) setSelectedRow(null);
+        }}
+      >
+        {selectedRow && <KycDetailPanel row={selectedRow} onClose={() => setDrawerOpen(false)} />}
+      </DetailDrawer>
     </>
   );
 }

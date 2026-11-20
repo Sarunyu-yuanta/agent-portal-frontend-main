@@ -4,10 +4,7 @@ import { Suspense, useState, useEffect, useRef } from "react";
 import { SearchInput } from "@sarunyu/system-one";
 import { useSearchParams } from "next/navigation";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import {
-  ProductCatalogTab,
-  type CatalogNavigation,
-} from "../client/[id]/ProductCatalogTab";
+import { ProductCatalogTab, type CatalogNavigation } from "../client/[id]/ProductCatalogTab";
 import {
   advisoryDetailHref,
   catalogListHref,
@@ -63,11 +60,7 @@ function ProductCatalogPageInner() {
       setHeaderSlot(<Skeleton className="h-9 w-full rounded-lg" />);
     } else if (scrolled) {
       setHeaderSlot(
-        <div
-          ref={headerSearchWrapRef}
-          className="w-full"
-          onFocus={() => setSearchOpen(true)}
-        >
+        <div ref={headerSearchWrapRef} className="w-full" onFocus={() => setSearchOpen(true)}>
           <SearchInput
             value={searchValue}
             onChange={setSearchValue}
@@ -89,17 +82,12 @@ function ProductCatalogPageInner() {
     onTopIdeaSelect: (sector) =>
       router.push(`/product-catalog/top-idea/${encodeURIComponent(sector)}`),
     onAllTopIdeasView: () => router.push("/product-catalog/top-idea"),
-    onInvestmentSolutionSelect: (id) =>
-      router.push(`/product-catalog/investment-solution/${id}`),
-    onFixedIncomeBondSelect: (bond) =>
-      router.push(`/product-catalog/fixed-income/bond/${bond.id}`),
-    onGlobalBondIssuerSelect: (id) =>
-      router.push(`/product-catalog/global-bond/${id}`),
+    onInvestmentSolutionSelect: (id) => router.push(`/product-catalog/investment-solution/${id}`),
+    onFixedIncomeBondSelect: (bond) => router.push(`/product-catalog/fixed-income/bond/${bond.id}`),
+    onGlobalBondIssuerSelect: (id) => router.push(`/product-catalog/global-bond/${id}`),
     onAllGlobalBondsView: () => router.push("/product-catalog/global-bond"),
     onThaiProductSelect: (p) =>
-      router.push(
-        `/product-catalog/thai-structured/${encodeURIComponent(p.theme)}`,
-      ),
+      router.push(`/product-catalog/thai-structured/${encodeURIComponent(p.theme)}`),
     onMutualFundSelect: (fundId) =>
       router.push(`/product-catalog/mutual-fund/${encodeURIComponent(fundId)}`),
     onMutualFundTopPerformersSeeAll: (groupId) =>

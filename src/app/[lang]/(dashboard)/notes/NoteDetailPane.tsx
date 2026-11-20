@@ -36,7 +36,7 @@ function SummaryChip({
     <span
       className={`inline-flex w-fit items-center gap-1 rounded-[4px] px-2 py-1 text-xs leading-[20px] whitespace-nowrap ${TAG_CHIP_TONE[variant]}`}
     >
-      <span className="shrink-0 flex items-center">{icon}</span>
+      <span className="flex shrink-0 items-center">{icon}</span>
       {children}
     </span>
   );
@@ -254,9 +254,8 @@ export function NoteDetailPane({
   ].map(nameFor);
   const reminder = reminderTag(note, t, locale);
 
-
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="flex h-full min-h-0 flex-col">
       {/* The date is centred with an `absolute` sibling rather than by sitting in
           a flex row: the back arrow only exists on mobile, so flex/grid centring
           would land the date in the middle of the *leftover* space and shift it
@@ -268,7 +267,7 @@ export function NoteDetailPane({
             type="button"
             onClick={onBack}
             aria-label={t.common.back}
-            className="absolute left-3 flex items-center justify-center size-7 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-foreground cursor-pointer"
+            className="absolute left-3 flex size-7 cursor-pointer items-center justify-center rounded-lg text-foreground transition-colors hover:bg-[var(--bg-default-secondary)]"
           >
             <ArrowLeftIcon size={18} />
           </button>
@@ -277,7 +276,7 @@ export function NoteDetailPane({
             line: when the note was last touched, and that you don't have to do
             anything to keep it that way. */}
         <div className="flex min-w-0 flex-col items-center gap-0.5 px-10">
-          <p className="type-caption text-muted-foreground truncate">
+          <p className="type-caption truncate text-muted-foreground">
             {formatDateTime(note.updatedAt, locale)}
           </p>
           {/* Hidden until something has been written — on a note you've only just
@@ -316,7 +315,7 @@ export function NoteDetailPane({
                 <button
                   type="button"
                   onClick={() => flushRef.current()}
-                  className="font-medium underline cursor-pointer"
+                  className="cursor-pointer font-medium underline"
                 >
                   {t.states.retry}
                 </button>
@@ -331,7 +330,7 @@ export function NoteDetailPane({
             type="button"
             onClick={onDelete}
             aria-label={t.planner.notes.deleteNote}
-            className="absolute right-3 flex items-center justify-center size-7 rounded-lg hover:bg-[var(--bg-default-secondary)] transition-colors text-muted-foreground hover:text-destructive cursor-pointer"
+            className="absolute right-3 flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-destructive"
           >
             <TrashIcon size={16} />
           </button>
@@ -339,7 +338,7 @@ export function NoteDetailPane({
       </div>
 
       <div
-        className={`flex flex-1 min-h-0 flex-col overflow-y-auto px-4 py-4 ${
+        className={`flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 ${
           layout === "side" ? "gap-4 xl:flex-row xl:gap-6" : ""
         }`}
       >
@@ -417,7 +416,7 @@ export function NoteDetailPane({
             order still starts where you type. `xl:order-1/2` restores the
             desktop arrangement, where the two are side by side anyway. */}
         {layout === "side" && (
-          <div className="order-1 shrink-0 xl:order-2 xl:w-80 xl:sticky xl:top-0 xl:self-start">
+          <div className="order-1 shrink-0 xl:sticky xl:top-0 xl:order-2 xl:w-80 xl:self-start">
             {isNarrow ? (
               /* The pill, not the card, on a phone: the card is a 256px block of
                  chrome above the note, and the two fields it holds are usually
@@ -457,7 +456,7 @@ export function NoteDetailPane({
                       onSave({ clientIds: [], reminderAt: null, reminderDone: false });
                       setAttributesReset((k) => k + 1);
                     }}
-                    className="-mb-1 flex items-center gap-1.5 self-end rounded-lg px-2 py-1 type-caption text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+                    className="type-caption -mb-1 flex cursor-pointer items-center gap-1.5 self-end rounded-lg px-2 py-1 text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
                   >
                     <XIcon size={12} weight="bold" className="shrink-0" />
                     {t.planner.notes.fields.clear}
@@ -488,32 +487,32 @@ export function NoteDetailPane({
           action here you can't undo. The `border-t` is what separates it from the
           writing area; the strip itself takes the pane's own background. */}
       {layout === "footer" && (
-      <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-3">
-        <NoteAttributesControl
-          clientIds={note.clientIds}
-          clients={clients}
-          pinnedClientId={pinnedClientId}
-          reminderAt={note.reminderAt}
-          open={attributesOpen}
-          onOpenChange={(open) => {
-            setAttributesOpen(open);
-            onAttributesOpenChange?.(open);
-          }}
-          onClientIdsChange={(clientIds) => onSave({ clientIds })}
-          onReminderChange={(reminderAt) => onSave({ reminderAt, reminderDone: false })}
-          onClear={() => onSave({ clientIds: [], reminderAt: null, reminderDone: false })}
-        />
-        <Tooltip content={t.planner.notes.deleteNote} side="top">
-          <button
-            type="button"
-            onClick={onDelete}
-            aria-label={t.planner.notes.deleteNote}
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--bg-default-secondary)] text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-danger-light)] hover:text-destructive"
-          >
-            <TrashIcon size={16} />
-          </button>
-        </Tooltip>
-      </div>
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-3">
+          <NoteAttributesControl
+            clientIds={note.clientIds}
+            clients={clients}
+            pinnedClientId={pinnedClientId}
+            reminderAt={note.reminderAt}
+            open={attributesOpen}
+            onOpenChange={(open) => {
+              setAttributesOpen(open);
+              onAttributesOpenChange?.(open);
+            }}
+            onClientIdsChange={(clientIds) => onSave({ clientIds })}
+            onReminderChange={(reminderAt) => onSave({ reminderAt, reminderDone: false })}
+            onClear={() => onSave({ clientIds: [], reminderAt: null, reminderDone: false })}
+          />
+          <Tooltip content={t.planner.notes.deleteNote} side="top">
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label={t.planner.notes.deleteNote}
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--bg-default-secondary)] text-muted-foreground transition-colors hover:bg-[var(--bg-danger-light)] hover:text-destructive"
+            >
+              <TrashIcon size={16} />
+            </button>
+          </Tooltip>
+        </div>
       )}
     </div>
   );

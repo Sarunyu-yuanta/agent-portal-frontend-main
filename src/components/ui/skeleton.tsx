@@ -18,13 +18,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 }
 
 /** Drop-in replacement for a table's row list while its data is still loading. */
-export function TableRowsSkeleton({
-  columns,
-  rows = 8,
-}: {
-  columns: number;
-  rows?: number;
-}) {
+export function TableRowsSkeleton({ columns, rows = 8 }: { columns: number; rows?: number }) {
   return (
     <>
       {Array.from({ length: rows }).map((_, i) => (
@@ -46,16 +40,13 @@ export function TableRowsSkeleton({
  * only a few even columns and never scrolls, and its header has no sort
  * controls, so nothing on it can be pressed or dragged before there is data.
  */
-export function TableSkeleton({
-  columns = 6,
-  rows = 8,
-}: {
-  columns?: number;
-  rows?: number;
-}) {
+export function TableSkeleton({ columns = 6, rows = 8 }: { columns?: number; rows?: number }) {
   return (
-    <div aria-busy="true" className="overflow-hidden rounded-lg border border-[var(--border-default)]">
-      <Table className="table-fixed w-full">
+    <div
+      aria-busy="true"
+      className="overflow-hidden rounded-lg border border-[var(--border-default)]"
+    >
+      <Table className="w-full table-fixed">
         <TableHead>
           <TableRow hoverable={false}>
             {Array.from({ length: columns }).map((_, j) => (
@@ -108,13 +99,7 @@ export function PaginationSkeleton() {
  * tabs render and stay live; a tab whose own data is still coming shows a
  * skeleton in its content only. Even bars, one per tab.
  */
-export function TabsSkeleton({
-  count,
-  className = "",
-}: {
-  count: number;
-  className?: string;
-}) {
+export function TabsSkeleton({ count, className = "" }: { count: number; className?: string }) {
   return (
     <div aria-busy="true" className={`flex h-12 items-center gap-6 overflow-hidden ${className}`}>
       {Array.from({ length: count }).map((_, i) => (

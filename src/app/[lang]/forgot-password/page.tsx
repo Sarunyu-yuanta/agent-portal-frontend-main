@@ -79,7 +79,12 @@ export default function ForgotPasswordPage() {
               {t.auth.forgot.sentBodyAfter}
             </p>
           </div>
-          <Button variant="outline" size="lg" className="w-full" onClick={() => router.push("/login")}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full"
+            onClick={() => router.push("/login")}
+          >
             {t.auth.login}
           </Button>
         </>
@@ -87,9 +92,7 @@ export default function ForgotPasswordPage() {
         <>
           <div className="flex flex-col gap-1">
             <h1 className="type-h4 text-foreground">{t.auth.forgot.title}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t.auth.forgot.body}
-            </p>
+            <p className="text-sm text-muted-foreground">{t.auth.forgot.body}</p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -104,7 +107,7 @@ export default function ForgotPasswordPage() {
               errorMessage={error ?? undefined}
             />
 
-            <div className="flex flex-col gap-2 mt-6">
+            <div className="mt-6 flex flex-col gap-2">
               <Button
                 type="submit"
                 variant="primary"
@@ -128,9 +131,7 @@ export default function ForgotPasswordPage() {
         </>
       )}
 
-      <p className="type-description text-center text-muted-foreground">
-        {t.auth.copyright}
-      </p>
+      <p className="type-description text-center text-muted-foreground">{t.auth.copyright}</p>
     </AuthShell>
   );
 }

@@ -1,9 +1,51 @@
 [
-  { "id": "k1", "clientId": "110001", "riskRating": "High",   "kycStatus": "success",    "daysUntilExpiry": 97 },
-  { "id": "k2", "clientId": "110002", "riskRating": "Medium", "kycStatus": "error",      "daysUntilExpiry": 25 },
-  { "id": "k3", "clientId": "110003", "riskRating": "Low",    "kycStatus": "success",    "daysUntilExpiry": 12 },
-  { "id": "k4", "clientId": "110004", "riskRating": "High",   "kycStatus": "processing", "daysUntilExpiry": 5  },
-  { "id": "k5", "clientId": "110005", "riskRating": "Medium", "kycStatus": "hold",       "daysUntilExpiry": 1  },
-  { "id": "k6", "clientId": "110006", "riskRating": "Low",    "kycStatus": "processing", "daysUntilExpiry": 0  },
-  { "id": "k7", "clientId": "110007", "riskRating": "High",   "kycStatus": "processing", "daysUntilExpiry": 20 }
+  {
+    "id": "k1",
+    "clientId": "110001",
+    "riskRating": "High",
+    "kycStatus": "success",
+    "daysUntilExpiry": 97
+  },
+  {
+    "id": "k2",
+    "clientId": "110002",
+    "riskRating": "Medium",
+    "kycStatus": "error",
+    "daysUntilExpiry": 25
+  },
+  {
+    "id": "k3",
+    "clientId": "110003",
+    "riskRating": "Low",
+    "kycStatus": "success",
+    "daysUntilExpiry": 12
+  },
+  {
+    "id": "k4",
+    "clientId": "110004",
+    "riskRating": "High",
+    "kycStatus": "processing",
+    "daysUntilExpiry": 5
+  },
+  {
+    "id": "k5",
+    "clientId": "110005",
+    "riskRating": "Medium",
+    "kycStatus": "hold",
+    "daysUntilExpiry": 1
+  },
+  {
+    "id": "k6",
+    "clientId": "110006",
+    "riskRating": "Low",
+    "kycStatus": "processing",
+    "daysUntilExpiry": 0
+  },
+  {
+    "id": "k7",
+    "clientId": "110007",
+    "riskRating": "High",
+    "kycStatus": "processing",
+    "daysUntilExpiry": 20
+  }
 ]

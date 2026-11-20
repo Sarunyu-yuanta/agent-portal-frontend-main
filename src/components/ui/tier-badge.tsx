@@ -1,12 +1,5 @@
 export type MembershipTier =
-  | "member"
-  | "bronze"
-  | "silver"
-  | "gold"
-  | "platinum"
-  | "elite"
-  | "prestige"
-  | "signature";
+  "member" | "bronze" | "silver" | "gold" | "platinum" | "elite" | "prestige" | "signature";
 
 type TierStyle = { label: string; bg: string; text: string; border?: string };
 
@@ -27,7 +20,7 @@ export function TierBadge({ tier, className }: { tier: MembershipTier; className
   const style = TIER_STYLE[tier];
   return (
     <span
-      className={`inline-flex items-center gap-[5px] rounded-full py-0.5 pl-1 pr-2 w-fit ${className ?? ""}`}
+      className={`inline-flex w-fit items-center gap-[5px] rounded-full py-0.5 pr-2 pl-1 ${className ?? ""}`}
       style={{
         backgroundColor: style.bg,
         boxShadow: style.border ? `inset 0 0 0 1px ${style.border}` : undefined,
@@ -39,7 +32,7 @@ export function TierBadge({ tier, className }: { tier: MembershipTier; className
           `@sarunyu/system-one` sets `font-weight` itself and its stylesheet
           loads after `globals.css`, so a plain Tailwind weight ties on
           specificity and loses — the label rendered at 400. */}
-      <span className="type-caption font-bold! leading-none" style={{ color: style.text }}>
+      <span className="type-caption leading-none font-bold!" style={{ color: style.text }}>
         {style.label}
       </span>
     </span>

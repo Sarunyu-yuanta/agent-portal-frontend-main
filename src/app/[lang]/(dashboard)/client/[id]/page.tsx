@@ -44,11 +44,7 @@ import { KycTab } from "./KycTab";
 import { OverviewTab } from "./OverviewTab";
 import { useLocale } from "@/i18n/I18nProvider";
 
-export default function ClientPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ClientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   // Keyed remount on client id — this page reuses the same component instance
   // across in-app navigations between different clients (same route segment),
@@ -78,7 +74,7 @@ function ClientPageInner({ id }: { id: string }) {
 
   if (resource.isLoading) {
     return (
-      <div className="flex flex-col -mt-6 pt-6">
+      <div className="-mt-6 flex flex-col pt-6">
         <ClientProfileSkeleton tab={activeTab} />
       </div>
     );
@@ -98,15 +94,7 @@ function ClientPageInner({ id }: { id: string }) {
   return <ClientProfile id={id} client={client} clients={resource.data} />;
 }
 
-function ClientProfile({
-  id,
-  client,
-  clients,
-}: {
-  id: string;
-  client: Client;
-  clients: Client[];
-}) {
+function ClientProfile({ id, client, clients }: { id: string; client: Client; clients: Client[] }) {
   const locale = useLocale();
   const t = useT();
   const searchParams = useSearchParams();
@@ -127,8 +115,7 @@ function ClientProfile({
   // `replace`: sub-tabs are views of one profile, not stops worth unwinding.
   const tabParam = searchParams.get("tab");
   const activeTab = tabParam && CLIENT_TABS.includes(tabParam) ? tabParam : "overview";
-  const setActiveTab = (tab: string) =>
-    setQueryState(`/client/${id}?tab=${tab}`, "replace");
+  const setActiveTab = (tab: string) => setQueryState(`/client/${id}?tab=${tab}`, "replace");
 
   // Holdings sort state
   const [holdingsSortDir, setHoldingsSortDir] = useState<SortDir>("none");
@@ -141,7 +128,10 @@ function ClientProfile({
   const { data: assetAccounts, isLoading: assetsLoading } = useClientAssetAccounts(client.id);
   const kycLine = kycExpiryLabel(client.id, t, locale);
   const [liabilitiesOpen, setLiabilitiesOpen] = useState(false);
-  const [liabilitiesData, setLiabilitiesData] = useState<{ amount: string; detail: LiabilitiesDetail } | null>(null);
+  const [liabilitiesData, setLiabilitiesData] = useState<{
+    amount: string;
+    detail: LiabilitiesDetail;
+  } | null>(null);
 
   const setHeaderSlot = useSetHeaderSlot();
 
@@ -197,7 +187,7 @@ function ClientProfile({
   }, [scrolled, activeTab, setHeaderSlot]);
 
   const tabStrip = (
-    <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
+    <div className="transparent-tabs scrollable-tabs -mx-4 pl-4 xl:-mx-6 xl:pl-6">
       <TabGroup
         items={CLIENT_TAB_ITEMS.map((tab) => ({ id: tab.id, title: t.client.tabs[tab.id] }))}
         activeId={activeTab}
@@ -208,21 +198,22 @@ function ClientProfile({
   );
 
   return (
-    <div className="flex flex-col -mt-6">
-
+    <div className="-mt-6 flex flex-col">
       {/* Sticky Identity + KPI bar + Tabs */}
-      <div className={`sticky -top-6 z-20 -mx-[9999px] px-[9999px] bg-card will-change-transform [overflow-anchor:none] transition-shadow duration-300 ease-out ${scrolled ? "shadow-sm" : ""}`}>
+      <div
+        className={`sticky -top-6 z-20 -mx-[9999px] bg-card px-[9999px] transition-shadow duration-300 ease-out will-change-transform [overflow-anchor:none] ${scrolled ? "shadow-sm" : ""}`}
+      >
         {/* Mobile/Tablet breadcrumb — inside sticky header */}
         {breadcrumb && (
-          <div className="xl:hidden pt-5 pb-0">
+          <div className="pt-5 pb-0 xl:hidden">
             <ResponsiveBreadcrumb items={breadcrumb} />
           </div>
         )}
-        <div className={`flex flex-wrap md:flex-nowrap items-center md:items-start xl:items-center justify-between gap-4 lg:gap-8 transition-[padding] duration-300 ease-out ${scrolled ? "py-3" : "py-5"}`}>
-
+        <div
+          className={`flex flex-wrap items-center justify-between gap-4 transition-[padding] duration-300 ease-out md:flex-nowrap md:items-start lg:gap-8 xl:items-center ${scrolled ? "py-3" : "py-5"}`}
+        >
           {/* Left: identity */}
           <div className={`flex flex-col ${scrolled ? "justify-center" : "gap-4"}`}>
-
             {/* Avatar + identity */}
             <div className={`flex gap-4 ${scrolled ? "items-center" : "items-start"}`}>
               {!scrolled && (
@@ -232,14 +223,16 @@ function ClientProfile({
               )}
               <div className="flex flex-col">
                 {/* Name + Tier + Status pill */}
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <h4 className="type-h4 text-foreground leading-none">{maskedClientName}</h4>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h4 className="type-h4 leading-none text-foreground">{maskedClientName}</h4>
                   <TierBadge tier={client.membershipTier} />
                 </div>
                 {/* Metadata — collapses when scrolled */}
-                <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${scrolled ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}>
-                  <div className="overflow-hidden min-h-0">
-                    <div className="flex items-center gap-2 mt-0.5">
+                <div
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${scrolled ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="mt-0.5 flex items-center gap-2">
                       <span className="type-caption text-muted-foreground">{client.id}</span>
                       {/* Last Contact sat here. It is out of scope for this
                           phase (see the note on `CALL_LOG_ENABLED`), not
@@ -250,7 +243,7 @@ function ClientProfile({
                           the pill's own outline is the separator, so the
                           middot went with it. */}
                       {kycLine && (
-                        <span className="type-caption text-muted-foreground rounded-md bg-muted px-2 py-0.5">
+                        <span className="type-caption rounded-md bg-muted px-2 py-0.5 text-muted-foreground">
                           {kycLine}
                         </span>
                       )}
@@ -261,22 +254,26 @@ function ClientProfile({
             </div>
 
             {/* Quick contact — collapses on scroll */}
-            <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}>
-              <div className="overflow-hidden min-h-0 -mx-4 xl:-mx-6">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
+            >
+              <div className="-mx-4 min-h-0 overflow-hidden xl:-mx-6">
                 <ContactChips
                   clientId={client.id}
                   scrollerRef={quickContactRef}
                   /* Bleeds past the card's padding so a pill can sit under the
                      edge while scrolling, and scroll-padding puts it back
                      inside when one is snapped to. */
-                  className="px-4 xl:px-6 py-0.5 [scroll-padding-inline:1rem] xl:[scroll-padding-inline:1.5rem]"
+                  className="[scroll-padding-inline:1rem] px-4 py-0.5 xl:[scroll-padding-inline:1.5rem] xl:px-6"
                 />
               </div>
             </div>
           </div>
 
           {/* Right: KPIs — fade between sizes, hide on mobile when scrolled */}
-          <div className={`flex items-center justify-center gap-8 md:justify-start md:gap-0 shrink-0 w-full md:w-auto bg-[var(--bg-default-secondary)] md:!bg-transparent border border-border md:!border-0 rounded-2xl md:!rounded-none p-4 md:!p-0 ${scrolled ? "hidden sm:flex" : ""}`}>
+          <div
+            className={`flex w-full shrink-0 items-center justify-center gap-8 rounded-2xl border border-border bg-[var(--bg-default-secondary)] p-4 md:w-auto md:justify-start md:gap-0 md:!rounded-none md:!border-0 md:!bg-transparent md:!p-0 ${scrolled ? "hidden sm:flex" : ""}`}
+          >
             {/* `flex-1` only below `md` — the two stats don't naturally take
                 equal width (the P&L side carries an extra arrow icon), so
                 without it the pair centers as a whole and the divider lands
@@ -284,7 +281,7 @@ function ClientProfile({
                 pushed toward it rather than centered in its own half. `md:`
                 drops it: the desktop layout right-aligns each stat against
                 its own edge instead of splitting a shared box in half. */}
-            <div className="flex flex-1 md:flex-none flex-col items-center text-center md:items-end md:text-right gap-1 md:pr-8">
+            <div className="flex flex-1 flex-col items-center gap-1 text-center md:flex-none md:items-end md:pr-8 md:text-right">
               <p className="type-caption text-muted-foreground">{t.client.profile.totalAum}</p>
               {/* `type-h3` is a fixed 32px — fine on the desktop layout this
                   block switches to at `md`, but on a narrow phone that's wide
@@ -295,22 +292,37 @@ function ClientProfile({
                   in `NotesSidebarList` documents. `md:text-[32px]!` restores
                   `type-h3`'s exact size rather than Tailwind's own `text-3xl`
                   (30px), so nothing shifts at the breakpoint. */}
-              <p className={`text-foreground transition-opacity duration-150 ${scrolled ? "type-subtitle-1" : "type-h3 text-xl! md:text-[32px]!"}`}>{formatAumThb(client.aum)}</p>
+              <p
+                className={`text-foreground transition-opacity duration-150 ${scrolled ? "type-subtitle-1" : "type-h3 text-xl! md:text-[32px]!"}`}
+              >
+                {formatAumThb(client.aum)}
+              </p>
             </div>
-            <div className="w-px bg-border self-stretch -my-4 md:my-1 shrink-0" />
-            <div className="flex flex-1 md:flex-none flex-col items-center text-center md:items-end md:text-right gap-1 md:pl-8">
+            <div className="-my-4 w-px shrink-0 self-stretch bg-border md:my-1" />
+            <div className="flex flex-1 flex-col items-center gap-1 text-center md:flex-none md:items-end md:pl-8 md:text-right">
               <p className="type-caption text-muted-foreground">{t.client.profile.ytdPl}</p>
               <div className="flex items-center gap-1.5">
                 {client.plYtdPct >= 0 ? (
-                  <ArrowUpIcon size={scrolled ? 14 : 18} className="text-success shrink-0" weight="bold" />
+                  <ArrowUpIcon
+                    size={scrolled ? 14 : 18}
+                    className="text-success shrink-0"
+                    weight="bold"
+                  />
                 ) : (
-                  <ArrowDownIcon size={scrolled ? 14 : 18} className="text-destructive shrink-0" weight="bold" />
+                  <ArrowDownIcon
+                    size={scrolled ? 14 : 18}
+                    className="shrink-0 text-destructive"
+                    weight="bold"
+                  />
                 )}
-                <p className={`transition-opacity duration-150 ${scrolled ? "type-subtitle-1" : "type-h3 text-xl! md:text-[32px]!"} ${client.plYtdPct >= 0 ? "text-success" : "text-destructive"}`}>{formatPlYtdPct(client.plYtdPct)}</p>
+                <p
+                  className={`transition-opacity duration-150 ${scrolled ? "type-subtitle-1" : "type-h3 text-xl! md:text-[32px]!"} ${client.plYtdPct >= 0 ? "text-success" : "text-destructive"}`}
+                >
+                  {formatPlYtdPct(client.plYtdPct)}
+                </p>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* ── Tab navigation ── */}
@@ -332,20 +344,20 @@ function ClientProfile({
             {assetsLoading ? (
               <DetailCardsSkeleton />
             ) : (
-            <ClientAssetSidebarContent
-              clientId={client.id}
-              client={client}
-              assetAccounts={assetAccounts}
-              accordionCards
-              onLiabilitiesOpen={(amount, detail) => {
-                setLiabilitiesData({ amount, detail });
-                setLiabilitiesOpen(true);
-              }}
-            />
+              <ClientAssetSidebarContent
+                clientId={client.id}
+                client={client}
+                assetAccounts={assetAccounts}
+                accordionCards
+                onLiabilitiesOpen={(amount, detail) => {
+                  setLiabilitiesData({ amount, detail });
+                  setLiabilitiesOpen(true);
+                }}
+              />
             )}
           </div>
         ) : activeTab === "orders" ? (
-          <div className="pt-8 w-full">
+          <div className="w-full pt-8">
             <Card variant="default">
               <div className="flex flex-col gap-4">
                 <h6 className="type-h6 text-foreground">{t.client.tabs.orders}</h6>
@@ -354,7 +366,7 @@ function ClientProfile({
             </Card>
           </div>
         ) : activeTab === "call-log" ? (
-          <div className="pt-8 w-full">
+          <div className="w-full pt-8">
             <Card variant="default">
               <div className="flex flex-col gap-4">
                 <h6 className="type-h6 text-foreground">{t.client.tabs["call-log"]}</h6>
@@ -372,11 +384,11 @@ function ClientProfile({
             </Card>
           </div>
         ) : activeTab === "notes" ? (
-          <div className="pt-8 w-full">
+          <div className="w-full pt-8">
             <ClientNotesTab clientId={client.id} />
           </div>
         ) : activeTab === "reminders" ? (
-          <div className="pt-8 w-full">
+          <div className="w-full pt-8">
             <Card variant="default">
               <div className="flex flex-col gap-4">
                 <h6 className="type-h6 text-foreground">{t.client.tabs.reminders}</h6>

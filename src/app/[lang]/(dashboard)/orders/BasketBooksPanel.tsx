@@ -104,8 +104,6 @@ export function BasketBooksPanel({
     );
   }, [books, desk, search, isPrivate, step_, proposals, clientId]);
 
-
-
   if (isLoading) return <OrdersPanelSkeleton withCreate />;
 
   return (
@@ -159,12 +157,12 @@ export function BasketBooksPanel({
         <EmptyState
           icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
           title={search.trim() ? t.states.noResultTitle : step.empty}
-          action={search.trim() ? { label: t.states.clearFilters, onClick: () => setSearch("") } : undefined}
-          body={
+          action={
             search.trim()
-              ? t.orders.books.searchHint
-              : t.orders.books.basketEmptyHint
+              ? { label: t.states.clearFilters, onClick: () => setSearch("") }
+              : undefined
           }
+          body={search.trim() ? t.orders.books.searchHint : t.orders.books.basketEmptyHint}
           actionSlot={
             search.trim() ? undefined : (
               <Link href={catalogHref}>

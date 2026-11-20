@@ -15,9 +15,7 @@ const HeaderSlotContext = createContext<HeaderSlotContextType>({
 export function HeaderSlotProvider({ children }: { children: ReactNode }) {
   const [slot, setSlot] = useState<ReactNode>(null);
   return (
-    <HeaderSlotContext.Provider value={{ slot, setSlot }}>
-      {children}
-    </HeaderSlotContext.Provider>
+    <HeaderSlotContext.Provider value={{ slot, setSlot }}>{children}</HeaderSlotContext.Provider>
   );
 }
 

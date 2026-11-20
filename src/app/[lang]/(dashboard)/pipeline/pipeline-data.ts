@@ -24,44 +24,32 @@ export type Deal = (typeof mockPipelineDeals)[number];
 
 /** Stage labels: `t.pipeline.stage[stage]`. */
 export const STAGE_META: Record<Stage, { dot: string }> = {
-  "Qualified":    { dot: "var(--bg-brand-primary)" },
-  "Proposed":     { dot: "var(--bg-brand-secondary)" },
+  Qualified: { dot: "var(--bg-brand-primary)" },
+  Proposed: { dot: "var(--bg-brand-secondary)" },
   "Under Review": { dot: "var(--bg-warning-primary)" },
-  "Negotiation":  { dot: "var(--text-warning-primary)" },
-  "Closed Won":   { dot: "var(--bg-success-primary)" },
-  "Closed Lost":  { dot: "var(--text-default-secondary)" },
+  Negotiation: { dot: "var(--text-warning-primary)" },
+  "Closed Won": { dot: "var(--bg-success-primary)" },
+  "Closed Lost": { dot: "var(--text-default-secondary)" },
 };
 
 /** Button labels: `t.pipeline.advance[stage]`. */
 export const STAGE_ADVANCE: Partial<Record<Stage, { next: Stage }>> = {
-  "Qualified":    { next: "Proposed" },
-  "Proposed":     { next: "Under Review" },
+  Qualified: { next: "Proposed" },
+  Proposed: { next: "Under Review" },
   "Under Review": { next: "Negotiation" },
-  "Negotiation":  { next: "Closed Won" },
+  Negotiation: { next: "Closed Won" },
 };
 
 /** Item labels: `t.pipeline.checklist[id]`. */
 export const ADVANCE_CHECKLIST: Partial<Record<Stage, { id: string }[]>> = {
-  "Qualified": [
-    { id: "product-match" },
-    { id: "proposal-ready" },
-    { id: "meeting-scheduled" },
-  ],
-  "Proposed": [
-    { id: "sent-to-client" },
-    { id: "client-ack" },
-    { id: "compliance-ok" },
-  ],
+  Qualified: [{ id: "product-match" }, { id: "proposal-ready" }, { id: "meeting-scheduled" }],
+  Proposed: [{ id: "sent-to-client" }, { id: "client-ack" }, { id: "compliance-ok" }],
   "Under Review": [
     { id: "client-feedback" },
     { id: "pricing-reviewed" },
     { id: "internal-approval" },
   ],
-  "Negotiation": [
-    { id: "terms-agreed" },
-    { id: "compliance-signoff" },
-    { id: "contract-signed" },
-  ],
+  Negotiation: [{ id: "terms-agreed" }, { id: "compliance-signoff" }, { id: "contract-signed" }],
 };
 
 export function parseDealValue(dealSize: string) {

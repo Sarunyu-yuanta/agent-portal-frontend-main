@@ -57,12 +57,7 @@ import { getAccountIdentity } from "@/data/client-profiles";
 import { IC_NAME } from "@/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type {
-  Booking,
-  RequirementItem,
-  RequirementKey,
-  RequirementStatus,
-} from "@/types/domain";
+import type { Booking, RequirementItem, RequirementKey, RequirementStatus } from "@/types/domain";
 import { bookingModeFor, type BookableProduct } from "./bookable-products";
 import { useOrderBook, useRosterReadiness } from "./use-order-books";
 import {
@@ -86,7 +81,6 @@ const PAGE_SIZE = 10;
 
 /** One line of the table: a booking, and the date it sorts on. */
 type OrderRow = { at: string; booking: Booking };
-
 
 /**
  * Every cell's style, inline on purpose.
@@ -178,7 +172,12 @@ export function ProductOrderSection({
     };
   }, [newBookingId, onNewBookingSeen]);
 
-  const { data: book, isLoading: bookLoading, error: bookError, retry: retryBook } = useOrderBook(product.id);
+  const {
+    data: book,
+    isLoading: bookLoading,
+    error: bookError,
+    retry: retryBook,
+  } = useOrderBook(product.id);
   const clients = useClients();
   const readiness = useRosterReadiness(clients, product);
   // `bookingModeFor(product)`, not `book?.mode` — the book may still be
@@ -237,7 +236,8 @@ export function ProductOrderSection({
     if (inPhase.length === 0) return null;
     // Cancelled amounts only count on the cancelled chip — anywhere else they
     // are not part of what fills the deal.
-    const counted = phase === "cancelled" ? inPhase : inPhase.filter((b) => b.status !== "cancelled");
+    const counted =
+      phase === "cancelled" ? inPhase : inPhase.filter((b) => b.status !== "cancelled");
     return { count: inPhase.length, amount: counted.reduce((sum, b) => sum + b.amount, 0) };
   }, [book, phase, search]);
 
@@ -287,10 +287,7 @@ export function ProductOrderSection({
   return (
     // No card and no heading of its own — it is a tab inside the product's
     // card, and the tab already names it.
-    <section
-      className="flex w-full flex-col gap-4"
-      aria-label={words.listAria}
-    >
+    <section className="flex w-full flex-col gap-4" aria-label={words.listAria}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="scrollable-tabs flex min-w-0 items-center gap-2">
           {bookingPhaseSteps(book.mode, t).map((s) => (
@@ -393,10 +390,18 @@ export function ProductOrderSection({
                   <TableHeaderCell style={CENTER} sortable={false}>
                     {t.orders.field.notionalAmount}
                   </TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.currency}</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.dealStatus}</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.paymentStatus}</TableHeaderCell>
-                  <TableHeaderCell style={CENTER} sortable={false}>{t.orders.field.emailPreConfirmation}</TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>
+                    {t.orders.field.currency}
+                  </TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>
+                    {t.orders.field.dealStatus}
+                  </TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>
+                    {t.orders.field.paymentStatus}
+                  </TableHeaderCell>
+                  <TableHeaderCell style={CENTER} sortable={false}>
+                    {t.orders.field.emailPreConfirmation}
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -411,7 +416,9 @@ export function ProductOrderSection({
                      client's live ones only stand in for a seeded one. */
                   const live = readiness.get(clientId)?.items ?? [];
                   const checks = checksAtBooking(b, live);
-                  const struck = cancelled ? "text-muted-foreground line-through" : "text-foreground";
+                  const struck = cancelled
+                    ? "text-muted-foreground line-through"
+                    : "text-foreground";
                   return (
                     // The whole row opens this booking — a column of arrows only to
                     // say "this is clickable" spent width the table did not have.
@@ -419,7 +426,9 @@ export function ProductOrderSection({
                       key={b.id}
                       hoverable
                       tabIndex={0}
-                      aria-label={t.orders.productOrders.openBookingAria(maskName(clientName, isPrivate))}
+                      aria-label={t.orders.productOrders.openBookingAria(
+                        maskName(clientName, isPrivate),
+                      )}
                       onClick={() => setOpenId(b.id)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -429,7 +438,7 @@ export function ProductOrderSection({
                       }}
                       // The row just booked pulses, then stays highlighted — see
                       // `.row-just-added` in globals.css.
-                      className={`cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)] ${
+                      className={`cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)] ${
                         b.id === newBookingId ? "row-just-added" : ""
                       }`}
                     >
@@ -449,7 +458,9 @@ export function ProductOrderSection({
                                 and the account is the number an order is
                                 actually placed on. */}
                             <span className="type-caption truncate text-muted-foreground">
-                              {t.orders.productOrders.account(getAccountIdentity(clientId).accountNo)}
+                              {t.orders.productOrders.account(
+                                getAccountIdentity(clientId).accountNo,
+                              )}
                             </span>
                           </div>
                         </div>
@@ -496,12 +507,9 @@ export function ProductOrderSection({
                   // every column, its content pinned to the middle of what is
                   // on screen — it stays put while the rows above it scroll.
                   <TableRow className="bg-[var(--fill-gray-100)]">
-                    <TableCell
-                      colSpan={TOTAL_COLUMNS}
-                      style={{ minWidth: 0, padding: 0 }}
-                    >
+                    <TableCell colSpan={TOTAL_COLUMNS} style={{ minWidth: 0, padding: 0 }}>
                       <div
-                        className="type-caption sticky left-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-muted-foreground"
+                        className="type-caption sticky left-0 flex items-center justify-center gap-1.5 px-4 py-2.5 whitespace-nowrap text-muted-foreground"
                         style={{ width: viewWidth || undefined }}
                       >
                         {/* One quiet line — a note at the foot of the table,
@@ -531,15 +539,13 @@ export function ProductOrderSection({
                   : words.noneYet}
             </p>
             {!search && !phase && canBook && (
-              <p className="type-caption text-muted-foreground">
-                {words.noneYetHint}
-              </p>
+              <p className="type-caption text-muted-foreground">{words.noneYetHint}</p>
             )}
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="mt-1 text-body-sm font-medium text-primary-action hover:underline cursor-pointer"
+                className="text-primary-action mt-1 cursor-pointer text-body-sm font-medium hover:underline"
               >
                 {t.states.clearFilters}
               </button>
@@ -564,13 +570,23 @@ export function ProductOrderSection({
               claim about the same arithmetic. The split of that figure between
               this IC and the rest is on the Detail tab — see `DealProgress`. */}
           <Total label={words.myTotal} value={money(notionalIc)} />
-          <Total label={t.orders.productOrders.myCompleted} value={money(confirmedIc)} tone="green" />
           <Total
-            label={book.mode === "basket" ? t.orders.progress.dealTotal : t.orders.progress.quotaUsed}
+            label={t.orders.productOrders.myCompleted}
+            value={money(confirmedIc)}
+            tone="green"
+          />
+          <Total
+            label={
+              book.mode === "basket" ? t.orders.progress.dealTotal : t.orders.progress.quotaUsed
+            }
             value={`${money(book.mode === "basket" ? notional : book.quotaUsed)} / ${money(book.targetAmount)}`}
           />
           <Total
-            label={book.mode === "basket" ? t.orders.productOrders.dealCompleted : t.orders.productOrders.allCompleted}
+            label={
+              book.mode === "basket"
+                ? t.orders.productOrders.dealCompleted
+                : t.orders.productOrders.allCompleted
+            }
             value={money(book.confirmedAmount)}
             tone="green"
           />
@@ -578,7 +594,9 @@ export function ProductOrderSection({
       )}
 
       <div className="flex items-center justify-between gap-3">
-        <span className="type-body-2 text-muted-foreground">{t.orders.productOrders.totalRecords(rows.length)}</span>
+        <span className="type-body-2 text-muted-foreground">
+          {t.orders.productOrders.totalRecords(rows.length)}
+        </span>
         {totalPages > 1 && (
           <Pagination totalPages={totalPages} currentPage={current} onPageChange={setPage} />
         )}
@@ -589,9 +607,7 @@ export function ProductOrderSection({
         booking={opened}
         book={book}
         product={product}
-        checks={
-          opened ? checksAtBooking(opened, readiness.get(opened.clientId)?.items ?? []) : []
-        }
+        checks={opened ? checksAtBooking(opened, readiness.get(opened.clientId)?.items ?? []) : []}
         deal={opened ? dealStatus(opened, book, t) : CLOSED_TAG}
         payment={opened ? paymentStatus(opened, book, t) : CLOSED_TAG}
         email={opened ? emailStatus(opened, book, t) : CLOSED_TAG}
@@ -612,25 +628,19 @@ function CheckMark({ item }: { item: RequirementItem | undefined }) {
   if (!item) return <span className="type-body-2 text-muted-foreground">—</span>;
   const { icon: Icon, fg } = CHECK_ICON[item.status];
   if (item.value) {
-    return <span className={`type-body-2 whitespace-nowrap font-semibold ${fg}`}>{item.value}</span>;
+    return (
+      <span className={`type-body-2 font-semibold whitespace-nowrap ${fg}`}>{item.value}</span>
+    );
   }
   return <Icon size={22} weight="fill" className={fg} aria-label={item.status} />;
 }
 
-function Total({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "green";
-}) {
+function Total({ label, value, tone }: { label: string; value: string; tone?: "green" }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-black/10 px-4 py-3">
-      <span className="text-xs uppercase leading-[20px] tracking-wide text-[#6a7282]">{label}</span>
+      <span className="text-xs leading-[20px] tracking-wide text-[#6a7282] uppercase">{label}</span>
       <span
-        className={`text-lg font-bold leading-[28px] tabular-nums ${
+        className={`text-lg leading-[28px] font-bold tabular-nums ${
           tone === "green" ? "text-[var(--fill-green-600)]" : "text-[#101828]"
         }`}
       >

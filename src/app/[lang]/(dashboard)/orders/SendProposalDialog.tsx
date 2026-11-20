@@ -29,7 +29,13 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Avatar, Button, Checkbox, Tag, useIsMobile } from "@sarunyu/system-one";
-import { CaretDownIcon, DevicesIcon, PaperPlaneTiltIcon, UsersIcon, XIcon } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  DevicesIcon,
+  PaperPlaneTiltIcon,
+  UsersIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { SlideSteps } from "@/components/ui/slide-steps";
@@ -47,11 +53,7 @@ import {
 } from "./proposal-channels";
 import { BackButton } from "./BackButton";
 import { ProposalChip } from "./ProposalChip";
-import {
-  PROPOSAL_OUTCOME_VARIANT,
-  latestProposalFor,
-  proposalOutcome,
-} from "./order-proposals";
+import { PROPOSAL_OUTCOME_VARIANT, latestProposalFor, proposalOutcome } from "./order-proposals";
 import { useT } from "@/i18n/I18nProvider";
 
 /**
@@ -249,7 +251,7 @@ export function ProposalSteps({
      this in front of a client and has to know which document. */
   const productBox = product && (
     <div className="flex items-start gap-2 rounded-xl border border-border/60 bg-muted/30 px-3 py-2">
-      <DevicesIcon size={16} weight="fill" className="mt-0.5 shrink-0 text-primary-action" />
+      <DevicesIcon size={16} weight="fill" className="text-primary-action mt-0.5 shrink-0" />
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-label font-semibold text-foreground">
           {product.underlying}
@@ -266,13 +268,13 @@ export function ProposalSteps({
     <div className="flex flex-col gap-4">
       {rows.length > 0 && (
         <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">{t.orders.proposal.clientList}</span>
+          <span className="text-label font-semibold text-muted-foreground">
+            {t.orders.proposal.clientList}
+          </span>
           <Button
             variant="plain"
             size="sm"
-            onClick={() =>
-              setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.client.id)))
-            }
+            onClick={() => setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.client.id)))}
           >
             {allPicked ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
           </Button>
@@ -351,12 +353,18 @@ export function ProposalSteps({
             type="button"
             onClick={() => setShowRecipients((v) => !v)}
             aria-expanded={showRecipients}
-            aria-label={showRecipients ? t.orders.proposal.hideRecipients : t.orders.proposal.showRecipients(recipients.length)}
+            aria-label={
+              showRecipients
+                ? t.orders.proposal.hideRecipients
+                : t.orders.proposal.showRecipients(recipients.length)
+            }
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-muted/40"
           >
             <span className="min-w-0 flex-1 text-label text-muted-foreground">
               {t.orders.proposal.sendingTo}{" "}
-              <span className="font-semibold text-foreground">{t.orders.proposal.people(recipients.length)}</span>
+              <span className="font-semibold text-foreground">
+                {t.orders.proposal.people(recipients.length)}
+              </span>
             </span>
             <CaretDownIcon
               size={14}
@@ -369,7 +377,7 @@ export function ProposalSteps({
               {recipients.map(({ id, name }) => (
                 <span
                   key={id}
-                  className="inline-flex items-center gap-1 rounded-full bg-muted/50 py-0.5 pl-2 pr-1 text-meta font-medium text-foreground"
+                  className="inline-flex items-center gap-1 rounded-full bg-muted/50 py-0.5 pr-1 pl-2 text-meta font-medium text-foreground"
                 >
                   {name}
                   <button
@@ -389,7 +397,9 @@ export function ProposalSteps({
 
       <div className="flex flex-col gap-2">
         <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">{t.orders.proposal.channels}</span>
+          <span className="text-label font-semibold text-muted-foreground">
+            {t.orders.proposal.channels}
+          </span>
           <Button
             variant="plain"
             size="sm"
@@ -506,10 +516,8 @@ export function ProposalSteps({
       <ProposalScroller resetKey={`${lead?.index ?? "x"}-${step}`}>
         <SlideSteps index={index} initialHeight={initialHeight} onHeightChange={onHeightChange}>
           {[
-            ...(lead?.panes ?? []).map((pane, i) => (
-              <Fragment key={`lead-${i}`}>{pane}</Fragment>
-            )),
-            <div key="clients" className="flex flex-col gap-4 px-4 pb-4 pt-3 md:px-6">
+            ...(lead?.panes ?? []).map((pane, i) => <Fragment key={`lead-${i}`}>{pane}</Fragment>),
+            <div key="clients" className="flex flex-col gap-4 px-4 pt-3 pb-4 md:px-6">
               {product && (
                 <>
                   {/* A phone's sheet has no arrow in its title row. */}
@@ -523,7 +531,7 @@ export function ProposalSteps({
                 </>
               )}
             </div>,
-            <div key="channels" className="flex flex-col gap-4 px-4 pb-4 pt-3 md:px-6">
+            <div key="channels" className="flex flex-col gap-4 px-4 pt-3 pb-4 md:px-6">
               {product && (
                 <>
                   {isMobile && (
@@ -558,7 +566,7 @@ function ProposalScroller({ resetKey, children }: { resetKey: string; children: 
     if (ref.current) ref.current.scrollTop = 0;
   }, [resetKey]);
   return (
-    <div ref={ref} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+    <div ref={ref} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
       {children}
     </div>
   );

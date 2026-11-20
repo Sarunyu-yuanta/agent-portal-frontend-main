@@ -18,14 +18,7 @@ import type { Note } from "@/types/domain";
 import { CalendarLegend } from "./CalendarLegend";
 import { DayCell } from "./DayCell";
 import { MonthPicker } from "./MonthPicker";
-import {
-  addMonths,
-  dayKey,
-  dayLabel,
-  monthGrid,
-  todayDateKey,
-  weeksOf,
-} from "./calendar-grid";
+import { addMonths, dayKey, dayLabel, monthGrid, todayDateKey, weeksOf } from "./calendar-grid";
 import { AlertOverlay, type AlertTarget } from "./AlertOverlay";
 import {
   CalendarFilterMenu,
@@ -150,7 +143,11 @@ export function CalendarView({
     const values = modalValuesRef.current;
     setSaving(true);
     try {
-      await editNote({ ...panelNote, title: values?.title.trim() || null, body: values?.body ?? panelNote.body });
+      await editNote({
+        ...panelNote,
+        title: values?.title.trim() || null,
+        body: values?.body ?? panelNote.body,
+      });
     } catch (err) {
       console.warn("[CalendarView] save failed", err);
       addToast({ status: "critical", message: t.planner.saveFailedKept });
@@ -257,7 +254,11 @@ export function CalendarView({
   const showHolidays = holidaysVisible(filter);
 
   if (!viewDate) {
-    return <p className="type-body-2 text-muted-foreground text-center py-10">{t.planner.calendar.loading}</p>;
+    return (
+      <p className="type-body-2 py-10 text-center text-muted-foreground">
+        {t.planner.calendar.loading}
+      </p>
+    );
   }
 
   const today = new Date();
@@ -267,7 +268,9 @@ export function CalendarView({
    * them. On today's own month it is the plain calendar mark.
    */
   const monthOffset =
-    viewDate.getFullYear() * 12 + viewDate.getMonth() - (today.getFullYear() * 12 + today.getMonth());
+    viewDate.getFullYear() * 12 +
+    viewDate.getMonth() -
+    (today.getFullYear() * 12 + today.getMonth());
   const TodayIcon =
     monthOffset > 0 ? ArrowLeftIcon : monthOffset < 0 ? ArrowRightIcon : CalendarDotIcon;
   const days = monthGrid(viewDate);
@@ -310,12 +313,12 @@ export function CalendarView({
       {/* No card frame: the page is `isEdgeToEdge` in `page-chrome`, so the grid
           runs to the edges of the content area at every size and a border or
           rounded corner pressed against them would read as a rendering fault. */}
-      <div className="flex min-h-0 flex-1 flex-col bg-card overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card">
         {/* Navigation left, action right — the toolbar arrangement Outlook and
             Google Calendar both use. Today / ‹ / › sit together because they are
             one control (move the view) and the month label reads as their
             readout, which is why it follows them rather than heading the bar. */}
-        <div className="flex shrink-0 items-center justify-between gap-2 px-3 py-2 border-b border-border">
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2">
           {/* Three groups, not four controls: Today, the two arrows, and the
               month they read out. The gap between the groups opens up below
               `sm` — a phone has fewer pixels but bigger targets, and at 4px the
@@ -348,7 +351,7 @@ export function CalendarView({
                 type="button"
                 onClick={() => setViewDate((d) => addMonths(d ?? today, -1))}
                 aria-label={t.planner.calendar.previousMonth}
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
+                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
                 <CaretLeftIcon size={16} />
               </button>
@@ -356,7 +359,7 @@ export function CalendarView({
                 type="button"
                 onClick={() => setViewDate((d) => addMonths(d ?? today, 1))}
                 aria-label={t.planner.calendar.nextMonth}
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
+                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)] hover:text-foreground"
               >
                 <CaretRightIcon size={16} />
               </button>
@@ -416,7 +419,7 @@ export function CalendarView({
 
         <div className="grid shrink-0 grid-cols-7 border-b border-[rgba(0,0,0,0.12)]">
           {weekdayNames(locale, "short").map((label) => (
-            <div key={label} className="px-2 py-2 type-caption text-center text-muted-foreground">
+            <div key={label} className="type-caption px-2 py-2 text-center text-muted-foreground">
               {label}
             </div>
           ))}
@@ -438,16 +441,28 @@ export function CalendarView({
               <div className="pointer-events-auto rounded-xl border border-border bg-card px-6 shadow-lg">
                 <EmptyState
                   size="compact"
-                  icon={<FunnelIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                  icon={
+                    <FunnelIcon
+                      size={32}
+                      weight="duotone"
+                      className="text-[var(--text-default-placeholder)]"
+                    />
+                  }
                   title={t.states.noFilterResultTitle}
                   body={t.planner.calendar.filter.noResultBody}
-                  action={{ label: t.states.clearFilters, onClick: () => setFilter(SHOW_EVERYTHING) }}
+                  action={{
+                    label: t.states.clearFilters,
+                    onClick: () => setFilter(SHOW_EVERYTHING),
+                  }}
                 />
               </div>
             </div>
           )}
           {weeksOf(days).map((week, i) => (
-            <div key={i} className="grid min-h-0 flex-1 grid-cols-7 border-b border-[rgba(0,0,0,0.12)] last:border-b-0">
+            <div
+              key={i}
+              className="grid min-h-0 flex-1 grid-cols-7 border-b border-[rgba(0,0,0,0.12)] last:border-b-0"
+            >
               {week.map((day, dayIndex) => (
                 <DayCell
                   key={day.toISOString()}
@@ -486,19 +501,23 @@ export function CalendarView({
             setCreateOpen(false);
           }}
         >
-          <div className="relative w-full max-w-4xl h-[calc(var(--vh)*75)] rounded-xl border border-border bg-card flex flex-col overflow-hidden shadow-xl">
-            <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="relative flex h-[calc(var(--vh)*75)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+            <div className="min-h-0 flex-1 overflow-hidden">
               <NoteDetailPane
                 key="__draft__"
                 note={draftNoteForPane}
                 clients={clients}
                 onSave={(patch) => setDraftAttrs((prev) => ({ ...prev, ...patch }))}
                 onEmptyChange={setBlank}
-                onValuesChange={(values) => { modalValuesRef.current = values; }}
+                onValuesChange={(values) => {
+                  modalValuesRef.current = values;
+                }}
                 manualSave
                 layout="side"
                 autoFocusTitle
-                onAttributesOpenChange={(open) => { attributesOpenRef.current = open; }}
+                onAttributesOpenChange={(open) => {
+                  attributesOpenRef.current = open;
+                }}
               />
             </div>
             <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
@@ -528,8 +547,8 @@ export function CalendarView({
             setEditNoteId(null);
           }}
         >
-          <div className="relative w-full max-w-4xl h-[calc(var(--vh)*75)] rounded-xl border border-border bg-card flex flex-col overflow-hidden shadow-xl">
-            <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="relative flex h-[calc(var(--vh)*75)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+            <div className="min-h-0 flex-1 overflow-hidden">
               {panelNote && (
                 <NoteDetailPane
                   key={panelNote.id}
@@ -537,11 +556,15 @@ export function CalendarView({
                   clients={clients}
                   onSave={(patch) => editNote({ ...panelNote, ...patch })}
                   onEmptyChange={setBlank}
-                  onValuesChange={(values) => { modalValuesRef.current = values; }}
+                  onValuesChange={(values) => {
+                    modalValuesRef.current = values;
+                  }}
                   manualSave
                   layout="side"
                   autoFocusTitle={panelNote.title === null && panelNote.body === ""}
-                  onAttributesOpenChange={(open) => { attributesOpenRef.current = open; }}
+                  onAttributesOpenChange={(open) => {
+                    attributesOpenRef.current = open;
+                  }}
                   onDelete={() => setDeleteTarget(panelNote)}
                 />
               )}
@@ -583,11 +606,7 @@ export function CalendarView({
       {/* A sheet on a phone and a centred panel on a pointer device — the same
           split the day list makes, and for the same reason: a floating card is
           fine where there is room around it and wrong where there isn't. */}
-      <AlertOverlay
-        target={alertTarget}
-        clients={clients}
-        onClose={() => setAlertTarget(null)}
-      />
+      <AlertOverlay target={alertTarget} clients={clients} onClose={() => setAlertTarget(null)} />
     </>
   );
 }

@@ -3,7 +3,14 @@
 import { ListTabSkeleton } from "./ClientProfileSkeleton";
 import { useMemo } from "react";
 import { CalendarBlankIcon, CalendarCheckIcon, CaretRightIcon } from "@phosphor-icons/react";
-import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@sarunyu/system-one";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+} from "@sarunyu/system-one";
 import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
 import { CompactList } from "@/components/ui/compact-list";
@@ -195,14 +202,19 @@ export function ClientRemindersTab({
         // coming" without the dialog outgrowing the screen the way an
         // unbounded list would. Past that, View All is the way out rather
         // than more scrolling.
-        <CompactList onViewAll={onViewAll} contentClassName="gap-4 max-h-[380px] overflow-y-auto pr-1 -mr-1">
+        <CompactList
+          onViewAll={onViewAll}
+          contentClassName="gap-4 max-h-[380px] overflow-y-auto pr-1 -mr-1"
+        >
           <DaySectionedList sections={daySections} onOpen={openItem} />
         </CompactList>
       ) : (
         <>
           {/* Mobile / tablet — day-sectioned cards */}
           <div className="md:hidden">
-            {isEmpty ? emptyState("default") : (
+            {isEmpty ? (
+              emptyState("default")
+            ) : (
               <DaySectionedList sections={daySections} onOpen={openItem} />
             )}
           </div>
@@ -214,20 +226,36 @@ export function ClientRemindersTab({
           <div className="hidden md:block">
             {/* The body says where they come from, because there is nothing on
                 this tab that makes one — a reminder is an attribute of a note. */}
-            {isEmpty ? emptyState("default") : (
+            {isEmpty ? (
+              emptyState("default")
+            ) : (
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.status}</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.date}</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.reminders.source}</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0">{t.client.reminders.reminder}</TableHeaderCell>
-                    <TableHeaderCell sortable={false} className="min-w-0">{t.client.reminders.detail}</TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                      {t.client.reminders.status}
+                    </TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                      {t.client.reminders.date}
+                    </TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                      {t.client.reminders.source}
+                    </TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0">
+                      {t.client.reminders.reminder}
+                    </TableHeaderCell>
+                    <TableHeaderCell sortable={false} className="min-w-0">
+                      {t.client.reminders.detail}
+                    </TableHeaderCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {rows.map((row) => (
-                    <ReminderRow key={row.item.id} row={row} onOpen={() => openItem(row.item, row.day)} />
+                    <ReminderRow
+                      key={row.item.id}
+                      row={row}
+                      onOpen={() => openItem(row.item, row.day)}
+                    />
                   ))}
                 </TableBody>
               </Table>
@@ -255,7 +283,10 @@ function DaySectionedList({
       {sections.map((section) => (
         <div key={section.key} className="flex flex-col gap-2">
           <p className="type-subtitle-2 text-muted-foreground">
-            {t.client.reminders.daySection(section.isToday ? t.dates.today : dayLabel(section.day, locale), section.items.length)}
+            {t.client.reminders.daySection(
+              section.isToday ? t.dates.today : dayLabel(section.day, locale),
+              section.items.length,
+            )}
           </p>
           {section.items.length === 0 ? (
             // Only Today can ever land here — every other key in `daySections`
@@ -266,7 +297,9 @@ function DaySectionedList({
             // here, since other days already have things in them.
             <div className="flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-border py-6 text-center">
               <CalendarCheckIcon size={22} className="text-muted-foreground/40" />
-              <p className="type-body-2 text-muted-foreground/60">{t.client.reminders.nothingDueToday}</p>
+              <p className="type-body-2 text-muted-foreground/60">
+                {t.client.reminders.nothingDueToday}
+              </p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -287,22 +320,28 @@ function ReminderCard({ item, onOpen }: { item: DayItem; onOpen: () => void }) {
     <button
       type="button"
       onClick={onOpen}
-      className="flex items-start gap-3 rounded-xl border border-border p-3 text-left cursor-pointer transition-colors active:bg-[var(--bg-default-pressed)]"
+      className="flex cursor-pointer items-start gap-3 rounded-xl border border-border p-3 text-left transition-colors active:bg-[var(--bg-default-pressed)]"
     >
       {/* The circle carries where the row came from — primary for the user's
           own handwriting, orange for anything the system raised. Read from the
           shared lookup rather than restated here; a local copy is how the
           alert panel stayed green after the Calendar's pills turned orange. */}
-      <SourceBadgeIcon item={item} size="default" label={item.source === "note" ? t.client.reminders.sourceNote : t.client.reminders.sourceSystem} />
-      <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+      <SourceBadgeIcon
+        item={item}
+        size="default"
+        label={
+          item.source === "note" ? t.client.reminders.sourceNote : t.client.reminders.sourceSystem
+        }
+      />
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span
-          className={`type-body-2 font-semibold truncate ${
+          className={`type-body-2 truncate font-semibold ${
             item.done ? "text-muted-foreground line-through" : "text-foreground"
           }`}
         >
           {item.title}
         </span>
-        <span className="type-caption text-muted-foreground truncate">
+        <span className="type-caption truncate text-muted-foreground">
           {item.detail ? snippet(item.detail, 60) : t.client.reminders.noAdditionalText}
         </span>
       </div>
@@ -325,7 +364,7 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
     >
       <TableCell className="min-w-0 whitespace-nowrap">
         <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 type-caption font-medium ${BUCKET_TONE[bucket]}`}
+          className={`type-caption inline-flex items-center rounded-full px-2 py-0.5 font-medium ${BUCKET_TONE[bucket]}`}
         >
           {t.buckets.reminder[bucket]}
         </span>
@@ -333,8 +372,12 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
 
       <TableCell className="min-w-0 whitespace-nowrap">
         <div className="flex flex-col">
-          <span className="type-body-2 text-foreground font-medium">{formatDayOnly(day.toISOString(), locale)}</span>
-          <span className="type-caption text-muted-foreground">{relativeDayLabel(daysDiff, t)}</span>
+          <span className="type-body-2 font-medium text-foreground">
+            {formatDayOnly(day.toISOString(), locale)}
+          </span>
+          <span className="type-caption text-muted-foreground">
+            {relativeDayLabel(daysDiff, t)}
+          </span>
         </div>
       </TableCell>
 
@@ -344,7 +387,7 @@ function ReminderRow({ row, onOpen }: { row: Row; onOpen: () => void }) {
             rather than something to infer from an icon shape. */}
         <span
           style={badge.style}
-          className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 type-caption font-medium ${badge.className}`}
+          className={`type-caption inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-medium ${badge.className}`}
         >
           {badge.icon}
           {item.source === "note" ? t.client.reminders.sourceNote : t.client.reminders.sourceSystem}

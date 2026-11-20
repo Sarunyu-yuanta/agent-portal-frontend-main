@@ -17,38 +17,34 @@ import { useT } from "@/i18n/I18nProvider";
  * animation, and a hole that only stays a hole over a white background. Each
  * category brings its own `color`, so the shared palette stands aside here.
  */
-function LiabilitiesDonutChart({
-  categories,
-}: {
-  categories: LiabilityCategory[];
-}) {
+function LiabilitiesDonutChart({ categories }: { categories: LiabilityCategory[] }) {
   const t = useT();
   return (
     <AllocationDonut
-      slices={categories.map((c) => ({ label: t.client.liabilities.categories[c.id] ?? c.label, percent: c.percent, color: c.color }))}
+      slices={categories.map((c) => ({
+        label: t.client.liabilities.categories[c.id] ?? c.label,
+        percent: c.percent,
+        color: c.color,
+      }))}
       size={96}
     />
   );
 }
 
-function LiabilitiesLegendItem({
-  category,
-}: {
-  category: LiabilityCategory;
-}) {
+function LiabilitiesLegendItem({ category }: { category: LiabilityCategory }) {
   const t = useT();
   return (
-    <div className="flex gap-2 items-center w-full">
-      <div className="flex flex-1 gap-1 items-center min-w-0 px-2 py-1">
+    <div className="flex w-full items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-1 px-2 py-1">
         <span
-          className="shrink-0 size-3 rounded-full"
+          className="size-3 shrink-0 rounded-full"
           style={{ backgroundColor: category.color }}
         />
-        <p className="text-label font-normal leading-[20px] text-[var(--text-default-tertiary)] truncate">
+        <p className="truncate text-label leading-[20px] font-normal text-[var(--text-default-tertiary)]">
           {t.client.liabilities.categories[category.id] ?? category.label}
         </p>
       </div>
-      <p className="text-label font-normal leading-[20px] text-[var(--text-default-tertiary)] shrink-0">
+      <p className="shrink-0 text-label leading-[20px] font-normal text-[var(--text-default-tertiary)]">
         {category.percent}%
       </p>
     </div>
@@ -71,41 +67,41 @@ function LiabilityCategoryCard({
 
   const headerRow = (
     <>
-      <div className="flex flex-1 gap-2 items-center min-w-0">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <span
-          className="shrink-0 size-2 rounded-full"
+          className="size-2 shrink-0 rounded-full"
           style={{ backgroundColor: category.color }}
         />
-        <p className="text-body font-bold leading-[24px] text-[var(--text-default-primary)] whitespace-nowrap">
+        <p className="text-body leading-[24px] font-bold whitespace-nowrap text-[var(--text-default-primary)]">
           {t.client.liabilities.categories[category.id] ?? category.label}
         </p>
       </div>
 
-      <div className="flex flex-1 justify-end items-center min-w-0">
-        <div className="flex gap-1 items-center text-right whitespace-nowrap">
-          <p className="text-body font-bold leading-[24px] text-[var(--text-default-primary)]">
+      <div className="flex min-w-0 flex-1 items-center justify-end">
+        <div className="flex items-center gap-1 text-right whitespace-nowrap">
+          <p className="text-body leading-[24px] font-bold text-[var(--text-default-primary)]">
             {amount}
           </p>
-          <p className="text-body font-normal leading-[24px] text-[var(--text-default-tertiary)]">
+          <p className="text-body leading-[24px] font-normal text-[var(--text-default-tertiary)]">
             THB
           </p>
         </div>
       </div>
 
       {expanded ? (
-        <CaretUpIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+        <CaretUpIcon size={20} className="shrink-0 text-[var(--text-default-tertiary)]" />
       ) : (
-        <CaretDownIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+        <CaretDownIcon size={20} className="shrink-0 text-[var(--text-default-tertiary)]" />
       )}
     </>
   );
 
   if (!expanded) {
     return (
-      <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden w-full">
+      <div className="w-full overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white">
         <button
           type="button"
-          className="flex gap-2 items-center px-3 py-4 w-full cursor-pointer hover:bg-[var(--bg-default-secondary)] transition-colors text-left"
+          className="flex w-full cursor-pointer items-center gap-2 px-3 py-4 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
           onClick={onToggle}
           aria-expanded={false}
         >
@@ -116,10 +112,10 @@ function LiabilityCategoryCard({
   }
 
   return (
-    <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden w-full flex flex-col gap-2 px-3 pt-2 pb-4">
+    <div className="flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white px-3 pt-2 pb-4">
       <button
         type="button"
-        className="flex gap-2 items-center py-2 w-full cursor-pointer hover:opacity-80 transition-opacity text-left"
+        className="flex w-full cursor-pointer items-center gap-2 py-2 text-left transition-opacity hover:opacity-80"
         onClick={onToggle}
         aria-expanded
       >
@@ -132,12 +128,10 @@ function LiabilityCategoryCard({
         {category.subItems.map((subItem) => (
           <div
             key={subItem.label}
-            className="flex gap-2 items-center text-label font-normal leading-[20px] text-[var(--text-default-tertiary)] w-full"
+            className="flex w-full items-center gap-2 text-label leading-[20px] font-normal text-[var(--text-default-tertiary)]"
           >
-            <p className="flex-1 min-w-0">{subItem.label}</p>
-            <p className="flex-1 min-w-0 text-right">
-              {subItem.amount} THB
-            </p>
+            <p className="min-w-0 flex-1">{subItem.label}</p>
+            <p className="min-w-0 flex-1 text-right">{subItem.amount} THB</p>
           </div>
         ))}
       </div>
@@ -154,12 +148,14 @@ export function LiabilitiesDetailContent({
 }) {
   const t = useT();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["debt"]));
-  const allExpanded = detail.categories.length > 0 && detail.categories.every((c) => expandedIds.has(c.id));
+  const allExpanded =
+    detail.categories.length > 0 && detail.categories.every((c) => expandedIds.has(c.id));
 
   const toggleId = (id: string) =>
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
@@ -170,13 +166,19 @@ export function LiabilitiesDetailContent({
   // "Expand all" that has nothing to expand.
   if (detail.categories.length === 0) {
     return (
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex w-full flex-col gap-4">
         <EmptyState
           size="compact"
-          icon={<CreditCardIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          icon={
+            <CreditCardIcon
+              size={32}
+              weight="duotone"
+              className="text-[var(--text-default-placeholder)]"
+            />
+          }
           title={t.client.liabilities.empty}
         />
-        <p className="type-caption text-[var(--text-default-tertiary)] leading-4 text-center w-full">
+        <p className="type-caption w-full text-center leading-4 text-[var(--text-default-tertiary)]">
           {t.client.liabilities.lastUpdated(detail.lastUpdated)}
         </p>
       </div>
@@ -184,11 +186,11 @@ export function LiabilitiesDetailContent({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg p-4 w-full">
-        <div className="flex gap-3 items-center w-full">
+    <div className="flex w-full flex-col gap-4">
+      <div className="w-full rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-4">
+        <div className="flex w-full items-center gap-3">
           <LiabilitiesDonutChart categories={detail.categories} />
-          <div className="flex flex-1 flex-col items-start justify-center min-w-0">
+          <div className="flex min-w-0 flex-1 flex-col items-start justify-center">
             {detail.categories.map((category) => (
               <LiabilitiesLegendItem key={category.id} category={category} />
             ))}
@@ -196,12 +198,12 @@ export function LiabilitiesDetailContent({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 w-full">
+      <div className="flex w-full flex-col gap-3">
         <div className="flex justify-end">
           <button
             type="button"
             onClick={handleExpandCollapseAll}
-            className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
+            className="type-caption text-primary-action cursor-pointer font-medium hover:underline"
           >
             {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
           </button>
@@ -217,7 +219,7 @@ export function LiabilitiesDetailContent({
         ))}
       </div>
 
-      <p className="type-caption text-[var(--text-default-tertiary)] leading-4 text-center w-full">
+      <p className="type-caption w-full text-center leading-4 text-[var(--text-default-tertiary)]">
         {t.client.liabilities.lastUpdated(detail.lastUpdated)}
       </p>
     </div>
@@ -247,7 +249,7 @@ export function LiabilitiesDetailModal({
       desktopMaxWidth="max-w-[704px]"
       desktopTitleClassName="leading-7"
     >
-      <div className="flex-1 min-h-0 overflow-y-auto pt-4 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto pt-4 pb-6">
         <div className={`flex flex-col gap-6 ${isMobile ? "px-2" : "px-6"}`}>
           <LiabilitiesDetailContent totalAmount={totalAmount} detail={detail} />
         </div>

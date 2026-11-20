@@ -135,8 +135,14 @@ const client = {
     searchProducts: "ค้นหาผลิตภัณฑ์…",
     perPage: "แสดงต่อหน้า",
     /** Each value is passed in already wrapped (it is bolded on screen). */
-    showingClients: <T,>(from: T, to: T, total: T): (string | T)[] => [
-      "แสดง ", from, " – ", to, " จาก ", total, " ราย",
+    showingClients: <T>(from: T, to: T, total: T): (string | T)[] => [
+      "แสดง ",
+      from,
+      " – ",
+      to,
+      " จาก ",
+      total,
+      " ราย",
     ],
     rowNo: "ลำดับ",
     viewClientProfile: "ดูโปรไฟล์ลูกค้า",
@@ -282,7 +288,7 @@ const client = {
     title: "รายละเอียด",
     heading: "มูลค่าความมั่งคั่งสุทธิ (THB)",
     /** `bold` wraps the two emphasised terms. */
-    description: <T,>(bold: (text: string) => T): (string | T)[] => [
+    description: <T>(bold: (text: string) => T): (string | T)[] => [
       "มูลค่าความมั่งคั่งสุทธิคือ มูลค่าคงเหลือของ ",
       bold("สินทรัพย์ทั้งหมด"),
       " (THB) หักลบ ",

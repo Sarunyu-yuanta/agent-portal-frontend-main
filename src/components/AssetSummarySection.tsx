@@ -59,7 +59,7 @@ function AllocationBreakdownHeader() {
   const t = useT();
   return (
     <div className="flex w-full shrink-0 justify-start">
-      <p className="type-body-2 !font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-5">
+      <p className="type-body-2 leading-5 !font-bold whitespace-nowrap text-[var(--text-default-secondary)]">
         {t.client.assets.allocationBreakdown}
       </p>
     </div>
@@ -75,7 +75,7 @@ function AllocationBreakdownCard({
 }) {
   return (
     <div
-      className={`bg-white border border-[rgba(0,0,0,0.1)] rounded-lg flex flex-col gap-3 items-start justify-center p-4 w-full ${className}`}
+      className={`flex w-full flex-col items-start justify-center gap-3 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-4 ${className}`}
     >
       {children}
     </div>
@@ -105,17 +105,17 @@ export function AllocationBreakdown({ slices }: { slices: AssetAllocationSlice[]
 function AllocationLegendItemCompact({ slice }: { slice: AssetAllocationSlice }) {
   const t = useT();
   return (
-    <div className="flex gap-2 items-center w-full justify-between">
-      <div className="flex gap-1 items-center px-2 py-1">
-        <span className="relative shrink-0 size-3">
+    <div className="flex w-full items-center justify-between gap-2">
+      <div className="flex items-center gap-1 px-2 py-1">
+        <span className="relative size-3 shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- 12px SVG status dot; the image optimizer rejects SVG */}
           <img alt="" className="block size-full max-w-none" src={slice.statusIcon} />
         </span>
-        <p className="type-body-2 text-[var(--text-default-tertiary)] leading-5 whitespace-nowrap">
+        <p className="type-body-2 leading-5 whitespace-nowrap text-[var(--text-default-tertiary)]">
           {displayAssetLabel(slice.label, t)}
         </p>
       </div>
-      <p className="type-body-2 text-[var(--text-default-tertiary)] leading-5 shrink-0">
+      <p className="type-body-2 shrink-0 leading-5 text-[var(--text-default-tertiary)]">
         {slice.percent}%
       </p>
     </div>
@@ -133,9 +133,9 @@ export function AllocationBreakdownSidebar({ slices }: { slices: AssetAllocation
     <AllocationBreakdownCard>
       <AllocationBreakdownHeader />
       {hasAllocation(slices) ? (
-        <div className="flex gap-3 items-center shrink-0 w-full">
+        <div className="flex w-full shrink-0 items-center gap-3">
           <AllocationDonut slices={slices} size={96} />
-          <div className="flex flex-1 flex-col items-start min-w-0">
+          <div className="flex min-w-0 flex-1 flex-col items-start">
             {slices.map((slice) => (
               <AllocationLegendItemCompact key={slice.label} slice={slice} />
             ))}
@@ -150,29 +150,23 @@ export function AllocationBreakdownSidebar({ slices }: { slices: AssetAllocation
   );
 }
 
-export function LiabilitiesBar({
-  amount,
-  onClick,
-}: {
-  amount: string;
-  onClick?: () => void;
-}) {
+export function LiabilitiesBar({ amount, onClick }: { amount: string; onClick?: () => void }) {
   const t = useT();
   return (
     <button
       type="button"
-      className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg flex items-center gap-2 pl-5 pr-4 py-2 w-full cursor-pointer hover:bg-[var(--bg-default-secondary)] transition-colors"
+      className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white py-2 pr-4 pl-5 transition-colors hover:bg-[var(--bg-default-secondary)]"
       onClick={onClick}
     >
-      <div className="flex flex-1 gap-0.5 items-center min-w-0">
-        <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4 shrink-0">
+      <div className="flex min-w-0 flex-1 items-center gap-0.5">
+        <p className="type-caption shrink-0 leading-4 whitespace-nowrap text-[var(--text-default-tertiary)]">
           {t.client.assets.liabilities}
         </p>
-        <p className="flex-1 type-body-2 font-bold text-destructive text-right leading-5 min-w-0">
+        <p className="type-body-2 min-w-0 flex-1 text-right leading-5 font-bold text-destructive">
           {amount}
         </p>
       </div>
-      <CaretRightIcon size={16} className="text-[var(--text-default-tertiary)] shrink-0" />
+      <CaretRightIcon size={16} className="shrink-0 text-[var(--text-default-tertiary)]" />
     </button>
   );
 }
@@ -184,90 +178,87 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
 
   return (
     <>
-    <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden w-full">
-      <div className="flex flex-col items-center py-3 w-full">
-        <div className="flex items-start justify-center w-full">
-          <div className="flex gap-1 items-center justify-center">
-            <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-              {t.client.assets.netValue}
-            </p>
-            <button
-              type="button"
-              onClick={() => setInfoOpen(true)}
-              className="text-[var(--text-default-tertiary)] hover:text-[var(--text-default-secondary)] transition-colors cursor-pointer"
-              aria-label={t.client.assets.netValueInfoAria}
+      <div className="w-full overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white">
+        <div className="flex w-full flex-col items-center py-3">
+          <div className="flex w-full items-start justify-center">
+            <div className="flex items-center justify-center gap-1">
+              <p className="type-caption leading-4 whitespace-nowrap text-[var(--text-default-tertiary)]">
+                {t.client.assets.netValue}
+              </p>
+              <button
+                type="button"
+                onClick={() => setInfoOpen(true)}
+                className="cursor-pointer text-[var(--text-default-tertiary)] transition-colors hover:text-[var(--text-default-secondary)]"
+                aria-label={t.client.assets.netValueInfoAria}
+              >
+                <InfoIcon size={16} className="shrink-0" />
+              </button>
+            </div>
+          </div>
+          <p className="type-h4 leading-9 whitespace-nowrap text-[var(--text-default-primary)]">
+            {summary.netValue}
+          </p>
+          <div className="flex items-center justify-end gap-1">
+            <p
+              className={`type-caption leading-4 whitespace-nowrap ${
+                summary.changePositive ? "text-[var(--text-success-primary)]" : "text-destructive"
+              }`}
             >
-              <InfoIcon size={16} className="shrink-0" />
-            </button>
+              {summary.changeAmount}
+            </p>
+            <div
+              className={`type-caption flex items-center rounded px-1.5 py-0.5 leading-4 ${
+                summary.changePositive
+                  ? "bg-[var(--bg-success-soft)] text-[var(--text-success-primary)]"
+                  : "bg-[var(--bg-danger-light)] text-destructive"
+              }`}
+            >
+              <span>{changePrefix}</span>
+              <span>{summary.changePercent}%</span>
+            </div>
           </div>
         </div>
-        <p className="type-h4 text-[var(--text-default-primary)] whitespace-nowrap leading-9">
-          {summary.netValue}
-        </p>
-        <div className="flex gap-1 items-center justify-end">
-          <p
-            className={`type-caption whitespace-nowrap leading-4 ${
-              summary.changePositive ? "text-[var(--text-success-primary)]" : "text-destructive"
-            }`}
+
+        <div className="relative h-px w-full shrink-0">
+          <svg
+            className="absolute inset-0 block h-px w-full max-w-none"
+            viewBox="0 0 996 1"
+            preserveAspectRatio="none"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
           >
-            {summary.changeAmount}
-          </p>
-          <div
-            className={`flex items-center px-1.5 py-0.5 rounded type-caption leading-4 ${
-              summary.changePositive
-                ? "bg-[var(--bg-success-soft)] text-[var(--text-success-primary)]"
-                : "bg-[var(--bg-danger-light)] text-destructive"
-            }`}
-          >
-            <span>{changePrefix}</span>
-            <span>{summary.changePercent}%</span>
+            <line
+              y1="0.5"
+              x2="996"
+              y2="0.5"
+              stroke="black"
+              strokeOpacity="0.1"
+              strokeDasharray="2 2"
+            />
+          </svg>
+        </div>
+
+        <div className="flex w-full items-center">
+          <div className="flex min-w-0 flex-[1_0_0] flex-col items-center pt-1.5 pb-3">
+            <p className="type-caption leading-4 whitespace-nowrap text-[var(--text-default-tertiary)]">
+              {t.client.assets.lineAvailable}
+            </p>
+            <p className="type-subtitle-1 leading-6 font-bold whitespace-nowrap text-[var(--text-default-secondary)]">
+              {summary.lineAvailable}
+            </p>
+          </div>
+          <div className="flex min-w-0 flex-[1_0_0] flex-col items-center pt-1.5 pb-3">
+            <p className="type-caption leading-4 whitespace-nowrap text-[var(--text-default-tertiary)]">
+              {t.client.assets.cash}
+            </p>
+            <p className="type-subtitle-1 leading-6 font-bold whitespace-nowrap text-[var(--text-default-secondary)]">
+              {summary.cash}
+            </p>
           </div>
         </div>
       </div>
-
-      <div className="relative h-px shrink-0 w-full">
-        <svg
-          className="absolute inset-0 block h-px w-full max-w-none"
-          viewBox="0 0 996 1"
-          preserveAspectRatio="none"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <line
-            y1="0.5"
-            x2="996"
-            y2="0.5"
-            stroke="black"
-            strokeOpacity="0.1"
-            strokeDasharray="2 2"
-          />
-        </svg>
-      </div>
-
-      <div className="flex items-center w-full">
-        <div className="flex flex-[1_0_0] flex-col items-center min-w-0 pt-1.5 pb-3">
-          <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-            {t.client.assets.lineAvailable}
-          </p>
-          <p className="type-subtitle-1 font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-6">
-            {summary.lineAvailable}
-          </p>
-        </div>
-        <div className="flex flex-[1_0_0] flex-col items-center min-w-0 pt-1.5 pb-3">
-          <p className="type-caption text-[var(--text-default-tertiary)] whitespace-nowrap leading-4">
-            {t.client.assets.cash}
-          </p>
-          <p className="type-subtitle-1 font-bold text-[var(--text-default-secondary)] whitespace-nowrap leading-6">
-            {summary.cash}
-          </p>
-        </div>
-      </div>
-    </div>
-    <NetValueSummaryModal
-      open={infoOpen}
-      onClose={() => setInfoOpen(false)}
-    />
+      <NetValueSummaryModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </>
   );
 }
@@ -275,7 +266,7 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
 export function LastUpdated({ summary }: { summary: AssetHeroSummary }) {
   const t = useT();
   return (
-    <div className="flex gap-1 items-center justify-center w-full type-caption text-[var(--text-default-placeholder)] whitespace-nowrap leading-4">
+    <div className="type-caption flex w-full items-center justify-center gap-1 leading-4 whitespace-nowrap text-[var(--text-default-placeholder)]">
       <span>{t.client.assets.lastUpdated}</span>
       <span>{summary.lastUpdatedDate}</span>
       <span>-</span>
@@ -284,16 +275,12 @@ export function LastUpdated({ summary }: { summary: AssetHeroSummary }) {
   );
 }
 
-export function AssetSummarySection({
-  heroSummary,
-}: {
-  heroSummary?: AssetHeroSummary;
-}) {
+export function AssetSummarySection({ heroSummary }: { heroSummary?: AssetHeroSummary }) {
   const summary = heroSummary ?? DEFAULT_HERO;
 
   return (
-    <section className="flex flex-col w-full">
-      <div className="flex flex-col gap-2 items-center w-full max-w-[996px] mx-auto">
+    <section className="flex w-full flex-col">
+      <div className="mx-auto flex w-full max-w-[996px] flex-col items-center gap-2">
         <HeroCard summary={summary} />
         <LastUpdated summary={summary} />
 

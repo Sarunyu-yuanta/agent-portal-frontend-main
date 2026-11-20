@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { CaretDownIcon, CaretUpIcon, FileTextIcon } from "@phosphor-icons/react";
 import type { GlobalBondRow } from "./global-bond-data";
-import {
-  BORDER_COLOR,
-  BondLogo,
-  DetailRow,
-  TopPickTag,
-} from "./fixed-income-shared";
+import { BORDER_COLOR, BondLogo, DetailRow, TopPickTag } from "./fixed-income-shared";
 import { CatalogSectionEmpty } from "./ProductCatalogEmpty";
 import { useT } from "@/i18n/I18nProvider";
 
@@ -51,17 +46,20 @@ export function GlobalBondAllAccordion({
   if (bonds.length === 0) {
     return (
       <div
-        className="w-full rounded-lg overflow-hidden bg-white px-4"
+        className="w-full overflow-hidden rounded-lg bg-white px-4"
         style={{ border: `1px solid ${BORDER_COLOR}` }}
       >
-        <CatalogSectionEmpty title={t.products.states.noGlobalBonds} onClearFilters={onClearFilters} />
+        <CatalogSectionEmpty
+          title={t.products.states.noGlobalBonds}
+          onClearFilters={onClearFilters}
+        />
       </div>
     );
   }
 
   return (
     <div
-      className="flex flex-col w-full rounded-lg overflow-hidden bg-white"
+      className="flex w-full flex-col overflow-hidden rounded-lg bg-white"
       style={{ border: `1px solid rgba(0,0,0,0.08)` }}
     >
       {bonds.map((row, i) => {
@@ -78,7 +76,7 @@ export function GlobalBondAllAccordion({
             <button
               type="button"
               onClick={() => setExpandedId(expanded ? null : row.id)}
-              className="flex w-full items-center gap-2 p-3 bg-white border-none cursor-pointer text-left"
+              className="flex w-full cursor-pointer items-center gap-2 border-none bg-white p-3 text-left"
             >
               <div
                 className="shrink-0"
@@ -91,7 +89,7 @@ export function GlobalBondAllAccordion({
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 <IssuerLogo src={row.logo} />
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate text-sm font-bold leading-[24px] text-[#4a5565]">
+                  <span className="truncate text-sm leading-[24px] font-bold text-[#4a5565]">
                     {row.name}
                   </span>
                   <div className="flex min-h-[18px] items-center gap-0.5">
@@ -100,7 +98,9 @@ export function GlobalBondAllAccordion({
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <span className="text-sm font-normal leading-[24px] text-[#4a5565]">{row.yieldPct}</span>
+                  <span className="text-sm leading-[24px] font-normal text-[#4a5565]">
+                    {row.yieldPct}
+                  </span>
                   {expanded ? (
                     <CaretUpIcon size={22} className="text-[#4a5565]" />
                   ) : (
@@ -110,7 +110,7 @@ export function GlobalBondAllAccordion({
               </div>
             </button>
             {expanded && (
-              <div className="flex flex-col items-center gap-3 px-3 pb-3 w-full">
+              <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
                 <div className="flex w-full flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2">
                   <DetailRow label={cols.currency} value={row.currency} />
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
@@ -119,12 +119,16 @@ export function GlobalBondAllAccordion({
                   <DetailRow label={cols.maturity} value={row.maturity} />
                   <DetailRow label={cols.durationYears} value={row.duration} />
                   <div className="flex w-full items-start gap-3 text-sm leading-[24px]">
-                    <span className="flex-1 text-[#4a5565]">{t.products.common.relatedDocuments}</span>
+                    <span className="flex-1 text-[#4a5565]">
+                      {t.products.common.relatedDocuments}
+                    </span>
                     <button
                       type="button"
                       className="inline-flex cursor-pointer items-center gap-0.5 border-none bg-transparent p-0"
                     >
-                      <span className="text-sm text-[#2b7fff] underline">{t.products.common.factsheet}</span>
+                      <span className="text-sm text-[#2b7fff] underline">
+                        {t.products.common.factsheet}
+                      </span>
                       <FileTextIcon size={14} color="#2b7fff" />
                     </button>
                   </div>

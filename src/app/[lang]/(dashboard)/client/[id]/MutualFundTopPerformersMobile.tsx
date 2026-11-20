@@ -2,12 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Button, SearchInput, useIsMobile } from "@sarunyu/system-one";
-import {
-  ArrowLeftIcon,
-} from "@phosphor-icons/react";
-import {
-  MutualFundListCardMobile,
-} from "./MutualFundCard";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { MutualFundListCardMobile } from "./MutualFundCard";
 import { MutualFundGroupHeroGraphic } from "./MutualFundGroupHero";
 import { MutualFundLegendBottomSheet, MutualFundLegendModal } from "./MutualFundLegendSheet";
 
@@ -45,7 +41,7 @@ function MobileCategoryTabs({
               key={group.id}
               type="button"
               onClick={() => onSelect(group.id)}
-              className={`flex min-w-[80px] shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap ${
+              className={`flex min-w-[80px] shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap ${
                 active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
               }`}
             >
@@ -64,11 +60,13 @@ function MobileHero({ groupId }: { groupId: MobileFundGroupId }) {
   const title = group.id === "all" ? t.fund.list.allFunds : t.fund.groups[group.id];
 
   return (
-    <div className="relative flex h-[126px] w-full shrink-0 items-center gap-2.5 overflow-visible bg-[#f9fafb] px-6 pb-2.5 pt-2.5">
+    <div className="relative flex h-[126px] w-full shrink-0 items-center gap-2.5 overflow-visible bg-[#f9fafb] px-6 pt-2.5 pb-2.5">
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <p className="text-xl font-bold leading-[34px] text-[#074ea4]">{title}</p>
-        <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{t.fund.topPerformers.heroSubtitle}</p>
-        <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
+        <p className="text-xl leading-[34px] font-bold text-[#074ea4]">{title}</p>
+        <p className="text-sm leading-[24px] font-normal text-[#4a5565]">
+          {t.fund.topPerformers.heroSubtitle}
+        </p>
+        <p className="text-micro leading-[18px] font-normal text-[#6a7282]">
           {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
         </p>
       </div>
@@ -106,7 +104,7 @@ export function MutualFundTopPerformersMobile({
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white">
-      <div className="flex w-full items-center gap-2 px-4 pb-2 pt-4">
+      <div className="flex w-full items-center gap-2 px-4 pt-4 pb-2">
         <Button
           variant="plain"
           size="icon-sm"
@@ -116,7 +114,7 @@ export function MutualFundTopPerformersMobile({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
           {t.fund.topPerformers.title}
         </h1>
       </div>
@@ -175,7 +173,9 @@ export function MutualFundTopPerformersMobile({
 
             {tagFunds.length === 0 ? (
               <p className="px-3 text-center text-sm text-[#6a7282]">
-                {query.trim() ? t.fund.list.noMatchForQuery(query.trim()) : t.fund.list.noFundsInCategory}
+                {query.trim()
+                  ? t.fund.list.noMatchForQuery(query.trim())
+                  : t.fund.list.noFundsInCategory}
               </p>
             ) : null}
           </div>

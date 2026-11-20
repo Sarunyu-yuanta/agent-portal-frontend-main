@@ -23,7 +23,10 @@ export function ComingSoonPage({
   body: string;
 }) {
   return (
-    <Card variant="default" className="min-h-[calc(var(--vh)*60)] w-full items-center justify-center">
+    <Card
+      variant="default"
+      className="min-h-[calc(var(--vh)*60)] w-full items-center justify-center"
+    >
       <EmptyState icon={icon} title={title} body={body} />
     </Card>
   );

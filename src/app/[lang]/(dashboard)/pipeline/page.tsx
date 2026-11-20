@@ -11,17 +11,21 @@ import type { Deal, Stage } from "./pipeline-data";
 import { useT } from "@/i18n/I18nProvider";
 
 export default function PipelinePage() {
-  const { data: strapiDeals, isLoading: dealsLoading, error: dealsError, retry: retryDeals } =
-    usePipelineDeals();
+  const {
+    data: strapiDeals,
+    isLoading: dealsLoading,
+    error: dealsError,
+    retry: retryDeals,
+  } = usePipelineDeals();
   const t = useT();
   const p = t.pipeline;
   const [showModal, setShowModal] = useState(false);
   const [newProposal, setNewProposal] = useState({ clientName: "", productType: "", dealSize: "" });
-  const [deals, setDeals] = useState<Deal[]>(() => strapiDeals.map(d => ({ ...d })));
+  const [deals, setDeals] = useState<Deal[]>(() => strapiDeals.map((d) => ({ ...d })));
   const [dealsSource, setDealsSource] = useState(strapiDeals);
   if (dealsSource !== strapiDeals) {
     setDealsSource(strapiDeals);
-    setDeals(strapiDeals.map(d => ({ ...d })));
+    setDeals(strapiDeals.map((d) => ({ ...d })));
   }
   const [advancing, setAdvancing] = useState<{ deal: Deal; next: Stage } | null>(null);
 
@@ -37,7 +41,7 @@ export default function PipelinePage() {
   function handleAdvanceConfirm() {
     if (!advancing) return;
     setDeals((prev) =>
-      prev.map((d) => d.id === advancing.deal.id ? { ...d, stage: advancing.next } : d)
+      prev.map((d) => (d.id === advancing.deal.id ? { ...d, stage: advancing.next } : d)),
     );
     setAdvancing(null);
   }
@@ -45,20 +49,44 @@ export default function PipelinePage() {
   return (
     <div className="flex flex-col gap-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+      <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
         {[
-          { label: p.kpi.totalValue,      tag: p.kpi.vsQuarter("+8%", "Q1"),  tagV: "green" as const, value: "฿ 770M",  sub: p.kpi.activeDeals(8) },
-          { label: p.kpi.weightedRevenue, tag: p.kpi.vsQuarter("+15%", "Q1"), tagV: "green" as const, value: "฿ 8.2M",  sub: p.kpi.probabilityWeighted },
-          { label: p.kpi.winRate,         tag: "YTD 2026",                    tagV: "blue" as const,  value: "68%",     sub: p.kpi.industryAvg("52%") },
-          { label: p.kpi.avgCycle,        tag: p.kpi.vsQuarter("+3d", "Q1"),  tagV: "red" as const,   value: p.kpi.days(18), sub: p.kpi.target(p.kpi.days(15)) },
+          {
+            label: p.kpi.totalValue,
+            tag: p.kpi.vsQuarter("+8%", "Q1"),
+            tagV: "green" as const,
+            value: "฿ 770M",
+            sub: p.kpi.activeDeals(8),
+          },
+          {
+            label: p.kpi.weightedRevenue,
+            tag: p.kpi.vsQuarter("+15%", "Q1"),
+            tagV: "green" as const,
+            value: "฿ 8.2M",
+            sub: p.kpi.probabilityWeighted,
+          },
+          {
+            label: p.kpi.winRate,
+            tag: "YTD 2026",
+            tagV: "blue" as const,
+            value: "68%",
+            sub: p.kpi.industryAvg("52%"),
+          },
+          {
+            label: p.kpi.avgCycle,
+            tag: p.kpi.vsQuarter("+3d", "Q1"),
+            tagV: "red" as const,
+            value: p.kpi.days(18),
+            sub: p.kpi.target(p.kpi.days(15)),
+          },
         ].map((k) => (
           <Card key={k.label} variant="default" className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-2">
               <p className="type-caption text-muted-foreground">{k.label}</p>
               <Tag text={k.tag} variant={k.tagV} size="small" />
             </div>
-            <div className="flex flex-col gap-1 mt-auto">
-              <p className="type-h3 text-foreground leading-none">{k.value}</p>
+            <div className="mt-auto flex flex-col gap-1">
+              <p className="type-h3 leading-none text-foreground">{k.value}</p>
               <p className="type-caption text-[var(--text-default-disabled)]">{k.sub}</p>
             </div>
           </Card>
@@ -66,8 +94,8 @@ export default function PipelinePage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="w-full sm:w-72">
             <DropdownMultiple
               label={p.toolbar.productType}
@@ -109,21 +137,21 @@ export default function PipelinePage() {
       ) : dealsError ? (
         <ErrorState onRetry={retryDeals} />
       ) : (
-      <div className="flex gap-5 overflow-x-auto pb-3">
-        {allStages.map((stage) => {
-          const stageDeals = deals.filter(d => d.stage === stage);
-          const isClosed = stage === "Closed Won" || stage === "Closed Lost";
-          return (
-            <KanbanColumn
-              key={stage}
-              stage={stage}
-              deals={stageDeals}
-              dimmed={isClosed}
-              onAdvanceRequest={handleAdvanceRequest}
-            />
-          );
-        })}
-      </div>
+        <div className="flex gap-5 overflow-x-auto pb-3">
+          {allStages.map((stage) => {
+            const stageDeals = deals.filter((d) => d.stage === stage);
+            const isClosed = stage === "Closed Won" || stage === "Closed Lost";
+            return (
+              <KanbanColumn
+                key={stage}
+                stage={stage}
+                deals={stageDeals}
+                dimmed={isClosed}
+                onAdvanceRequest={handleAdvanceRequest}
+              />
+            );
+          })}
+        </div>
       )}
 
       {/* Stage Advance Modal */}
@@ -143,7 +171,10 @@ export default function PipelinePage() {
             variant="content"
             title={p.newProposal.title}
             actionLayout="none"
-            onClose={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}
+            onClose={() => {
+              setShowModal(false);
+              setNewProposal({ clientName: "", productType: "", dealSize: "" });
+            }}
           >
             <div className="flex flex-col gap-4">
               <Input
@@ -166,10 +197,26 @@ export default function PipelinePage() {
                 value={newProposal.dealSize}
                 onChange={(val) => setNewProposal((p) => ({ ...p, dealSize: val }))}
               />
-              <Button variant="primary" size="xl" className="w-full" onClick={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}>
+              <Button
+                variant="primary"
+                size="xl"
+                className="w-full"
+                onClick={() => {
+                  setShowModal(false);
+                  setNewProposal({ clientName: "", productType: "", dealSize: "" });
+                }}
+              >
                 {p.newProposal.create}
               </Button>
-              <Button variant="outline" size="xl" className="w-full" onClick={() => { setShowModal(false); setNewProposal({ clientName: "", productType: "", dealSize: "" }); }}>
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full"
+                onClick={() => {
+                  setShowModal(false);
+                  setNewProposal({ clientName: "", productType: "", dealSize: "" });
+                }}
+              >
                 {t.common.cancel}
               </Button>
             </div>

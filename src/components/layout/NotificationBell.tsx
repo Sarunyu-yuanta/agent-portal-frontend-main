@@ -51,8 +51,7 @@ export function NotificationBell({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const idsOf = (groups: NotificationGroup[]) =>
-    groups.flatMap((g) => g.items.map((i) => i.id));
+  const idsOf = (groups: NotificationGroup[]) => groups.flatMap((g) => g.items.map((i) => i.id));
 
   const liveIds = useMemo(() => idsOf(groups), [groups]);
 
@@ -138,7 +137,7 @@ export function NotificationBell({
                   {item.title}
                 </span>
                 {item.time && (
-                  <span className="shrink-0 whitespace-nowrap text-xs leading-[28px] text-muted-foreground">
+                  <span className="shrink-0 text-xs leading-[28px] whitespace-nowrap text-muted-foreground">
                     {item.time}
                   </span>
                 )}
@@ -150,7 +149,7 @@ export function NotificationBell({
             {!seen.has(item.id) && (
               <span
                 aria-hidden="true"
-                className="mt-2 size-2 shrink-0 rounded-full bg-visual-red-default"
+                className="bg-visual-red-default mt-2 size-2 shrink-0 rounded-full"
               />
             )}
           </button>
@@ -171,7 +170,7 @@ export function NotificationBell({
           if (!open && !isLoading) setSeen(new Set(liveIds));
           setOpen((v) => !v);
         }}
-        className="relative flex size-6 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 text-icon-brand transition-colors hover:bg-hover-bg"
+        className="text-icon-brand hover:bg-hover-bg relative flex size-6 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 transition-colors"
       >
         {/* Filled while something is waiting, outline once it isn't — the
             glyph and the count carry the same state, so they turn together
@@ -180,7 +179,7 @@ export function NotificationBell({
         {showBadge && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -right-0.5 -top-0.5 z-[1] flex h-3.5 min-h-3.5 min-w-3.5 items-center justify-center rounded-[60px] bg-visual-red-default px-[2.5px] text-on-visual-red"
+            className="bg-visual-red-default text-on-visual-red pointer-events-none absolute -top-0.5 -right-0.5 z-[1] flex h-3.5 min-h-3.5 min-w-3.5 items-center justify-center rounded-[60px] px-[2.5px]"
           >
             <span className="text-xs leading-none font-normal tabular-nums">
               {unseenCount > 99 ? "99+" : unseenCount}
@@ -193,9 +192,9 @@ export function NotificationBell({
         <div
           role="dialog"
           aria-label={t.nav.notifications}
-          className="absolute right-0 top-full z-50 mt-2 w-[375px] max-w-[calc(var(--vw)*100-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+          className="absolute top-full right-0 z-50 mt-2 w-[375px] max-w-[calc(var(--vw)*100-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
-          <div className="max-h-[480px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="max-h-[480px] [scrollbar-width:none] overflow-y-auto [&::-webkit-scrollbar]:hidden">
             {isLoading ? (
               <NotificationRowsSkeleton />
             ) : (
@@ -219,7 +218,7 @@ function NotificationRowsSkeleton() {
   return (
     <div aria-busy="true">
       <div className="border-b border-border bg-[var(--bg-default-secondary)] px-4 py-1.5">
-        <Skeleton className="h-4 w-12 my-0.5" />
+        <Skeleton className="my-0.5 h-4 w-12" />
       </div>
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-start gap-3 px-4 py-3">
@@ -228,7 +227,7 @@ function NotificationRowsSkeleton() {
           </span>
           <div className="min-w-0 flex-1 space-y-2 py-1">
             <div className="flex items-center gap-2">
-              <Skeleton className="h-5 flex-1 max-w-[160px]" />
+              <Skeleton className="h-5 max-w-[160px] flex-1" />
               <Skeleton className="ml-auto h-4 w-14" />
             </div>
             <Skeleton className="h-4 w-full" />

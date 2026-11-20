@@ -35,5 +35,11 @@ export function ProposalChip({
   size?: "sm" | "lg";
 }) {
   const t = useT();
-  return <Tag text={label ?? t.orders.stepOffered} variant={PROPOSAL_VARIANT} size={size === "lg" ? "large" : "small"} />;
+  return (
+    <Tag
+      text={label ?? t.orders.stepOffered}
+      variant={PROPOSAL_VARIANT}
+      size={size === "lg" ? "large" : "small"}
+    />
+  );
 }

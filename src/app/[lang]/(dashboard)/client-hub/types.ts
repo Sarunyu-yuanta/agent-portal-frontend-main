@@ -24,12 +24,7 @@ export type SortKey =
 
 /** Sortable columns of the Product tab's table. */
 export type ProductSortKey =
-  | "rowIndex"
-  | "label"
-  | "clientCount"
-  | "totalAmountThb"
-  | "avgAllocationPct"
-  | null;
+  "rowIndex" | "label" | "clientCount" | "totalAmountThb" | "avgAllocationPct" | null;
 
 export type ColumnId =
   | "clientId"

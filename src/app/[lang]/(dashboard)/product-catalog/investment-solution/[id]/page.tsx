@@ -36,9 +36,7 @@ export default function InvestmentSolutionDetailPage({
     <InvestmentSolutionDetail
       solution={solution}
       onBack={goBack}
-      onProductSelect={(p: StructuredProduct) =>
-        router.push(`/product-catalog/product/${p.id}`)
-      }
+      onProductSelect={(p: StructuredProduct) => router.push(`/product-catalog/product/${p.id}`)}
     />
   );
 }

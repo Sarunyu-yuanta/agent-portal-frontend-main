@@ -72,11 +72,8 @@ function NotesPageInner() {
  */
 function NotesPageSkeleton() {
   return (
-    <div
-      aria-busy="true"
-      className="flex flex-1 min-h-0 overflow-hidden bg-card"
-    >
-      <div className="flex w-full md:w-[280px]! shrink-0 flex-col md:border-r md:border-border">
+    <div aria-busy="true" className="flex min-h-0 flex-1 overflow-hidden bg-card">
+      <div className="flex w-full shrink-0 flex-col md:w-[280px]! md:border-r md:border-border">
         <div className="flex flex-col gap-2 p-3">
           <Skeleton className="h-10 w-full rounded-lg" />
           <Skeleton className="h-10 w-full rounded-lg" />
@@ -94,7 +91,7 @@ function NotesPageSkeleton() {
           ))}
         </div>
       </div>
-      <div className="hidden md:flex flex-1 min-w-0 flex-col items-center justify-center gap-3">
+      <div className="hidden min-w-0 flex-1 flex-col items-center justify-center gap-3 md:flex">
         <Skeleton className="size-8 rounded-md" />
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-4 w-64" />

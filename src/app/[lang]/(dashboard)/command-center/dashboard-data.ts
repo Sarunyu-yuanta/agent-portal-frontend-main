@@ -160,10 +160,7 @@ export function buildQueue({
   // of the date it is given, so a 15-day horizon started late in a month would
   // otherwise stop at the month boundary. Notes are passed to the first call
   // only — they carry their own dates and would come back twice.
-  const dayGroups = [
-    groupDayItems(notes, today, t),
-    groupDayItems([], addMonths(today, 1), t),
-  ];
+  const dayGroups = [groupDayItems(notes, today, t), groupDayItems([], addMonths(today, 1), t)];
 
   for (const group of dayGroups) {
     for (const [key, items] of group) {
@@ -200,8 +197,7 @@ export function buildQueue({
   }
 
   return rows.sort(
-    (a, b) =>
-      a.daysLeft - b.daysLeft || SOURCE_WEIGHT[a.source] - SOURCE_WEIGHT[b.source],
+    (a, b) => a.daysLeft - b.daysLeft || SOURCE_WEIGHT[a.source] - SOURCE_WEIGHT[b.source],
   );
 }
 
@@ -325,7 +321,11 @@ export type DatedReminder = {
   daysUntil: number;
 };
 
-function datedReminders(map: Map<string, DayItem[]>, today: Date, seen: Set<string>): DatedReminder[] {
+function datedReminders(
+  map: Map<string, DayItem[]>,
+  today: Date,
+  seen: Set<string>,
+): DatedReminder[] {
   const rows: DatedReminder[] = [];
   for (const [key, items] of map) {
     const day = dayFromKey(key);
@@ -345,7 +345,12 @@ function datedReminders(map: Map<string, DayItem[]>, today: Date, seen: Set<stri
  * Anchored on that day so a month the mini calendar can reach still has its
  * desk alerts, which `groupDayItems` only loads for the month it is given.
  */
-export function remindersOnDay(notes: Note[], day: Date, today: Date, t: Dictionary): DatedReminder[] {
+export function remindersOnDay(
+  notes: Note[],
+  day: Date,
+  today: Date,
+  t: Dictionary,
+): DatedReminder[] {
   const key = dayKey(day);
   const rows = datedReminders(groupDayItems(notes, day, t), today, new Set());
   return rows
@@ -355,7 +360,12 @@ export function remindersOnDay(notes: Note[], day: Date, today: Date, t: Diction
 
 /** Open reminders for the month on screen, keyed by calendar day — what the
  *  mini calendar's dot and its day popover both read. */
-export function remindersByDay(notes: Note[], viewDate: Date, today: Date, t: Dictionary): Map<string, DatedReminder[]> {
+export function remindersByDay(
+  notes: Note[],
+  viewDate: Date,
+  today: Date,
+  t: Dictionary,
+): Map<string, DatedReminder[]> {
   const map = new Map<string, DatedReminder[]>();
   for (const row of datedReminders(groupDayItems(notes, viewDate, t), today, new Set())) {
     const key = dayKey(row.day);

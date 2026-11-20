@@ -50,10 +50,7 @@ function formatAmount(value: number): string {
   });
 }
 
-function scaleSubItems(
-  items: LiabilitySubItem[],
-  categoryTotal: number,
-): LiabilitySubItem[] {
+function scaleSubItems(items: LiabilitySubItem[], categoryTotal: number): LiabilitySubItem[] {
   const baseSum = items.reduce((sum, item) => sum + parseAmount(item.amount), 0);
   if (baseSum <= 0) return items;
 
@@ -77,10 +74,7 @@ function scaleSubItems(
   });
 }
 
-export function getLiabilitiesDetail(
-  totalAmount: string,
-  lastUpdated: string,
-): LiabilitiesDetail {
+export function getLiabilitiesDetail(totalAmount: string, lastUpdated: string): LiabilitiesDetail {
   const total = parseAmount(totalAmount) || BASE_TOTAL;
 
   const categories: LiabilityCategory[] = BASE_CATEGORIES.map((category) => {
@@ -98,10 +92,7 @@ export function getLiabilitiesDetail(
   };
 }
 
-export function getCategoryAmount(
-  totalAmount: string,
-  percent: number,
-): string {
+export function getCategoryAmount(totalAmount: string, percent: number): string {
   const total = parseAmount(totalAmount) || BASE_TOTAL;
   return formatAmount(Math.round(total * (percent / 100)));
 }

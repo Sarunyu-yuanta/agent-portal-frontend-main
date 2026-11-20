@@ -83,11 +83,11 @@ export function MutualFundInsightCard({
           holdList ? "gap-2" : "gap-2.5"
         } ${INSIGHT_LIST_CARD_INTERACTIVE} ${className ?? ""}`}
       >
-        <h3 className="line-clamp-2 h-12 shrink-0 text-base font-bold leading-[28px] text-[#0c244a]">
+        <h3 className="line-clamp-2 h-12 shrink-0 text-base leading-[28px] font-bold text-[#0c244a]">
           {item.title}
         </h3>
         <p className="shrink-0 text-xs leading-[20px] text-[#0c244a]">{item.date}</p>
-        <div className="flex h-2 shrink-0 w-full items-center">
+        <div className="flex h-2 w-full shrink-0 items-center">
           <div className="h-px w-full bg-black/10" />
         </div>
         <div className="flex shrink-0 flex-col gap-2">
@@ -104,7 +104,7 @@ export function MutualFundInsightCard({
           width={100}
           height={92}
           className={`pointer-events-none absolute size-[100px] opacity-30 ${
-            holdList ? "-right-[43px] -top-5" : "-right-[3px] -top-11"
+            holdList ? "-top-5 -right-[43px]" : "-top-11 -right-[3px]"
           }`}
         />
       </Link>
@@ -119,7 +119,9 @@ export function MutualFundInsightCard({
         elevated ? INSIGHT_CARD_SHADOW : ""
       } ${carousel ? "w-[266.5px] lg:w-[343px]" : "w-full"} ${INSIGHT_LIST_CARD_INTERACTIVE} ${className ?? ""}`}
     >
-      <h3 className="line-clamp-3 text-base font-bold leading-[28px] text-[#0c244a]">{item.title}</h3>
+      <h3 className="line-clamp-3 text-base leading-[28px] font-bold text-[#0c244a]">
+        {item.title}
+      </h3>
       <p className="mt-2.5 text-xs leading-[20px] text-[#0c244a]">{item.date}</p>
       <div className="my-2.5 h-2 w-full">
         <div className="h-px w-full bg-black/10" />
@@ -137,7 +139,7 @@ export function MutualFundInsightCard({
         alt=""
         width={100}
         height={92}
-        className="pointer-events-none absolute -right-11 -top-11 size-[100px] opacity-30"
+        className="pointer-events-none absolute -top-11 -right-11 size-[100px] opacity-30"
       />
     </Link>
   );
@@ -208,33 +210,44 @@ export function MutualFundInsightsSection({
         <div className="relative z-10 flex items-center gap-4 px-0 lg:px-0">
           <div className="flex min-w-0 flex-1 flex-col gap-0 lg:gap-1">
             <div className="flex items-center gap-1">
-              <Image src={MF_ASSETS.bookOpen} alt="" width={20} height={20} className="size-5 shrink-0" />
-              <h2 className="flex-1 text-lg font-bold leading-[32px] bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-transparent">
+              <Image
+                src={MF_ASSETS.bookOpen}
+                alt=""
+                width={20}
+                height={20}
+                className="size-5 shrink-0"
+              />
+              <h2 className="flex-1 bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-lg leading-[32px] font-bold text-transparent">
                 <span className="lg:hidden">{t.fund.insights.titleShort}</span>
                 <span className="hidden lg:inline">{t.fund.insights.titleLong}</span>
               </h2>
             </div>
-            <p className="text-sm leading-[24px] bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-transparent">
+            <p className="bg-gradient-to-r from-[#73442b] to-[#b58063] bg-clip-text text-sm leading-[24px] text-transparent">
               {t.fund.insights.subtitle}
             </p>
           </div>
           {!isEmpty && (
-          <Link
-            href={seeAllHref}
-            className="hidden w-fit shrink-0 no-underline lg:inline-flex"
-            onClick={
-              onSeeAll
-                ? (e) => {
-                    e.preventDefault();
-                    onSeeAll();
-                  }
-                : undefined
-            }
-          >
-            <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
-              {t.fund.list.seeMore}
-            </Button>
-          </Link>
+            <Link
+              href={seeAllHref}
+              className="hidden w-fit shrink-0 no-underline lg:inline-flex"
+              onClick={
+                onSeeAll
+                  ? (e) => {
+                      e.preventDefault();
+                      onSeeAll();
+                    }
+                  : undefined
+              }
+            >
+              <Button
+                variant="plain"
+                size="xl"
+                rightIcon={<MutualFundSeeMoreIcon />}
+                className="w-fit shrink-0"
+              >
+                {t.fund.list.seeMore}
+              </Button>
+            </Link>
           )}
         </div>
 
@@ -243,72 +256,77 @@ export function MutualFundInsightsSection({
             <MutualFundSectionEmpty title={t.fund.empty.insights} />
           </div>
         ) : (
-        <>
-        <div className="relative z-10 flex flex-col gap-4 lg:gap-6">
-          <div
-            ref={scrollRef}
-            className="overflow-x-auto hide-scrollbar"
-            style={{ scrollbarWidth: "none", cursor: "grab" }}
-            {...dragHandlers}
-          >
-            <div className="flex w-max gap-2.5">
-              {insights.map((item) => (
-                <MutualFundInsightCard key={item.id} item={item} carousel />
-              ))}
-            </div>
-          </div>
-          <div className="relative flex items-center justify-center">
-            <PaginationBanner
-              count={insights.length}
-              activeIndex={activeIndex}
-              className="w-fit"
-              onIndexChange={(index) => {
-                const el = scrollRef.current;
-                if (el) scrollInsightToIndex(el, index);
-              }}
-            />
-            <div className="absolute right-4 hidden items-center gap-2 lg:flex">
-              <Button
-                variant="outline"
-                size="icon-md"
-                aria-label={t.fund.list.scrollLeft}
-                className={canScrollLeft ? "" : "invisible"}
-                onClick={() => scrollByCard(-1)}
+          <>
+            <div className="relative z-10 flex flex-col gap-4 lg:gap-6">
+              <div
+                ref={scrollRef}
+                className="hide-scrollbar overflow-x-auto"
+                style={{ scrollbarWidth: "none", cursor: "grab" }}
+                {...dragHandlers}
               >
-                <CaretLeftIcon size={20} />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon-md"
-                aria-label={t.fund.list.scrollRight}
-                className={canScrollRight ? "" : "invisible"}
-                onClick={() => scrollByCard(1)}
-              >
-                <CaretRightIcon size={20} />
-              </Button>
+                <div className="flex w-max gap-2.5">
+                  {insights.map((item) => (
+                    <MutualFundInsightCard key={item.id} item={item} carousel />
+                  ))}
+                </div>
+              </div>
+              <div className="relative flex items-center justify-center">
+                <PaginationBanner
+                  count={insights.length}
+                  activeIndex={activeIndex}
+                  className="w-fit"
+                  onIndexChange={(index) => {
+                    const el = scrollRef.current;
+                    if (el) scrollInsightToIndex(el, index);
+                  }}
+                />
+                <div className="absolute right-4 hidden items-center gap-2 lg:flex">
+                  <Button
+                    variant="outline"
+                    size="icon-md"
+                    aria-label={t.fund.list.scrollLeft}
+                    className={canScrollLeft ? "" : "invisible"}
+                    onClick={() => scrollByCard(-1)}
+                  >
+                    <CaretLeftIcon size={20} />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon-md"
+                    aria-label={t.fund.list.scrollRight}
+                    className={canScrollRight ? "" : "invisible"}
+                    onClick={() => scrollByCard(1)}
+                  >
+                    <CaretRightIcon size={20} />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="relative z-10 flex w-full justify-center lg:hidden">
-          <Link
-            href={seeAllHref}
-            className="inline-flex w-fit shrink-0 no-underline"
-            onClick={
-              onSeeAll
-                ? (e) => {
-                    e.preventDefault();
-                    onSeeAll();
-                  }
-                : undefined
-            }
-          >
-            <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
-              {t.fund.list.seeMore}
-            </Button>
-          </Link>
-        </div>
-        </>
+            <div className="relative z-10 flex w-full justify-center lg:hidden">
+              <Link
+                href={seeAllHref}
+                className="inline-flex w-fit shrink-0 no-underline"
+                onClick={
+                  onSeeAll
+                    ? (e) => {
+                        e.preventDefault();
+                        onSeeAll();
+                      }
+                    : undefined
+                }
+              >
+                <Button
+                  variant="plain"
+                  size="xl"
+                  rightIcon={<MutualFundSeeMoreIcon />}
+                  className="w-fit shrink-0"
+                >
+                  {t.fund.list.seeMore}
+                </Button>
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </section>

@@ -120,10 +120,7 @@ export const ROBO_ADVISORY_PLANS: RoboAdvisoryPlan[] = [
         "Ensemble Tree Model",
         "Black-Litterman Model",
       ],
-      targetInvestors: [
-        "นักลงทุนที่ยอมรับความเสี่ยงสูงเพื่อผลตอบแทนระยะยาว",
-        "มีระยะเวลาออมอย่างน้อย 3-5 ปี",
-      ],
+      targetInvestors: ["นักลงทุนที่ยอมรับความเสี่ยงสูงเพื่อผลตอบแทนระยะยาว", "มีระยะเวลาออมอย่างน้อย 3-5 ปี"],
       allocation: HIGH_RETURN_ALLOCATION,
       fees: DEFAULT_FEES,
       feeFootnote: "* ของมูลค่าเงินลงทุนเริ่มต้น โดยคิดตาม ระดับเงินลงทุน",

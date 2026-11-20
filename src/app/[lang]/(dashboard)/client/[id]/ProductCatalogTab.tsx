@@ -1,8 +1,21 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { Button, Chip, SearchInput, Tab, Tag } from "@sarunyu/system-one";
-import { ArrowUpLeftIcon, CaretLeftIcon, CaretRightIcon, ChartLineUpIcon } from "@phosphor-icons/react";
+import {
+  ArrowUpLeftIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  ChartLineUpIcon,
+} from "@phosphor-icons/react";
 import { ChipScroller } from "@/components/ui/chip-scroller";
 import { EmptyState, NotFoundState } from "@/components/ui/empty-state";
 import { FixedIncomeTab } from "./FixedIncomeTab";
@@ -27,7 +40,11 @@ import {
 import { GlobalBondDetail } from "./GlobalBondDetail";
 import { GlobalBondAllPage } from "./GlobalBondAllPage";
 import { getIssuerIdForBondRow, type GlobalBondIssuerId } from "./global-bond-data";
-import { PRODUCT_SEARCH_INDEX, matchesProductQuery, type ProductSearchItem } from "./product-search-index";
+import {
+  PRODUCT_SEARCH_INDEX,
+  matchesProductQuery,
+  type ProductSearchItem,
+} from "./product-search-index";
 import { addRecentSearch, clearRecentSearches, getRecentSearches } from "./recent-product-searches";
 import { StructuredProductDetail } from "./StructuredProductDetail";
 import { StructuredProductAllPage } from "./StructuredProductAllPage";
@@ -50,14 +67,14 @@ import {
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ProductCatalogTabSkeleton } from "./ProductCatalogSkeletons";
-import { FixedIncomeCompanyDetailSkeleton, GlobalBondDetailSkeleton } from "./ProductDetailSkeletons";
+import {
+  FixedIncomeCompanyDetailSkeleton,
+  GlobalBondDetailSkeleton,
+} from "./ProductDetailSkeletons";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
 import { useHasLoaded } from "@/hooks/use-api";
 import type { StructuredProduct } from "./structured-product-data";
-import {
-  getInvestmentSolution,
-  type InvestmentSolutionId,
-} from "./investment-solution-data";
+import { getInvestmentSolution, type InvestmentSolutionId } from "./investment-solution-data";
 import {
   InvestmentSolutionSection,
   StructuredProductGridSection,
@@ -203,7 +220,7 @@ function TabStripScroller({
       <div className="relative">
         <div
           ref={scrollRef}
-          className="overflow-x-auto pl-4 lg:pl-6 [--bg-default-primary:transparent]"
+          className="overflow-x-auto pl-4 [--bg-default-primary:transparent] lg:pl-6"
           style={{ scrollbarWidth: "none" }}
         >
           <div ref={contentRef} className="w-max">
@@ -218,15 +235,17 @@ function TabStripScroller({
               key={side}
               className={`pointer-events-none absolute top-0 bottom-[2px] flex items-center ${
                 isLeft
-                  ? "left-0 pl-1.5 pr-8 bg-gradient-to-r from-[#f7f7f7] via-[#f7f7f7] to-transparent"
-                  : "right-0 pr-1.5 pl-8 bg-gradient-to-l from-[#f7f7f7] via-[#f7f7f7] to-transparent"
+                  ? "left-0 bg-gradient-to-r from-[#f7f7f7] via-[#f7f7f7] to-transparent pr-8 pl-1.5"
+                  : "right-0 bg-gradient-to-l from-[#f7f7f7] via-[#f7f7f7] to-transparent pr-1.5 pl-8"
               }`}
             >
               <Button
                 variant="outline"
                 size="icon-sm"
                 onClick={() => step(isLeft ? -1 : 1)}
-                aria-label={isLeft ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight}
+                aria-label={
+                  isLeft ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight
+                }
                 className="pointer-events-auto"
               >
                 {isLeft ? <CaretLeftIcon size={16} /> : <CaretRightIcon size={16} />}
@@ -322,17 +341,23 @@ export function ProductCatalogTab({
   const router = useLocalizedRouter();
   const [activeTabInternal, setActiveTabInternal] = useState("structured");
   const activeProductTab = activeCategory ?? activeTabInternal;
-  const [selectedFixedIncomeBond, setSelectedFixedIncomeBond] = useState<FixedIncomeBond | null>(null);
+  const [selectedFixedIncomeBond, setSelectedFixedIncomeBond] = useState<FixedIncomeBond | null>(
+    null,
+  );
   const [selectedFixedIncomeCompany, setSelectedFixedIncomeCompany] = useState<string | null>(null);
   const [fixedIncomeView, setFixedIncomeView] = useState<"bond" | "company" | null>(null);
-  const [selectedGlobalBondIssuer, setSelectedGlobalBondIssuer] = useState<GlobalBondIssuerId | null>(null);
+  const [selectedGlobalBondIssuer, setSelectedGlobalBondIssuer] =
+    useState<GlobalBondIssuerId | null>(null);
   const [showAllGlobalBonds, setShowAllGlobalBonds] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<StructuredProduct | null>(null);
   const [selectedTopIdea, setSelectedTopIdea] = useState<TopIdeaSector | null>(null);
-  const [selectedInvestmentSolution, setSelectedInvestmentSolution] = useState<InvestmentSolutionId | null>(null);
+  const [selectedInvestmentSolution, setSelectedInvestmentSolution] =
+    useState<InvestmentSolutionId | null>(null);
   const [showAllTopIdeas, setShowAllTopIdeas] = useState(false);
   const [showAllStructuredProducts, setShowAllStructuredProducts] = useState(false);
-  const [selectedThaiProduct, setSelectedThaiProduct] = useState<ThaiStructuredProduct | null>(null);
+  const [selectedThaiProduct, setSelectedThaiProduct] = useState<ThaiStructuredProduct | null>(
+    null,
+  );
   const [selectedMutualFundId, setSelectedMutualFundId] = useState<string | null>(null);
 
   const [searchValueInternal, setSearchValueInternal] = useState("");
@@ -358,7 +383,9 @@ export function ProductCatalogTab({
       ? searchIndex.filter((item) => item.kind === searchCategory)
       : searchIndex;
     const query = searchValue.trim();
-    const byQuery = query ? byCategory.filter((item) => matchesProductQuery(item, query)) : byCategory;
+    const byQuery = query
+      ? byCategory.filter((item) => matchesProductQuery(item, query))
+      : byCategory;
     return byQuery.slice(0, MAX_SEARCH_RESULTS);
   }, [searchIndex, searchValue, searchCategory]);
 
@@ -382,17 +409,17 @@ export function ProductCatalogTab({
   const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const desktopSearchWrapRef = useRef<HTMLDivElement>(null);
   const modalSearchWrapRef = useRef<HTMLDivElement>(null);
-  const [anchorRect, setAnchorRect] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [anchorRect, setAnchorRect] = useState<{ top: number; left: number; width: number } | null>(
+    null,
+  );
 
   useLayoutEffect(() => {
     if (!searchOpen) return;
     const measure = () => {
       const el =
-        [
-          searchAnchorRef?.current,
-          mobileSearchWrapRef.current,
-          desktopSearchWrapRef.current,
-        ].find((node) => node && node.offsetParent !== null) ?? null;
+        [searchAnchorRef?.current, mobileSearchWrapRef.current, desktopSearchWrapRef.current].find(
+          (node) => node && node.offsetParent !== null,
+        ) ?? null;
       if (!el) return;
       // Screen pixels, converted to the page's own for `style` (see `pageZoom`).
       const rect = el.getBoundingClientRect();
@@ -465,11 +492,14 @@ export function ProductCatalogTab({
     onAllProductsView: navigation?.onAllProductsView ?? (() => setShowAllStructuredProducts(true)),
     onTopIdeaSelect: navigation?.onTopIdeaSelect ?? setSelectedTopIdea,
     onAllTopIdeasView: navigation?.onAllTopIdeasView ?? (() => setShowAllTopIdeas(true)),
-    onInvestmentSolutionSelect: navigation?.onInvestmentSolutionSelect ?? setSelectedInvestmentSolution,
-    onFixedIncomeBondSelect: navigation?.onFixedIncomeBondSelect ?? ((bond: FixedIncomeBond) => {
-      setSelectedFixedIncomeBond(bond);
-      setFixedIncomeView("bond");
-    }),
+    onInvestmentSolutionSelect:
+      navigation?.onInvestmentSolutionSelect ?? setSelectedInvestmentSolution,
+    onFixedIncomeBondSelect:
+      navigation?.onFixedIncomeBondSelect ??
+      ((bond: FixedIncomeBond) => {
+        setSelectedFixedIncomeBond(bond);
+        setFixedIncomeView("bond");
+      }),
     onGlobalBondIssuerSelect: navigation?.onGlobalBondIssuerSelect ?? setSelectedGlobalBondIssuer,
     onAllGlobalBondsView: navigation?.onAllGlobalBondsView ?? (() => setShowAllGlobalBonds(true)),
     onThaiProductSelect: navigation?.onThaiProductSelect ?? setSelectedThaiProduct,
@@ -485,8 +515,7 @@ export function ProductCatalogTab({
       ((themeId: MutualFundThemeId) => router.push(mutualFundThemeHref(themeId))),
     onTrendingSeeAll:
       navigation?.onTrendingSeeAll ??
-      ((groupId: string, sort: TrendingSort) =>
-        router.push(trendingGroupHref(groupId, sort))),
+      ((groupId: string, sort: TrendingSort) => router.push(trendingGroupHref(groupId, sort))),
     onRoboAdvisorySelect:
       navigation?.onRoboAdvisorySelect ??
       ((clientId) => router.push(advisoryDetailHref("/product-catalog/robo-advisory", clientId))),
@@ -546,7 +575,7 @@ export function ProductCatalogTab({
     const fund = getMutualFund(selectedMutualFundId);
     if (fund) {
       return (
-        <div className="flex flex-col w-full">
+        <div className="flex w-full flex-col">
           <MutualFundDetail fund={fund} onBack={() => setSelectedMutualFundId(null)} />
         </div>
       );
@@ -555,7 +584,7 @@ export function ProductCatalogTab({
 
   if (!navigation && selectedThaiProduct) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <ThaiStructuredProductDetail
           product={selectedThaiProduct}
           onBack={() => setSelectedThaiProduct(null)}
@@ -566,7 +595,7 @@ export function ProductCatalogTab({
 
   if (!navigation && showAllGlobalBonds) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <GlobalBondAllPage onBack={() => setShowAllGlobalBonds(false)} />
       </div>
     );
@@ -574,7 +603,7 @@ export function ProductCatalogTab({
 
   if (!navigation && selectedGlobalBondIssuer) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <InlineGlobalBondDetail
           issuerId={selectedGlobalBondIssuer}
           onBack={() => setSelectedGlobalBondIssuer(null)}
@@ -586,7 +615,7 @@ export function ProductCatalogTab({
 
   if (!navigation && fixedIncomeView === "bond" && selectedFixedIncomeBond) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <FixedIncomeDetail
           bond={selectedFixedIncomeBond}
           onBack={() => {
@@ -608,7 +637,7 @@ export function ProductCatalogTab({
 
   if (!navigation && fixedIncomeView === "company" && selectedFixedIncomeCompany) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <InlineFixedIncomeCompanyDetail
           companyId={selectedFixedIncomeCompany}
           onBack={() => {
@@ -630,7 +659,7 @@ export function ProductCatalogTab({
 
   if (!navigation && selectedProduct) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <StructuredProductDetail
           product={selectedProduct}
           onBack={() => setSelectedProduct(null)}
@@ -641,7 +670,7 @@ export function ProductCatalogTab({
 
   if (!navigation && selectedTopIdea) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <TopIdeaDetail
           sector={selectedTopIdea}
           onBack={() => setSelectedTopIdea(null)}
@@ -656,7 +685,7 @@ export function ProductCatalogTab({
     : undefined;
   if (!navigation && pickedSolution) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <InvestmentSolutionDetail
           solution={pickedSolution}
           onBack={() => setSelectedInvestmentSolution(null)}
@@ -668,7 +697,7 @@ export function ProductCatalogTab({
 
   if (!navigation && showAllTopIdeas) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <TopIdeaAllPage
           onBack={() => setShowAllTopIdeas(false)}
           onSelect={(sector) => setSelectedTopIdea(sector)}
@@ -679,7 +708,7 @@ export function ProductCatalogTab({
 
   if (!navigation && showAllStructuredProducts) {
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <StructuredProductAllPage
           onBack={() => setShowAllStructuredProducts(false)}
           onProductSelect={(product) => setSelectedProduct(product)}
@@ -690,7 +719,7 @@ export function ProductCatalogTab({
 
   return (
     // Root: full-bleed — negative margin + matching width expansion
-    <div className="flex flex-col flex-1 w-full" style={{ backgroundColor: "white" }}>
+    <div className="flex w-full flex-1 flex-col" style={{ backgroundColor: "white" }}>
       {/* ── Mobile/Tablet: sticky search + tab bar — always expanded, never collapses ── */}
       <div
         className="sticky top-0 z-30 flex flex-col lg:hidden"
@@ -717,16 +746,22 @@ export function ProductCatalogTab({
             ["--bg-default-primary" as string]: "transparent",
           }}
         >
-          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} hasLoaded={hasLoaded} />
+          <CatalogTabBar
+            activeId={activeProductTab}
+            onChange={handleProductTabChange}
+            hasLoaded={hasLoaded}
+          />
         </div>
       </div>
 
       {/* ── Desktop: search + tab bar, one shared section ────────────── */}
-      <div className={`hidden lg:flex flex-col shrink-0 w-full bg-gradient-to-t from-[#f7f7f7] to-white sticky top-0 z-30 transition-shadow duration-300 ease-out ${mobileScrolled ? "shadow-sm" : ""}`}>
+      <div
+        className={`sticky top-0 z-30 hidden w-full shrink-0 flex-col bg-gradient-to-t from-[#f7f7f7] to-white transition-shadow duration-300 ease-out lg:flex ${mobileScrolled ? "shadow-sm" : ""}`}
+      >
         <div
           className={`grid transition-[grid-template-rows] duration-300 ease-out ${mobileScrolled ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
         >
-          <div className="overflow-hidden min-h-0">
+          <div className="min-h-0 overflow-hidden">
             <div
               className="flex flex-col items-center justify-center px-6"
               style={{ height: 120, paddingTop: 32, paddingBottom: 24 }}
@@ -750,9 +785,13 @@ export function ProductCatalogTab({
         </div>
         <TabStripScroller
           activeKey={hasLoaded ? activeProductTab : undefined}
-          className={`max-w-[1280px] mx-auto w-full transition-[padding] duration-300 ease-out ${mobileScrolled ? "pt-6" : ""}`}
+          className={`mx-auto w-full max-w-[1280px] transition-[padding] duration-300 ease-out ${mobileScrolled ? "pt-6" : ""}`}
         >
-          <CatalogTabBar activeId={activeProductTab} onChange={handleProductTabChange} hasLoaded={hasLoaded} />
+          <CatalogTabBar
+            activeId={activeProductTab}
+            onChange={handleProductTabChange}
+            hasLoaded={hasLoaded}
+          />
         </TabStripScroller>
       </div>
 
@@ -767,7 +806,7 @@ export function ProductCatalogTab({
       )}
       {searchOpen && anchorRect && (
         <div
-          className="fixed z-50 flex flex-col rounded-2xl overflow-hidden shadow-lg"
+          className="fixed z-50 flex flex-col overflow-hidden rounded-2xl shadow-lg"
           style={{
             // Clamped so anchoring to the slim header bar — which sits only a
             // few pixels below the viewport top — doesn't push the modal flush
@@ -783,7 +822,10 @@ export function ProductCatalogTab({
             ref={modalSearchWrapRef}
             style={{
               padding: SEARCH_MODAL_PADDING,
-              borderBottom: searchValue.trim() === "" && recentSearches.length > 0 ? undefined : "1px solid rgba(0,0,0,0.08)",
+              borderBottom:
+                searchValue.trim() === "" && recentSearches.length > 0
+                  ? undefined
+                  : "1px solid rgba(0,0,0,0.08)",
             }}
           >
             <SearchInput
@@ -803,7 +845,7 @@ export function ProductCatalogTab({
                 <button
                   type="button"
                   onClick={() => setRecentSearches(clearRecentSearches())}
-                  className="type-caption text-primary-action hover:underline cursor-pointer"
+                  className="type-caption text-primary-action cursor-pointer hover:underline"
                 >
                   {labels.clearHistory}
                 </button>
@@ -818,7 +860,7 @@ export function ProductCatalogTab({
                     // the old `bg-muted/70` went *lighter* and read as
                     // disabled. Same gray-200/300 pair the notes sidebar
                     // chips use.
-                    className="group shrink-0 flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 type-caption text-foreground transition-colors cursor-pointer hover:bg-[var(--fill-gray-200)] active:bg-[var(--fill-gray-300)]"
+                    className="group type-caption flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-foreground transition-colors hover:bg-[var(--fill-gray-200)] active:bg-[var(--fill-gray-300)]"
                   >
                     {term}
                     {/* ↖ is the conventional "put this term back in the search
@@ -826,7 +868,7 @@ export function ProductCatalogTab({
                         fills the input rather than opening a result. */}
                     <ArrowUpLeftIcon
                       size={12}
-                      className="shrink-0 text-[var(--text-default-tertiary)] group-hover:text-[var(--text-default-secondary)] transition-colors"
+                      className="shrink-0 text-[var(--text-default-tertiary)] transition-colors group-hover:text-[var(--text-default-secondary)]"
                     />
                   </button>
                 ))}
@@ -845,9 +887,9 @@ export function ProductCatalogTab({
               />
             ))}
           </ChipScroller>
-          <div className="flex flex-col max-h-[420px] overflow-y-auto py-2">
+          <div className="flex max-h-[420px] flex-col overflow-y-auto py-2">
             {searchResults.length === 0 ? (
-              <p className="px-4 py-8 text-center type-caption text-muted-foreground">
+              <p className="type-caption px-4 py-8 text-center text-muted-foreground">
                 {searchValue.trim() ? labels.noMatchFor(searchValue) : labels.noneInCategory}
               </p>
             ) : (
@@ -856,13 +898,13 @@ export function ProductCatalogTab({
                   key={item.key}
                   type="button"
                   onClick={() => handleSearchSelect(item)}
-                  className="flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/60 transition-colors cursor-pointer"
+                  className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/60"
                 >
-                  <div className="flex flex-col min-w-0">
-                    <span className="type-subtitle-2 text-foreground truncate">
+                  <div className="flex min-w-0 flex-col">
+                    <span className="type-subtitle-2 truncate text-foreground">
                       {highlightMatch(item.title, searchValue)}
                     </span>
-                    <span className="type-caption text-muted-foreground truncate">
+                    <span className="type-caption truncate text-muted-foreground">
                       {highlightMatch(item.subtitle, searchValue)}
                     </span>
                   </div>
@@ -875,7 +917,7 @@ export function ProductCatalogTab({
       )}
 
       {/* ── Tab content ─────────────────────────────────────────────────────── */}
-      <FadeIn key={activeProductTab} className="flex flex-col w-full">
+      <FadeIn key={activeProductTab} className="flex w-full flex-col">
         {/* Stock and Robo Advisory skip the catalog's shared loading
             skeleton: Stock reads its market through `useMarketCatalog` and
             renders its own (`StockTabSkeleton`); Robo Advisory's data is local
@@ -890,7 +932,7 @@ export function ProductCatalogTab({
         ) : EMPTY_CATALOG_TABS[activeProductTab] ? (
           /* Sits in the no-skeleton branch because there is nothing to wait for. */
           <div className="w-full bg-white">
-            <div className="max-w-[1280px] mx-auto w-full px-4 lg:px-6 py-12">
+            <div className="mx-auto w-full max-w-[1280px] px-4 py-12 lg:px-6">
               <EmptyState
                 {...EMPTY_CATALOG_TABS[activeProductTab]}
                 title={labels.emptyTabs[activeProductTab]?.title ?? ""}
@@ -919,13 +961,15 @@ export function ProductCatalogTab({
             )}
 
             {activeProductTab === "structured" && (
-              <div className="flex flex-col gap-6 items-center w-full" style={{ paddingTop: 24 }}>
+              <div className="flex w-full flex-col items-center gap-6" style={{ paddingTop: 24 }}>
                 <TopIdeaStrip
                   drag={drag}
                   onTopIdeaSelect={nav.onTopIdeaSelect}
                   onAllTopIdeasView={nav.onAllTopIdeasView}
                 />
-                <InvestmentSolutionSection onInvestmentSolutionSelect={nav.onInvestmentSolutionSelect} />
+                <InvestmentSolutionSection
+                  onInvestmentSolutionSelect={nav.onInvestmentSolutionSelect}
+                />
                 <TopPickSection onProductSelect={nav.onProductSelect} />
                 <StructuredProductGridSection
                   title={labels.allGlobalStructured}
@@ -936,7 +980,7 @@ export function ProductCatalogTab({
             )}
 
             {activeProductTab === "thai-structured" && (
-              <div className="flex flex-col gap-6 items-center w-full" style={{ paddingTop: 24 }}>
+              <div className="flex w-full flex-col items-center gap-6" style={{ paddingTop: 24 }}>
                 <TopIdeaStrip
                   drag={drag}
                   onTopIdeaSelect={nav.onTopIdeaSelect}
@@ -949,8 +993,11 @@ export function ProductCatalogTab({
                 <TopPickSection onProductSelect={nav.onProductSelect} />
 
                 {/* ── Thai FCN Table ─────────────────────────────────────────────────── */}
-                <div className="w-full" style={{ backgroundColor: "white", paddingTop: 24, paddingBottom: 24 }}>
-                  <div className="flex flex-col gap-4 w-full max-w-[1280px] mx-auto px-4 lg:px-6">
+                <div
+                  className="w-full"
+                  style={{ backgroundColor: "white", paddingTop: 24, paddingBottom: 24 }}
+                >
+                  <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 px-4 lg:px-6">
                     <p
                       className="font-bold"
                       style={{ color: "#101828", fontSize: 22, lineHeight: "32px" }}
@@ -1013,7 +1060,8 @@ function InlineFixedIncomeCompanyDetail({
   if (isLoading) {
     return <FixedIncomeCompanyDetailSkeleton hasSecondary={detail.secondaryBonds.length > 0} />;
   }
-  if (!detail.company) return <NotFoundState message={t.products.notFound.company} onBack={onBack} />;
+  if (!detail.company)
+    return <NotFoundState message={t.products.notFound.company} onBack={onBack} />;
   return (
     <FixedIncomeCompanyDetail
       company={detail.company}

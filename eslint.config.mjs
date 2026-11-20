@@ -5,7 +5,8 @@ import nextTs from "eslint-config-next/typescript";
 /** Shared layers must never reach up into routes. */
 const NO_ROUTE_IMPORTS = {
   group: ["@/app/*", "**/app/\\[lang\\]/*"],
-  message: "Shared code must not import from route folders. Move the code into src/features or a shared layer.",
+  message:
+    "Shared code must not import from route folders. Move the code into src/features or a shared layer.",
 };
 
 const eslintConfig = defineConfig([

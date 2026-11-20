@@ -4,8 +4,7 @@ import type { RoboRiskTier } from "./robo-risk-level";
 
 /** Shared modal body — Robo Advisory & Definit differ only in copy and a few layout flags. */
 export type PlanDetailSummary =
-  | { kind: "paragraph"; text: string }
-  | { kind: "factors"; intro: string; factors: string[] };
+  { kind: "paragraph"; text: string } | { kind: "factors"; intro: string; factors: string[] };
 
 export type PortfolioAdvisoryPlanDetailPresentation = {
   showDividendStat: boolean;

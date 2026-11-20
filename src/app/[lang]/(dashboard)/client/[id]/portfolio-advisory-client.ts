@@ -42,7 +42,11 @@ export function planSuitability(client: Client, planTier: RoboRiskTier): PlanSui
 }
 
 /** `action` is labelled by `t.products.advisory.cta`. */
-export type AdvisoryCta = { action: "changePlan" | "openAccount"; href: string; variant: "primary" | "outline" };
+export type AdvisoryCta = {
+  action: "changePlan" | "openAccount";
+  href: string;
+  variant: "primary" | "outline";
+};
 
 /** Opening an account is the headline action; changing an existing plan is secondary. */
 export function advisoryCta(client: Client, service: AdvisoryService): AdvisoryCta {

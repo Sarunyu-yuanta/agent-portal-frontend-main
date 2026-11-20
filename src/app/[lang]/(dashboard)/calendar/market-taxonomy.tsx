@@ -209,11 +209,12 @@ export function eventCategory(category: string, t: Dictionary): EventCategoryMet
     ...ramp(hueFor(category)),
     // Title-cased rather than passed through raw: the feed sends a slug and a
     // badge reading "quarterly_briefing" is a leak of the wire format.
-    label: category
-      .split(/[-_\s]+/)
-      .filter(Boolean)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ") || t.planner.eventCategories.other,
+    label:
+      category
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ") || t.planner.eventCategories.other,
     icon: EVENT_CATEGORIES.other.icon,
   };
 }
@@ -235,6 +236,5 @@ export function eventCategory(category: string, t: Dictionary): EventCategoryMet
  * hues was left.
  */
 export const HOLIDAY_PALETTE: MarketPalette = ramp("rose");
-
 
 export const HolidayIcon = IslandIcon;

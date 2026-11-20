@@ -1,10 +1,82 @@
 [
-  { "id": "i1", "type": "Product Match", "clientId": "110001", "tier": "UHNW", "insight": "High idle cash (18%) — ideal candidate for 6-month Structured Note yielding 8.5% p.a.",                          "confidence": 94, "revenueImpact": "฿ 2.4M",       "category": "Product Match" },
-  { "id": "i2", "type": "Risk Alert",    "clientId": "110002", "tier": "HNW",  "insight": "Portfolio concentration risk: 65% in single equity sector. Recommend diversification review.",                  "confidence": 88, "revenueImpact": "Risk Reduction","category": "Risk Alert"    },
-  { "id": "i3", "type": "Engagement",   "clientId": "110005", "tier": "HNW",  "insight": "No contact in 14 days. Engagement score dropped from 82 to 60. Re-engagement opportunity.",                    "confidence": 75, "revenueImpact": "฿ 0.5M",       "category": "Engagement"    },
-  { "id": "i4", "type": "Product Match","clientId": "110004", "tier": "UHNW", "insight": "Strong cash flow profile — Global Private Equity fund at target allocation ceiling.",                           "confidence": 91, "revenueImpact": "฿ 3.2M",       "category": "Product Match" },
-  { "id": "i5", "type": "Risk Alert",   "clientId": "110003", "tier": "HNW",  "insight": "Bond allocation 78% — duration risk elevated. Market rate sensitivity at critical threshold.",                  "confidence": 82, "revenueImpact": "Risk Reduction","category": "Risk Alert"    },
-  { "id": "i6", "type": "Engagement",   "clientId": "110006", "tier": "HNW",  "insight": "Birthday in 7 days — high engagement moment. Personalized market outlook recommended.",                         "confidence": 70, "revenueImpact": "฿ 0.8M",       "category": "Engagement"    },
-  { "id": "i7", "type": "Product Match","clientId": "110008", "tier": "HNW",  "insight": "ESG fund launch aligned with client's stated preference for sustainable investing.",                            "confidence": 86, "revenueImpact": "฿ 1.1M",       "category": "Product Match" },
-  { "id": "i8", "type": "Portfolio",    "clientId": "110007", "tier": "UHNW", "insight": "FX exposure at 42% — currency hedging opportunity before US rate decision next week.",                           "confidence": 79, "revenueImpact": "฿ 1.5M",       "category": "Portfolio"     }
+  {
+    "id": "i1",
+    "type": "Product Match",
+    "clientId": "110001",
+    "tier": "UHNW",
+    "insight": "High idle cash (18%) — ideal candidate for 6-month Structured Note yielding 8.5% p.a.",
+    "confidence": 94,
+    "revenueImpact": "฿ 2.4M",
+    "category": "Product Match"
+  },
+  {
+    "id": "i2",
+    "type": "Risk Alert",
+    "clientId": "110002",
+    "tier": "HNW",
+    "insight": "Portfolio concentration risk: 65% in single equity sector. Recommend diversification review.",
+    "confidence": 88,
+    "revenueImpact": "Risk Reduction",
+    "category": "Risk Alert"
+  },
+  {
+    "id": "i3",
+    "type": "Engagement",
+    "clientId": "110005",
+    "tier": "HNW",
+    "insight": "No contact in 14 days. Engagement score dropped from 82 to 60. Re-engagement opportunity.",
+    "confidence": 75,
+    "revenueImpact": "฿ 0.5M",
+    "category": "Engagement"
+  },
+  {
+    "id": "i4",
+    "type": "Product Match",
+    "clientId": "110004",
+    "tier": "UHNW",
+    "insight": "Strong cash flow profile — Global Private Equity fund at target allocation ceiling.",
+    "confidence": 91,
+    "revenueImpact": "฿ 3.2M",
+    "category": "Product Match"
+  },
+  {
+    "id": "i5",
+    "type": "Risk Alert",
+    "clientId": "110003",
+    "tier": "HNW",
+    "insight": "Bond allocation 78% — duration risk elevated. Market rate sensitivity at critical threshold.",
+    "confidence": 82,
+    "revenueImpact": "Risk Reduction",
+    "category": "Risk Alert"
+  },
+  {
+    "id": "i6",
+    "type": "Engagement",
+    "clientId": "110006",
+    "tier": "HNW",
+    "insight": "Birthday in 7 days — high engagement moment. Personalized market outlook recommended.",
+    "confidence": 70,
+    "revenueImpact": "฿ 0.8M",
+    "category": "Engagement"
+  },
+  {
+    "id": "i7",
+    "type": "Product Match",
+    "clientId": "110008",
+    "tier": "HNW",
+    "insight": "ESG fund launch aligned with client's stated preference for sustainable investing.",
+    "confidence": 86,
+    "revenueImpact": "฿ 1.1M",
+    "category": "Product Match"
+  },
+  {
+    "id": "i8",
+    "type": "Portfolio",
+    "clientId": "110007",
+    "tier": "UHNW",
+    "insight": "FX exposure at 42% — currency hedging opportunity before US rate decision next week.",
+    "confidence": 79,
+    "revenueImpact": "฿ 1.5M",
+    "category": "Portfolio"
+  }
 ]

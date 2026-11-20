@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, useIsMobile } from "@sarunyu/system-one";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { MutualFundListCardMobile } from "./MutualFundCard";
 import {
-  ArrowLeftIcon,
-} from "@phosphor-icons/react";
-import {
-  MutualFundListCardMobile,
-} from "./MutualFundCard";
-import { THEME_HERO_COLOR, THEME_ICON_COMPONENTS, ThemeHeroGraphic } from "./MutualFundThemesSection";
+  THEME_HERO_COLOR,
+  THEME_ICON_COMPONENTS,
+  ThemeHeroGraphic,
+} from "./MutualFundThemesSection";
 import { MutualFundLegendBottomSheet, MutualFundLegendModal } from "./MutualFundLegendSheet";
 
 import { MobilePeriodTabs, MutualFundTagLegend } from "./mutual-fund-ui";
@@ -48,7 +48,7 @@ function MobileThemeTabs({
               key={themeId}
               type="button"
               onClick={() => onSelect(themeId)}
-              className={`flex min-w-[80px] shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap ${
+              className={`flex min-w-[80px] shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap ${
                 active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
               }`}
             >
@@ -61,7 +61,13 @@ function MobileThemeTabs({
   );
 }
 
-function MobileThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme: MutualFundTheme }) {
+function MobileThemeHero({
+  themeId,
+  theme,
+}: {
+  themeId: MutualFundThemeId;
+  theme: MutualFundTheme;
+}) {
   const t = useT();
   // Falls back to no icon for a key the app doesn't know, rather than crashing.
   const Icon = THEME_ICON_COMPONENTS[theme.icon];
@@ -69,18 +75,23 @@ function MobileThemeHero({ themeId, theme }: { themeId: MutualFundThemeId; theme
   return (
     <div className="relative w-full overflow-hidden">
       <div
-        className="relative flex h-[126px] w-full shrink-0 items-center gap-2.5 overflow-visible px-6 pb-2.5 pt-2.5"
+        className="relative flex h-[126px] w-full shrink-0 items-center gap-2.5 overflow-visible px-6 pt-2.5 pb-2.5"
         style={{ backgroundColor: THEME_HERO_COLOR.glow }}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex items-center gap-1">
             {Icon && <Icon size={20} weight="fill" style={{ color: THEME_HERO_COLOR.title }} />}
-            <p className="min-w-0 flex-1 truncate text-xl font-bold leading-[34px]" style={{ color: THEME_HERO_COLOR.title }}>
+            <p
+              className="min-w-0 flex-1 truncate text-xl leading-[34px] font-bold"
+              style={{ color: THEME_HERO_COLOR.title }}
+            >
               {getThemeHeroTitle(themeId)}
             </p>
           </div>
-          <p className="text-sm font-normal leading-[24px] text-[#4a5565]">{getThemeDescription(themeId)}</p>
-          <p className="text-micro font-normal leading-[18px] text-[#6a7282]">
+          <p className="text-sm leading-[24px] font-normal text-[#4a5565]">
+            {getThemeDescription(themeId)}
+          </p>
+          <p className="text-micro leading-[18px] font-normal text-[#6a7282]">
             {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
           </p>
         </div>
@@ -136,7 +147,7 @@ export function MutualFundThemeDetailMobile({
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white">
-      <div className="flex w-full items-center gap-2 px-4 pb-2 pt-4">
+      <div className="flex w-full items-center gap-2 px-4 pt-4 pb-2">
         <Button
           variant="plain"
           size="icon-sm"
@@ -146,7 +157,9 @@ export function MutualFundThemeDetailMobile({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">{t.fund.themes.detailTitle}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+          {t.fund.themes.detailTitle}
+        </h1>
       </div>
 
       {isPageLoading ? (
@@ -187,7 +200,9 @@ export function MutualFundThemeDetailMobile({
             </div>
 
             {tagFunds.length === 0 ? (
-              <p className="px-3 text-center text-sm text-[#6a7282]">{t.fund.list.noFundsInTheme}</p>
+              <p className="px-3 text-center text-sm text-[#6a7282]">
+                {t.fund.list.noFundsInTheme}
+              </p>
             ) : null}
           </div>
         </>

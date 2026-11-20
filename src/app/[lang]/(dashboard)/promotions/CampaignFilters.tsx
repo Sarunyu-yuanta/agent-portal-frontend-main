@@ -4,15 +4,8 @@ import { useState } from "react";
 import { Button, Chip, SearchInput } from "@sarunyu/system-one";
 import { FunnelSimpleIcon, XIcon } from "@phosphor-icons/react";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
-import type {
-  CampaignFormat,
-  CampaignProduct,
-  ClientSegment,
-} from "@/types/domain";
-import {
-  type CampaignFilters as Filters,
-  type CampaignTab,
-} from "./campaign-data";
+import type { CampaignFormat, CampaignProduct, ClientSegment } from "@/types/domain";
+import { type CampaignFilters as Filters, type CampaignTab } from "./campaign-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 
@@ -42,15 +35,12 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
 export type DropdownFilters = Omit<Filters, "search">;
 
 /** A label record as the chip row renders it, in declaration order. */
-function chipOptions<T extends string>(
-  labels: Record<T, string>,
-): { value: T; label: string }[] {
+function chipOptions<T extends string>(labels: Record<T, string>): { value: T; label: string }[] {
   return (Object.entries(labels) as [T, string][]).map(([value, label]) => ({
     value,
     label,
   }));
 }
-
 
 const NO_DROPDOWNS: DropdownFilters = {
   product: null,
@@ -111,7 +101,10 @@ function ChipGroup<T extends string>({
 }
 
 /** The chips under the row — one per applied dropdown, in dialog order. */
-function activeChips(filters: Filters, t: Dictionary): {
+function activeChips(
+  filters: Filters,
+  t: Dictionary,
+): {
   key: keyof DropdownFilters;
   label: string;
 }[] {
@@ -222,7 +215,7 @@ export function CampaignFilters({
           >
             {t.campaigns.filters.button}
             {chips.length > 0 && (
-              <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
+              <span className="bg-primary-action text-on-primary-action ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full px-1 text-meta font-bold tabular-nums">
                 {chips.length}
               </span>
             )}
@@ -238,7 +231,7 @@ export function CampaignFilters({
               type="button"
               onClick={() => onChange({ [chip.key]: null } as Partial<Filters>)}
               aria-label={t.campaigns.filters.removeChip(chip.label)}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-card py-1 pl-2.5 pr-1.5 text-label font-medium text-foreground transition-colors hover:bg-muted"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-card py-1 pr-1.5 pl-2.5 text-label font-medium text-foreground transition-colors hover:bg-muted"
             >
               {chip.label}
               <XIcon size={13} weight="bold" className="text-muted-foreground" />
@@ -247,7 +240,7 @@ export function CampaignFilters({
           <button
             type="button"
             onClick={onClear}
-            className="cursor-pointer px-1 text-label font-medium text-primary-action hover:underline"
+            className="text-primary-action cursor-pointer px-1 text-label font-medium hover:underline"
           >
             {t.campaigns.filters.clearAll}
           </button>
@@ -274,26 +267,20 @@ export function CampaignFilters({
             label={t.campaigns.filters.product}
             options={PRODUCT_OPTIONS}
             value={draft.product}
-            onChange={(product: CampaignProduct | null) =>
-              setDraft((d) => ({ ...d, product }))
-            }
+            onChange={(product: CampaignProduct | null) => setDraft((d) => ({ ...d, product }))}
           />
           <ChipGroup
             label={t.campaigns.filters.segment}
             options={SEGMENT_OPTIONS}
             value={draft.segment}
-            onChange={(segment: ClientSegment | null) =>
-              setDraft((d) => ({ ...d, segment }))
-            }
+            onChange={(segment: ClientSegment | null) => setDraft((d) => ({ ...d, segment }))}
           />
           {tab === "event" && (
             <ChipGroup
               label={t.campaigns.filters.format}
               options={FORMAT_OPTIONS}
               value={draft.format}
-              onChange={(format: CampaignFormat | null) =>
-                setDraft((d) => ({ ...d, format }))
-              }
+              onChange={(format: CampaignFormat | null) => setDraft((d) => ({ ...d, format }))}
             />
           )}
 

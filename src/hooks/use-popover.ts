@@ -15,7 +15,9 @@ import { useEffect, useRef, useState } from "react";
  *   tap out and close it. Those surfaces come with their own dismissal
  *   (backdrop, drag handle, Escape) via `onOpenChange`, so nothing is lost.
  */
-export function usePopover({ dismissOnOutsideClick = true }: { dismissOnOutsideClick?: boolean } = {}) {
+export function usePopover({
+  dismissOnOutsideClick = true,
+}: { dismissOnOutsideClick?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);

@@ -15,8 +15,14 @@ import { useT } from "@/i18n/I18nProvider";
  * own label set and gets the palette by index.
  */
 export const ALLOCATION_COLORS = [
-  "#074EA4", "#51A2FF", "#FDC700", "#A684FF",
-  "#A3B3FF", "#FB64B6", "#FF8904", "#00D492",
+  "#074EA4",
+  "#51A2FF",
+  "#FDC700",
+  "#A684FF",
+  "#A3B3FF",
+  "#FB64B6",
+  "#FF8904",
+  "#00D492",
 ] as const;
 
 /** `color` overrides the palette — liabilities carry their own red/pink set. */
@@ -118,19 +124,24 @@ export function AllocationTiles({
 }) {
   const t = useT();
   return (
-    <div className={`grid gap-2 flex-1 min-w-0 ${columnsClassName}`}>
+    <div className={`grid min-w-0 flex-1 gap-2 ${columnsClassName}`}>
       {slices.map((s, i) => (
-        <div key={s.label} className="flex flex-col gap-1 rounded-xl p-3 bg-[var(--bg-default-secondary)]">
+        <div
+          key={s.label}
+          className="flex flex-col gap-1 rounded-xl bg-[var(--bg-default-secondary)] p-3"
+        >
           <div className="flex items-center gap-1.5">
             <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ backgroundColor: s.color ?? ALLOCATION_COLORS[i % ALLOCATION_COLORS.length] }}
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{
+                backgroundColor: s.color ?? ALLOCATION_COLORS[i % ALLOCATION_COLORS.length],
+              }}
             />
-            <p className="text-meta font-semibold text-muted-foreground truncate">
+            <p className="truncate text-meta font-semibold text-muted-foreground">
               {displayAssetLabel(s.label, t)}
             </p>
           </div>
-          <p className="type-subtitle-1 font-bold leading-none text-foreground">{s.percent}%</p>
+          <p className="type-subtitle-1 leading-none font-bold text-foreground">{s.percent}%</p>
         </div>
       ))}
     </div>
@@ -149,7 +160,13 @@ export function AllocationEmptyState() {
   return (
     <EmptyState
       size="compact"
-      icon={<ChartPieSliceIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      icon={
+        <ChartPieSliceIcon
+          size={32}
+          weight="duotone"
+          className="text-[var(--text-default-placeholder)]"
+        />
+      }
       title={t.client.assets.noAllocation}
     />
   );
@@ -171,7 +188,7 @@ export function AllocationDonutWithTiles({
 }) {
   if (!hasAllocation(slices)) return <AllocationEmptyState />;
   return (
-    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:items-center w-full">
+    <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
       <div className="mx-auto sm:mx-0">
         <AllocationDonut slices={slices} size={donutSize} className={donutClassName} />
       </div>

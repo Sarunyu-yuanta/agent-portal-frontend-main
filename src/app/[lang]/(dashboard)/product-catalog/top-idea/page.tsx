@@ -11,9 +11,7 @@ export default function TopIdeaAllPageRoute() {
   return (
     <TopIdeaAllPage
       onBack={goBack}
-      onSelect={(sector) =>
-        router.push(`/product-catalog/top-idea/${encodeURIComponent(sector)}`)
-      }
+      onSelect={(sector) => router.push(`/product-catalog/top-idea/${encodeURIComponent(sector)}`)}
     />
   );
 }

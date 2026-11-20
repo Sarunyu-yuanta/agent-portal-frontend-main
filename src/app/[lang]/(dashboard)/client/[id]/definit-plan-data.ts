@@ -63,10 +63,7 @@ export const DEFINIT_PLANS: DefinitPlan[] = [
     id: "dgs",
     name: "Definit Global Select (DGS)",
     intro: "คัดเลือก DR อย่างเป็นระบบด้วย 2 ปัจจัยสำคัญ ได้แก่",
-    factors: [
-      "Earnings การปรับเพิ่มคาดการณ์กำไรของนักวิเคราะห์",
-      "Momentum ราคาหุ้นมีโมเมนตัมเชิงบวกระยะกลาง",
-    ],
+    factors: ["Earnings การปรับเพิ่มคาดการณ์กำไรของนักวิเคราะห์", "Momentum ราคาหุ้นมีโมเมนตัมเชิงบวกระยะกลาง"],
     riskTier: "high",
     availableRoom: "700/2000",
     minInvestment: "500,000",

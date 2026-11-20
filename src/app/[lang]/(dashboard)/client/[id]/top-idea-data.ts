@@ -1,11 +1,7 @@
 import topIdeasRaw from "@/data/top-ideas.json";
 
 export type TopIdeaSector =
-  | "Energy"
-  | "Material"
-  | "Industrials"
-  | "Consumer Discretionary"
-  | "Consumer Staples";
+  "Energy" | "Material" | "Industrials" | "Consumer Discretionary" | "Consumer Staples";
 
 export const TOP_IDEA_THEMES: Record<TopIdeaSector, string> = Object.fromEntries(
   topIdeasRaw.sectors.map((s) => [s.id, s.theme]),

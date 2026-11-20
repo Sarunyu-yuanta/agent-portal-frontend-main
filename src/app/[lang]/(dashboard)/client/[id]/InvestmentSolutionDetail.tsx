@@ -43,19 +43,19 @@ function HeroImageContent({
       fill
       priority
       sizes="(max-width: 1280px) 100vw, 1280px"
-      className="max-w-none object-cover pointer-events-none"
+      className="pointer-events-none max-w-none object-cover"
       style={{ mixBlendMode: "screen" }}
       src={src}
     />
   ) : (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Stays a plain <img>: this layer is a Figma crop, positioned by a
           computed `left`/`width` pair against its own intrinsic size. `fill`
           hard-codes inset-0 + 100%/100% and cannot express that offset. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- percentage-cropped art layer, see above */}
       <img
         alt=""
-        className="absolute h-full max-w-none top-0"
+        className="absolute top-0 h-full max-w-none"
         style={{ left: imgLeft, width: imgWidth, mixBlendMode: "screen" }}
         src={src}
       />
@@ -107,16 +107,20 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
   );
 
   const textBlock = (
-    <div className="relative z-10 flex flex-1 flex-col gap-0 items-start justify-center min-w-0">
-      <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate w-full">{solution.name}</p>
-      <p className="text-label leading-[20px] text-[#6a7282] truncate w-full">{solution.desc}</p>
+    <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0">
+      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+        {solution.name}
+      </p>
+      <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">{solution.desc}</p>
     </div>
   );
 
   const couponBlock = solution.showCoupon ? (
-    <div className="relative z-10 flex flex-col gap-0.5 items-end justify-center shrink-0">
-      <div className="flex items-center px-1 rounded-md bg-white">
-        <span className="font-bold text-title leading-[28px] text-[#008236]">{solution.couponRange}</span>
+    <div className="relative z-10 flex shrink-0 flex-col items-end justify-center gap-0.5">
+      <div className="flex items-center rounded-md bg-white px-1">
+        <span className="text-title leading-[28px] font-bold text-[#008236]">
+          {solution.couponRange}
+        </span>
       </div>
       <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
     </div>
@@ -130,14 +134,14 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
 
     return (
       <div
-        className="relative flex md:hidden w-full shrink-0 box-border items-center pr-3 pt-4 pb-10 -mb-6 overflow-hidden"
+        className="relative -mb-6 box-border flex w-full shrink-0 items-center overflow-hidden pt-4 pr-3 pb-10 md:hidden"
         style={{
           height: mobile.bannerHeight,
           backgroundImage: solution.heroGradientMobile,
         }}
       >
         <div
-          className="relative shrink-0 overflow-hidden pointer-events-none z-0"
+          className="pointer-events-none relative z-0 shrink-0 overflow-hidden"
           style={{
             marginLeft: mobile.leftPx,
             marginTop: iconTopOffset,
@@ -150,11 +154,15 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
         </div>
 
         <div
-          className="relative z-10 flex flex-1 flex-col gap-0 items-start justify-center min-w-0"
+          className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0"
           style={{ marginLeft: gapAfterIcon }}
         >
-          <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate w-full">{solution.name}</p>
-          <p className="text-label leading-[20px] text-[#6a7282] truncate w-full">{solution.desc}</p>
+          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+            {solution.name}
+          </p>
+          <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">
+            {solution.desc}
+          </p>
         </div>
 
         {couponBlock}
@@ -165,7 +173,7 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
   // High Conviction — Figma 34995:49790: anchor at calc(50%-167.56px) = 19.94px on 375px frame
   return (
     <div
-      className="relative flex md:hidden w-full shrink-0 box-border items-center pl-20 pr-3 pt-4 pb-10 -mb-6 overflow-hidden"
+      className="relative -mb-6 box-border flex w-full shrink-0 items-center overflow-hidden pt-4 pr-3 pb-10 pl-20 md:hidden"
       style={{
         height: mobile.bannerHeight,
         gap: mobile.gap ?? 16,
@@ -173,7 +181,7 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
       }}
     >
       <div
-        className="absolute flex items-center justify-center pointer-events-none z-0 overflow-hidden"
+        className="pointer-events-none absolute z-0 flex items-center justify-center overflow-hidden"
         style={anchorHeroImageStyle(mobile.anchorLeftPx!, mobile.width, mobile.height)}
         aria-hidden
       >
@@ -203,16 +211,20 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
   );
 
   const textBlock = (
-    <div className="relative z-10 flex flex-1 flex-col gap-0 items-start justify-center min-w-0">
-      <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate w-full">{solution.name}</p>
-      <p className="text-label leading-[20px] text-[#6a7282] truncate w-full">{solution.desc}</p>
+    <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0">
+      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+        {solution.name}
+      </p>
+      <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">{solution.desc}</p>
     </div>
   );
 
   const couponBlock = solution.showCoupon ? (
-    <div className="relative z-10 flex flex-col gap-0.5 items-end justify-center shrink-0">
-      <div className="flex items-center px-1 rounded-md bg-white">
-        <span className="font-bold text-title leading-[28px] text-[#008236]">{solution.couponRange}</span>
+    <div className="relative z-10 flex shrink-0 flex-col items-end justify-center gap-0.5">
+      <div className="flex items-center rounded-md bg-white px-1">
+        <span className="text-title leading-[28px] font-bold text-[#008236]">
+          {solution.couponRange}
+        </span>
       </div>
       <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
     </div>
@@ -225,14 +237,14 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
 
     return (
       <div
-        className="relative hidden md:flex lg:hidden w-full shrink-0 box-border items-center pr-8 pt-4 pb-10 -mb-6 overflow-hidden"
+        className="relative -mb-6 box-border hidden w-full shrink-0 items-center overflow-hidden pt-4 pr-8 pb-10 md:flex lg:hidden"
         style={{
           height: tablet.bannerHeight,
           backgroundImage: solution.heroGradientTablet,
         }}
       >
         <div
-          className="relative shrink-0 overflow-hidden pointer-events-none z-0"
+          className="pointer-events-none relative z-0 shrink-0 overflow-hidden"
           style={{
             marginLeft: tablet.leftPx,
             marginTop: iconTopOffset,
@@ -245,11 +257,15 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
         </div>
 
         <div
-          className="relative z-10 flex flex-1 flex-col gap-0 items-start justify-center min-w-0"
+          className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0"
           style={{ marginLeft: gapAfterIcon }}
         >
-          <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate w-full">{solution.name}</p>
-          <p className="text-label leading-[20px] text-[#6a7282] truncate w-full">{solution.desc}</p>
+          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+            {solution.name}
+          </p>
+          <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">
+            {solution.desc}
+          </p>
         </div>
 
         {couponBlock}
@@ -259,14 +275,14 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
 
   return (
     <div
-      className="relative hidden md:flex lg:hidden w-full shrink-0 box-border items-center gap-4 pl-[96px] pr-8 pt-4 pb-10 -mb-6 overflow-hidden"
+      className="relative -mb-6 box-border hidden w-full shrink-0 items-center gap-4 overflow-hidden pt-4 pr-8 pb-10 pl-[96px] md:flex lg:hidden"
       style={{
         height: tablet.bannerHeight,
         backgroundImage: solution.heroGradientTablet,
       }}
     >
       <div
-        className="absolute flex items-center justify-center pointer-events-none z-0 overflow-hidden"
+        className="pointer-events-none absolute z-0 flex items-center justify-center overflow-hidden"
         style={anchorHeroImageStyle(tablet.anchorLeftPx!, tablet.width, tablet.height)}
         aria-hidden
       >
@@ -282,24 +298,30 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
 function SolutionHeroBannerDesktop({ solution }: { solution: InvestmentSolution }) {
   const img = solution.heroBannerImage;
 
-  const imageStyle: CSSProperties = img.anchorLeftPx != null
-    ? anchorHeroImageStyle(img.anchorLeftPx, img.containerWidth, img.containerHeight, img.topOffset)
-    : {
-        left: img.leftPx,
-        top: `calc(50% - ${img.topOffset}px)`,
-        transform: "translateY(-50%)",
-        width: img.containerWidth,
-        height: img.containerHeight,
-      };
+  const imageStyle: CSSProperties =
+    img.anchorLeftPx != null
+      ? anchorHeroImageStyle(
+          img.anchorLeftPx,
+          img.containerWidth,
+          img.containerHeight,
+          img.topOffset,
+        )
+      : {
+          left: img.leftPx,
+          top: `calc(50% - ${img.topOffset}px)`,
+          transform: "translateY(-50%)",
+          width: img.containerWidth,
+          height: img.containerHeight,
+        };
 
   return (
     <div
-      className="relative hidden lg:flex w-full h-[146px] shrink-0 box-border -mb-6 overflow-hidden"
+      className="relative -mb-6 box-border hidden h-[146px] w-full shrink-0 overflow-hidden lg:flex"
       style={{ backgroundImage: solution.heroGradient }}
     >
-      <div className="relative flex items-center gap-4 w-full max-w-[1280px] mx-auto h-full pt-4 pb-10 pr-8">
+      <div className="relative mx-auto flex h-full w-full max-w-[1280px] items-center gap-4 pt-4 pr-8 pb-10">
         <div
-          className="absolute pointer-events-none z-0 overflow-hidden"
+          className="pointer-events-none absolute z-0 overflow-hidden"
           style={imageStyle}
           aria-hidden
         >
@@ -314,15 +336,19 @@ function SolutionHeroBannerDesktop({ solution }: { solution: InvestmentSolution 
           />
         </div>
 
-        <div className="relative z-10 flex flex-1 flex-col gap-2 items-start justify-center min-w-[141px] pl-[120px]">
-          <p className="font-bold text-lg leading-[28px] text-[#101828] truncate w-full">{solution.name}</p>
-          <p className="text-sm leading-[24px] text-[#6a7282] truncate w-full">{solution.desc}</p>
+        <div className="relative z-10 flex min-w-[141px] flex-1 flex-col items-start justify-center gap-2 pl-[120px]">
+          <p className="w-full truncate text-lg leading-[28px] font-bold text-[#101828]">
+            {solution.name}
+          </p>
+          <p className="w-full truncate text-sm leading-[24px] text-[#6a7282]">{solution.desc}</p>
         </div>
 
         {solution.showCoupon && (
-          <div className="relative z-10 flex flex-col gap-2 items-end justify-center shrink-0">
-            <div className="flex items-center px-1 rounded-md bg-white">
-              <span className="font-bold text-xl leading-[34px] text-[#008236]">{solution.couponRange}</span>
+          <div className="relative z-10 flex shrink-0 flex-col items-end justify-center gap-2">
+            <div className="flex items-center rounded-md bg-white px-1">
+              <span className="text-xl leading-[34px] font-bold text-[#008236]">
+                {solution.couponRange}
+              </span>
             </div>
             <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
           </div>
@@ -364,12 +390,18 @@ export function InvestmentSolutionDetail({
   }, [solution.id]);
 
   return (
-    <div className="flex flex-col gap-2 w-full bg-white pt-4 md:pt-6">
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-20">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+    <div className="flex w-full flex-col gap-2 bg-white pt-4 md:pt-6">
+      <div className="mx-auto flex h-[46px] w-full max-w-[1280px] items-center gap-2 px-4 py-2 md:px-8 lg:px-20">
+        <Button
+          variant="plain"
+          size="icon-sm"
+          onClick={onBack}
+          aria-label={t.products.common.back}
+          className="shrink-0"
+        >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-base font-bold leading-[28px] text-[#101828] truncate lg:text-lg lg:leading-[30px]">
+        <h1 className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[30px]">
           <span className="md:hidden">Investment Solution</span>
           <span className="hidden md:inline">{solution.name}</span>
         </h1>
@@ -378,61 +410,65 @@ export function InvestmentSolutionDetail({
       <div className="max-md:relative max-md:overflow-visible md:max-lg:relative md:max-lg:overflow-visible md:max-lg:pb-6">
         <SolutionHeroBanner solution={solution} />
 
-        <div className="relative z-10 w-full bg-white rounded-t-[24px] pt-4 pb-10 md:max-lg:pt-4 md:max-lg:px-8 lg:pt-6">
-        <div className="flex flex-col gap-2 items-center w-full max-w-[1280px] mx-auto px-4 md:max-lg:px-0 md:px-8 lg:px-20">
-          <div className="flex gap-3 items-center w-full">
-            <p className="flex-1 min-w-0 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
-              {t.products.common.items(products.length)}
+        <div className="relative z-10 w-full rounded-t-[24px] bg-white pt-4 pb-10 md:max-lg:px-8 md:max-lg:pt-4 lg:pt-6">
+          <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-2 px-4 md:px-8 md:max-lg:px-0 lg:px-20">
+            <div className="flex w-full items-center gap-3">
+              <p className="min-w-0 flex-1 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
+                {t.products.common.items(products.length)}
+              </p>
+              {/* Mobile filter */}
+              <Button
+                variant="outline-black"
+                size="icon-sm"
+                aria-label={t.products.common.filter}
+                className="shrink-0 md:hidden"
+              >
+                <FunnelSimpleIcon size={18} />
+              </Button>
+              {/* Tablet filter — icon only 32px Figma 23025:51744 */}
+              <Button
+                variant="outline-black"
+                size="icon-sm"
+                aria-label={t.products.common.filter}
+                className="hidden size-8 shrink-0 md:max-lg:flex"
+              >
+                <FunnelSimpleIcon size={18} />
+              </Button>
+              {/* Desktop filter */}
+              <Button
+                variant="outline-black"
+                size="sm"
+                leftIcon={<FunnelSimpleIcon size={18} />}
+                className="hidden shrink-0 lg:inline-flex"
+              >
+                {t.products.common.filter}
+              </Button>
+            </div>
+            <p className="w-full text-micro leading-[18px] text-[#6a7282] lg:text-xs lg:leading-[20px]">
+              <span className="lg:hidden">
+                {t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT_MOBILE)}
+              </span>
+              <span className="hidden lg:inline">
+                {t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT)}
+              </span>
             </p>
-            {/* Mobile filter */}
-            <Button
-              variant="outline-black"
-              size="icon-sm"
-              aria-label={t.products.common.filter}
-              className="shrink-0 md:hidden"
-            >
-              <FunnelSimpleIcon size={18} />
-            </Button>
-            {/* Tablet filter — icon only 32px Figma 23025:51744 */}
-            <Button
-              variant="outline-black"
-              size="icon-sm"
-              aria-label={t.products.common.filter}
-              className="shrink-0 hidden md:max-lg:flex size-8"
-            >
-              <FunnelSimpleIcon size={18} />
-            </Button>
-            {/* Desktop filter */}
-            <Button
-              variant="outline-black"
-              size="sm"
-              leftIcon={<FunnelSimpleIcon size={18} />}
-              className="shrink-0 hidden lg:inline-flex"
-            >
-              {t.products.common.filter}
-            </Button>
-          </div>
-          <p className="w-full text-micro leading-[18px] text-[#6a7282] lg:text-xs lg:leading-[20px]">
-            <span className="lg:hidden">{t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT_MOBILE)}</span>
-            <span className="hidden lg:inline">{t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT)}</span>
-          </p>
 
-          {products.length === 0 ? (
-            <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
-          ) : (
-          <div className="flex flex-col gap-3 md:max-lg:gap-3 w-full lg:grid lg:grid-cols-3 lg:gap-3">
-            {products.map((product) => (
-              <StructuredProductCard
-                key={product.id}
-                {...product}
-                variant="catalog"
-                onClick={() => onProductSelect(product)}
-              />
-            ))}
+            {products.length === 0 ? (
+              <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+            ) : (
+              <div className="flex w-full flex-col gap-3 md:max-lg:gap-3 lg:grid lg:grid-cols-3 lg:gap-3">
+                {products.map((product) => (
+                  <StructuredProductCard
+                    key={product.id}
+                    {...product}
+                    variant="catalog"
+                    onClick={() => onProductSelect(product)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          )}
         </div>
-      </div>
       </div>
     </div>
   );

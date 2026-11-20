@@ -7,10 +7,7 @@ import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetMo
 import { ReminderPreviewRow, RemindersPreviewEmpty } from "../../calendar/reminder-preview";
 import { useClients } from "@/hooks/use-api";
 import { useStickyRailTop } from "@/hooks/use-sticky-rail";
-import {
-  NBA_MESSAGE_CLIENT,
-  NbaComingSoonCard,
-} from "../../command-center/NbaComingSoonCard";
+import { NBA_MESSAGE_CLIENT, NbaComingSoonCard } from "../../command-center/NbaComingSoonCard";
 import { useNbaRows } from "../../command-center/use-nba-rows";
 import { useNotes } from "@/contexts/notes-context";
 import { EmptyState, ErrorState } from "@/components/ui/empty-state";
@@ -42,14 +39,14 @@ function ActivityTimeline({ items }: { items: ClientDetail["recentActivity"] }) 
     <div className="flex flex-col">
       {items.map((item, i) => (
         <div key={i} className="flex gap-4">
-          <div className="flex flex-col items-center shrink-0 w-3">
-            <span className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ${item.dotColor}`} />
-            {i < items.length - 1 && <div className="w-px flex-1 bg-border my-1.5" />}
+          <div className="flex w-3 shrink-0 flex-col items-center">
+            <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${item.dotColor}`} />
+            {i < items.length - 1 && <div className="my-1.5 w-px flex-1 bg-border" />}
           </div>
           <div className={`flex flex-col gap-0.5 ${i < items.length - 1 ? "pb-5" : ""}`}>
-            <p className="type-subtitle-2 text-foreground leading-snug">{item.label}</p>
-            <p className="type-body-2 text-muted-foreground leading-snug">{item.description}</p>
-            <p className="type-caption text-muted-foreground mt-0.5">{item.date}</p>
+            <p className="type-subtitle-2 leading-snug text-foreground">{item.label}</p>
+            <p className="type-body-2 leading-snug text-muted-foreground">{item.description}</p>
+            <p className="type-caption mt-0.5 text-muted-foreground">{item.date}</p>
           </div>
         </div>
       ))}
@@ -153,135 +150,147 @@ export function OverviewTab({
 
   return (
     <>
-    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start pt-8">
-
-      {/* ── Left column (main) ── */}
-      <div className="flex-[3] min-w-0 flex flex-col gap-6">
-
-        {/* What to do about this client, before what they hold. The Dashboard
+      <div className="flex flex-col gap-6 pt-8 lg:flex-row lg:items-start lg:gap-8">
+        {/* ── Left column (main) ── */}
+        <div className="flex min-w-0 flex-[3] flex-col gap-6">
+          {/* What to do about this client, before what they hold. The Dashboard
             answers "which client first"; standing on one profile that question
             is already settled, so the card leads with the move rather than the
             balances the identity bar above has just given. */}
-        <NbaComingSoonCard rows={clientNbaRows} message={NBA_MESSAGE_CLIENT} />
+          <NbaComingSoonCard rows={clientNbaRows} message={NBA_MESSAGE_CLIENT} />
 
-        {/* Current Allocation */}
-        <Card variant="default">
-          <div className="flex flex-col gap-4">
-            <h6 className="type-h6 text-foreground">{t.client.overview.currentAllocation}</h6>
-            <CurrentAllocationSection slices={allocationSlices} />
-          </div>
-        </Card>
-
-        {/* Top Holdings */}
-        <Card variant="default">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">{t.client.overview.topHoldings}</h6>
-              {topHoldings.length > 0 && (
-                <Button variant="plain" size="sm" onClick={onViewAllHoldings}>{t.client.overview.viewAll}</Button>
-              )}
+          {/* Current Allocation */}
+          <Card variant="default">
+            <div className="flex flex-col gap-4">
+              <h6 className="type-h6 text-foreground">{t.client.overview.currentAllocation}</h6>
+              <CurrentAllocationSection slices={allocationSlices} />
             </div>
-            <TopHoldingsSection
-              holdings={topHoldings}
-              sortKey={holdingsSortKey}
-              sortDir={holdingsSortDir}
-              onSort={onSort}
-            />
-          </div>
-        </Card>
+          </Card>
 
-      </div>{/* end left column */}
+          {/* Top Holdings */}
+          <Card variant="default">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-2">
+                <h6 className="type-h6 text-foreground">{t.client.overview.topHoldings}</h6>
+                {topHoldings.length > 0 && (
+                  <Button variant="plain" size="sm" onClick={onViewAllHoldings}>
+                    {t.client.overview.viewAll}
+                  </Button>
+                )}
+              </div>
+              <TopHoldingsSection
+                holdings={topHoldings}
+                sortKey={holdingsSortKey}
+                sortDir={holdingsSortDir}
+                onSort={onSort}
+              />
+            </div>
+          </Card>
+        </div>
+        {/* end left column */}
 
-      {/* ── Right column (sidebar) ── */}
-      <div
-        ref={railRef}
-        style={{ top: railTop }}
-        className="flex-[2] min-w-0 flex flex-col gap-5 lg:sticky"
-      >
-
-        {/* Reminders — out of the current delivery phase (see
+        {/* ── Right column (sidebar) ── */}
+        <div
+          ref={railRef}
+          style={{ top: railTop }}
+          className="flex min-w-0 flex-[2] flex-col gap-5 lg:sticky"
+        >
+          {/* Reminders — out of the current delivery phase (see
             `lib/feature-flags`). Hiding the card rather than letting it render
             its empty state: "No reminders yet" invites the user to go and set
             one, and the surface that would take them there isn't shipping. */}
-        {REMINDERS_ENABLED && (
-        <Card variant="default">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">{t.client.tabs.reminders}</h6>
-              {upcomingReminders.length > 0 && (
-                <Button variant="plain" size="sm" onClick={onViewReminders}>{t.client.overview.viewAll}</Button>
-              )}
-            </div>
-            {/* Loading and error before "none": an empty card while the notes
+          {REMINDERS_ENABLED && (
+            <Card variant="default">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h6 className="type-h6 text-foreground">{t.client.tabs.reminders}</h6>
+                  {upcomingReminders.length > 0 && (
+                    <Button variant="plain" size="sm" onClick={onViewReminders}>
+                      {t.client.overview.viewAll}
+                    </Button>
+                  )}
+                </div>
+                {/* Loading and error before "none": an empty card while the notes
                 are still coming would claim there is nothing due. */}
-            {notesLoading ? (
-              <p className="type-body-2 py-6 text-center text-muted-foreground">{t.common.loading}</p>
-            ) : notesError ? (
-              <ErrorState size="compact" title={t.client.overview.remindersLoadError} onRetry={retryNotes} />
-            ) : upcomingReminders.length === 0 ? (
-              <RemindersPreviewEmpty />
-            ) : (
-              <div className="flex flex-col gap-2">
-                {upcomingReminders.map(({ item, day, daysUntil }) => (
-                  // Only two states ever reach this card: everything overdue
-                  // or done was already filtered out above, so "today" is the
-                  // one date that needs to say more than just the date.
-                  <ReminderPreviewRow
-                    key={item.id}
-                    title={item.title}
-                    dayIso={day.toISOString()}
-                    dueToday={daysUntil === 0}
-                    onClick={() => openReminder(item, day)}
+                {notesLoading ? (
+                  <p className="type-body-2 py-6 text-center text-muted-foreground">
+                    {t.common.loading}
+                  </p>
+                ) : notesError ? (
+                  <ErrorState
+                    size="compact"
+                    title={t.client.overview.remindersLoadError}
+                    onRetry={retryNotes}
                   />
-                ))}
+                ) : upcomingReminders.length === 0 ? (
+                  <RemindersPreviewEmpty />
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {upcomingReminders.map(({ item, day, daysUntil }) => (
+                      // Only two states ever reach this card: everything overdue
+                      // or done was already filtered out above, so "today" is the
+                      // one date that needs to say more than just the date.
+                      <ReminderPreviewRow
+                        key={item.id}
+                        title={item.title}
+                        dayIso={day.toISOString()}
+                        dueToday={daysUntil === 0}
+                        onClick={() => openReminder(item, day)}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </Card>
-        )}
+            </Card>
+          )}
 
-        {/* Recent Activity */}
-        <Card variant="default">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-2">
-              <h6 className="type-h6 text-foreground">{t.client.overview.recentActivity}</h6>
-              {recentActivity.length > 0 && (
-                <Button variant="plain" size="sm" onClick={() => setActivityModalOpen(true)}>
-                  {t.client.overview.viewAll}
-                </Button>
+          {/* Recent Activity */}
+          <Card variant="default">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-2">
+                <h6 className="type-h6 text-foreground">{t.client.overview.recentActivity}</h6>
+                {recentActivity.length > 0 && (
+                  <Button variant="plain" size="sm" onClick={() => setActivityModalOpen(true)}>
+                    {t.client.overview.viewAll}
+                  </Button>
+                )}
+              </div>
+              {recentActivity.length === 0 ? (
+                <EmptyState
+                  size="compact"
+                  icon={
+                    <ClockCounterClockwiseIcon
+                      size={32}
+                      weight="duotone"
+                      className="text-[var(--text-default-placeholder)]"
+                    />
+                  }
+                  title={t.client.overview.noActivity}
+                />
+              ) : (
+                <ActivityTimeline items={recentActivity.slice(0, RECENT_ACTIVITY_PREVIEW)} />
               )}
             </div>
-            {recentActivity.length === 0 ? (
-              <EmptyState
-                size="compact"
-                icon={<ClockCounterClockwiseIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-                title={t.client.overview.noActivity}
-              />
-            ) : (
-              <ActivityTimeline items={recentActivity.slice(0, RECENT_ACTIVITY_PREVIEW)} />
-            )}
-          </div>
-        </Card>
+          </Card>
+        </div>
+        {/* end right column */}
+      </div>
 
-      </div>{/* end right column */}
+      {REMINDERS_ENABLED && reminderModals}
 
-    </div>
-
-    {REMINDERS_ENABLED && reminderModals}
-
-    <ResponsiveBottomSheetModal
-      open={activityModalOpen}
-      onClose={() => setActivityModalOpen(false)}
-      title={t.client.overview.recentActivity}
-      titleId="client-activity-modal-title"
-    >
-      {/* The timeline scrolls inside the modal rather than the modal growing:
+      <ResponsiveBottomSheetModal
+        open={activityModalOpen}
+        onClose={() => setActivityModalOpen(false)}
+        title={t.client.overview.recentActivity}
+        titleId="client-activity-modal-title"
+      >
+        {/* The timeline scrolls inside the modal rather than the modal growing:
           a client's full history is unbounded, and the sheet already caps its
           own height on both mobile and desktop. */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        <ActivityTimeline items={recentActivity} />
-      </div>
-    </ResponsiveBottomSheetModal>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+          <ActivityTimeline items={recentActivity} />
+        </div>
+      </ResponsiveBottomSheetModal>
     </>
   );
 }

@@ -23,14 +23,16 @@ import {
 } from "./stock-industry-sector-data";
 import { stockProductHref } from "./stock-product-detail-data";
 import { SectorGlyph } from "./stock-ui";
-import {
-  HeroPercentPill,
-  navigateWithoutFlicker,
-  StockDetailList,
-} from "./stock-detail-list";
+import { HeroPercentPill, navigateWithoutFlicker, StockDetailList } from "./stock-detail-list";
 import { useT } from "@/i18n/I18nProvider";
 
-function SectorHeroBand({ page, sector }: { page: IndustrySectorPage; sector: IndustrySectorPage["sector"] }) {
+function SectorHeroBand({
+  page,
+  sector,
+}: {
+  page: IndustrySectorPage;
+  sector: IndustrySectorPage["sector"];
+}) {
   const { description } = page;
   const trend = sector.trend;
   return (
@@ -39,7 +41,7 @@ function SectorHeroBand({ page, sector }: { page: IndustrySectorPage; sector: In
         src="/products/stock/sector-hero-bg.png"
         alt=""
         fill
-        className="object-cover pointer-events-none"
+        className="pointer-events-none object-cover"
         sizes="100vw"
         priority
       />
@@ -48,7 +50,7 @@ function SectorHeroBand({ page, sector }: { page: IndustrySectorPage; sector: In
           <SectorGlyph id={sector.id} size={64} color="#0a6ee7" />
         </span>
         <div className="relative flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-2xl font-bold leading-9 text-[#101828]">{sector.name}</p>
+          <p className="truncate text-2xl leading-9 font-bold text-[#101828]">{sector.name}</p>
           <p className="text-base leading-[24px] text-[#4a5565]">{description}</p>
         </div>
         <div className="relative flex shrink-0 items-center gap-2 whitespace-nowrap">
@@ -56,7 +58,10 @@ function SectorHeroBand({ page, sector }: { page: IndustrySectorPage; sector: In
             <span className="text-base leading-[24px] text-[#6a7282]">{sector.changeAmount}</span>
           ) : (
             <>
-              <span className="text-base leading-[24px]" style={{ color: trend === "up" ? "#016630" : "#c10007" }}>
+              <span
+                className="text-base leading-[24px]"
+                style={{ color: trend === "up" ? "#016630" : "#c10007" }}
+              >
                 {sector.changeAmount}
               </span>
               <HeroPercentPill trend={trend} percentBody={sector.changePercent} />
@@ -94,7 +99,11 @@ export function SetIndustrySectorDetail({
   if (!page) {
     return (
       <div className="flex min-h-full w-full flex-1 flex-col bg-white">
-        <CatalogDetailBackHeader title={t.stock.sectorSection.title} onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader
+          title={t.stock.sectorSection.title}
+          onBack={onBack}
+          className="!pt-8"
+        />
         <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
@@ -106,7 +115,11 @@ export function SetIndustrySectorDetail({
           sharing a wrapper: a sticky element can't travel outside its parent's
           box, and a two-row wrapper is only as tall as the two rows. */}
       <div className="bg-white pb-2">
-        <CatalogDetailBackHeader title={t.stock.sectorSection.title} onBack={onBack} className="!pt-8" />
+        <CatalogDetailBackHeader
+          title={t.stock.sectorSection.title}
+          onBack={onBack}
+          className="!pt-8"
+        />
       </div>
       <CatalogDetailTextTabs
         sticky

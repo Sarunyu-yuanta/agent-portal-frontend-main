@@ -45,13 +45,13 @@ export function GlobalBondTopPickTable({
 
   return (
     <div
-      className="w-full rounded-xl overflow-hidden bg-white table-scroll"
+      className="table-scroll w-full overflow-hidden rounded-xl bg-white"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW_SM }}
     >
       <div className="overflow-x-auto">
-        <div className="flex items-stretch min-w-[1305px]">
+        <div className="flex min-w-[1305px] items-stretch">
           {/* Bond name */}
-          <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex min-w-0 flex-1 flex-col">
             <div
               className="flex h-11 items-center px-4"
               style={headerBorderStyle({ right: false })}
@@ -61,18 +61,18 @@ export function GlobalBondTopPickTable({
             {TOP_PICK_ROWS.map((row, i) => (
               <div
                 key={i}
-                className={`flex items-center gap-2 min-w-0 px-4 py-3.5 min-h-[52px] overflow-hidden ${ROW_CELL_CLS}`}
+                className={`flex min-h-[52px] min-w-0 items-center gap-2 overflow-hidden px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
                 <BondLogo src={row.logo} className="size-8 rounded" />
-                <span className="flex-1 min-w-0 truncate text-sm leading-[24px] text-[#101828]">
+                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#101828]">
                   {row.name}
                 </span>
               </div>
             ))}
           </div>
           {/* Top Pick tag column */}
-          <div className="flex flex-col w-[70px] shrink-0">
+          <div className="flex w-[70px] shrink-0 flex-col">
             <div
               className="flex h-11 items-center justify-center px-4"
               style={headerBorderStyle()}
@@ -80,7 +80,7 @@ export function GlobalBondTopPickTable({
             {TOP_PICK_ROWS.map((_row, i) => (
               <div
                 key={i}
-                className={`flex flex-1 items-center justify-center px-4 py-3 min-h-[52px] ${ROW_CELL_CLS}`}
+                className={`flex min-h-[52px] flex-1 items-center justify-center px-4 py-3 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
                 <TopPickTag />
@@ -88,100 +88,139 @@ export function GlobalBondTopPickTable({
             ))}
           </div>
           {/* ISIN */}
-          <div className="flex flex-col w-[154px] shrink-0">
+          <div className="flex w-[154px] shrink-0 flex-col">
             <div className="flex h-11 items-center px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.isin}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
               </div>
             ))}
           </div>
           {/* Currency */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.currency}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
               </div>
             ))}
           </div>
           {/* Coupon Rate */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
               </div>
             ))}
           </div>
           {/* Price */}
-          <div className="flex flex-col w-[81px] shrink-0">
+          <div className="flex w-[81px] shrink-0 flex-col">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.price}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
               </div>
             ))}
           </div>
           {/* Yield */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.yield}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
               </div>
             ))}
           </div>
           {/* Maturity */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-center px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
               </div>
             ))}
           </div>
           {/* Duration */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-end px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.durationYears}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-end px-4 py-3.5 min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
               </div>
             ))}
           </div>
           {/* Factsheet */}
-          <div className="flex flex-col shrink-0">
+          <div className="flex shrink-0 flex-col">
             <div className="flex h-11 items-center justify-center px-3" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.documents}</span>
             </div>
             {TOP_PICK_ROWS.map((_row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-center px-3 py-[11px] min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-center px-3 py-[11px] ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <FactsheetButton />
               </div>
             ))}
           </div>
           {/* Invest */}
-          <div className="flex flex-col shrink-0">
-            <div className="flex h-11 items-center justify-center px-3" style={headerBorderStyle({ right: false })}>
+          <div className="flex shrink-0 flex-col">
+            <div
+              className="flex h-11 items-center justify-center px-3"
+              style={headerBorderStyle({ right: false })}
+            >
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.order}</span>
             </div>
             {TOP_PICK_ROWS.map((row, i) => (
-              <div key={i} className={`flex flex-1 items-center justify-center px-3 py-[11px] min-h-[52px] ${ROW_CELL_CLS}`} {...rowCellProps(i, isLastRow(i))}>
+              <div
+                key={i}
+                className={`flex min-h-[52px] flex-1 items-center justify-center px-3 py-[11px] ${ROW_CELL_CLS}`}
+                {...rowCellProps(i, isLastRow(i))}
+              >
                 <GlobalBondListCta row={row} />
               </div>
             ))}

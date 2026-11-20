@@ -21,11 +21,7 @@ import type { Client } from "@/types/domain";
 import { assembleOrderBook, isBookClosed } from "./order-book";
 import { useT } from "@/i18n/I18nProvider";
 import { clientReadiness } from "./order-requirements";
-import {
-  bookingModeForId,
-  findBookableProduct,
-  type BookableProduct,
-} from "./bookable-products";
+import { bookingModeForId, findBookableProduct, type BookableProduct } from "./bookable-products";
 
 /** One product's book, or `null` when the id resolves to no product. */
 export function useOrderBook(productId: string): Resource<OrderBook | null> {
@@ -196,11 +192,7 @@ export function useProcessingProductIds(): Set<string> {
  * shelf of `limit` cards stays full, the next product in line moving up into
  * the gap a closed one left.
  */
-export function useOpenProducts<T>(
-  items: T[],
-  idOf: (item: T) => string,
-  limit?: number,
-): T[] {
+export function useOpenProducts<T>(items: T[], idOf: (item: T) => string, limit?: number): T[] {
   const closed = useClosedProductIds();
   return useMemo(() => {
     const open = items.filter((item) => !closed.has(idOf(item)));
@@ -214,8 +206,7 @@ export function useOpenProducts<T>(
 export function useRequestsFor(clientId: string, productId: string): RequirementRequest[] {
   const { requirementRequests } = useOrders();
   return useMemo(
-    () =>
-      requirementRequests.filter((r) => r.clientId === clientId && r.productId === productId),
+    () => requirementRequests.filter((r) => r.clientId === clientId && r.productId === productId),
     [requirementRequests, clientId, productId],
   );
 }
@@ -227,15 +218,9 @@ export function useRequestsFor(clientId: string, productId: string): Requirement
  * {@link clientReadiness}: a request that has come back changes the answer, and
  * the panel showing it has to re-render when it does.
  */
-export function useClientReadiness(
-  client: Client,
-  product: BookableProduct,
-): ClientReadiness {
+export function useClientReadiness(client: Client, product: BookableProduct): ClientReadiness {
   const requests = useRequestsFor(client.id, product.id);
-  return useMemo(
-    () => clientReadiness(client, product, requests),
-    [client, product, requests],
-  );
+  return useMemo(() => clientReadiness(client, product, requests), [client, product, requests]);
 }
 
 /**

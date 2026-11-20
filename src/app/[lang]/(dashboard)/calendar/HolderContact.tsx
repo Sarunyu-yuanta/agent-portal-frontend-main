@@ -58,7 +58,9 @@ export function ContactChips({
   const profile = getClientProfile(clientId);
   if (!profile) {
     return (
-      <p className={`type-caption text-muted-foreground ${className ?? ""}`}>{t.planner.calendar.contact.none}</p>
+      <p className={`type-caption text-muted-foreground ${className ?? ""}`}>
+        {t.planner.calendar.contact.none}
+      </p>
     );
   }
 
@@ -87,19 +89,17 @@ export function ContactChips({
   return (
     <div
       ref={scrollerRef}
-      className={`flex items-center gap-2 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className ?? ""}`}
+      className={`flex snap-x snap-mandatory [scrollbar-width:none] items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden ${className ?? ""}`}
     >
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="flex items-center gap-1.5 pl-1.5 pr-3 py-1 rounded-full bg-muted/70 text-foreground shrink-0 whitespace-nowrap snap-start"
+          className="flex shrink-0 snap-start items-center gap-1.5 rounded-full bg-muted/70 py-1 pr-3 pl-1.5 whitespace-nowrap text-foreground"
         >
-          <span className="flex items-center justify-center size-6 rounded-full bg-card shadow-sm shrink-0 select-none">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-card shadow-sm select-none">
             {chip.icon}
           </span>
-          <span className="type-caption font-medium select-text cursor-text">
-            {chip.value}
-          </span>
+          <span className="type-caption cursor-text font-medium select-text">{chip.value}</span>
         </span>
       ))}
     </div>
@@ -115,22 +115,19 @@ export function ContactChips({
  * precision the task doesn't need. The icon stays because it is what tells you
  * the row is copyable at all.
  */
-function CopyField({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
+function CopyField({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clearing on unmount matters here: the panel this lives in is dismissed by
   // the row above it, so a pending timer would fire into a gone component.
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const copy = async () => {
     try {
@@ -153,7 +150,7 @@ function CopyField({
       // tick alone says nothing to one.
       // Hover moved off `--bg-default-secondary`: that is the card's own fill
       // now, so hovering to it would be no change at all.
-      className="group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer hover:bg-[var(--fill-p1-100)]!"
+      className="group flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--fill-p1-100)]!"
     >
       {/* White for the same reason — a grey disc on a grey card is a disc you
           cannot see. */}
@@ -162,11 +159,11 @@ function CopyField({
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="type-caption text-muted-foreground">{label}</span>
-        <span className="type-body-2 text-foreground truncate">{value}</span>
+        <span className="type-body-2 truncate text-foreground">{value}</span>
       </span>
       <span
         aria-live="polite"
-        className={`flex shrink-0 items-center gap-1 type-caption transition-colors ${
+        className={`type-caption flex shrink-0 items-center gap-1 transition-colors ${
           copied ? "text-[var(--text-success-primary)]" : "text-muted-foreground"
         }`}
       >
@@ -199,7 +196,7 @@ export function ContactFields({ clientId }: { clientId: string }) {
   // No profile on file: say so rather than offering a number to call.
   if (!profile) {
     return (
-      <p className="rounded-xl bg-[var(--bg-default-secondary)] px-4 py-3 type-body-2 text-muted-foreground">
+      <p className="type-body-2 rounded-xl bg-[var(--bg-default-secondary)] px-4 py-3 text-muted-foreground">
         {t.planner.calendar.contact.noneForClient}
       </p>
     );
@@ -261,27 +258,25 @@ export function HolderContact({
 
   return (
     <div className="flex w-full flex-col">
-      <header
-        className={`flex shrink-0 items-center gap-2 px-3 pb-3 ${isSheet ? "pt-2" : "pt-3"}`}
-      >
+      <header className={`flex shrink-0 items-center gap-2 px-3 pb-3 ${isSheet ? "pt-2" : "pt-3"}`}>
         {onBack && (
           <button
             type="button"
             onClick={onBack}
             aria-label={t.planner.calendar.contact.backToAlert}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <ArrowLeftIcon size={16} />
           </button>
         )}
         <Avatar type="text" initials={getInitial(name)} size="s" />
-        <p className="min-w-0 flex-1 truncate type-body-1 font-bold! text-foreground">{name}</p>
+        <p className="type-body-1 min-w-0 flex-1 truncate font-bold! text-foreground">{name}</p>
         {!isSheet && (
           <button
             type="button"
             onClick={onClose}
             aria-label={t.common.close}
-            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <XIcon size={16} />
           </button>
@@ -319,7 +314,7 @@ export function HolderContact({
         <Link
           href={`/client/${clientId}`}
           onClick={onClose}
-          className="flex h-9 w-full items-center justify-center rounded-lg border border-transparent bg-transparent type-body-2 font-medium text-primary-action transition-colors hover:bg-[var(--bg-default-secondary)]!"
+          className="type-body-2 text-primary-action flex h-9 w-full items-center justify-center rounded-lg border border-transparent bg-transparent font-medium transition-colors hover:bg-[var(--bg-default-secondary)]!"
         >
           {t.planner.calendar.contact.viewProfile}
         </Link>

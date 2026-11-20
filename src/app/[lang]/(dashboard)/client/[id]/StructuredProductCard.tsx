@@ -12,8 +12,7 @@ type CardProduct = Pick<
   id?: string;
 };
 
-const CARD_SHADOW =
-  "0px 1px 3px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1)";
+const CARD_SHADOW = "0px 1px 3px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1)";
 
 function LogoRow({
   logos,
@@ -27,38 +26,50 @@ function LogoRow({
 }) {
   const t = useT();
   return (
-    <div className="flex gap-2 items-center w-full shrink-0">
-      <div className="flex gap-1 items-center flex-1 min-w-0">
+    <div className="flex w-full shrink-0 items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-1">
         {logos.map((src, i) => (
           <div
             key={i}
-            className="relative shrink-0 size-8 rounded overflow-hidden"
+            className="relative size-8 shrink-0 overflow-hidden rounded"
             style={{ border: "1px solid rgba(0,0,0,0.08)" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- swaps in a placeholder by reassigning `currentTarget.src` on error; `next/image` owns that attribute, so the fallback cannot work through it */}
-            <img alt="" className="absolute inset-0 size-full object-cover" src={src} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/bond-logos/logo-placeholder.svg"; }} />
+            <img
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+              src={src}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/bond-logos/logo-placeholder.svg";
+              }}
+            />
           </div>
         ))}
       </div>
-      <div className="flex gap-1 items-center shrink-0">
+      <div className="flex shrink-0 items-center gap-1">
         {/* "ใกล้เต็ม" stops being true once the order has gone out — the
             card's status band says what replaced it. */}
         {!processing && tags.includes(STRUCTURED_TAG.almostFull) && (
           <div
-            className="flex gap-0.5 items-center overflow-hidden px-1 py-0.5 rounded shrink-0"
+            className="flex shrink-0 items-center gap-0.5 overflow-hidden rounded px-1 py-0.5"
             style={{ backgroundColor: "#fdefe6" }}
           >
             <FireIcon size={14} weight="fill" color="#f97316" />
-            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">{t.products.structured.tags.almostFull}</p>
+            <p className="text-micro leading-[18px] whitespace-nowrap text-[#101828]">
+              {t.products.structured.tags.almostFull}
+            </p>
           </div>
         )}
         {tags.includes(STRUCTURED_TAG.principalProtected) && (
           <div
-            className="flex gap-0.5 items-center overflow-hidden px-1 py-0.5 rounded shrink-0"
+            className="flex shrink-0 items-center gap-0.5 overflow-hidden rounded px-1 py-0.5"
             style={{ backgroundColor: "#eff6ff" }}
           >
             <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" />
-            <p className="whitespace-nowrap text-micro leading-[18px] text-[#101828]">{t.products.structured.tags.principalProtected}</p>
+            <p className="text-micro leading-[18px] whitespace-nowrap text-[#101828]">
+              {t.products.structured.tags.principalProtected}
+            </p>
           </div>
         )}
       </div>
@@ -78,7 +89,7 @@ function LogoRow({
 function ProcessingBand() {
   const t = useT();
   return (
-    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label font-medium leading-[20px] text-[#0a6ee7]">
+    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label leading-[20px] font-medium text-[#0a6ee7]">
       <HourglassMediumIcon size={14} weight="fill" />
       {t.products.common.processingOrder}
     </div>
@@ -87,13 +98,15 @@ function ProcessingBand() {
 
 function UnderlyingCouponRow({ underlying, coupon }: { underlying: string; coupon: string }) {
   return (
-    <div className="flex gap-2 items-center w-full shrink-0">
-      <div className="flex flex-col flex-1 min-w-0">
-        <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate w-full">{underlying}</p>
+    <div className="flex w-full shrink-0 items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+          {underlying}
+        </p>
         <p className="text-label leading-[20px] text-[#6a7282]">Underlying</p>
       </div>
-      <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
-        <p className="font-bold text-title-sm leading-[28px] text-[#101828]">{coupon}</p>
+      <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
+        <p className="text-title-sm leading-[28px] font-bold text-[#101828]">{coupon}</p>
         <p className="text-label leading-[20px] text-[#6a7282]">Coupon</p>
       </div>
     </div>
@@ -111,17 +124,17 @@ function StatsGrid({
 }) {
   return (
     <div
-      className={`flex items-center justify-center text-center bg-[#f9fafb] rounded-lg ${className}`}
+      className={`flex items-center justify-center rounded-lg bg-[#f9fafb] text-center ${className}`}
     >
       {stats.map((s, i) => (
         <div
           key={s.label}
-          className="flex flex-col gap-0.5 items-center justify-center flex-1 min-w-0 h-full"
+          className="flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-0.5"
           style={i < stats.length - 1 ? { borderRight: "1px solid rgba(0,0,0,0.1)" } : {}}
         >
-          <p className="text-micro leading-[18px] text-[#6a7282] w-full">{s.label}</p>
+          <p className="w-full text-micro leading-[18px] text-[#6a7282]">{s.label}</p>
           <p
-            className={`text-label leading-[20px] text-[#4a5565] w-full ${
+            className={`w-full text-label leading-[20px] text-[#4a5565] ${
               layout === "tablet"
                 ? s.label === "Tenor"
                   ? "font-bold"
@@ -168,22 +181,23 @@ export function StructuredProductCard({
   const isGrid = variant === "grid";
   const clickable = Boolean(onClick || href);
 
-  const interactiveProps = onClick && !href
-    ? {
-        role: "button" as const,
-        tabIndex: 0,
-        onClick,
-        onKeyDown: (e: React.KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onClick();
-          }
-        },
-        className: CARD_HOVER,
-      }
-    : clickable
-      ? { className: CARD_HOVER }
-      : {};
+  const interactiveProps =
+    onClick && !href
+      ? {
+          role: "button" as const,
+          tabIndex: 0,
+          onClick,
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
+            }
+          },
+          className: CARD_HOVER,
+        }
+      : clickable
+        ? { className: CARD_HOVER }
+        : {};
 
   const cardStyle = {
     border: "1px solid rgba(0,0,0,0.1)",
@@ -191,28 +205,28 @@ export function StructuredProductCard({
   };
 
   const card = isGrid ? (
-      <div
-        {...interactiveProps}
-        className={`flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
-        style={cardStyle}
-      >
-        {processing && <ProcessingBand />}
-        <div className="flex flex-col gap-2 items-start w-full">
-          <LogoRow logos={logos} tags={tags} processing={processing} />
-          <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
-        </div>
-        <StatsGrid stats={stats} className="w-full py-2" />
+    <div
+      {...interactiveProps}
+      className={`flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
+      style={cardStyle}
+    >
+      {processing && <ProcessingBand />}
+      <div className="flex w-full flex-col items-start gap-2">
+        <LogoRow logos={logos} tags={tags} processing={processing} />
+        <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
       </div>
-    ) : (
+      <StatsGrid stats={stats} className="w-full py-2" />
+    </div>
+  ) : (
     <>
       {/* Mobile — vertical stack */}
       <div
         {...interactiveProps}
-        className={`flex md:hidden flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
+        className={`flex flex-col items-center gap-3 overflow-hidden p-5 md:hidden ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         {processing && <ProcessingBand />}
-        <div className="flex flex-col gap-2 items-start w-full">
+        <div className="flex w-full flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
@@ -222,32 +236,32 @@ export function StructuredProductCard({
       {/* Tablet — horizontal */}
       <div
         {...interactiveProps}
-        className={`hidden md:flex lg:hidden ${processing ? "h-[148px]" : "h-[120px]"} box-border items-start gap-4 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
+        className={`hidden md:flex lg:hidden ${processing ? "h-[148px]" : "h-[120px]"} box-border items-start gap-4 overflow-hidden p-5 ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         {processing && <ProcessingBand />}
-        <div className="flex flex-1 flex-col gap-2 items-start min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
-        <StatsGrid stats={stats} className="flex-1 h-full min-w-0 py-3" layout="tablet" />
+        <StatsGrid stats={stats} className="h-full min-w-0 flex-1 py-3" layout="tablet" />
       </div>
 
       {/* Desktop — vertical grid card */}
       <div
         {...interactiveProps}
-        className={`hidden lg:flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative rounded-[12px] w-full self-start bg-white ${interactiveProps.className ?? ""}`}
+        className={`hidden flex-col items-center gap-3 overflow-hidden p-5 lg:flex ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
         {processing && <ProcessingBand />}
-        <div className="flex flex-col gap-2 items-start w-full">
+        <div className="flex w-full flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
           <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
       </div>
     </>
-    );
+  );
 
   if (href) {
     return (

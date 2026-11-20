@@ -69,7 +69,12 @@ import { useLocale } from "@/i18n/I18nProvider";
 const COLUMNS = 6;
 const SIDES: TransactionSide[] = ["buy", "sell", "switch"];
 
-const FALLBACK_PRODUCT = { id: "", tags: [], currency: "", minInvestment: "0" } as unknown as BookableProduct;
+const FALLBACK_PRODUCT = {
+  id: "",
+  tags: [],
+  currency: "",
+  minInvestment: "0",
+} as unknown as BookableProduct;
 
 /**
  * @param clientId One client's records only — the client profile's Order tab
@@ -208,7 +213,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
           >
             {t.orders.list.filter}
             {activeFilters > 0 && (
-              <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
+              <span className="bg-primary-action text-on-primary-action ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full px-1 text-meta font-bold tabular-nums">
                 {activeFilters}
               </span>
             )}
@@ -286,16 +291,28 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
         )
       ) : (
         <FadeIn key={`${status}|${asset}|${side}`} className="flex flex-col gap-3">
-          <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
-            <Table className="table-fixed min-w-[960px]">
+          <div className="table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)]">
+            <Table className="min-w-[960px] table-fixed">
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell className="w-[15%] whitespace-nowrap">{t.orders.list.col.time}</TableHeaderCell>
-                  <TableHeaderCell className="w-[19%] whitespace-nowrap">{t.orders.list.col.client}</TableHeaderCell>
-                  <TableHeaderCell className="w-[25%] whitespace-nowrap">{t.orders.list.col.product}</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{t.orders.list.col.asset}</TableHeaderCell>
-                  <TableHeaderCell className="w-[13%] whitespace-nowrap text-right">{t.orders.list.col.amount}</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{t.orders.list.col.status}</TableHeaderCell>
+                  <TableHeaderCell className="w-[15%] whitespace-nowrap">
+                    {t.orders.list.col.time}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[19%] whitespace-nowrap">
+                    {t.orders.list.col.client}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[25%] whitespace-nowrap">
+                    {t.orders.list.col.product}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">
+                    {t.orders.list.col.asset}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[13%] text-right whitespace-nowrap">
+                    {t.orders.list.col.amount}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">
+                    {t.orders.list.col.status}
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -324,14 +341,16 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
           {!isLoading && (
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
-                <p className="text-label text-muted-foreground whitespace-nowrap">{t.orders.list.perPage}</p>
+                <p className="text-label whitespace-nowrap text-muted-foreground">
+                  {t.orders.list.perPage}
+                </p>
                 <select
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="text-label border border-border rounded-md px-2 py-1 bg-background text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-action"
+                  className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => (
                     <option key={n} value={n}>
@@ -348,7 +367,9 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
                       to: Math.min(safePage * pageSize, visible.length),
                       total: visible.length,
                     },
-                    (n) => <span className="font-medium text-foreground">{n}</span>,
+                    (n) => (
+                      <span className="font-medium text-foreground">{n}</span>
+                    ),
                   )}
                 </p>
                 <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setPage} />
@@ -368,7 +389,10 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
           booking={opened.booking}
           book={opened.book}
           product={bookingProduct}
-          checks={checksAtBooking(opened.booking, readiness.get(opened.booking.clientId)?.items ?? [])}
+          checks={checksAtBooking(
+            opened.booking,
+            readiness.get(opened.booking.clientId)?.items ?? [],
+          )}
           deal={dealStatus(opened.booking, opened.book, t)}
           payment={paymentStatus(opened.booking, opened.book, t)}
           email={emailStatus(opened.booking, opened.book, t)}
@@ -422,12 +446,12 @@ function Row({
       }
       className={
         onOpen
-          ? "cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
+          ? "cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
           : undefined
       }
     >
       <TableCell>
-        <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
+        <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">
           {formatLogTime(row.at, locale)}
         </p>
       </TableCell>
@@ -436,7 +460,10 @@ function Row({
           <div className="flex min-w-0 flex-col gap-0.5">
             <p className="type-body-2 truncate !font-semibold text-foreground">{name}</p>
             <p className="type-caption truncate text-muted-foreground">
-              {t.orders.list.clientAccount(row.clientId, getAccountIdentity(row.clientId).accountNo)}
+              {t.orders.list.clientAccount(
+                row.clientId,
+                getAccountIdentity(row.clientId).accountNo,
+              )}
             </p>
           </div>
         </TableCell>

@@ -12,14 +12,14 @@ export const PRODUCT_CATEGORIES = [
   // `EMPTY_CATALOG_TABS` in `ProductCatalogTab` — and so is deliberately absent
   // from `CATEGORY_BY_PATH` below: it owns no detail route yet.
   { id: "product-trending", title: "Recommended" },
-  { id: "stock",           title: "Stock" },
-  { id: "tfex",            title: "TFEX" },
-  { id: "mutual-fund",     title: "Mutual Fund" },
-  { id: "fixed-income",    title: "Fixed Income" },
+  { id: "stock", title: "Stock" },
+  { id: "tfex", title: "TFEX" },
+  { id: "mutual-fund", title: "Mutual Fund" },
+  { id: "fixed-income", title: "Fixed Income" },
   { id: "thai-structured", title: "Thai Structured Product" },
-  { id: "structured",      title: "Global Structured Product" },
-  { id: "global-bond",     title: "Global Bond" },
-  { id: "robo-advisory",   title: "Portfolio Advisory" },
+  { id: "structured", title: "Global Structured Product" },
+  { id: "global-bond", title: "Global Bond" },
+  { id: "robo-advisory", title: "Portfolio Advisory" },
 ];
 
 export const CATALOG_PATH = "/product-catalog";
@@ -35,9 +35,7 @@ export const DEFAULT_PRODUCT_CATEGORY = "stock";
 
 /** Coerces a URL `?category=` value to a real tab id, falling back to the default. */
 export function normalizeProductCategory(value: string | null | undefined): string {
-  return PRODUCT_CATEGORIES.some((c) => c.id === value)
-    ? value!
-    : DEFAULT_PRODUCT_CATEGORY;
+  return PRODUCT_CATEGORIES.some((c) => c.id === value) ? value! : DEFAULT_PRODUCT_CATEGORY;
 }
 
 /** Display title for a tab id, or `null` when the id isn't a real tab. */

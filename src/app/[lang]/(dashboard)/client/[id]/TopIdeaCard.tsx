@@ -25,16 +25,58 @@ const IND_CLOUDS = [
   { src: "/products/top-idea/ind-clouds/ind-cloud-3.svg", l: 118.8, t: -1.36, w: 16.574, h: 9.961 },
   { src: "/products/top-idea/ind-clouds/ind-cloud-4.svg", l: 117.86, t: 5.52, w: 7.324, h: 7.471 },
   { src: "/products/top-idea/ind-clouds/ind-cloud-5.svg", l: 145.58, t: 2.1, w: 8.981, h: 6.981 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-6.svg", l: 152.38, t: 15.12, w: 10.491, h: 3.144 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-7.svg", l: 135.08, t: 15.71, w: 11.948, h: 4.152 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-8.svg", l: 156.76, t: -6.57, w: 19.402, h: 9.591 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-9.svg", l: 107.22, t: 10.21, w: 20.92, h: 11.378 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-10.svg", l: 124.83, t: 4.46, w: 10.394, h: 3.428 },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-6.svg",
+    l: 152.38,
+    t: 15.12,
+    w: 10.491,
+    h: 3.144,
+  },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-7.svg",
+    l: 135.08,
+    t: 15.71,
+    w: 11.948,
+    h: 4.152,
+  },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-8.svg",
+    l: 156.76,
+    t: -6.57,
+    w: 19.402,
+    h: 9.591,
+  },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-9.svg",
+    l: 107.22,
+    t: 10.21,
+    w: 20.92,
+    h: 11.378,
+  },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-10.svg",
+    l: 124.83,
+    t: 4.46,
+    w: 10.394,
+    h: 3.428,
+  },
   { src: "/products/top-idea/ind-clouds/ind-cloud-11.svg", l: 146.08, t: 8.87, w: 8.628, h: 4.19 },
   { src: "/products/top-idea/ind-clouds/ind-cloud-12.svg", l: 124.48, t: 1.95, w: 8.629, h: 4.192 },
   { src: "/products/top-idea/ind-clouds/ind-cloud-13.svg", l: 169.56, t: -2.93, w: 4.05, h: 1.979 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-14.svg", l: 121.11, t: 12.74, w: 4.481, h: 2.473 },
-  { src: "/products/top-idea/ind-clouds/ind-cloud-15.svg", l: 151.23, t: -0.3, w: 16.212, h: 9.972 },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-14.svg",
+    l: 121.11,
+    t: 12.74,
+    w: 4.481,
+    h: 2.473,
+  },
+  {
+    src: "/products/top-idea/ind-clouds/ind-cloud-15.svg",
+    l: 151.23,
+    t: -0.3,
+    w: 16.212,
+    h: 9.972,
+  },
 ];
 
 function SectorIcon({ sector }: { sector: TopIdeaSector }) {
@@ -53,8 +95,7 @@ function SectorIcon({ sector }: { sector: TopIdeaSector }) {
   }
 }
 
-const CARD_SHADOW =
-  "0px 4px 6px -1px rgba(0,0,0,0.1),0px 2px 4px -2px rgba(0,0,0,0.1)";
+const CARD_SHADOW = "0px 4px 6px -1px rgba(0,0,0,0.1),0px 2px 4px -2px rgba(0,0,0,0.1)";
 
 export function TopIdeaCard({
   sector,
@@ -84,8 +125,8 @@ export function TopIdeaCard({
           : undefined
       }
       className={`relative overflow-hidden rounded-[8px] ${
-        fullWidth ? "w-full h-[98px]" : "shrink-0 w-[171px] md:w-[200px]"
-      }${onClick ? " cursor-pointer" : ""}`}
+        fullWidth ? "h-[98px] w-full" : "w-[171px] shrink-0 md:w-[200px]"
+      }${onClick ? "cursor-pointer" : ""}`}
       style={{
         height: 98,
         backgroundColor: "#f3f4f6",
@@ -93,7 +134,7 @@ export function TopIdeaCard({
       }}
     >
       <div
-        className="absolute flex items-center justify-center pointer-events-none"
+        className="pointer-events-none absolute flex items-center justify-center"
         style={{ left: -5.61, top: -20.65, width: 196.729, height: 90.39 }}
       >
         <div style={{ transform: "rotate(176.8deg)", flexShrink: 0 }}>
@@ -103,7 +144,7 @@ export function TopIdeaCard({
               style={{ top: "-25.07%", right: "-12.46%", bottom: "-35.1%", left: "-12.46%" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- SVG art layer; the image optimizer rejects SVG */}
-              <img alt="" className="block max-w-none w-full h-full" src={ASSETS.vector} />
+              <img alt="" className="block h-full w-full max-w-none" src={ASSETS.vector} />
             </div>
           </div>
         </div>
@@ -111,7 +152,7 @@ export function TopIdeaCard({
 
       {sector === "Energy" && (
         <div
-          className="absolute pointer-events-none mix-blend-screen"
+          className="pointer-events-none absolute mix-blend-screen"
           style={{ left: 107.19, top: -23.23, width: 60.284, height: 61.408 }}
         >
           <Image alt="" fill sizes="61px" className="object-cover" src={ASSETS.energy1} />
@@ -119,27 +160,27 @@ export function TopIdeaCard({
       )}
       {sector === "Material" && (
         <div
-          className="absolute pointer-events-none"
+          className="pointer-events-none absolute"
           style={{ left: 114.08, top: -0.75, width: 63.103, height: 23.21 }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG art layer; the image optimizer rejects SVG */}
-          <img alt="" className="absolute inset-0 w-full h-full" src={ASSETS.wall1} />
+          <img alt="" className="absolute inset-0 h-full w-full" src={ASSETS.wall1} />
         </div>
       )}
       {sector === "Industrials" &&
         IND_CLOUDS.map((c, i) => (
           <div
             key={i}
-            className="absolute pointer-events-none"
+            className="pointer-events-none absolute"
             style={{ left: c.l, top: c.t, width: c.w, height: c.h }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- SVG cloud art; the image optimizer rejects SVG */}
-            <img alt="" className="absolute inset-0 max-w-none w-full h-full" src={c.src} />
+            <img alt="" className="absolute inset-0 h-full w-full max-w-none" src={c.src} />
           </div>
         ))}
       {sector === "Consumer Discretionary" && (
         <div
-          className="absolute pointer-events-none"
+          className="pointer-events-none absolute"
           style={{ left: 106, top: -3.97, width: 68.696, height: 41.109 }}
         >
           <div className="absolute inset-0 overflow-hidden">
@@ -160,8 +201,14 @@ export function TopIdeaCard({
       )}
       {sector === "Consumer Staples" && (
         <div
-          className="absolute flex items-center justify-center pointer-events-none"
-          style={{ left: 130, top: -3.64, width: 41.03, height: 27.563, mixBlendMode: "luminosity" }}
+          className="pointer-events-none absolute flex items-center justify-center"
+          style={{
+            left: 130,
+            top: -3.64,
+            width: 41.03,
+            height: 27.563,
+            mixBlendMode: "luminosity",
+          }}
         >
           <div style={{ transform: "rotate(-15deg)", flexShrink: 0 }}>
             <div style={{ width: 37.525, height: 18.481, position: "relative" }}>
@@ -169,7 +216,7 @@ export function TopIdeaCard({
                 alt=""
                 fill
                 sizes="38px"
-                className="max-w-none pointer-events-none"
+                className="pointer-events-none max-w-none"
                 style={{ objectPosition: "bottom", opacity: 0.8 }}
                 src={ASSETS.graphic}
               />
@@ -179,10 +226,16 @@ export function TopIdeaCard({
       )}
 
       <div className="absolute flex items-center gap-1" style={{ left: 4, top: 2, height: 16 }}>
-        <div className="shrink-0 flex items-center justify-center" style={{ width: 12, height: 12 }}>
+        <div
+          className="flex shrink-0 items-center justify-center"
+          style={{ width: 12, height: 12 }}
+        >
           <SectorIcon sector={sector} />
         </div>
-        <p className="whitespace-nowrap" style={{ color: "#525252", fontSize: 14, lineHeight: "20px" }}>
+        <p
+          className="whitespace-nowrap"
+          style={{ color: "#525252", fontSize: 14, lineHeight: "20px" }}
+        >
           {sector}
         </p>
       </div>
@@ -205,9 +258,14 @@ export function TopIdeaCard({
         <p className="font-bold" style={{ color: "#101828", fontSize: 16, lineHeight: "24px" }}>
           {theme}
         </p>
-        <div className="flex items-baseline gap-0.5 justify-end whitespace-nowrap">
-          <span style={{ color: "#4a5565", fontSize: 14, lineHeight: "20px" }}>{t.products.topIdea.upTo}</span>
-          <span className="font-bold" style={{ color: "#008236", fontSize: 20, lineHeight: "28px" }}>
+        <div className="flex items-baseline justify-end gap-0.5 whitespace-nowrap">
+          <span style={{ color: "#4a5565", fontSize: 14, lineHeight: "20px" }}>
+            {t.products.topIdea.upTo}
+          </span>
+          <span
+            className="font-bold"
+            style={{ color: "#008236", fontSize: 20, lineHeight: "28px" }}
+          >
             30.5%
           </span>
         </div>

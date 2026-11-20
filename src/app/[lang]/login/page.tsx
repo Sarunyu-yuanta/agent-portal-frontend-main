@@ -37,8 +37,6 @@ class SignInError extends Error {
   }
 }
 
-
-
 /**
  * No auth backend exists yet, so submitting goes straight to the home page
  * `/` (`src/app/[lang]/page.tsx`, which decides where home is) rather than
@@ -84,11 +82,7 @@ export default function LoginPage() {
       // reads as the click not having registered, so people just press again.
       .catch((err: unknown) => {
         if (cancelled) return;
-        setError(
-          err instanceof SignInError
-            ? t.auth.errors[err.reason]
-            : t.auth.errors.network,
-        );
+        setError(err instanceof SignInError ? t.auth.errors[err.reason] : t.auth.errors.network);
         setIsAuthenticating(false);
       });
 
@@ -128,19 +122,15 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
                 aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
-                {showPassword ? (
-                  <EyeSlashIcon size={20} />
-                ) : (
-                  <EyeIcon size={20} />
-                )}
+                {showPassword ? <EyeSlashIcon size={20} /> : <EyeIcon size={20} />}
               </button>
             }
           />
           <Link
             href="/forgot-password"
-            className="self-end text-sm font-semibold text-primary-action hover:underline"
+            className="text-primary-action self-end text-sm font-semibold hover:underline"
           >
             {t.auth.forgotPassword}
           </Link>
@@ -150,16 +140,14 @@ export default function LoginPage() {
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full mt-6"
+          className="mt-6 w-full"
           disabled={isAuthenticating || isPending}
         >
           {t.auth.login}
         </Button>
       </form>
 
-      <p className="type-description text-center text-muted-foreground">
-        {t.auth.copyright}
-      </p>
+      <p className="type-description text-center text-muted-foreground">{t.auth.copyright}</p>
 
       {(isAuthenticating || isPending) && <AuthPendingScreen label={t.auth.signingIn} />}
     </AuthShell>

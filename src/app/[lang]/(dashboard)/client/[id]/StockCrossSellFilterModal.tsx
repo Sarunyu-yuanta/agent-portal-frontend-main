@@ -25,7 +25,7 @@ function FilterChip({
       type="button"
       onClick={onToggle}
       aria-pressed={selected}
-      className={`flex w-full cursor-pointer items-center gap-2 rounded-full border py-2 pl-2 pr-3 text-sm transition-colors ${
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-full border py-2 pr-3 pl-2 text-sm transition-colors ${
         selected
           ? "border-[#0a6ee7] bg-[#f3f8fe] text-[#0a6ee7] hover:bg-[#e4eefb]!"
           : "border-black/10 bg-white text-[#4a5565] hover:border-[#0a6ee7]/40! hover:bg-[#f9fafb]!"
@@ -70,7 +70,9 @@ export function StockCrossSellFilterModal({
 }) {
   const t = useT();
   const [draftIssuers, setDraftIssuers] = useState<Set<string>>(() => new Set(initialIssuerIds));
-  const [draftCountries, setDraftCountries] = useState<Set<string>>(() => new Set(initialCountryIds));
+  const [draftCountries, setDraftCountries] = useState<Set<string>>(
+    () => new Set(initialCountryIds),
+  );
 
   const toggle = (set: Set<string>, setSet: (next: Set<string>) => void, id: string) => {
     const next = new Set(set);
@@ -95,7 +97,7 @@ export function StockCrossSellFilterModal({
           type="button"
           onClick={onClose}
           aria-label={t.stock.crossSell.close}
-          className="absolute right-3 top-3 flex size-6 cursor-pointer items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/40!"
+          className="absolute top-3 right-3 flex size-6 cursor-pointer items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/40!"
         >
           <XIcon size={14} weight="bold" />
         </button>
@@ -103,14 +105,14 @@ export function StockCrossSellFilterModal({
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <FunnelSimpleIcon size={20} style={{ color: "#101828" }} />
-            <p className="font-bold text-lg" style={{ color: "#101828" }}>
+            <p className="text-lg font-bold" style={{ color: "#101828" }}>
               {t.stock.crossSell.filterTitle(count)}
             </p>
           </div>
 
           {showIssuerFilter && (
             <div className="flex flex-col gap-4">
-              <p className="font-bold text-base" style={{ color: "#101828" }}>
+              <p className="text-base font-bold" style={{ color: "#101828" }}>
                 {t.stock.crossSell.issuer}
               </p>
               <div className="grid grid-cols-3 gap-x-4 gap-y-3">
@@ -127,7 +129,7 @@ export function StockCrossSellFilterModal({
           )}
 
           <div className="flex flex-col gap-4">
-            <p className="font-bold text-base" style={{ color: "#101828" }}>
+            <p className="text-base font-bold" style={{ color: "#101828" }}>
               {t.stock.crossSell.region}
             </p>
             <div className="grid grid-cols-3 gap-x-4 gap-y-3">

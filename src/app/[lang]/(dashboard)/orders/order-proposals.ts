@@ -34,10 +34,7 @@ export type ProposalOutcome = "open" | "won" | "lost";
  * its job in the rejected case; crediting it is a one-line change here, and
  * should be a deliberate one rather than a side effect of this test.
  */
-export function proposalBooking(
-  proposal: ProposalLog,
-  book: OrderBook,
-): Booking | undefined {
+export function proposalBooking(proposal: ProposalLog, book: OrderBook): Booking | undefined {
   return book.allBookings.find(
     (b) =>
       b.clientId === proposal.clientId &&

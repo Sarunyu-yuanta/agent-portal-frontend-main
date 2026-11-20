@@ -59,10 +59,7 @@ export function useRiskAlertRows(): {
 } {
   const { data: alerts, isLoading, error, retry } = useRiskAlertsResource();
   const { isPrivate } = usePrivacy();
-  const [ackIds, setAckIds] = useStoredIds<string>(
-    RISK_ACK_IDS_PREF,
-    isRiskAlertId,
-  );
+  const [ackIds, setAckIds] = useStoredIds<string>(RISK_ACK_IDS_PREF, isRiskAlertId);
 
   const all = useMemo(
     () =>
@@ -75,10 +72,7 @@ export function useRiskAlertRows(): {
   );
 
   const rows = useMemo(() => openRiskAlerts(all), [all]);
-  const acknowledgedRows = useMemo(
-    () => all.filter((row) => row.acknowledged),
-    [all],
-  );
+  const acknowledgedRows = useMemo(() => all.filter((row) => row.acknowledged), [all]);
 
   const acknowledge = useCallback(
     (alert: RiskAlert) => {

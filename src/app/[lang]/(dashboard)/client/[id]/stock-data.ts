@@ -55,7 +55,10 @@ export type MarketStatusValue =
 /** Visual style per status — 4 distinct colorways shared across the 9 labels
  *  (bg/text tokens + the 12px "Status" dot fill, sampled from the Figma
  *  asset circles: FDC024 / 52C41A / 999999 / FF8904). */
-export const MARKET_STATUS_STYLE: Record<MarketStatusValue, { bg: string; text: string; dot: string }> = {
+export const MARKET_STATUS_STYLE: Record<
+  MarketStatusValue,
+  { bg: string; text: string; dot: string }
+> = {
   "Pre-Open": { bg: "#feeda7", text: "#b47e23", dot: "#fdc024" },
   Open: { bg: "#dcfac3", text: "#2f952a", dot: "#52c41a" },
   "Pre-Close": { bg: "#feeda7", text: "#b47e23", dot: "#fdc024" },
@@ -79,11 +82,51 @@ export const MARKET_WATCHLIST = [
 const MARKET_INDEX_ICON = "/products/stock/market-index-icon.svg";
 
 export const MARKET_INDICES: MarketIndex[] = [
-  { code: "SET", icon: MARKET_INDEX_ICON, price: "1,320.45", changeAmount: "+8.05", changePercent: "+0.61%", trend: "up", series: seededSeries("SET", 20, "up") },
-  { code: "SET50", icon: MARKET_INDEX_ICON, price: "845.10", changeAmount: "+5.15", changePercent: "+0.61%", trend: "up", series: seededSeries("SET50", 20, "up") },
-  { code: "SET100", icon: MARKET_INDEX_ICON, price: "1,880.20", changeAmount: "0.00", changePercent: "0.00%", trend: "flat", series: seededSeries("SET100", 20, "flat") },
-  { code: "sSET", icon: MARKET_INDEX_ICON, price: "410.32", changeAmount: "-1.85", changePercent: "-0.45%", trend: "down", series: seededSeries("sSET", 20, "down") },
-  { code: "MAI", icon: MARKET_INDEX_ICON, price: "395.80", changeAmount: "+1.25", changePercent: "+0.32%", trend: "up", series: seededSeries("MAI", 20, "up") },
+  {
+    code: "SET",
+    icon: MARKET_INDEX_ICON,
+    price: "1,320.45",
+    changeAmount: "+8.05",
+    changePercent: "+0.61%",
+    trend: "up",
+    series: seededSeries("SET", 20, "up"),
+  },
+  {
+    code: "SET50",
+    icon: MARKET_INDEX_ICON,
+    price: "845.10",
+    changeAmount: "+5.15",
+    changePercent: "+0.61%",
+    trend: "up",
+    series: seededSeries("SET50", 20, "up"),
+  },
+  {
+    code: "SET100",
+    icon: MARKET_INDEX_ICON,
+    price: "1,880.20",
+    changeAmount: "0.00",
+    changePercent: "0.00%",
+    trend: "flat",
+    series: seededSeries("SET100", 20, "flat"),
+  },
+  {
+    code: "sSET",
+    icon: MARKET_INDEX_ICON,
+    price: "410.32",
+    changeAmount: "-1.85",
+    changePercent: "-0.45%",
+    trend: "down",
+    series: seededSeries("sSET", 20, "down"),
+  },
+  {
+    code: "MAI",
+    icon: MARKET_INDEX_ICON,
+    price: "395.80",
+    changeAmount: "+1.25",
+    changePercent: "+0.32%",
+    trend: "up",
+    series: seededSeries("MAI", 20, "up"),
+  },
 ];
 
 /** The feed's own timestamp — the "Latest update:" wording is the dictionary's. */
@@ -110,7 +153,14 @@ const STOCK_NAMES: Record<string, string> = {
 };
 
 function stockRows(
-  entries: [symbol: string, price: string, changeAmount: string, changePercent: string, trend: Trend, featured?: boolean][],
+  entries: [
+    symbol: string,
+    price: string,
+    changeAmount: string,
+    changePercent: string,
+    trend: Trend,
+    featured?: boolean,
+  ][],
 ): StockRow[] {
   return entries.map(([symbol, price, changeAmount, changePercent, trend, featured]) => ({
     symbol,
@@ -155,10 +205,26 @@ export type ScreenerCard = {
 };
 
 export const STOCK_SCREENER_CARDS: ScreenerCard[] = [
-  { id: "trending", title: "Trending search", desc: "Based on an analysis of recent investor behavior and common practices" },
-  { id: "highlight", title: "Highlight", desc: "Various stock groups to watch at the current time" },
-  { id: "talk-of-the-town", title: "Talk of the town", desc: "The Most Discussed Stocks and Business Sectors on Social Media" },
-  { id: "realtime", title: "Realtime", desc: "Real-time intraday stock updates. Filter stocks by specified details" },
+  {
+    id: "trending",
+    title: "Trending search",
+    desc: "Based on an analysis of recent investor behavior and common practices",
+  },
+  {
+    id: "highlight",
+    title: "Highlight",
+    desc: "Various stock groups to watch at the current time",
+  },
+  {
+    id: "talk-of-the-town",
+    title: "Talk of the town",
+    desc: "The Most Discussed Stocks and Business Sectors on Social Media",
+  },
+  {
+    id: "realtime",
+    title: "Realtime",
+    desc: "Real-time intraday stock updates. Filter stocks by specified details",
+  },
 ];
 
 export type CrossSellRow = {
@@ -174,7 +240,15 @@ export type CrossSellRow = {
 
 function crossSellRows(
   kind: "DR" | "ETF",
-  entries: [symbol: string, subtitle: string, price: string, changeAmount: string, changePercent: string, trend: Trend, currency?: string][],
+  entries: [
+    symbol: string,
+    subtitle: string,
+    price: string,
+    changeAmount: string,
+    changePercent: string,
+    trend: Trend,
+    currency?: string,
+  ][],
 ): CrossSellRow[] {
   return entries.map(([symbol, subtitle, price, changeAmount, changePercent, trend, currency]) => ({
     symbol,
@@ -335,14 +409,72 @@ export type SectorRow = {
 };
 
 export const SET_INDUSTRY_SECTORS: SectorRow[] = [
-  { id: "resources", name: "Resources", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
-  { id: "services", name: "Services", changeAmount: "-20.00", changePercent: "-10.58%", trend: "down", size: "lg" },
-  { id: "industrials", name: "Industrials", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
-  { id: "consumer-products", name: "Consumer Products", heatmapName: "Consumer \nProducts", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "md" },
-  { id: "agro-food", name: "Agro & Food Industry", heatmapName: "Agro & \nFood \nIndustry", changeAmount: "-20.00", changePercent: "-1.58%", trend: "down", size: "md" },
-  { id: "financials", name: "Financials", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
-  { id: "technology", name: "Technology", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
-  { id: "property-construction", name: "Property & Construction", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
+  {
+    id: "resources",
+    name: "Resources",
+    changeAmount: "+20.00",
+    changePercent: "+0.61%",
+    trend: "up",
+    size: "lg",
+  },
+  {
+    id: "services",
+    name: "Services",
+    changeAmount: "-20.00",
+    changePercent: "-10.58%",
+    trend: "down",
+    size: "lg",
+  },
+  {
+    id: "industrials",
+    name: "Industrials",
+    changeAmount: "+20.00",
+    changePercent: "+0.61%",
+    trend: "up",
+    size: "lg",
+  },
+  {
+    id: "consumer-products",
+    name: "Consumer Products",
+    heatmapName: "Consumer \nProducts",
+    changeAmount: "+20.00",
+    changePercent: "+0.61%",
+    trend: "up",
+    size: "md",
+  },
+  {
+    id: "agro-food",
+    name: "Agro & Food Industry",
+    heatmapName: "Agro & \nFood \nIndustry",
+    changeAmount: "-20.00",
+    changePercent: "-1.58%",
+    trend: "down",
+    size: "md",
+  },
+  {
+    id: "financials",
+    name: "Financials",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
+  {
+    id: "technology",
+    name: "Technology",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
+  {
+    id: "property-construction",
+    name: "Property & Construction",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
 ];
 
 export type ServiceCard = {
@@ -422,7 +554,15 @@ const US_LOGOS: Record<string, string> = {
 };
 
 function usStockRows(
-  entries: [symbol: string, name: string, price: string, changeAmount: string, changePercent: string, trend: Trend, featured?: boolean][],
+  entries: [
+    symbol: string,
+    name: string,
+    price: string,
+    changeAmount: string,
+    changePercent: string,
+    trend: Trend,
+    featured?: boolean,
+  ][],
 ): StockRow[] {
   return entries.map(([symbol, name, price, changeAmount, changePercent, trend, featured]) => ({
     symbol,
@@ -438,12 +578,60 @@ function usStockRows(
 }
 
 export const US_MARKET_INDICES: MarketIndex[] = [
-  { code: "Dow Jones", icon: "/products/stock/logos/indices/dow.svg", price: "120.00", changeAmount: "-24.00", changePercent: "-20.00%", trend: "down", series: seededSeries("DJIA", 20, "down") },
-  { code: "S&P 500", icon: "/products/stock/logos/indices/spx.svg", price: "120.00", changeAmount: "+0.73", changePercent: "+0.61%", trend: "up", series: seededSeries("SPX", 20, "up") },
-  { code: "Nasdaq 100", icon: "/products/stock/logos/indices/ndx.svg", price: "120.00", changeAmount: "0.00", changePercent: "0.00%", trend: "flat", series: seededSeries("NDX", 20, "flat") },
-  { code: "HSI", icon: "/products/stock/logos/indices/hsi.svg", price: "120.00", changeAmount: "-24.00", changePercent: "-20.00%", trend: "down", series: seededSeries("HSI", 20, "down") },
-  { code: "HOSE", icon: "/products/stock/logos/indices/hose.svg", price: "120.00", changeAmount: "0.00", changePercent: "0.00%", trend: "flat", series: seededSeries("HOSE", 20, "flat") },
-  { code: "TSX", icon: "/products/stock/logos/indices/tsx.svg", price: "120.00", changeAmount: "+0.73", changePercent: "+0.61%", trend: "up", series: seededSeries("TSX", 20, "up") },
+  {
+    code: "Dow Jones",
+    icon: "/products/stock/logos/indices/dow.svg",
+    price: "120.00",
+    changeAmount: "-24.00",
+    changePercent: "-20.00%",
+    trend: "down",
+    series: seededSeries("DJIA", 20, "down"),
+  },
+  {
+    code: "S&P 500",
+    icon: "/products/stock/logos/indices/spx.svg",
+    price: "120.00",
+    changeAmount: "+0.73",
+    changePercent: "+0.61%",
+    trend: "up",
+    series: seededSeries("SPX", 20, "up"),
+  },
+  {
+    code: "Nasdaq 100",
+    icon: "/products/stock/logos/indices/ndx.svg",
+    price: "120.00",
+    changeAmount: "0.00",
+    changePercent: "0.00%",
+    trend: "flat",
+    series: seededSeries("NDX", 20, "flat"),
+  },
+  {
+    code: "HSI",
+    icon: "/products/stock/logos/indices/hsi.svg",
+    price: "120.00",
+    changeAmount: "-24.00",
+    changePercent: "-20.00%",
+    trend: "down",
+    series: seededSeries("HSI", 20, "down"),
+  },
+  {
+    code: "HOSE",
+    icon: "/products/stock/logos/indices/hose.svg",
+    price: "120.00",
+    changeAmount: "0.00",
+    changePercent: "0.00%",
+    trend: "flat",
+    series: seededSeries("HOSE", 20, "flat"),
+  },
+  {
+    code: "TSX",
+    icon: "/products/stock/logos/indices/tsx.svg",
+    price: "120.00",
+    changeAmount: "+0.73",
+    changePercent: "+0.61%",
+    trend: "up",
+    series: seededSeries("TSX", 20, "up"),
+  },
 ];
 
 export const US_STOCK_TOP_GAIN: StockRow[] = usStockRows([
@@ -481,15 +669,63 @@ export const US_ETF_TOP_GAIN: CrossSellRow[] = crossSellRows("ETF", [
 export const US_ETF_TOP_LOSS: CrossSellRow[] = crossSellRows("ETF", [
   ["QQQM", "Invesco NASDAQ 100 ETF", "128.10", "-20.00", "-20.00%", "down", "USD"],
   ["VOO", "Vanguard S&P 500 ETF NYSEARCA: VOO", "150.00", "-20.00", "-20.00%", "down", "USD"],
-  ["2828.HK", "Hang Seng China Enterprises Index ETF", "125.00", "-20.00", "-20.00%", "down", "HKD"],
-  ["2828.HK", "Hang Seng China Enterprises Index ETF", "135.75", "-20.00", "-20.00%", "down", "HKD"],
-  ["2828.HK", "Hang Seng China Enterprises Index ETF", "142.50", "-20.00", "-20.00%", "down", "HKD"],
+  [
+    "2828.HK",
+    "Hang Seng China Enterprises Index ETF",
+    "125.00",
+    "-20.00",
+    "-20.00%",
+    "down",
+    "HKD",
+  ],
+  [
+    "2828.HK",
+    "Hang Seng China Enterprises Index ETF",
+    "135.75",
+    "-20.00",
+    "-20.00%",
+    "down",
+    "HKD",
+  ],
+  [
+    "2828.HK",
+    "Hang Seng China Enterprises Index ETF",
+    "142.50",
+    "-20.00",
+    "-20.00%",
+    "down",
+    "HKD",
+  ],
 ]);
 
 export const US_INDUSTRY_SECTORS: SectorRow[] = [
-  { id: "energy", name: "Energy", heatmapName: "Resources", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
-  { id: "material", name: "Material", heatmapName: "Services", changeAmount: "-20.00", changePercent: "-10.58%", trend: "down", size: "lg", listAccent: "teal" },
-  { id: "industrials", name: "Industrials", changeAmount: "+20.00", changePercent: "+0.61%", trend: "up", size: "lg" },
+  {
+    id: "energy",
+    name: "Energy",
+    heatmapName: "Resources",
+    changeAmount: "+20.00",
+    changePercent: "+0.61%",
+    trend: "up",
+    size: "lg",
+  },
+  {
+    id: "material",
+    name: "Material",
+    heatmapName: "Services",
+    changeAmount: "-20.00",
+    changePercent: "-10.58%",
+    trend: "down",
+    size: "lg",
+    listAccent: "teal",
+  },
+  {
+    id: "industrials",
+    name: "Industrials",
+    changeAmount: "+20.00",
+    changePercent: "+0.61%",
+    trend: "up",
+    size: "lg",
+  },
   {
     id: "consumer-discretionary",
     name: "Consumer Discretionary",
@@ -522,8 +758,22 @@ export const US_INDUSTRY_SECTORS: SectorRow[] = [
     heatmapChangePercent: "-10.58%",
     heatmapTrend: "down",
   },
-  { id: "financials", name: "Financials", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
-  { id: "information-technology", name: "Information Technology", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
+  {
+    id: "financials",
+    name: "Financials",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
+  {
+    id: "information-technology",
+    name: "Information Technology",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
   {
     id: "communication-services",
     name: "Communication Services",
@@ -544,7 +794,14 @@ export const US_INDUSTRY_SECTORS: SectorRow[] = [
     heatmapChangePercent: "-10.58%",
     heatmapTrend: "down",
   },
-  { id: "real-estate", name: "Real Estate", changeAmount: "0.00", changePercent: "0.00", trend: "flat", size: "sm" },
+  {
+    id: "real-estate",
+    name: "Real Estate",
+    changeAmount: "0.00",
+    changePercent: "0.00",
+    trend: "flat",
+    size: "sm",
+  },
 ];
 
 export const US_GLOBAL_SERVICES: ServiceCard[] = [

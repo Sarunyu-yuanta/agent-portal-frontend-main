@@ -26,8 +26,18 @@ export function CatalogDetailDesktopShell({ children }: { children: ReactNode })
 }
 
 /** Full-width shell when the design has no separate mobile frame (e.g. SET sector desktop Figma). */
-export function CatalogDetailPageShell({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`flex w-full flex-1 flex-col bg-white pb-16 lg:pb-20 ${className}`}>{children}</div>;
+export function CatalogDetailPageShell({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`flex w-full flex-1 flex-col bg-white pb-16 lg:pb-20 ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 export function CatalogDetailBackHeader({
@@ -54,7 +64,7 @@ export function CatalogDetailBackHeader({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[30px] text-[#101828] lg:leading-7">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828] lg:leading-7">
           {title}
         </h1>
       </div>
@@ -83,7 +93,9 @@ function TabScrollButton({
       onClick={onClick}
       tabIndex={hidden ? -1 : 0}
       aria-hidden={hidden}
-      aria-label={direction === "prev" ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight}
+      aria-label={
+        direction === "prev" ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight
+      }
       className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-black/10 bg-white text-[#4a5565] transition-opacity hover:bg-black/[0.02] ${
         hidden ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
@@ -228,7 +240,7 @@ export function CatalogDetailTextTabs<T extends string>({
   const strip = (
     <div
       ref={attachStrip}
-      className={`w-full overflow-x-auto hide-scrollbar ${scrollButtons ? "" : "xl:overflow-visible"}`}
+      className={`hide-scrollbar w-full overflow-x-auto ${scrollButtons ? "" : "xl:overflow-visible"}`}
       style={{ scrollbarWidth: "none" }}
     >
       <div className={`flex w-full min-w-max ${fill ? "xl:min-w-0" : ""}`}>
@@ -244,7 +256,7 @@ export function CatalogDetailTextTabs<T extends string>({
               // already where you are, so there is nothing to invite. Trailing
               // `!` because system-one ships its base utilities unlayered,
               // where they outrank a `hover:` variant.
-              className={`flex cursor-pointer items-center justify-center gap-1.5 border-b-[1.5px] px-3 py-2.5 text-sm font-bold leading-[24px] whitespace-nowrap transition-colors ${
+              className={`flex cursor-pointer items-center justify-center gap-1.5 border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap transition-colors ${
                 fill ? "min-w-[80px] flex-1" : "shrink-0"
               } ${
                 active

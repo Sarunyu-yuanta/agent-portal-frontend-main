@@ -77,7 +77,14 @@ function resourcesSectorStocks(): StockRow[] {
     ["PTG", "PTG ENERGY PUBLIC COMPANY LIMITED", "128.10", "+22.50", "+0.61%", "up"],
     ["GREEN", "GREEN RESOURCES PUBLIC COMPANY LIMITED", "128.10", "-20.00", "-20.00%", "down"],
     ["GULF", "GULF DEVELOPMENT PUBLIC COMPANY LIMITED", "128.10", "-20.00", "-20.00%", "down"],
-    ["KBSPIF", "KHONBURI SUGAR POWER PLANT INFRASTRUCTURE FUND", "128.10", "+22.50", "+0.61%", "up"],
+    [
+      "KBSPIF",
+      "KHONBURI SUGAR POWER PLANT INFRASTRUCTURE FUND",
+      "128.10",
+      "+22.50",
+      "+0.61%",
+      "up",
+    ],
     ["MDX", "M.D.X. PUBLIC COMPANY LIMITED", "128.10", "+22.50", "+0.61%", "up"],
     ["TCC", "THAI CAPITAL CORPORATION PUBLIC COMPANY LIMITED", "120.00", "0.00", "0.00", "flat"],
   ];
@@ -170,7 +177,11 @@ export function getIndustrySectorPage(slug: string): IndustrySectorPage | null {
  * and, where the heatmap tile spells it differently, the tile's. A sector the
  * dictionary doesn't know keeps the feed's own name.
  */
-export function localizeSector(t: Dictionary, market: IndustrySectorMarket, sector: SectorRow): SectorRow {
+export function localizeSector(
+  t: Dictionary,
+  market: IndustrySectorMarket,
+  sector: SectorRow,
+): SectorRow {
   const name = t.stock.sectorNames[market][sector.id] ?? sector.name;
   const heatmapName = sector.heatmapName
     ? (t.stock.sectorTileNames[market][sector.id] ?? sector.heatmapName)

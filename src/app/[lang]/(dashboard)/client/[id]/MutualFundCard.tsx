@@ -4,7 +4,12 @@ import Image from "next/image";
 import { LocaleLink as Link } from "@/i18n/navigation";
 import { Tag } from "@sarunyu/system-one";
 import { useId, useMemo } from "react";
-import { fundHasHighlightTag, fundHasViewTag, getNavHistory, type MutualFund } from "./mutual-fund-data";
+import {
+  fundHasHighlightTag,
+  fundHasViewTag,
+  getNavHistory,
+  type MutualFund,
+} from "./mutual-fund-data";
 import { MF_ASSETS, mutualFundRiskMeterSrc } from "./mutual-fund-assets";
 import { useT } from "@/i18n/I18nProvider";
 
@@ -20,7 +25,13 @@ export { mutualFundDetailHref };
 /** Figma Button plain xl — chevron icon (#0A6EE7, 20×20). */
 export function MutualFundSeeMoreIcon() {
   return (
-    <Image src={MF_ASSETS.arrowRightBlue} alt="" width={20} height={20} className="size-5 shrink-0" />
+    <Image
+      src={MF_ASSETS.arrowRightBlue}
+      alt=""
+      width={20}
+      height={20}
+      className="size-5 shrink-0"
+    />
   );
 }
 
@@ -28,10 +39,14 @@ function PickTag() {
   const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5">
-      <Image src={MF_ASSETS.performersTagHighlight} alt="" width={11} height={11} className="size-[11px] shrink-0" />
-      <span
-        className="text-micro leading-[15px] font-normal bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-transparent"
-      >
+      <Image
+        src={MF_ASSETS.performersTagHighlight}
+        alt=""
+        width={11}
+        height={11}
+        className="size-[11px] shrink-0"
+      />
+      <span className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-micro leading-[15px] font-normal text-transparent">
         {t.fund.tags.pick}
       </span>
     </span>
@@ -42,7 +57,7 @@ function PickTag() {
 function RiskMeterIcon({ risk }: { risk: number }) {
   return (
     <span className="relative size-4 shrink-0 overflow-clip">
-      <span className="absolute bottom-[29.17%] left-[8.33%] right-[8.33%] top-1/4">
+      <span className="absolute top-1/4 right-[8.33%] bottom-[29.17%] left-[8.33%]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={mutualFundRiskMeterSrc(risk)}
@@ -58,16 +73,18 @@ function RiskMeterIcon({ risk }: { risk: number }) {
 export function RiskBadge({ risk, inline }: { risk: number; inline?: boolean }) {
   const t = useT();
   const pill = (
-    <span className="inline-flex h-5 shrink-0 self-start items-center gap-1 rounded-2xl border border-black/10 bg-white px-2">
+    <span className="inline-flex h-5 shrink-0 items-center gap-1 self-start rounded-2xl border border-black/10 bg-white px-2">
       <RiskMeterIcon risk={risk} />
-      <span className="text-xs font-semibold leading-[20px] text-[#4a5565] whitespace-nowrap">{t.fund.tags.risk(risk)}</span>
+      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-[#4a5565]">
+        {t.fund.tags.risk(risk)}
+      </span>
     </span>
   );
 
   if (inline) return pill;
 
   return (
-    <div className="flex w-full shrink-0 gap-1 items-start">
+    <div className="flex w-full shrink-0 items-start gap-1">
       <div className="flex h-5 shrink-0 flex-col items-start">{pill}</div>
     </div>
   );
@@ -95,7 +112,7 @@ export function TagFilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`relative flex shrink-0 cursor-pointer items-center gap-0.5 overflow-hidden rounded-full border py-1.5 pl-1.5 pr-2.5 transition-colors ${
+      className={`relative flex shrink-0 cursor-pointer items-center gap-0.5 overflow-hidden rounded-full border py-1.5 pr-2.5 pl-1.5 transition-colors ${
         active
           ? "border-[#0a6ee7] bg-[#f3f8fe] hover:bg-[#e4f0fd]!"
           : "border-black/10 bg-white hover:bg-black/[0.03]!"
@@ -109,11 +126,13 @@ export function TagFilterChip({
           icon
         )}
       </span>
-      <span className={`text-xs leading-[20px] whitespace-nowrap ${active ? "text-[#0a6ee7]" : "text-[#4a5565]"}`}>
+      <span
+        className={`text-xs leading-[20px] whitespace-nowrap ${active ? "text-[#0a6ee7]" : "text-[#4a5565]"}`}
+      >
         {label}
       </span>
       {active && selectedBadge ? (
-        <span className="pointer-events-none absolute left-[-1px] top-1/2 size-[28px] -translate-y-1/2">
+        <span className="pointer-events-none absolute top-1/2 left-[-1px] size-[28px] -translate-y-1/2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={MF_ASSETS.tagChipSelectedBadge}
@@ -138,12 +157,16 @@ function ListCardMetaTag({
   labelClassName: string;
 }) {
   return (
-    <span className={`inline-flex items-center justify-center gap-0.5 overflow-hidden rounded px-1 py-0.5 ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center gap-0.5 overflow-hidden rounded px-1 py-0.5 ${className}`}
+    >
       <span className="relative size-3.5 shrink-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={iconSrc} alt="" className="absolute inset-0 block size-full max-w-none" />
       </span>
-      <span className={`text-micro font-normal leading-[18px] whitespace-nowrap ${labelClassName}`}>{label}</span>
+      <span className={`text-micro leading-[18px] font-normal whitespace-nowrap ${labelClassName}`}>
+        {label}
+      </span>
     </span>
   );
 }
@@ -205,13 +228,15 @@ function ListCardPriceChange({ fund }: { fund: MutualFund }) {
 
   return (
     <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-      <div className="flex items-center justify-end gap-1 text-sm font-bold leading-[24px] text-[#101828]">
+      <div className="flex items-center justify-end gap-1 text-sm leading-[24px] font-bold text-[#101828]">
         <span>{fund.price}</span>
         <span>{fund.currency}</span>
       </div>
       {absNeutral ? (
         <div className="flex w-[105px] items-center gap-1">
-          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-[#4a5565]">{changeAbs}</span>
+          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-[#4a5565]">
+            {changeAbs}
+          </span>
           <ListCardPercentPill changePct={fund.changePct} />
         </div>
       ) : (
@@ -237,14 +262,14 @@ function PriceChange({ fund }: { fund: MutualFund }) {
   const valueColor = isNeutral ? "#4a5565" : isPositive ? "#008236" : "#fb2c36";
 
   return (
-    <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
-      <div className="flex items-center gap-1 text-sm font-bold leading-[24px] text-[#101828]">
+    <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
+      <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-[#101828]">
         <span>{fund.price}</span>
         <span>{fund.currency}</span>
       </div>
       <div className="flex items-center gap-1 text-xs leading-[20px]" style={{ color: valueColor }}>
         <span>{fund.changeAbs}</span>
-        <span className="inline-flex items-center rounded px-1.5 py-0.5 text-xs leading-[20px] bg-[#dbfce7] text-[#008236]">
+        <span className="inline-flex items-center rounded bg-[#dbfce7] px-1.5 py-0.5 text-xs leading-[20px] text-[#008236]">
           {fund.changePct}
         </span>
       </div>
@@ -275,7 +300,8 @@ function Sparkline({ fund }: { fund: MutualFund }) {
     for (let i = 0; i < SPARK_SAMPLES && Math.round(i * step) < series.length; i += 1) {
       sampled.push(series[Math.round(i * step)].nav);
     }
-    if (sampled[sampled.length - 1] !== series[series.length - 1].nav) sampled.push(series[series.length - 1].nav);
+    if (sampled[sampled.length - 1] !== series[series.length - 1].nav)
+      sampled.push(series[series.length - 1].nav);
     return sampled;
   }, [fund.id]);
 
@@ -292,7 +318,9 @@ function Sparkline({ fund }: { fund: MutualFund }) {
     pad + (i / (points.length - 1)) * (SPARK_W - pad * 2),
     pad + (1 - (v - min) / span) * (SPARK_H - pad * 2),
   ]);
-  const line = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`).join("");
+  const line = coords
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join("");
   const area = `${line}L${(SPARK_W - pad).toFixed(2)} ${SPARK_H - pad}L${pad} ${SPARK_H - pad}Z`;
   const color = points[points.length - 1] >= points[0] ? "#00C951" : "#FB2C36";
 
@@ -310,7 +338,14 @@ function Sparkline({ fund }: { fund: MutualFund }) {
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${gradientId})`} opacity="0.24" />
-      <path d={line} stroke={color} strokeLinecap="round" strokeLinejoin="round" fill="none" vectorEffect="non-scaling-stroke" />
+      <path
+        d={line}
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        vectorEffect="non-scaling-stroke"
+      />
     </svg>
   );
 }
@@ -333,7 +368,9 @@ export function MutualFundListCard({
     <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-clip">
       <div className="flex w-full items-start gap-2">
         <div className="flex h-[52px] min-w-0 flex-1 flex-col gap-1">
-          <span className="text-sm font-bold leading-[24px] text-[#101828] whitespace-nowrap">{fund.symbol}</span>
+          <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+            {fund.symbol}
+          </span>
           <p className="line-clamp-2 text-xs leading-[20px] text-[#4a5565]">{fund.name}</p>
         </div>
         <Sparkline fund={fund} />
@@ -405,7 +442,9 @@ export function MutualFundListCardMobile({
     <div className="flex w-full flex-col gap-2">
       <div className="flex w-full items-start justify-end gap-2">
         <div className="flex h-[52px] min-w-0 flex-1 flex-col gap-1">
-          <span className="truncate text-sm font-bold leading-[24px] text-[#101828]">{fund.symbol}</span>
+          <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+            {fund.symbol}
+          </span>
           <p className="line-clamp-2 text-xs leading-[20px] text-[#4a5565]">{fund.name}</p>
         </div>
         <Sparkline fund={fund} />
@@ -470,10 +509,10 @@ export function MutualFundCard({
 }) {
   const content = (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex min-w-0 items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex min-w-0 items-center gap-1">
-            <span className="text-sm font-bold leading-[24px] text-[#101828] whitespace-nowrap">
+            <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
               {fund.symbol}
             </span>
             {fund.isPick && <PickTag />}
@@ -561,7 +600,7 @@ function MutualFundThemeRow({
     >
       <div className="flex flex-col gap-2">
         <div className="flex w-full items-center gap-2">
-          <span className="min-w-0 flex-1 self-start break-words text-sm font-bold leading-[24px] text-[#101828]">
+          <span className="min-w-0 flex-1 self-start text-sm leading-[24px] font-bold break-words text-[#101828]">
             {fund.symbol}
           </span>
           <Sparkline fund={fund} />

@@ -33,7 +33,12 @@ import { NBA_ROW_LIMIT, type NbaRow } from "./dashboard-data";
  */
 const CATEGORY: Record<
   string,
-  { id: "revenue" | "compliance" | "productMatch" | "reengage"; variant: "green" | "red" | "blue" | "yellow"; tone: string; Icon: React.ElementType }
+  {
+    id: "revenue" | "compliance" | "productMatch" | "reengage";
+    variant: "green" | "red" | "blue" | "yellow";
+    tone: string;
+    Icon: React.ElementType;
+  }
 > = {
   "Review & Send": {
     id: "revenue",
@@ -84,7 +89,13 @@ export function NbaPanel({
   if (rows.length === 0) {
     return (
       <EmptyState
-        icon={<SparkleIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        icon={
+          <SparkleIcon
+            size={40}
+            weight="duotone"
+            className="text-[var(--text-default-placeholder)]"
+          />
+        }
         title={t.commandCenter.nba.emptyTitle}
         body={t.commandCenter.nba.emptyBody}
       />
@@ -95,7 +106,7 @@ export function NbaPanel({
     /* One surface with rules inside it, matching the Call Log and KYC cards.
        The drafted message keeps its own blue tint, which still reads against
        the grey — it is the part of the row that has to look machine-written. */
-    <div className="overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+    <div className="divide-y divide-black/[0.05] overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)]">
       {rows.slice(0, limit).map(({ action, displayName, revenueThbM }) => {
         const category = CATEGORY[action.action];
         const { Icon, tone, variant } = category ?? FALLBACK;
@@ -113,25 +124,25 @@ export function NbaPanel({
                 router.push(href);
               }
             }}
-            className="group flex flex-col gap-3 p-4 cursor-pointer transition-colors hover:bg-[var(--fill-p1-100)]"
+            className="group flex cursor-pointer flex-col gap-3 p-4 transition-colors hover:bg-[var(--fill-p1-100)]"
           >
             <div className="flex items-start gap-3">
               <RowIcon tone={tone}>
                 <Icon size={18} weight="duotone" />
               </RowIcon>
 
-              <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <p className="text-body font-bold text-foreground truncate">
-                    {displayName}
-                  </p>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex min-w-0 items-center gap-2">
+                  <p className="truncate text-body font-bold text-foreground">{displayName}</p>
                   <Avatar type="text" initials={getInitials(displayName)} size="xs" />
-                  <span className="shrink-0 text-meta text-muted-foreground">
-                    {action.tier}
-                  </span>
+                  <span className="shrink-0 text-meta text-muted-foreground">{action.tier}</span>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Tag text={category ? t.commandCenter.nba.category[category.id] : action.action} variant={variant} size="small" />
+                  <Tag
+                    text={category ? t.commandCenter.nba.category[category.id] : action.action}
+                    variant={variant}
+                    size="small"
+                  />
                   <Tag text={action.priority} variant={action.priorityVariant} size="small" />
                 </div>
               </div>
@@ -143,15 +154,15 @@ export function NbaPanel({
                 <div className="text-right">
                   {revenueThbM !== null ? (
                     <>
-                      <p className="text-body-lg font-bold leading-none text-success tabular-nums">
+                      <p className="text-success text-body-lg leading-none font-bold tabular-nums">
                         ฿{revenueThbM}M
                       </p>
-                      <p className="mt-1 text-meta text-muted-foreground">{t.commandCenter.nba.revenueOpportunity}</p>
+                      <p className="mt-1 text-meta text-muted-foreground">
+                        {t.commandCenter.nba.revenueOpportunity}
+                      </p>
                     </>
                   ) : (
-                    <p className="text-meta font-medium text-warning">
-                      {action.revenueImpact}
-                    </p>
+                    <p className="text-warning text-meta font-medium">{action.revenueImpact}</p>
                   )}
                 </div>
                 <button
@@ -162,14 +173,14 @@ export function NbaPanel({
                     e.stopPropagation();
                     onDismiss(action.id);
                   }}
-                  className="shrink-0 cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-white hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
+                  className="shrink-0 cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 hover:bg-white hover:text-foreground focus-visible:opacity-100"
                 >
                   <XIcon size={14} weight="bold" />
                 </button>
               </div>
             </div>
 
-            <p className="text-label text-muted-foreground leading-relaxed line-clamp-2">
+            <p className="line-clamp-2 text-label leading-relaxed text-muted-foreground">
               {action.insight}
             </p>
 
@@ -177,13 +188,13 @@ export function NbaPanel({
                 framed it in — it is the part of the row the RM is most likely
                 to act on, and it has to read as machine-written rather than as
                 something the desk already sent. */}
-            <div className="flex gap-2 rounded-xl bg-primary-action-light px-3 py-2.5">
+            <div className="bg-primary-action-light flex gap-2 rounded-xl px-3 py-2.5">
               <SparkleIcon
                 size={13}
                 weight="fill"
-                className="mt-0.5 shrink-0 text-primary-action"
+                className="text-primary-action mt-0.5 shrink-0"
               />
-              <p className="text-label leading-relaxed text-foreground line-clamp-2">
+              <p className="line-clamp-2 text-label leading-relaxed text-foreground">
                 {action.aiDraft}
               </p>
             </div>

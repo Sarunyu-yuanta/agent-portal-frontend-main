@@ -38,7 +38,6 @@ import { useOrderBooks } from "./use-order-books";
 import { bookingModeForDesk, type Desk } from "./bookable-products";
 import { useT } from "@/i18n/I18nProvider";
 
-
 export function QuotaBooksPanel({
   desk,
   clientId,
@@ -114,8 +113,6 @@ export function QuotaBooksPanel({
     );
   }, [books, desk, search, isPrivate, step_, proposals, productIds, clientId]);
 
-
-
   if (isLoading) return <OrdersPanelSkeleton withCreate />;
 
   return (
@@ -162,7 +159,11 @@ export function QuotaBooksPanel({
         <EmptyState
           icon={<ClipboardTextIcon size={40} className="text-[var(--text-default-placeholder)]" />}
           title={search.trim() ? t.states.noResultTitle : step.empty}
-          action={search.trim() ? { label: t.states.clearFilters, onClick: () => setSearch("") } : undefined}
+          action={
+            search.trim()
+              ? { label: t.states.clearFilters, onClick: () => setSearch("") }
+              : undefined
+          }
           body={
             search.trim()
               ? t.orders.books.searchHint

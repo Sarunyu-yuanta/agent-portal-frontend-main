@@ -50,36 +50,44 @@ export function ClientOrdersTab({ clientId }: { clientId: string }) {
       {!hasLoaded ? (
         <TabsSkeleton count={ORDER_TABS.length} />
       ) : (
-      <div className="transparent-tabs scrollable-tabs">
-        <TabGroup
-          items={ORDER_TABS.map((tab) => ({
-            id: tab.id,
-            title: tab.id === "all" ? t.orders.tabAll : tab.title,
-          }))}
-          activeId={tab.id}
-          // Every filter belongs to one sub-tab, so none is carried into the
-          // next — only the profile's own `tab` stays.
-          onChange={(id) =>
-            setQueryState(
-              withQuery(pathname, "", {
-                tab: searchParams.get("tab"),
-                otab: id === DEFAULT_ORDER_TAB ? null : id,
-              }),
-              "replace",
-            )
-          }
-          size="md"
-        />
-      </div>
+        <div className="transparent-tabs scrollable-tabs">
+          <TabGroup
+            items={ORDER_TABS.map((tab) => ({
+              id: tab.id,
+              title: tab.id === "all" ? t.orders.tabAll : tab.title,
+            }))}
+            activeId={tab.id}
+            // Every filter belongs to one sub-tab, so none is carried into the
+            // next — only the profile's own `tab` stays.
+            onChange={(id) =>
+              setQueryState(
+                withQuery(pathname, "", {
+                  tab: searchParams.get("tab"),
+                  otab: id === DEFAULT_ORDER_TAB ? null : id,
+                }),
+                "replace",
+              )
+            }
+            size="md"
+          />
+        </div>
       )}
 
       <FadeIn key={tab.id}>
         {tab.kind === "all" ? (
           <AllOrdersPanel clientId={clientId} />
         ) : tab.kind === "basket" ? (
-          <BasketBooksPanel desk={tab.desk} catalogHref={catalogListHref(tab.id)} clientId={clientId} />
+          <BasketBooksPanel
+            desk={tab.desk}
+            catalogHref={catalogListHref(tab.id)}
+            clientId={clientId}
+          />
         ) : tab.kind === "quota" ? (
-          <QuotaBooksPanel desk={tab.desk} catalogHref={catalogListHref(tab.id)} clientId={clientId} />
+          <QuotaBooksPanel
+            desk={tab.desk}
+            catalogHref={catalogListHref(tab.id)}
+            clientId={clientId}
+          />
         ) : (
           <TransactionsPanel asset={tab.asset} clientId={clientId} />
         )}

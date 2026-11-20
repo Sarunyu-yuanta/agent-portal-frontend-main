@@ -11,5 +11,4 @@ import { useEffect, useLayoutEffect } from "react";
  * given a home; they were byte-identical, which is six places to fix if the
  * shim ever needs to change and five chances to miss one.
  */
-export const useIsoLayoutEffect =
-  typeof window === "undefined" ? useEffect : useLayoutEffect;
+export const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;

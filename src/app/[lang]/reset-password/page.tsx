@@ -103,16 +103,17 @@ function ResetPasswordInner() {
         <div className="flex flex-col items-center gap-3 py-6 text-center">
           <LinkBreakIcon size={48} weight="duotone" className="text-[var(--text-danger-primary)]" />
           <h1 className="type-h4 text-foreground">{t.auth.reset.invalidTitle}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t.auth.reset.invalidBody}
-          </p>
+          <p className="text-sm text-muted-foreground">{t.auth.reset.invalidBody}</p>
         </div>
-        <Button variant="primary" size="lg" className="w-full" onClick={() => router.push("/forgot-password")}>
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          onClick={() => router.push("/forgot-password")}
+        >
           {t.auth.reset.requestNew}
         </Button>
-        <p className="type-description text-center text-muted-foreground">
-          {t.auth.copyright}
-        </p>
+        <p className="type-description text-center text-muted-foreground">{t.auth.copyright}</p>
       </AuthShell>
     );
   }
@@ -124,11 +125,14 @@ function ResetPasswordInner() {
           <div className="flex flex-col items-center gap-3 py-6 text-center">
             <CheckCircleIcon size={48} className="text-success" weight="fill" />
             <h1 className="type-h4 text-foreground">{t.auth.reset.doneTitle}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t.auth.reset.doneBody}
-            </p>
+            <p className="text-sm text-muted-foreground">{t.auth.reset.doneBody}</p>
           </div>
-          <Button variant="outline" size="lg" className="w-full" onClick={() => router.push("/login")}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full"
+            onClick={() => router.push("/login")}
+          >
             {t.auth.login}
           </Button>
         </>
@@ -157,7 +161,7 @@ function ResetPasswordInner() {
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {showPassword ? <EyeSlashIcon size={20} /> : <EyeIcon size={20} />}
                 </button>
@@ -180,7 +184,7 @@ function ResetPasswordInner() {
                   type="button"
                   onClick={() => setShowConfirmPassword((s) => !s)}
                   aria-label={showConfirmPassword ? t.auth.hidePassword : t.auth.showPassword}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {showConfirmPassword ? <EyeSlashIcon size={20} /> : <EyeIcon size={20} />}
                 </button>
@@ -191,7 +195,7 @@ function ResetPasswordInner() {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full mt-6"
+              className="mt-6 w-full"
               disabled={submitting}
             >
               {submitting ? t.common.saving : t.auth.reset.submit}
@@ -200,9 +204,7 @@ function ResetPasswordInner() {
         </>
       )}
 
-      <p className="type-description text-center text-muted-foreground">
-        {t.auth.copyright}
-      </p>
+      <p className="type-description text-center text-muted-foreground">{t.auth.copyright}</p>
     </AuthShell>
   );
 }

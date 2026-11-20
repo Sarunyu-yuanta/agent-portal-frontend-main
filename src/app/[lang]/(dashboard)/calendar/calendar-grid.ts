@@ -7,7 +7,6 @@ const WEEKDAYS_PER_WEEK = 7;
  * so paging between months always renders the same grid height. */
 export const WEEKS_SHOWN = 6;
 
-
 export type DayRelation = "past" | "today" | "future";
 
 /**

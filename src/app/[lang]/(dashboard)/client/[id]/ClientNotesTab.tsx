@@ -127,7 +127,9 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
     // Housekeeping for a note left blank; nothing the IC asked for, so a
     // failure is logged rather than toasted.
     if (note && draftBlank) {
-      removeNote(note.id).catch((err: unknown) => console.warn("[ClientNotesTab] prune failed", err));
+      removeNote(note.id).catch((err: unknown) =>
+        console.warn("[ClientNotesTab] prune failed", err),
+      );
     }
   };
 
@@ -235,7 +237,13 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
       {clientNotes.length === 0 && (
         <EmptyState
           size="compact"
-          icon={<NotePencilIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          icon={
+            <NotePencilIcon
+              size={32}
+              weight="duotone"
+              className="text-[var(--text-default-placeholder)]"
+            />
+          }
           title={t.client.notes.noneForClient}
         />
       )}
@@ -270,11 +278,15 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
             pinnedClientId={clientId}
             onSave={(patch) => setDraftAttrs((prev) => ({ ...prev, ...patch }))}
             onEmptyChange={setDraftBlank}
-            onValuesChange={(values) => { modalValuesRef.current = values; }}
+            onValuesChange={(values) => {
+              modalValuesRef.current = values;
+            }}
             manualSave
             layout="side"
             autoFocusTitle
-            onAttributesOpenChange={(open) => { attributesOpenRef.current = open; }}
+            onAttributesOpenChange={(open) => {
+              attributesOpenRef.current = open;
+            }}
           />
         ) : panelNote ? (
           <NoteDetailPane
@@ -284,11 +296,15 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
             pinnedClientId={clientId}
             onSave={(patch) => editNote({ ...panelNote, ...patch })}
             onEmptyChange={setDraftBlank}
-            onValuesChange={(values) => { modalValuesRef.current = values; }}
+            onValuesChange={(values) => {
+              modalValuesRef.current = values;
+            }}
             manualSave
             layout="side"
             autoFocusTitle={panelNote.title === null && panelNote.body === ""}
-            onAttributesOpenChange={(open) => { attributesOpenRef.current = open; }}
+            onAttributesOpenChange={(open) => {
+              attributesOpenRef.current = open;
+            }}
             onDelete={() => setDeleteTarget(panelNote)}
           />
         ) : null}

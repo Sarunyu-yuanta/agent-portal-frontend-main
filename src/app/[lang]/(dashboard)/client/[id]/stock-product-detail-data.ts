@@ -176,16 +176,86 @@ function depthLevels(side: "bid" | "offer"): OrderBookLevel[] {
 
 /** Figma node 23923:56893 — Time & Sales, 10 ticks. */
 const FIGMA_TRADES: TimeSalesRow[] = [
-  { time: "03:40:53", price: "50.50", priceTone: "up", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.75", priceTone: "up", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.50", priceTone: "up", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.75", priceTone: "up", volume: "10", volumeTone: "down", side: "Buy" },
-  { time: "03:40:53", price: "50.50", priceTone: "up", volume: "10", volumeTone: "down", side: "Sell" },
-  { time: "03:40:53", price: "50.75", priceTone: "up", volume: "10", volumeTone: "down", side: "Sell" },
-  { time: "03:40:53", price: "50.50", priceTone: "up", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.75", priceTone: "up", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.25", priceTone: "down", volume: "10", volumeTone: "up", side: "Buy" },
-  { time: "03:40:53", price: "50.00", priceTone: "down", volume: "10", volumeTone: "down", side: "Sell" },
+  {
+    time: "03:40:53",
+    price: "50.50",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.75",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.50",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.75",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "down",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.50",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "down",
+    side: "Sell",
+  },
+  {
+    time: "03:40:53",
+    price: "50.75",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "down",
+    side: "Sell",
+  },
+  {
+    time: "03:40:53",
+    price: "50.50",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.75",
+    priceTone: "up",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.25",
+    priceTone: "down",
+    volume: "10",
+    volumeTone: "up",
+    side: "Buy",
+  },
+  {
+    time: "03:40:53",
+    price: "50.00",
+    priceTone: "down",
+    volume: "10",
+    volumeTone: "down",
+    side: "Sell",
+  },
 ];
 
 /** Figma node 24632:43803 — Volume Analysis (bar widths sampled from desktop frame). */
@@ -379,8 +449,7 @@ export function getStockQuoteHistory(
   const k = last / (series[series.length - 1] || 1);
   const end = bangkok("2025-05-03T15:00:00");
   const day = 86400000;
-  const step =
-    range === "5D" ? day : range === "1M" ? day : range === "5Y" ? day * 30 : day * 7;
+  const step = range === "5D" ? day : range === "1M" ? day : range === "5Y" ? day * 30 : day * 7;
   return series.map((v, i) => ({
     t: end - (count - 1 - i) * step,
     price: v * k,

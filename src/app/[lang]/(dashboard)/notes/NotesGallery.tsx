@@ -69,9 +69,7 @@ export function NotesGallery({
 
 /** One column count for every tile, so the add tile lines up with the cards. */
 function GalleryGrid({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">{children}</div>
-  );
+  return <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">{children}</div>;
 }
 
 function AddTile({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
@@ -84,7 +82,7 @@ function AddTile({ onClick, disabled }: { onClick: () => void; disabled: boolean
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex flex-col self-start disabled:cursor-not-allowed disabled:opacity-50 group/tile"
+      className="group/tile flex flex-col self-start disabled:cursor-not-allowed disabled:opacity-50"
     >
       {/* Dashed and empty where a card would have content, so it reads as a slot
           waiting to be filled rather than a note that happens to be blank. The
@@ -98,7 +96,7 @@ function AddTile({ onClick, disabled }: { onClick: () => void; disabled: boolean
           class: the hover one has to (Tailwind can't build variants of the
           design system's hand-written classes), and matching them keeps the pair
           readable as one scale. */}
-      <span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-primary-action bg-[var(--primary-action-light)] text-primary-action transition-colors group-hover/tile:bg-[var(--primary-action-muted)]">
+      <span className="border-primary-action text-primary-action flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-[var(--primary-action-light)] transition-colors group-hover/tile:bg-[var(--primary-action-muted)]">
         <PlusIcon size={24} />
         <span className="type-body-2 font-semibold">{t.planner.notes.newNote}</span>
       </span>
@@ -124,7 +122,7 @@ function NoteCard({
       type="button"
       onClick={onOpen}
       aria-current={selected || undefined}
-      className="flex flex-col gap-2 text-left group/tile"
+      className="group/tile flex flex-col gap-2 text-left"
     >
       {/* The note at a smaller size: its own title, then the body as written,
           clipped by the tile. `whitespace-pre-wrap` keeps the line breaks — they
@@ -154,14 +152,14 @@ function NoteCard({
           transient and this isn't, so they need to be told apart when the
           pointer happens to be resting on the open one. */}
       <span
-        className={`flex aspect-[4/3] flex-col gap-1 overflow-hidden rounded-lg border bg-card p-3 select-none transition-[border-color,box-shadow,transform] duration-150 ease-out group-hover/tile:-translate-y-0.5 group-hover/tile:border-[var(--primary-action)] group-hover/tile:shadow-md motion-reduce:group-hover/tile:translate-y-0 ${
+        className={`flex aspect-[4/3] flex-col gap-1 overflow-hidden rounded-lg border bg-card p-3 transition-[border-color,box-shadow,transform] duration-150 ease-out select-none group-hover/tile:-translate-y-0.5 group-hover/tile:border-[var(--primary-action)] group-hover/tile:shadow-md motion-reduce:group-hover/tile:translate-y-0 ${
           selected
             ? "border-[var(--primary-action)] ring-2 ring-[var(--primary-action-muted)]"
             : "border-border"
         }`}
       >
         {note.title && (
-          <span className="type-caption font-semibold text-foreground line-clamp-2">
+          <span className="type-caption line-clamp-2 font-semibold text-foreground">
             {note.title}
           </span>
         )}
@@ -196,12 +194,12 @@ function NoteCard({
           learn it after hydration — one frame of captions appearing and
           vanishing across the whole wall. */}
       <span className={`flex-col gap-0.5 ${reminder ? "flex" : "hidden md:flex"}`}>
-        <span className="type-body-2 font-semibold text-foreground truncate max-md:hidden">
+        <span className="type-body-2 truncate font-semibold text-foreground max-md:hidden">
           {note.title || t.planner.notes.newNoteTitle}
         </span>
         {reminder && (
           <span
-            className={`flex items-center gap-1 type-caption ${REMINDER_TONE[reminder.variant]}`}
+            className={`type-caption flex items-center gap-1 ${REMINDER_TONE[reminder.variant]}`}
           >
             {note.reminderDone ? (
               <CheckCircleIcon size={13} weight="fill" className="shrink-0" aria-hidden />

@@ -113,7 +113,7 @@ export function AlertDetail({
           — a tinted band is already its own edge. */}
       <p
         style={badge.style}
-        className={`flex shrink-0 items-center gap-1.5 px-4 py-2 type-caption ${badge.className}`}
+        className={`type-caption flex shrink-0 items-center gap-1.5 px-4 py-2 ${badge.className}`}
       >
         <LightningIcon size={13} weight="fill" className="shrink-0" />
         {item.source === "corporate-action"
@@ -159,7 +159,7 @@ export function AlertDetail({
             type="button"
             onClick={onClose}
             aria-label={t.common.close}
-            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
           >
             <XIcon size={16} />
           </button>
@@ -171,9 +171,7 @@ export function AlertDetail({
         // continues the title rather than starting a new block. `pt-2` on top of
         // the header's own `pb-2`: enough air to read as its own sentence, still
         // closer to the date above it than to the rule below.
-        <p className="shrink-0 pb-4 pl-16 pr-4 pt-2 type-body-2 text-foreground">
-          {item.detail}
-        </p>
+        <p className="type-body-2 shrink-0 pt-2 pr-4 pb-4 pl-16 text-foreground">{item.detail}</p>
       )}
 
       {/* The row's own extras — a speaker, a seat count, a closing time. Laid
@@ -198,10 +196,8 @@ export function AlertDetail({
             >
               {group.map((fact) => (
                 <div key={fact.label} className="flex items-baseline gap-4">
-                  <dt className="min-w-0 flex-1 type-body-2 text-muted-foreground">
-                    {fact.label}
-                  </dt>
-                  <dd className="shrink-0 text-right type-body-2 font-semibold text-foreground">
+                  <dt className="type-body-2 min-w-0 flex-1 text-muted-foreground">{fact.label}</dt>
+                  <dd className="type-body-2 shrink-0 text-right font-semibold text-foreground">
                     {fact.value}
                   </dd>
                 </div>
@@ -213,51 +209,57 @@ export function AlertDetail({
 
       {showHolders && (
         <>
-      <p className="shrink-0 border-t border-border/60 px-4 pb-1 pt-3 type-caption font-medium uppercase tracking-wide text-muted-foreground">
-        {t.planner.calendar.alert.holders(holders.length)}
-      </p>
+          <p className="type-caption shrink-0 border-t border-border/60 px-4 pt-3 pb-1 font-medium tracking-wide text-muted-foreground uppercase">
+            {t.planner.calendar.alert.holders(holders.length)}
+          </p>
 
-      {/* `max-h` rather than `flex-1`, for the reason `HolderContact` gives: a
+          {/* `max-h` rather than `flex-1`, for the reason `HolderContact` gives: a
           pane in the sliding track needs a height of its own to be measured. */}
-      {holders.length === 0 ? (
-        <EmptyState
-          size="compact"
-          icon={<UsersIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
-          title={t.planner.calendar.alert.noHolders}
-        />
-      ) : (
-      <ul className="flex max-h-[calc(var(--vh)*40)] flex-col overflow-y-auto pb-2">
-        {holders.map((holder) => (
-          <li key={holder.id}>
-            {/* Into this panel's contact view, not out to the client's page. An
+          {holders.length === 0 ? (
+            <EmptyState
+              size="compact"
+              icon={
+                <UsersIcon
+                  size={32}
+                  weight="duotone"
+                  className="text-[var(--text-default-placeholder)]"
+                />
+              }
+              title={t.planner.calendar.alert.noHolders}
+            />
+          ) : (
+            <ul className="flex max-h-[calc(var(--vh)*40)] flex-col overflow-y-auto pb-2">
+              {holders.map((holder) => (
+                <li key={holder.id}>
+                  {/* Into this panel's contact view, not out to the client's page. An
                 alert like "notify holders" is answered by a phone number, and
                 leaving for a full profile to find one costs the alert you were
                 working from. The profile is still one button further in. */}
-            <button
-              type="button"
-              onClick={() => {
-                setShown(holder.id);
-                setContactId(holder.id);
-              }}
-              className={`group flex w-full items-center gap-2.5 px-4 text-left transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! ${
-                isSheet ? "py-3" : "py-2"
-              }`}
-            >
-              <Avatar type="text" initials={getInitial(holder.name)} size="s" />
-              <span className="min-w-0 flex-1 truncate type-body-2 text-foreground">
-                {holder.name}
-              </span>
-              <CaretRightIcon
-                size={14}
-                className={`shrink-0 text-muted-foreground transition-opacity ${
-                  isSheet ? "opacity-40" : "opacity-0 group-hover:opacity-100"
-                }`}
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
-      )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShown(holder.id);
+                      setContactId(holder.id);
+                    }}
+                    className={`group flex w-full cursor-pointer items-center gap-2.5 px-4 text-left transition-colors hover:bg-[var(--bg-default-secondary)]! ${
+                      isSheet ? "py-3" : "py-2"
+                    }`}
+                  >
+                    <Avatar type="text" initials={getInitial(holder.name)} size="s" />
+                    <span className="type-body-2 min-w-0 flex-1 truncate text-foreground">
+                      {holder.name}
+                    </span>
+                    <CaretRightIcon
+                      size={14}
+                      className={`shrink-0 text-muted-foreground transition-opacity ${
+                        isSheet ? "opacity-40" : "opacity-0 group-hover:opacity-100"
+                      }`}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       )}
     </div>

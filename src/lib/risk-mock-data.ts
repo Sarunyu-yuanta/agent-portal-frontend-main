@@ -138,9 +138,7 @@ function timestampFromMinutesAgo(minutes: number): string {
 
 /** Lookup map — a client's name lives only in `clients.json`. */
 const nameById = Object.fromEntries(mockClients.map((c) => [c.id, c.name]));
-const riskProfileById = Object.fromEntries(
-  mockClients.map((c) => [c.id, c.riskProfile]),
-);
+const riskProfileById = Object.fromEntries(mockClients.map((c) => [c.id, c.riskProfile]));
 
 /**
  * A suitability alert quotes the client's own risk rating, so it is written as
@@ -167,52 +165,45 @@ function metricOf(raw: RawMetric, clientId: string | null): RiskMetric {
     // Money is authored once, as a number, and formatted here — so the string
     // and the figure cannot disagree. Same move `fillKycPlaceholders` makes for
     // dates, applied to amounts.
-    value: fillClientPlaceholders(
-      raw.value ?? formatThbWhole(raw.amountThb ?? 0),
-      clientId,
-    ),
+    value: fillClientPlaceholders(raw.value ?? formatThbWhole(raw.amountThb ?? 0), clientId),
     amountThb: raw.amountThb ?? null,
     emphasis: raw.emphasis ?? false,
   };
 }
 
 /** The seed dataset, dates stamped from today. */
-export const mockRiskAlerts: RiskAlert[] = (riskAlertsRaw as RawRiskAlert[]).map(
-  (raw) => {
-    const kind = raw.kind as RiskAlertKind;
-    const clientId = raw.clientId;
-    // `dueDate` is the field of record; `daysLeft` is read back out of it
-    // rather than taken from `dueOffset`, so the path a real backend exercises
-    // is the one running here. Short-circuiting it would leave that path
-    // untested until the day it matters.
-    const dueDate = raw.dueOffset == null ? null : dayFromOffset(raw.dueOffset);
-    const daysLeft = dueDate === null ? null : daysFromToday(dueDate);
+export const mockRiskAlerts: RiskAlert[] = (riskAlertsRaw as RawRiskAlert[]).map((raw) => {
+  const kind = raw.kind as RiskAlertKind;
+  const clientId = raw.clientId;
+  // `dueDate` is the field of record; `daysLeft` is read back out of it
+  // rather than taken from `dueOffset`, so the path a real backend exercises
+  // is the one running here. Short-circuiting it would leave that path
+  // untested until the day it matters.
+  const dueDate = raw.dueOffset == null ? null : dayFromOffset(raw.dueOffset);
+  const daysLeft = dueDate === null ? null : daysFromToday(dueDate);
 
-    return {
-      id: raw.id,
-      kind,
-      category: RISK_CATEGORY_OF_KIND[kind],
-      severity: raw.severity as RiskSeverity,
-      ruleCode: raw.ruleCode,
-      title: fillClientPlaceholders(raw.title, clientId),
-      message: fillClientPlaceholders(raw.message, clientId),
-      metrics: raw.metrics.map((m) => metricOf(m, clientId)),
-      recommendedAction: fillClientPlaceholders(raw.recommendedAction, clientId),
-      clientId,
-      // Unmasked here. Masking is the feed's job, for the reason `buildQueue`
-      // gives: only the function building a display row knows which of its
-      // strings is a person's name.
-      clientName: clientId
-        ? (nameById[clientId] ?? clientId)
-        : (raw.clientLabel ?? "ยังระบุตัวตนไม่ได้"),
-      accountLabel: raw.accountLabel,
-      contactAllowed: raw.contactAllowed,
-      contactNote: raw.contactNote,
-      dismissible: raw.dismissible,
-      detectedAt: timestampFromMinutesAgo(raw.detectedMinutesAgo),
-      dueDate,
-      daysLeft,
-      zone: daysLeft === null ? null : zoneForDays(daysLeft),
-    };
-  },
-);
+  return {
+    id: raw.id,
+    kind,
+    category: RISK_CATEGORY_OF_KIND[kind],
+    severity: raw.severity as RiskSeverity,
+    ruleCode: raw.ruleCode,
+    title: fillClientPlaceholders(raw.title, clientId),
+    message: fillClientPlaceholders(raw.message, clientId),
+    metrics: raw.metrics.map((m) => metricOf(m, clientId)),
+    recommendedAction: fillClientPlaceholders(raw.recommendedAction, clientId),
+    clientId,
+    // Unmasked here. Masking is the feed's job, for the reason `buildQueue`
+    // gives: only the function building a display row knows which of its
+    // strings is a person's name.
+    clientName: clientId ? (nameById[clientId] ?? clientId) : (raw.clientLabel ?? "ยังระบุตัวตนไม่ได้"),
+    accountLabel: raw.accountLabel,
+    contactAllowed: raw.contactAllowed,
+    contactNote: raw.contactNote,
+    dismissible: raw.dismissible,
+    detectedAt: timestampFromMinutesAgo(raw.detectedMinutesAgo),
+    dueDate,
+    daysLeft,
+    zone: daysLeft === null ? null : zoneForDays(daysLeft),
+  };
+});

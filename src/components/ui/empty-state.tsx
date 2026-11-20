@@ -56,10 +56,12 @@ export function EmptyState({
   size?: StateSize;
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center gap-3 ${SIZE_CLASS[size]} text-center`}>
+    <div
+      className={`flex flex-col items-center justify-center gap-3 ${SIZE_CLASS[size]} text-center`}
+    >
       {icon}
       <p className="type-subtitle-1 font-semibold text-[var(--text-default-secondary)]">{title}</p>
-      {body && <p className="type-body-2 text-[var(--text-default-tertiary)] max-w-xs">{body}</p>}
+      {body && <p className="type-body-2 max-w-xs text-[var(--text-default-tertiary)]">{body}</p>}
       {actionSlot ? (
         <div className="mt-1">{actionSlot}</div>
       ) : (
@@ -67,7 +69,7 @@ export function EmptyState({
           <button
             type="button"
             onClick={action.onClick}
-            className="mt-1 text-body-sm font-medium text-primary-action hover:underline cursor-pointer"
+            className="text-primary-action mt-1 cursor-pointer text-body-sm font-medium hover:underline"
           >
             {action.label}
           </button>
@@ -103,7 +105,7 @@ export function ErrorState({
     >
       <WarningCircleIcon size={40} weight="duotone" className="text-[var(--text-danger-primary)]" />
       <p className="type-subtitle-1 font-semibold text-[var(--text-default-secondary)]">{title}</p>
-      <p className="type-body-2 text-[var(--text-default-tertiary)] max-w-xs">{body}</p>
+      <p className="type-body-2 max-w-xs text-[var(--text-default-tertiary)]">{body}</p>
       {onRetry && (
         <Button
           variant="outline"
@@ -129,15 +131,19 @@ export function StaleBanner({ onRetry }: { onRetry?: () => void }) {
   return (
     <div
       role="status"
-      className="flex items-center gap-2 rounded-lg border border-[var(--border-warning)] bg-[var(--bg-warning-light)] px-3 py-2 type-body-2 text-[var(--text-default-secondary)]"
+      className="type-body-2 flex items-center gap-2 rounded-lg border border-[var(--border-warning)] bg-[var(--bg-warning-light)] px-3 py-2 text-[var(--text-default-secondary)]"
     >
-      <WarningCircleIcon size={18} weight="fill" className="shrink-0 text-[var(--text-warning-primary)]" />
-      <span className="flex-1 min-w-0">{t.states.staleBanner}</span>
+      <WarningCircleIcon
+        size={18}
+        weight="fill"
+        className="shrink-0 text-[var(--text-warning-primary)]"
+      />
+      <span className="min-w-0 flex-1">{t.states.staleBanner}</span>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="shrink-0 font-medium text-primary-action hover:underline cursor-pointer"
+          className="text-primary-action shrink-0 cursor-pointer font-medium hover:underline"
         >
           {t.states.retry}
         </button>
@@ -165,9 +171,11 @@ export function NotFoundState({
 }) {
   const t = useT();
   return (
-    <div className="flex flex-col items-center justify-center gap-3 w-full text-center px-4 py-24">
+    <div className="flex w-full flex-col items-center justify-center gap-3 px-4 py-24 text-center">
       <MagnifyingGlassIcon size={40} weight="duotone" className="text-muted-foreground/40" />
-      <p className="type-subtitle-1 font-semibold text-[var(--text-default-secondary)]">{message}</p>
+      <p className="type-subtitle-1 font-semibold text-[var(--text-default-secondary)]">
+        {message}
+      </p>
       {onBack && (
         <Button variant="plain" size="sm" leftIcon={<ArrowLeftIcon size={16} />} onClick={onBack}>
           {backLabel ?? t.common.back}
@@ -213,7 +221,11 @@ export function TableEmptyOverlay({
   return (
     <div className="absolute inset-x-0 top-12 bottom-0 flex items-center justify-center bg-[var(--bg-default-primary,white)]">
       <EmptyState
-        icon={icon ?? <MagnifyingGlassIcon size={40} className="text-[var(--text-default-placeholder)]" />}
+        icon={
+          icon ?? (
+            <MagnifyingGlassIcon size={40} className="text-[var(--text-default-placeholder)]" />
+          )
+        }
         title={title ?? (isEmpty ? t.states.empty : t.states.noResultTitle)}
         body={body ?? (isEmpty ? undefined : t.states.noResultBody)}
         action={

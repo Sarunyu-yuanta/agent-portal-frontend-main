@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  CalendarBlankIcon,
-  CaretRightIcon,
-  PlusIcon,
-} from "@phosphor-icons/react";
+import { CalendarBlankIcon, CaretRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { ClientAvatarStack } from "@/components/ui/client-avatar-stack";
 import { dayLabel, weekdayLabel, type DayRelation } from "./calendar-grid";
 import { splitDayItems, type ActionGroup, type DayItem } from "./day-items";
@@ -22,7 +18,10 @@ import { useLocale, useT } from "@/i18n/I18nProvider";
  * because it's the one day being looked at from the inside. A future day would
  * get "Upcoming", which is exactly what the date already told you.
  */
-const RELATION_BADGE: Record<DayRelation, { labelKey: "overdue" | "today"; className: string } | null> = {
+const RELATION_BADGE: Record<
+  DayRelation,
+  { labelKey: "overdue" | "today"; className: string } | null
+> = {
   past: {
     labelKey: "overdue",
     className: "bg-[var(--fill-p1-100)] text-[var(--fill-p1-600)]",
@@ -73,7 +72,10 @@ function ActionGroupCard({
             exchange's name for it goes in the tooltip — "XD" is the label
             everyone here works in, and spelling it out on the card would push
             the chips, which are the point, onto a third line. */}
-        <span className="type-caption font-semibold text-foreground" title={actionKindName(group.kind, t)}>
+        <span
+          className="type-caption font-semibold text-foreground"
+          title={actionKindName(group.kind, t)}
+        >
           {group.kind}
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -88,12 +90,8 @@ function ActionGroupCard({
                 // chip opens is about the company and says nothing about who
                 // holds it (see `AlertOverlay`); the one thing worth saying at
                 // chip size is whether the action touches the book at all.
-                title={
-                  held > 0
-                    ? t.planner.calendar.day.heldBy(item.symbol, held)
-                    : item.symbol
-                }
-                className="flex max-w-full items-center gap-1 rounded px-1.5 py-0.5 type-caption cursor-pointer transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-p1-600)]"
+                title={held > 0 ? t.planner.calendar.day.heldBy(item.symbol, held) : item.symbol}
+                className="type-caption flex max-w-full cursor-pointer items-center gap-1 rounded px-1.5 py-0.5 transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--fill-p1-600)]"
                 style={{ backgroundColor: palette.tint, color: palette.text }}
               >
                 {held > 0 && (
@@ -170,8 +168,7 @@ export function DayPopoverContent({
   // An "Overdue" badge on a day whose reminders are all ticked off would be
   // wrong: nothing is outstanding. The badge describes work still owed, so a
   // fully-cleared past day gets none.
-  const badge =
-    relation === "past" && items.every((i) => i.done) ? null : RELATION_BADGE[relation];
+  const badge = relation === "past" && items.every((i) => i.done) ? null : RELATION_BADGE[relation];
 
   const { actionGroups, others } = splitDayItems(items);
 
@@ -179,7 +176,7 @@ export function DayPopoverContent({
     <div className={`flex min-h-0 flex-col ${isSheet ? "w-full" : "w-80"}`}>
       <header
         className={`flex shrink-0 items-start justify-between gap-3 px-3.5 ${
-          isSheet ? "pb-3 pt-1" : "pb-2.5 pt-3"
+          isSheet ? "pt-1 pb-3" : "pt-3 pb-2.5"
         }`}
       >
         <div className="min-w-0">
@@ -195,7 +192,7 @@ export function DayPopoverContent({
         </div>
         {badge && (
           <span
-            className={`shrink-0 rounded-full px-2 py-0.5 type-caption font-medium ${badge.className}`}
+            className={`type-caption shrink-0 rounded-full px-2 py-0.5 font-medium ${badge.className}`}
           >
             {t.planner.calendar.day[badge.labelKey]}
           </span>
@@ -208,12 +205,14 @@ export function DayPopoverContent({
           has to stay on screen while the list is scrolled. */}
       {holiday && (
         <p
-          className="flex shrink-0 items-center gap-1.5 px-3.5 py-2 type-caption"
+          className="type-caption flex shrink-0 items-center gap-1.5 px-3.5 py-2"
           style={{ backgroundColor: HOLIDAY_PALETTE.tint, color: HOLIDAY_PALETTE.text }}
         >
           <HolidayIcon size={14} weight="fill" className="shrink-0" />
           <span className="min-w-0 flex-1 truncate">{holiday.name}</span>
-          <span className="shrink-0 font-medium">{t.planner.calendar.day.marketClosed(holiday.market)}</span>
+          <span className="shrink-0 font-medium">
+            {t.planner.calendar.day.marketClosed(holiday.market)}
+          </span>
         </p>
       )}
 
@@ -222,7 +221,9 @@ export function DayPopoverContent({
         // one rule whichever branch renders.
         <div className="flex flex-col items-center gap-2 border-y border-border/60 px-3.5 py-8 text-center">
           <CalendarBlankIcon size={28} className="text-muted-foreground/40" />
-          <p className="type-body-2 text-muted-foreground">{t.planner.calendar.day.nothingScheduled}</p>
+          <p className="type-body-2 text-muted-foreground">
+            {t.planner.calendar.day.nothingScheduled}
+          </p>
         </div>
       ) : (
         <div
@@ -265,23 +266,27 @@ export function DayPopoverContent({
                     <button
                       type="button"
                       onClick={open}
-                      className={`group flex w-full items-start gap-2.5 px-3.5 text-left transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! ${
+                      className={`group flex w-full cursor-pointer items-start gap-2.5 px-3.5 text-left transition-colors hover:bg-[var(--bg-default-secondary)]! ${
                         isSheet ? "py-3.5" : "py-2.5"
                       }`}
                     >
                       {/* `self-center`, like the caret: the badge stands for the
                           row rather than for its title line. */}
-                      <SourceBadgeIcon item={item} size={isSheet ? "default" : "small"} selfCenter />
+                      <SourceBadgeIcon
+                        item={item}
+                        size={isSheet ? "default" : "small"}
+                        selfCenter
+                      />
 
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                         <span
-                          className={`type-body-2 font-medium truncate ${
+                          className={`type-body-2 truncate font-medium ${
                             item.done ? "text-muted-foreground line-through" : "text-foreground"
                           }`}
                         >
                           {item.title}
                         </span>
-                        <span className="type-caption text-muted-foreground truncate">
+                        <span className="type-caption truncate text-muted-foreground">
                           {item.detail ? snippet(item.detail, 44) : t.planner.noAdditionalText}
                         </span>
                       </span>
@@ -298,7 +303,7 @@ export function DayPopoverContent({
                           hover-only affordance is one nobody ever sees. */}
                       <CaretRightIcon
                         size={14}
-                        className={`self-center shrink-0 text-muted-foreground transition-opacity ${
+                        className={`shrink-0 self-center text-muted-foreground transition-opacity ${
                           isSheet ? "opacity-40" : "opacity-0 group-hover:opacity-100"
                         }`}
                       />
@@ -314,7 +319,7 @@ export function DayPopoverContent({
       <button
         type="button"
         onClick={onNewReminder}
-        className={`flex shrink-0 items-center gap-1.5 px-3.5 type-body-2 font-medium text-primary-action transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! ${
+        className={`type-body-2 text-primary-action flex shrink-0 cursor-pointer items-center gap-1.5 px-3.5 font-medium transition-colors hover:bg-[var(--bg-default-secondary)]! ${
           // Extra bottom room in the sheet clears the home indicator on a
           // gesture-navigation phone, where the last few pixels aren't tappable.
           isSheet ? "pt-3.5 pb-[max(1rem,env(safe-area-inset-bottom))]" : "py-2.5"

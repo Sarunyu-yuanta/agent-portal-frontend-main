@@ -63,26 +63,50 @@ const RESEARCH_CATS = [
 const MOCK_PDF_URL = "/mock-reports/sample-report.pdf";
 const RESEARCH_HOME_OPTION = "__home__";
 
-
 /** Title and subtitle: `t.research.research.tiles[id]`. */
 type LandingTile = { id: TileId; icon: PhosphorIcon; color: string; span?: string };
 
 type TileId = keyof Dictionary["research"]["research"]["tiles"];
 
 const RESEARCH_LANDING_TILES: LandingTile[] = [
-  { id: "t01", icon: SparkleIcon,      color: "#f59e0b", span: "lg:col-start-1 lg:row-start-1 lg:row-span-2" },
-  { id: "t02", icon: SunIcon,          color: "#f97316" },
-  { id: "t03", icon: BroadcastIcon,    color: "#06b6d4" },
-  { id: "t04", icon: BriefcaseIcon,    color: "#64748b" },
-  { id: "t13", icon: PuzzlePieceIcon,  color: "#6366f1" },
-  { id: "t10", icon: FactoryIcon,      color: "#3f3f46" },
-  { id: "t05", icon: BuildingsIcon,    color: "#0ea5e9" },
-  { id: "t07", icon: FileTextIcon,     color: "#71717a", span: "lg:col-start-3 lg:row-start-3 lg:row-span-2" },
-  { id: "t08", icon: LightningIcon,    color: "#ef4444", span: "lg:col-start-1 lg:row-start-4 lg:col-span-2" },
-  { id: "t09", icon: ChartLineUpIcon,  color: "#8b5cf6", span: "lg:col-start-1 lg:row-start-5 lg:row-span-2" },
-  { id: "t06", icon: NotePencilIcon,   color: "#10b981" },
-  { id: "t11", icon: GlobeIcon,        color: "#0891b2" },
-  { id: "t12", icon: TrophyIcon,       color: "#52525b", span: "lg:col-start-2 lg:row-start-6 lg:col-span-2" },
+  {
+    id: "t01",
+    icon: SparkleIcon,
+    color: "#f59e0b",
+    span: "lg:col-start-1 lg:row-start-1 lg:row-span-2",
+  },
+  { id: "t02", icon: SunIcon, color: "#f97316" },
+  { id: "t03", icon: BroadcastIcon, color: "#06b6d4" },
+  { id: "t04", icon: BriefcaseIcon, color: "#64748b" },
+  { id: "t13", icon: PuzzlePieceIcon, color: "#6366f1" },
+  { id: "t10", icon: FactoryIcon, color: "#3f3f46" },
+  { id: "t05", icon: BuildingsIcon, color: "#0ea5e9" },
+  {
+    id: "t07",
+    icon: FileTextIcon,
+    color: "#71717a",
+    span: "lg:col-start-3 lg:row-start-3 lg:row-span-2",
+  },
+  {
+    id: "t08",
+    icon: LightningIcon,
+    color: "#ef4444",
+    span: "lg:col-start-1 lg:row-start-4 lg:col-span-2",
+  },
+  {
+    id: "t09",
+    icon: ChartLineUpIcon,
+    color: "#8b5cf6",
+    span: "lg:col-start-1 lg:row-start-5 lg:row-span-2",
+  },
+  { id: "t06", icon: NotePencilIcon, color: "#10b981" },
+  { id: "t11", icon: GlobeIcon, color: "#0891b2" },
+  {
+    id: "t12",
+    icon: TrophyIcon,
+    color: "#52525b",
+    span: "lg:col-start-2 lg:row-start-6 lg:col-span-2",
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -105,12 +129,16 @@ function formatBuddhistDate(d: Date): string {
 
 function AnalystCard({ analyst }: { analyst: AnalystItem }) {
   return (
-    <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-4 sm:p-5 hover:bg-muted/30 transition-colors">
+    <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/30 sm:gap-4 sm:p-5">
       {/* eslint-disable-next-line @next/next/no-img-element -- fixed-size headshot, no responsive sizes needed */}
-      <img src={analyst.photo} alt={analyst.name} className="w-14 h-14 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0" />
-      <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+      <img
+        src={analyst.photo}
+        alt={analyst.name}
+        className="h-14 w-14 shrink-0 rounded-lg object-cover sm:h-24 sm:w-24"
+      />
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="text-body-sm font-bold text-foreground">{analyst.name}</p>
-        <p className="text-label text-muted-foreground leading-snug">{analyst.title}</p>
+        <p className="text-label leading-snug text-muted-foreground">{analyst.title}</p>
       </div>
     </div>
   );
@@ -119,8 +147,8 @@ function AnalystCard({ analyst }: { analyst: AnalystItem }) {
 function ResearchLandingGrid() {
   const r = useT().research.research;
   return (
-    <div className="flex-1 overflow-y-auto hide-scrollbar p-4">
-      <BentoGrid className="grid-cols-2 lg:grid-cols-3 auto-rows-[130px] lg:auto-rows-[150px] gap-2 lg:gap-3 grid-flow-dense">
+    <div className="hide-scrollbar flex-1 overflow-y-auto p-4">
+      <BentoGrid className="grid-flow-dense auto-rows-[130px] grid-cols-2 gap-2 lg:auto-rows-[150px] lg:grid-cols-3 lg:gap-3">
         {RESEARCH_LANDING_TILES.map((tile) => (
           <BentoCard
             key={tile.id}
@@ -133,7 +161,9 @@ function ResearchLandingGrid() {
             background={
               <div
                 className="pointer-events-none absolute inset-0 opacity-25"
-                style={{ background: `radial-gradient(140% 140% at 100% 0%, ${tile.color}, transparent 60%)` }}
+                style={{
+                  background: `radial-gradient(140% 140% at 100% 0%, ${tile.color}, transparent 60%)`,
+                }}
               />
             }
           />
@@ -175,9 +205,13 @@ export function Research() {
   const hasLoaded = useHasLoaded(isLoading);
 
   const filtered = feed.reports.filter((item) => {
-    const catOk = activeCategory === null || activeCategory === ALL_RESEARCH || item.category === activeCategory;
+    const catOk =
+      activeCategory === null ||
+      activeCategory === ALL_RESEARCH ||
+      item.category === activeCategory;
     const dateOk = !searchDate || item.date === formatBuddhistDate(searchDate);
-    const searchOk = !isSearching || item.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
+    const searchOk =
+      !isSearching || item.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
     return catOk && dateOk && searchOk;
   });
 
@@ -185,8 +219,18 @@ export function Research() {
   // on the feed (search, date, categories, the reports) waits for it.
   const subTabs = (
     <div className="flex items-center gap-2 pb-2">
-      <Chip label={r.research} type="single" selected={subTab === "research"} onClick={() => setSubTab("research")} />
-      <Chip label={r.analystContact} type="single" selected={subTab === "analyst"} onClick={() => setSubTab("analyst")} />
+      <Chip
+        label={r.research}
+        type="single"
+        selected={subTab === "research"}
+        onClick={() => setSubTab("research")}
+      />
+      <Chip
+        label={r.analystContact}
+        type="single"
+        selected={subTab === "analyst"}
+        onClick={() => setSubTab("analyst")}
+      />
     </div>
   );
 
@@ -195,7 +239,9 @@ export function Research() {
     return (
       <ResearchSkeleton
         subTabs={
-          hasLoaded ? subTabs : (
+          hasLoaded ? (
+            subTabs
+          ) : (
             <div className="flex items-center gap-2 pb-2">
               <Skeleton className="h-9 w-24 rounded-full" />
               <Skeleton className="h-9 w-36 rounded-full" />
@@ -207,12 +253,13 @@ export function Research() {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col md:max-h-[calc(var(--vh)*72)]">
-
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card md:max-h-[calc(var(--vh)*72)]">
       {/* Sub-tabs + desktop search bar */}
-      <div className="flex items-center justify-between gap-4 px-3 pt-2 border-b border-border shrink-0">
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border px-3 pt-2">
         {subTabs}
-        <div className={`hidden md:flex items-center gap-2 pb-2 ${subTab === "research" ? "" : "invisible"}`}>
+        <div
+          className={`hidden items-center gap-2 pb-2 md:flex ${subTab === "research" ? "" : "invisible"}`}
+        >
           <SearchInput
             placeholder={r.searchStock}
             value={searchQuery}
@@ -232,15 +279,14 @@ export function Research() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
-
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         {/* Desktop category sidebar — research tab only */}
         {subTab === "research" && (
-          <div className="hidden md:flex flex-col w-52 shrink-0 border-r border-border overflow-y-auto hide-scrollbar">
+          <div className="hide-scrollbar hidden w-52 shrink-0 flex-col overflow-y-auto border-r border-border md:flex">
             <button
               type="button"
               onClick={goHome}
-              className={`text-left px-4 py-2.5 text-body-sm transition-colors cursor-pointer border-b border-border/40 ${
+              className={`cursor-pointer border-b border-border/40 px-4 py-2.5 text-left text-body-sm transition-colors ${
                 !showList
                   ? "bg-primary-action-light text-primary-action font-semibold"
                   : "text-foreground hover:bg-muted/50"
@@ -253,7 +299,7 @@ export function Research() {
                 key={cat}
                 type="button"
                 onClick={() => setActiveCategory(cat)}
-                className={`text-left px-4 py-2.5 text-body-sm transition-colors cursor-pointer border-b border-border/40 last:border-0 ${
+                className={`cursor-pointer border-b border-border/40 px-4 py-2.5 text-left text-body-sm transition-colors last:border-0 ${
                   activeCategory === cat
                     ? "bg-primary-action-light text-primary-action font-semibold"
                     : "text-foreground hover:bg-muted/50"
@@ -268,11 +314,11 @@ export function Research() {
         {/* Content area */}
         <FadeIn
           key={`${subTab}-${activeCategory}-${showList}`}
-          className="flex-1 min-w-0 flex flex-col min-h-0"
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
         >
           {subTab === "analyst" ? (
-            <div className="flex-1 overflow-y-auto hide-scrollbar p-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="hide-scrollbar flex-1 overflow-y-auto p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {feed.analysts.map((analyst) => (
                   <AnalystCard key={analyst.id} analyst={analyst} />
                 ))}
@@ -288,7 +334,7 @@ export function Research() {
           ) : (
             <>
               {/* Mobile category picker */}
-              <div className="md:hidden flex flex-col gap-2 p-3 border-b border-border shrink-0">
+              <div className="flex shrink-0 flex-col gap-2 border-b border-border p-3 md:hidden">
                 <SearchInput
                   placeholder={r.searchStock}
                   value={searchQuery}
@@ -312,7 +358,10 @@ export function Research() {
                   }}
                   options={[
                     { label: r.homeOption, value: RESEARCH_HOME_OPTION },
-                    ...RESEARCH_CATS.map((c) => ({ label: c === ALL_RESEARCH ? t.insights.allResearch : c, value: c })),
+                    ...RESEARCH_CATS.map((c) => ({
+                      label: c === ALL_RESEARCH ? t.insights.allResearch : c,
+                      value: c,
+                    })),
                   ]}
                   placeholder={r.pickCategory}
                 />
@@ -324,23 +373,34 @@ export function Research() {
                 <>
                   {/* Column headers — desktop */}
                   <div
-                    className="hidden md:grid px-5 py-2.5 bg-muted/40 border-b border-border shrink-0"
+                    className="hidden shrink-0 border-b border-border bg-muted/40 px-5 py-2.5 md:grid"
                     style={{ gridTemplateColumns: "110px 180px 1fr" }}
                   >
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.date}</span>
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.report}</span>
-                    <span className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">{r.columns.detail}</span>
+                    <span className="text-meta font-semibold tracking-wide text-muted-foreground uppercase">
+                      {r.columns.date}
+                    </span>
+                    <span className="text-meta font-semibold tracking-wide text-muted-foreground uppercase">
+                      {r.columns.report}
+                    </span>
+                    <span className="text-meta font-semibold tracking-wide text-muted-foreground uppercase">
+                      {r.columns.detail}
+                    </span>
                   </div>
 
                   {/* Items */}
-                  <div className="flex-1 overflow-y-auto hide-scrollbar divide-y divide-border">
+                  <div className="hide-scrollbar flex-1 divide-y divide-border overflow-y-auto">
                     {filtered.length === 0 ? (
                       // A search or date that matched nothing can be cleared; a
                       // category with no reports in it is simply empty.
                       isSearching || searchDate !== undefined ? (
                         <EmptyState
                           size="compact"
-                          icon={<MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+                          icon={
+                            <MagnifyingGlassIcon
+                              size={32}
+                              className="text-[var(--text-default-placeholder)]"
+                            />
+                          }
                           title={t.states.noResultTitle}
                           body={t.states.noResultBody}
                           action={{ label: t.states.clearFilters, onClick: clearSearch }}
@@ -348,7 +408,12 @@ export function Research() {
                       ) : (
                         <EmptyState
                           size="compact"
-                          icon={<FileTextIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+                          icon={
+                            <FileTextIcon
+                              size={32}
+                              className="text-[var(--text-default-placeholder)]"
+                            />
+                          }
                           title={r.emptyCategory}
                         />
                       )
@@ -359,12 +424,14 @@ export function Research() {
                           href={MOCK_PDF_URL}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex flex-col gap-0.5 md:grid md:gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors group"
+                          className="group flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-muted/30 md:grid md:gap-4"
                           style={{ gridTemplateColumns: "110px 180px 1fr" }}
                         >
                           <span className="text-label text-muted-foreground">{item.date}</span>
                           <span className="text-body-sm text-foreground">{item.category}</span>
-                          <span className="text-body-sm text-primary-action group-hover:underline leading-snug">{item.title}</span>
+                          <span className="text-primary-action text-body-sm leading-snug group-hover:underline">
+                            {item.title}
+                          </span>
                         </a>
                       ))
                     )}
@@ -385,22 +452,22 @@ function ResearchSkeleton({ subTabs }: { subTabs: React.ReactNode }) {
   return (
     <div
       aria-busy="true"
-      className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col md:max-h-[calc(var(--vh)*72)]"
+      className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card md:max-h-[calc(var(--vh)*72)]"
     >
-      <div className="flex items-center justify-between gap-4 px-3 pt-2 border-b border-border">
+      <div className="flex items-center justify-between gap-4 border-b border-border px-3 pt-2">
         {subTabs}
-        <div className="hidden md:flex items-center gap-2 pb-2">
+        <div className="hidden items-center gap-2 pb-2 md:flex">
           <Skeleton className="h-12 w-80 rounded-lg" />
           <Skeleton className="h-12 w-56 rounded-lg" />
         </div>
       </div>
       <div className="flex flex-col md:flex-row">
-        <div className="hidden md:flex flex-col gap-3 w-52 shrink-0 border-r border-border p-4">
+        <div className="hidden w-52 shrink-0 flex-col gap-3 border-r border-border p-4 md:flex">
           {Array.from({ length: 12 }).map((_, i) => (
             <Skeleton key={i} className="h-5 w-full" />
           ))}
         </div>
-        <div className="flex-1 min-w-0 p-4 grid grid-cols-2 lg:grid-cols-3 auto-rows-[130px] gap-3">
+        <div className="grid min-w-0 flex-1 auto-rows-[130px] grid-cols-2 gap-3 p-4 lg:grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton key={i} className="h-full w-full rounded-xl" />
           ))}

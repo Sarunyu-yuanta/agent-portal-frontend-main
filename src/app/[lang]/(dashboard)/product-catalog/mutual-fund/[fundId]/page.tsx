@@ -8,11 +8,7 @@ import { useSectionBack } from "@/hooks/use-section-back";
 import { CatalogNotFound } from "../../CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
-export default function MutualFundDetailPage({
-  params,
-}: {
-  params: Promise<{ fundId: string }>;
-}) {
+export default function MutualFundDetailPage({ params }: { params: Promise<{ fundId: string }> }) {
   const t = useT();
   const { fundId } = use(params);
   const decodedId = decodeURIComponent(fundId);

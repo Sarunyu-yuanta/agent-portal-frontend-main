@@ -13,11 +13,7 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { CorporateActionDetailModal } from "../../calendar/CorporateActionDetailModal";
 import { MonthPicker } from "../../calendar/MonthPicker";
-import {
-  ACTION_KINDS,
-  actionKindName,
-  actionPalette,
-} from "../../calendar/market-taxonomy";
+import { ACTION_KINDS, actionKindName, actionPalette } from "../../calendar/market-taxonomy";
 import { useVisibleRows } from "../../calendar/use-visible-rows";
 import {
   addMonths,
@@ -80,7 +76,7 @@ function ActionBadge({
     <span
       role="img"
       aria-label={actionKindName(kind, t)}
-      className={`flex shrink-0 self-center items-center justify-center rounded-full text-meta font-semibold leading-none ${
+      className={`flex shrink-0 items-center justify-center self-center rounded-full text-meta leading-none font-semibold ${
         size === "small" ? "size-7" : "size-8"
       }`}
       style={{ backgroundColor: palette.tint, color: palette.text }}
@@ -159,7 +155,7 @@ function CalendarLegend() {
       {kinds.map((kind) => (
         <div
           key={kind}
-          className="flex items-center gap-2 rounded border border-black/10 bg-card py-1 pl-1.5 pr-3"
+          className="flex items-center gap-2 rounded border border-black/10 bg-card py-1 pr-3 pl-1.5"
         >
           {/* A filled block rather than Figma's 2px rule: the pill's fill is a
               pale tint, and two pixels of it against a white tag would have been
@@ -211,7 +207,7 @@ function CompanyDayPanel({
     <div className={`flex min-h-0 flex-col ${isSheet ? "w-full" : "w-[344px]"}`}>
       <header
         className={`flex shrink-0 items-start justify-between gap-3 px-3.5 ${
-          isSheet ? "pb-3 pt-1" : "pb-2.5 pt-3"
+          isSheet ? "pt-1 pb-3" : "pt-3 pb-2.5"
         }`}
       >
         <div className="min-w-0">
@@ -222,15 +218,14 @@ function CompanyDayPanel({
               scheduled" is about to say so in bigger type. */}
           <p className="type-caption text-muted-foreground">
             {weekdayLabel(day, locale)}
-            {markers.length > 0 &&
-              ` · ${t.stock.company.actionCount(markers.length)}`}
+            {markers.length > 0 && ` · ${t.stock.company.actionCount(markers.length)}`}
           </p>
         </div>
         {/* Only "Today" earns a badge here. The Calendar page's other one,
             "Overdue", describes work still owed — an XD that has already gone ex
             is settled fact, not a slipped deadline. */}
         {isToday && (
-          <span className="shrink-0 rounded-full bg-primary-action px-2 py-0.5 type-caption font-medium text-white">
+          <span className="bg-primary-action type-caption shrink-0 rounded-full px-2 py-0.5 font-medium text-white">
             {t.stock.company.today}
           </span>
         )}
@@ -261,7 +256,7 @@ function CompanyDayPanel({
               <button
                 type="button"
                 onClick={() => onOpenDetail(marker)}
-                className={`group flex w-full items-start gap-2.5 px-3.5 text-left transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! ${
+                className={`group flex w-full cursor-pointer items-start gap-2.5 px-3.5 text-left transition-colors hover:bg-[var(--bg-default-secondary)]! ${
                   isSheet ? "py-3.5" : "py-2.5"
                 }`}
               >
@@ -269,13 +264,13 @@ function CompanyDayPanel({
 
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span
-                    className={`type-body-2 font-medium truncate ${
+                    className={`type-body-2 truncate font-medium ${
                       marker.muted ? "text-muted-foreground" : "text-foreground"
                     }`}
                   >
                     {marker.kind}
                   </span>
-                  <span className="type-caption text-muted-foreground truncate">{symbol}</span>
+                  <span className="type-caption truncate text-muted-foreground">{symbol}</span>
                 </span>
 
                 {/* `self-center`: the caret stands for the whole row, so it
@@ -284,7 +279,7 @@ function CompanyDayPanel({
                     Always on in the sheet — there is no hover on a phone. */}
                 <CaretRightIcon
                   size={14}
-                  className={`self-center shrink-0 text-muted-foreground transition-opacity ${
+                  className={`shrink-0 self-center text-muted-foreground transition-opacity ${
                     isSheet ? "opacity-40" : "opacity-0 group-hover:opacity-100"
                   }`}
                 />
@@ -372,7 +367,7 @@ function CompanyDayCell({
         side={side}
         align={align}
         sideOffset={8}
-        className="p-0 overflow-hidden shadow-lg"
+        className="overflow-hidden p-0 shadow-lg"
         content={!isMobile && open ? panel : null}
       >
         <div
@@ -392,7 +387,7 @@ function CompanyDayCell({
 
              The `!` on both hovers is this repo's standing cascade fix — see the
              note above about `bg-card` outranking an app-level `hover:`. */
-          className={`flex h-full min-h-0 flex-col gap-1 overflow-hidden p-1.5 text-left transition-colors cursor-pointer ${
+          className={`flex h-full min-h-0 cursor-pointer flex-col gap-1 overflow-hidden p-1.5 text-left transition-colors ${
             columnIndex === COLUMNS_PER_WEEK - 1 ? "" : "border-r border-[rgba(0,0,0,0.12)]"
           } ${
             isToday && inMonth
@@ -401,7 +396,7 @@ function CompanyDayCell({
           }`}
         >
           <span
-            className={`flex size-6 shrink-0 items-center justify-center rounded-full type-caption font-semibold ${
+            className={`type-caption flex size-6 shrink-0 items-center justify-center rounded-full font-semibold ${
               isToday
                 ? "bg-primary-action text-white"
                 : inMonth
@@ -425,7 +420,7 @@ function CompanyDayCell({
               />
             ))}
             {overflow > 0 && (
-              <span className="shrink-0 truncate px-1 py-0.5 type-caption leading-tight font-medium text-muted-foreground">
+              <span className="type-caption shrink-0 truncate px-1 py-0.5 leading-tight font-medium text-muted-foreground">
                 {t.stock.company.more(overflow)}
               </span>
             )}
@@ -582,7 +577,7 @@ function CompanyEventsSection({
 
         <div className="grid shrink-0 grid-cols-7 border-b border-[rgba(0,0,0,0.12)]">
           {weekdayNames(locale, "short").map((label) => (
-            <div key={label} className="px-2 py-2 type-caption text-center text-muted-foreground">
+            <div key={label} className="type-caption px-2 py-2 text-center text-muted-foreground">
               {label}
             </div>
           ))}

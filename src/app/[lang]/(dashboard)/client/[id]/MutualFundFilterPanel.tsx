@@ -54,7 +54,10 @@ export function isEmptyFilterState(filter: MutualFundFilterState): boolean {
 }
 
 /** Figma 40544:772211 (no chips → full catalog) / 40544:772630 (no matches → empty state). */
-export function applyMutualFundFilter(funds: MutualFund[], filter: MutualFundFilterState): MutualFund[] {
+export function applyMutualFundFilter(
+  funds: MutualFund[],
+  filter: MutualFundFilterState,
+): MutualFund[] {
   if (isEmptyFilterState(filter)) return funds;
 
   return funds.filter((fund) => {
@@ -72,7 +75,10 @@ export function applyMutualFundFilter(funds: MutualFund[], filter: MutualFundFil
       const taxType = getFundTaxSavingType(fund.id);
       if (!taxType || !filter.taxTypes.includes(taxType)) return false;
     }
-    if (filter.dividendPolicies.length > 0 && !filter.dividendPolicies.includes(getFundDividendPolicy(fund.id))) {
+    if (
+      filter.dividendPolicies.length > 0 &&
+      !filter.dividendPolicies.includes(getFundDividendPolicy(fund.id))
+    ) {
       return false;
     }
     if (
@@ -108,8 +114,20 @@ const AMC_INSET_LOGOS: Partial<
   pamc: { w: 13.86, h: 13.86, top: 3, left: 3 },
   talisam: { w: 13.8, h: 13.86, top: 3.07, left: 3.12 },
   principal: { w: 12.12, h: 14.84, top: 2.88, left: 3.4 },
-  bcap: { w: 12.88, h: 16.44, top: 1.76, left: 3.56, crop: { width: "179.5%", height: "140.63%", left: "-40.99%", top: "-20.19%" } },
-  mfc: { w: 16.08, h: 5.84, top: 7.08, left: 1.96, crop: { width: "102.66%", height: "100%", left: "-0.21%", top: 0 } },
+  bcap: {
+    w: 12.88,
+    h: 16.44,
+    top: 1.76,
+    left: 3.56,
+    crop: { width: "179.5%", height: "140.63%", left: "-40.99%", top: "-20.19%" },
+  },
+  mfc: {
+    w: 16.08,
+    h: 5.84,
+    top: 7.08,
+    left: 1.96,
+    crop: { width: "102.66%", height: "100%", left: "-0.21%", top: 0 },
+  },
 };
 
 function AmcLogo({ id }: { id: string }) {
@@ -127,13 +145,21 @@ function AmcLogo({ id }: { id: string }) {
           <img
             src={src}
             alt=""
-            className={inset.crop ? "absolute block max-w-none" : "absolute inset-0 block size-full max-w-none object-cover"}
+            className={
+              inset.crop
+                ? "absolute block max-w-none"
+                : "absolute inset-0 block size-full max-w-none object-cover"
+            }
             style={inset.crop}
           />
         </span>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" className="absolute inset-0 block size-full max-w-none object-cover" />
+        <img
+          src={src}
+          alt=""
+          className="absolute inset-0 block size-full max-w-none object-cover"
+        />
       )}
     </span>
   );
@@ -155,7 +181,7 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex h-9 w-full cursor-pointer items-center justify-center gap-1 rounded-full border py-2 pl-2 pr-3 text-sm leading-[24px] transition-colors ${
+      className={`flex h-9 w-full cursor-pointer items-center justify-center gap-1 rounded-full border py-2 pr-3 pl-2 text-sm leading-[24px] transition-colors ${
         active
           ? "border-[#0a6ee7] bg-[#f3f8fe] text-[#0a6ee7] hover:bg-[#e4f0fd]!"
           : "border-black/10 bg-white text-[#4a5565] hover:bg-black/[0.03]!"
@@ -183,7 +209,7 @@ function FilterSection({
   return (
     <div className={`flex w-full flex-col ${compact ? "gap-3" : "gap-4"}`}>
       <div className="flex w-full items-center justify-between gap-2">
-        <p className="text-sm font-bold leading-[24px] text-[#101828]">{title}</p>
+        <p className="text-sm leading-[24px] font-bold text-[#101828]">{title}</p>
         <Button variant="plain" size="xs" onClick={onClear} className="shrink-0">
           {t.fund.filter.clear}
         </Button>
@@ -212,7 +238,11 @@ function MutualFundFilterContent({
   const t = useT();
   return (
     <div className="flex w-full flex-col gap-6">
-      <FilterSection title={t.fund.filter.sections.category} compact onClear={() => setDraft((prev) => ({ ...prev, categories: [] }))}>
+      <FilterSection
+        title={t.fund.filter.sections.category}
+        compact
+        onClear={() => setDraft((prev) => ({ ...prev, categories: [] }))}
+      >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {FILTER_CATEGORY_OPTIONS.map((option) => (
             <FilterChip
@@ -220,7 +250,10 @@ function MutualFundFilterContent({
               label={t.fund.groups[option.id]}
               active={draft.categories.includes(option.id)}
               onClick={() =>
-                setDraft((prev) => ({ ...prev, categories: toggleValue(prev.categories, option.id) }))
+                setDraft((prev) => ({
+                  ...prev,
+                  categories: toggleValue(prev.categories, option.id),
+                }))
               }
             />
           ))}
@@ -229,14 +262,19 @@ function MutualFundFilterContent({
 
       <FilterDivider />
 
-      <FilterSection title={t.fund.filter.sections.taxSaving} onClear={() => setDraft((prev) => ({ ...prev, taxTypes: [] }))}>
+      <FilterSection
+        title={t.fund.filter.sections.taxSaving}
+        onClear={() => setDraft((prev) => ({ ...prev, taxTypes: [] }))}
+      >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {TAX_SAVING_FUND_TYPES.map((type) => (
             <FilterChip
               key={type}
               label={type}
               active={draft.taxTypes.includes(type)}
-              onClick={() => setDraft((prev) => ({ ...prev, taxTypes: toggleValue(prev.taxTypes, type) }))}
+              onClick={() =>
+                setDraft((prev) => ({ ...prev, taxTypes: toggleValue(prev.taxTypes, type) }))
+              }
             />
           ))}
         </div>
@@ -314,7 +352,10 @@ function MutualFundFilterContent({
 
       <FilterDivider />
 
-      <FilterSection title={t.fund.filter.sections.riskLevel} onClear={() => setDraft((prev) => ({ ...prev, riskLevels: [] }))}>
+      <FilterSection
+        title={t.fund.filter.sections.riskLevel}
+        onClear={() => setDraft((prev) => ({ ...prev, riskLevels: [] }))}
+      >
         <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
           {FUND_RISK_LEVELS.map((level) => (
             <FilterChip
@@ -332,13 +373,7 @@ function MutualFundFilterContent({
   );
 }
 
-function FilterFooter({
-  onClear,
-  onApply,
-}: {
-  onClear: () => void;
-  onApply: () => void;
-}) {
+function FilterFooter({ onClear, onApply }: { onClear: () => void; onApply: () => void }) {
   const t = useT();
   return (
     <div className="flex w-full gap-3">
@@ -386,7 +421,7 @@ export function MutualFundFilterBottomSheet({
     >
       <MutualFundFilterContent draft={draft} setDraft={setDraft} />
       {/* Figma 360:78598 — footer stays pinned while the chips scroll under it */}
-      <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-white px-4 pb-10 pt-4 shadow-[0px_0px_1px_rgba(102,102,102,0.16),0px_4px_4px_rgba(102,102,102,0.12)]">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-white px-4 pt-4 pb-10 shadow-[0px_0px_1px_rgba(102,102,102,0.16),0px_4px_4px_rgba(102,102,102,0.12)]">
         <FilterFooter
           onClear={() => setDraft(EMPTY_FILTER_STATE)}
           onApply={() => {
@@ -436,7 +471,7 @@ export function MutualFundFilterModal({
           title={t.fund.filter.title}
           showClose
           onClose={onClose}
-          className="!max-w-[726px] w-[calc(var(--vw)*100-3rem)]"
+          className="w-[calc(var(--vw)*100-3rem)] !max-w-[726px]"
         >
           <div className="mx-[-16px] max-h-[calc(var(--vh)*70)] overflow-y-auto px-4 pb-2">
             <div className="flex w-full flex-col gap-6">

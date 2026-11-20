@@ -70,7 +70,11 @@ function MarketStatusTag({ status }: { status: MarketStatusValue }) {
       className="inline-flex w-fit items-center gap-1 rounded-lg px-2 py-1 text-sm"
       style={{ backgroundColor: s.bg, color: s.text }}
     >
-      <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: s.dot }} aria-hidden />
+      <span
+        className="size-2 shrink-0 rounded-full"
+        style={{ backgroundColor: s.dot }}
+        aria-hidden
+      />
       {t.stock.marketStatus[status] ?? status}
     </span>
   );
@@ -78,10 +82,10 @@ function MarketStatusTag({ status }: { status: MarketStatusValue }) {
 
 function SectionHeading({ icon, title, desc }: { icon?: ReactNode; title: string; desc?: string }) {
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex w-full flex-col gap-2">
       <div className="flex items-center gap-2">
         {icon}
-        <p className="font-bold text-title leading-[28px]" style={{ color: "rgba(0,0,0,0.75)" }}>
+        <p className="text-title leading-[28px] font-bold" style={{ color: "rgba(0,0,0,0.75)" }}>
           {title}
         </p>
       </div>
@@ -115,7 +119,7 @@ function MarketWatchlistRow({
   return (
     <div className="w-full" style={{ backgroundColor: "white" }}>
       <div
-        className="flex gap-2 items-center overflow-x-auto hide-scrollbar max-w-[1280px] mx-auto px-4 lg:px-6"
+        className="hide-scrollbar mx-auto flex max-w-[1280px] items-center gap-2 overflow-x-auto px-4 lg:px-6"
         style={{ scrollbarWidth: "none", paddingTop: 16, paddingBottom: 16 }}
       >
         {MARKET_WATCHLIST.map((m) => (
@@ -150,26 +154,38 @@ function MarketBoardCard({
       // Same lift as `StockLargeAssetCard`, the Stock tab's other clickable
       // card. Trailing `!` on the paint properties because system-one ships its
       // base utilities unlayered, where they outrank a plain `hover:` variant.
-      className="bg-white border border-black/10 rounded-lg p-3 flex flex-col gap-3 flex-1 min-w-[140px] text-left cursor-pointer transition-[background-color,border-color,box-shadow] hover:bg-[#fafafa]! hover:border-[#0a6ee7]/25! hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2"
+      className="flex min-w-[140px] flex-1 cursor-pointer flex-col gap-3 rounded-lg border border-black/10 bg-white p-3 text-left transition-[background-color,border-color,box-shadow] hover:border-[#0a6ee7]/25! hover:bg-[#fafafa]! hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      <div className="flex flex-col gap-2 w-full">
-        <div className="flex gap-2 items-center">
-          <Image src={icon} alt="" width={20} height={20} className="size-5 shrink-0 rounded-full" />
-          <p className="font-bold text-base" style={{ color: "#101828" }}>
+      <div className="flex w-full flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Image
+            src={icon}
+            alt=""
+            width={20}
+            height={20}
+            className="size-5 shrink-0 rounded-full"
+          />
+          <p className="text-base font-bold" style={{ color: "#101828" }}>
             {code}
           </p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <p className="text-base" style={{ color: "#4a5565" }}>
             {price}
           </p>
-          <div className="flex gap-1 items-center">
+          <div className="flex items-center gap-1">
             <TrendCaret trend={trend} />
             <PercentPill trend={trend} value={changePercent} size="lg" />
           </div>
         </div>
       </div>
-      <StockMiniChart series={series} trend={trend} width={166} height={42} className="w-full h-[42px]" />
+      <StockMiniChart
+        series={series}
+        trend={trend}
+        width={166}
+        height={42}
+        className="h-[42px] w-full"
+      />
     </button>
   );
 }
@@ -187,27 +203,30 @@ function MarketStatusSection({
   const router = useLocalizedRouter();
   return (
     <div className="w-full" style={{ backgroundColor: "white" }}>
-      <div className="flex flex-col gap-4 max-w-[1280px] mx-auto px-4 lg:px-6" style={{ paddingBottom: 16 }}>
+      <div
+        className="mx-auto flex max-w-[1280px] flex-col gap-4 px-4 lg:px-6"
+        style={{ paddingBottom: 16 }}
+      >
         <MarketStatusTag status={MARKET_STATUS} />
         {/* `py-1 -my-1` costs no layout but stops the scroller clipping the
             cards' hover shadow. */}
         {indices.length === 0 ? (
           <StockSectionEmpty title={t.stock.empty.indices} />
         ) : (
-        <div
-          className="flex gap-3 items-start overflow-x-auto hide-scrollbar py-1 -my-1"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {indices.map((idx) => (
-            <MarketBoardCard
-              key={idx.code}
-              {...idx}
-              onSelect={() => router.push(marketIndexHref(idx.code, market))}
-            />
-          ))}
-        </div>
+          <div
+            className="hide-scrollbar -my-1 flex items-start gap-3 overflow-x-auto py-1"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {indices.map((idx) => (
+              <MarketBoardCard
+                key={idx.code}
+                {...idx}
+                onSelect={() => router.push(marketIndexHref(idx.code, market))}
+              />
+            ))}
+          </div>
         )}
-        <div className="flex gap-2 items-center justify-center w-full">
+        <div className="flex w-full items-center justify-center gap-2">
           <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
             {t.stock.chart30Day}
           </p>
@@ -253,29 +272,47 @@ function InstrumentRow({
   const className = `flex gap-4 items-center py-4 px-3 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "cursor-pointer hover:bg-black/[0.02] transition-colors" : ""}`;
   const inner = (
     <>
-      <div className="flex flex-col flex-1 min-w-0">
-        <div className="flex gap-2 items-center h-6">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex h-6 items-center gap-2">
           {logo && (
-            <Image src={logo} alt="" width={24} height={24} className="size-6 shrink-0 object-contain" />
+            <Image
+              src={logo}
+              alt=""
+              width={24}
+              height={24}
+              className="size-6 shrink-0 object-contain"
+            />
           )}
-          <p className="font-bold text-sm truncate" style={{ color: "#101828" }}>
+          <p className="truncate text-sm font-bold" style={{ color: "#101828" }}>
             {symbol}
           </p>
           {featured && (
-            <Image src="/products/stock/sparkle-gradient-sm.svg" alt="" width={12} height={12} className="shrink-0" />
+            <Image
+              src="/products/stock/sparkle-gradient-sm.svg"
+              alt=""
+              width={12}
+              height={12}
+              className="shrink-0"
+            />
           )}
         </div>
-        <p className="text-xs truncate" style={{ color: "#6a7282" }}>
+        <p className="truncate text-xs" style={{ color: "#6a7282" }}>
           {subtitle}
         </p>
       </div>
-      <StockMiniChart series={series} trend={trend} width={48} height={30} className="shrink-0 w-12 h-[30px]" />
-      <div className="flex flex-col items-end w-24 shrink-0">
-        <div className="flex gap-1 items-baseline font-bold text-sm" style={{ color: "#101828" }}>
+      <StockMiniChart
+        series={series}
+        trend={trend}
+        width={48}
+        height={30}
+        className="h-[30px] w-12 shrink-0"
+      />
+      <div className="flex w-24 shrink-0 flex-col items-end">
+        <div className="flex items-baseline gap-1 text-sm font-bold" style={{ color: "#101828" }}>
           <span>{price}</span>
           <span>{currency}</span>
         </div>
-        <div className="flex gap-1 items-center">
+        <div className="flex items-center gap-1">
           {trend === "flat" ? (
             <span className="text-xs" style={{ color: "#6a7282" }}>
               {changeAmount}
@@ -322,35 +359,38 @@ function RecommendationCard({
   const t = useT();
   const router = useLocalizedRouter();
   return (
-    <div className={`flex-1 flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
-      <div className="flex gap-2 items-center px-6 py-3 shrink-0" style={{ backgroundColor: "#f9f9f9" }}>
+    <div className={`flex flex-1 flex-col overflow-hidden rounded-lg bg-white ${CARD_SHADOW}`}>
+      <div
+        className="flex shrink-0 items-center gap-2 px-6 py-3"
+        style={{ backgroundColor: "#f9f9f9" }}
+      >
         <span style={{ color: iconColor }}>{icon}</span>
-        <p className="font-bold text-base" style={{ color: "rgba(0,0,0,0.75)" }}>
+        <p className="text-base font-bold" style={{ color: "rgba(0,0,0,0.75)" }}>
           {title}
         </p>
       </div>
       {rows.length === 0 ? (
         <StockSectionEmpty title={t.stock.empty.stocks} />
       ) : (
-      <div className="flex flex-col p-3 w-full">
-        {rows.map((row, i) => (
-          <InstrumentRow
-            key={`${row.symbol}-${i}`}
-            symbol={row.symbol}
-            subtitle={row.name}
-            price={row.price}
-            changeAmount={row.changeAmount}
-            changePercent={row.changePercent}
-            trend={row.trend}
-            series={row.series}
-            featured={row.featured}
-            logo={row.logo}
-            currency={currency}
-            showBorder={i < rows.length - 1}
-            onSelect={() => router.push(stockProductHref(row.symbol))}
-          />
-        ))}
-      </div>
+        <div className="flex w-full flex-col p-3">
+          {rows.map((row, i) => (
+            <InstrumentRow
+              key={`${row.symbol}-${i}`}
+              symbol={row.symbol}
+              subtitle={row.name}
+              price={row.price}
+              changeAmount={row.changeAmount}
+              changePercent={row.changePercent}
+              trend={row.trend}
+              series={row.series}
+              featured={row.featured}
+              logo={row.logo}
+              currency={currency}
+              showBorder={i < rows.length - 1}
+              onSelect={() => router.push(stockProductHref(row.symbol))}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -374,7 +414,7 @@ function StockRecommendationSection({
     <div className="relative w-full overflow-hidden" style={{ paddingTop: 40, paddingBottom: 40 }}>
       {/* Figma "Recommend" frame background (asset 86090.png) + white→transparent
        *  fade so the bokeh photo only shows through toward the bottom. */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
         <Image
           src="/products/stock/recommendation-bg.jpg"
           alt=""
@@ -387,13 +427,15 @@ function StockRecommendationSection({
           style={{ background: "linear-gradient(to bottom, white 0%, rgba(255,255,255,0) 50%)" }}
         />
       </div>
-      <div className="relative z-10 flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
         <SectionHeading
-          icon={<Image src="/products/stock/thumbs-up-gradient.svg" alt="" width={20} height={20} />}
+          icon={
+            <Image src="/products/stock/thumbs-up-gradient.svg" alt="" width={20} height={20} />
+          }
           title={t.stock.tab.recommendationTitle}
           desc={t.stock.tab.recommendationDesc}
         />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
           <RecommendationCard
             title={t.stock.tab.topGain}
             icon={<TrendUpIcon size={24} weight="fill" />}
@@ -410,13 +452,15 @@ function StockRecommendationSection({
           />
           <RecommendationCard
             title={t.stock.tab.topPick}
-            icon={<Image src="/products/stock/sparkle-gradient-lg.svg" alt="" width={24} height={24} />}
+            icon={
+              <Image src="/products/stock/sparkle-gradient-lg.svg" alt="" width={24} height={24} />
+            }
             iconColor="transparent"
             rows={topPick}
             currency={currency}
           />
         </div>
-        <div className="flex gap-2 items-center justify-center w-full">
+        <div className="flex w-full items-center justify-center gap-2">
           <p className="text-xs text-white">{t.stock.chart30Day}</p>
           <span className="h-3 w-px bg-white" aria-hidden />
           <p className="text-xs text-white">{t.stock.latestUpdate(updatedAt)}</p>
@@ -459,18 +503,24 @@ function CrossSellInstrumentRow({
 }) {
   const className = `flex gap-6 items-center py-6 px-6 w-full text-left ${showBorder ? "border-b border-black/10" : ""} ${onSelect ? "cursor-pointer hover:bg-black/[0.02] transition-colors" : ""}`;
   const inner = (
-    <div className="flex gap-4 items-center flex-1 min-w-0">
-      <div className="flex flex-col flex-1 min-w-0 gap-0.5">
-        <p className="font-bold text-sm truncate" style={{ color: "#101828" }}>
+    <div className="flex min-w-0 flex-1 items-center gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <p className="truncate text-sm font-bold" style={{ color: "#101828" }}>
           {symbol}
         </p>
-        <p className="text-sm truncate" style={{ color: "#6a7282" }}>
+        <p className="truncate text-sm" style={{ color: "#6a7282" }}>
           {subtitle}
         </p>
       </div>
-      <StockMiniChart series={series} trend={trend} width={96} height={42} className="shrink-0 w-24 h-[42px]" />
-      <div className="flex flex-col items-end w-[120px] shrink-0 gap-0.5">
-        <div className="flex gap-1 items-baseline font-bold text-sm" style={{ color: "#101828" }}>
+      <StockMiniChart
+        series={series}
+        trend={trend}
+        width={96}
+        height={42}
+        className="h-[42px] w-24 shrink-0"
+      />
+      <div className="flex w-[120px] shrink-0 flex-col items-end gap-0.5">
+        <div className="flex items-baseline gap-1 text-sm font-bold" style={{ color: "#101828" }}>
           <span>{price}</span>
           <span>{currency}</span>
         </div>
@@ -479,7 +529,7 @@ function CrossSellInstrumentRow({
             {changeAmount}
           </span>
         ) : (
-          <div className="flex gap-1.5 items-center">
+          <div className="flex items-center gap-1.5">
             <span className="text-sm" style={{ color: TREND_TEXT[trend] }}>
               {changeAmount}
             </span>
@@ -525,22 +575,28 @@ function CrossSellCard({
   const canNavigate = !!onNavigate && rows.length > 0;
   const header = (
     <div
-      className="flex gap-2 items-center justify-between px-6 py-4"
+      className="flex items-center justify-between gap-2 px-6 py-4"
       style={{ background: `linear-gradient(to bottom, ${headerFrom}, #ffffff)` }}
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         {icon}
-        <p className="font-bold text-base" style={{ color: "#101828" }}>
+        <p className="text-base font-bold" style={{ color: "#101828" }}>
           {title}
         </p>
       </div>
-      {canNavigate && <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />}
+      {canNavigate && (
+        <ArrowRightIcon size={20} style={{ color: "#4a5565" }} className="shrink-0" />
+      )}
     </div>
   );
   return (
-    <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
+    <div className={`flex flex-col overflow-hidden rounded-lg bg-white ${CARD_SHADOW}`}>
       {canNavigate ? (
-        <button type="button" onClick={onNavigate} className="text-left w-full cursor-pointer hover:brightness-[0.98] transition-[filter]">
+        <button
+          type="button"
+          onClick={onNavigate}
+          className="w-full cursor-pointer text-left transition-[filter] hover:brightness-[0.98]"
+        >
           {header}
         </button>
       ) : (
@@ -549,25 +605,28 @@ function CrossSellCard({
       {rows.length === 0 ? (
         <StockSectionEmpty title={t.stock.empty.crossSell} />
       ) : (
-      <div className="flex flex-col px-6">
-        {rows.map((row, i) => (
-          <CrossSellInstrumentRow
-            key={`${row.symbol}-${i}`}
-            symbol={row.symbol}
-            subtitle={row.subtitle}
-            price={row.price}
-            changeAmount={row.changeAmount}
-            changePercent={row.changePercent}
-            trend={row.trend}
-            series={row.series}
-            currency={row.currency ?? "THB"}
-            showBorder={i < rows.length - 1}
-            onSelect={() => router.push(stockProductHref(row.symbol))}
-          />
-        ))}
-      </div>
+        <div className="flex flex-col px-6">
+          {rows.map((row, i) => (
+            <CrossSellInstrumentRow
+              key={`${row.symbol}-${i}`}
+              symbol={row.symbol}
+              subtitle={row.subtitle}
+              price={row.price}
+              changeAmount={row.changeAmount}
+              changePercent={row.changePercent}
+              trend={row.trend}
+              series={row.series}
+              currency={row.currency ?? "THB"}
+              showBorder={i < rows.length - 1}
+              onSelect={() => router.push(stockProductHref(row.symbol))}
+            />
+          ))}
+        </div>
       )}
-      <div className="flex gap-2 items-center justify-center px-3 py-4 text-xs" style={{ color: "#6a7282" }}>
+      <div
+        className="flex items-center justify-center gap-2 px-3 py-4 text-xs"
+        style={{ color: "#6a7282" }}
+      >
         <span>{t.stock.chart30Day}</span>
         <span className="h-3 w-px bg-black/10" aria-hidden />
         <span>{t.stock.latestUpdate(MARKET_LATEST_UPDATE)}</span>
@@ -587,14 +646,17 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
         alt=""
         fill
         aria-hidden
-        className="object-cover pointer-events-none"
+        className="pointer-events-none object-cover"
         sizes="100vw"
       />
-      <div className="relative flex flex-col gap-6 max-w-[1280px] mx-auto px-4 lg:px-6">
+      <div className="relative mx-auto flex max-w-[1280px] flex-col gap-6 px-4 lg:px-6">
         {isUsEtf ? (
-          <div className="flex gap-2 items-center w-full">
-            <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <p className="font-bold text-title leading-[28px]" style={{ color: "rgba(0,0,0,0.75)" }}>
+          <div className="flex w-full items-center gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <p
+                className="text-title leading-[28px] font-bold"
+                style={{ color: "rgba(0,0,0,0.75)" }}
+              >
                 {t.stock.tab.etfTitle}
               </p>
               <p className="text-sm" style={{ color: "rgba(0,0,0,0.6)" }}>
@@ -612,70 +674,73 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
             </Button>
           </div>
         ) : (
-          <SectionHeading
-            title={t.stock.tab.crossSellTitle}
-            desc={t.stock.tab.crossSellDesc}
-          />
+          <SectionHeading title={t.stock.tab.crossSellTitle} desc={t.stock.tab.crossSellDesc} />
         )}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+        <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           {isUsEtf ? (
             <>
-              <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
-                <div className="flex gap-2 items-center px-6 py-3" style={{ backgroundColor: "#f9f9f9" }}>
+              <div className={`flex flex-col overflow-hidden rounded-lg bg-white ${CARD_SHADOW}`}>
+                <div
+                  className="flex items-center gap-2 px-6 py-3"
+                  style={{ backgroundColor: "#f9f9f9" }}
+                >
                   <TrendUpIcon size={24} weight="fill" className="text-[#0092b8]" />
-                  <p className="font-bold text-base" style={{ color: "rgba(0,0,0,0.75)" }}>
+                  <p className="text-base font-bold" style={{ color: "rgba(0,0,0,0.75)" }}>
                     {t.stock.tab.topGain}
                   </p>
                 </div>
                 {catalog.etfGain.length === 0 ? (
                   <StockSectionEmpty title={t.stock.empty.crossSell} />
                 ) : (
-                <div className="flex flex-col">
-                  {catalog.etfGain.map((row, i) => (
-                    <CrossSellInstrumentRow
-                      key={`${row.symbol}-${i}`}
-                      symbol={row.symbol}
-                      subtitle={row.subtitle}
-                      price={row.price}
-                      changeAmount={row.changeAmount}
-                      changePercent={row.changePercent}
-                      trend={row.trend}
-                      series={row.series}
-                      currency={row.currency ?? catalog.currency}
-                      showBorder={i < catalog.etfGain.length - 1}
-                      onSelect={() => router.push(stockProductHref(row.symbol))}
-                    />
-                  ))}
-                </div>
+                  <div className="flex flex-col">
+                    {catalog.etfGain.map((row, i) => (
+                      <CrossSellInstrumentRow
+                        key={`${row.symbol}-${i}`}
+                        symbol={row.symbol}
+                        subtitle={row.subtitle}
+                        price={row.price}
+                        changeAmount={row.changeAmount}
+                        changePercent={row.changePercent}
+                        trend={row.trend}
+                        series={row.series}
+                        currency={row.currency ?? catalog.currency}
+                        showBorder={i < catalog.etfGain.length - 1}
+                        onSelect={() => router.push(stockProductHref(row.symbol))}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
-              <div className={`flex flex-col bg-white rounded-lg overflow-hidden ${CARD_SHADOW}`}>
-                <div className="flex gap-2 items-center px-6 py-3" style={{ backgroundColor: "#f9f9f9" }}>
+              <div className={`flex flex-col overflow-hidden rounded-lg bg-white ${CARD_SHADOW}`}>
+                <div
+                  className="flex items-center gap-2 px-6 py-3"
+                  style={{ backgroundColor: "#f9f9f9" }}
+                >
                   <TrendDownIcon size={24} weight="fill" className="text-[#fb2c36]" />
-                  <p className="font-bold text-base" style={{ color: "rgba(0,0,0,0.75)" }}>
+                  <p className="text-base font-bold" style={{ color: "rgba(0,0,0,0.75)" }}>
                     {t.stock.tab.topLoss}
                   </p>
                 </div>
                 {catalog.etfLoss.length === 0 ? (
                   <StockSectionEmpty title={t.stock.empty.crossSell} />
                 ) : (
-                <div className="flex flex-col">
-                  {catalog.etfLoss.map((row, i) => (
-                    <CrossSellInstrumentRow
-                      key={`${row.symbol}-${i}`}
-                      symbol={row.symbol}
-                      subtitle={row.subtitle}
-                      price={row.price}
-                      changeAmount={row.changeAmount}
-                      changePercent={row.changePercent}
-                      trend={row.trend}
-                      series={row.series}
-                      currency={row.currency ?? catalog.currency}
-                      showBorder={i < catalog.etfLoss.length - 1}
-                      onSelect={() => router.push(stockProductHref(row.symbol))}
-                    />
-                  ))}
-                </div>
+                  <div className="flex flex-col">
+                    {catalog.etfLoss.map((row, i) => (
+                      <CrossSellInstrumentRow
+                        key={`${row.symbol}-${i}`}
+                        symbol={row.symbol}
+                        subtitle={row.subtitle}
+                        price={row.price}
+                        changeAmount={row.changeAmount}
+                        changePercent={row.changePercent}
+                        trend={row.trend}
+                        series={row.series}
+                        currency={row.currency ?? catalog.currency}
+                        showBorder={i < catalog.etfLoss.length - 1}
+                        onSelect={() => router.push(stockProductHref(row.symbol))}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             </>
@@ -698,8 +763,8 @@ function CrossSellSection({ catalog }: { catalog: MarketCatalog }) {
             </>
           )}
         </div>
-        <div className="flex flex-col gap-3 items-center w-full">
-          <div className="flex gap-2 items-center justify-center">
+        <div className="flex w-full flex-col items-center gap-3">
+          <div className="flex items-center justify-center gap-2">
             <p className="text-xs" style={{ color: "rgba(0,0,0,0.4)" }}>
               {t.stock.chart30Day}
             </p>
@@ -732,7 +797,7 @@ export function StockTab() {
   const { data: catalog, isLoading } = useMarketCatalog(marketId);
   if (isLoading) return <StockTabSkeleton />;
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <MarketWatchlistRow
         activeId={marketId}
         onChange={(id) =>
@@ -760,7 +825,7 @@ export function StockTab() {
       />
       <CrossSellSection catalog={catalog} />
       <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 24 }}>
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SetIndustrySectorSection
             sectors={catalog.sectors}
             layout={catalog.heatmapLayout}

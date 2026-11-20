@@ -17,7 +17,11 @@ import { useSectionBack } from "@/hooks/use-section-back";
 import { useToasts } from "@/hooks/use-toasts";
 import { useClients } from "@/hooks/use-api";
 import { useCampaign } from "@/hooks/use-campaigns";
-import { CampaignRuleError, campaignRuleMessage, useCampaignStore } from "@/contexts/campaigns-context";
+import {
+  CampaignRuleError,
+  campaignRuleMessage,
+  useCampaignStore,
+} from "@/contexts/campaigns-context";
 import { useT } from "@/i18n/I18nProvider";
 import { NotFoundState } from "@/components/ui/empty-state";
 import type { Locale } from "@/i18n/config";
@@ -63,12 +67,7 @@ function CampaignDetailInner({ id }: { id: string }) {
   const locale = useLocale();
   const { data: campaign, isLoading } = useCampaign(id);
   const clients = useClients();
-  const {
-    campaignClients,
-    rsvps,
-    shareMaterial,
-    seatsLeft,
-  } = useCampaignStore();
+  const { campaignClients, rsvps, shareMaterial, seatsLeft } = useCampaignStore();
   const { toasts, addToast, removeToast } = useToasts();
   const t = useT();
   // Called before any early return — a missing campaign must not skip a hook.
@@ -106,16 +105,13 @@ function CampaignDetailInner({ id }: { id: string }) {
     a.href = href;
     a.download = isScript
       ? `${shareable.label}-${shareable.version}.txt`
-      : shareable.url.split("/").pop() ?? shareable.label;
+      : (shareable.url.split("/").pop() ?? shareable.label);
     a.click();
     if (isScript) URL.revokeObjectURL(href);
   }, [shareable]);
 
   const rows = useMemo(
-    () =>
-      campaign
-        ? campaignClientRows(campaign, campaignClients, rsvps, clients)
-        : [],
+    () => (campaign ? campaignClientRows(campaign, campaignClients, rsvps, clients) : []),
     [campaign, campaignClients, rsvps, clients],
   );
 
@@ -159,7 +155,11 @@ function CampaignDetailInner({ id }: { id: string }) {
 
   if (!campaign) {
     return (
-      <NotFoundState message={t.campaigns.detail.notFound} onBack={() => router.push("/promotions")} backLabel={t.campaigns.detail.backToList} />
+      <NotFoundState
+        message={t.campaigns.detail.notFound}
+        onBack={() => router.push("/promotions")}
+        backLabel={t.campaigns.detail.backToList}
+      />
     );
   }
 
@@ -169,8 +169,7 @@ function CampaignDetailInner({ id }: { id: string }) {
   const isEvent = campaign.type === "event";
   const past = isPastEvent(campaign, today);
   /** Only an online event still to come has a link worth handing out. */
-  const joinUrl =
-    isEvent && campaign.format === "online" && !past ? campaign.joinUrl : undefined;
+  const joinUrl = isEvent && campaign.format === "online" && !past ? campaign.joinUrl : undefined;
   const open = seatsLeft(campaign.id);
   /** No seats left: nothing to invite anyone to. */
   const full = isEvent && open === 0;
@@ -190,7 +189,9 @@ function CampaignDetailInner({ id }: { id: string }) {
       label: isEvent ? t.campaigns.detail.registrationCloses : t.campaigns.detail.status,
       // An event always carries both dates — see `Campaign.startDate`.
       value: isEvent
-        ? campaign.endDate ? campaignDay(campaign.endDate, locale) : t.common.notSpecified
+        ? campaign.endDate
+          ? campaignDay(campaign.endDate, locale)
+          : t.common.notSpecified
         : statusLine(status, campaign.endDate, today, t, locale),
     },
     isEvent
@@ -254,11 +255,11 @@ function CampaignDetailInner({ id }: { id: string }) {
             />
             <div
               aria-hidden
-              className="absolute -right-16 -top-16 size-56 rounded-full bg-white/10 blur-3xl"
+              className="absolute -top-16 -right-16 size-56 rounded-full bg-white/10 blur-3xl"
             />
             <div
               aria-hidden
-              className="absolute -bottom-20 left-1/4 size-40 rounded-full bg-primary-action/20 blur-3xl"
+              className="bg-primary-action/20 absolute -bottom-20 left-1/4 size-40 rounded-full blur-3xl"
             />
 
             <div className="absolute inset-0 flex flex-col justify-end gap-3.5 p-5 sm:gap-4 sm:p-7">
@@ -275,7 +276,7 @@ function CampaignDetailInner({ id }: { id: string }) {
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
                 <div className="flex min-w-0 flex-col gap-3.5 sm:gap-4">
-                  <h1 className="max-w-3xl text-[22px] font-bold leading-[1.2] tracking-tight text-white sm:text-[28px] sm:leading-[1.15]">
+                  <h1 className="max-w-3xl text-[22px] leading-[1.2] font-bold tracking-tight text-white sm:text-[28px] sm:leading-[1.15]">
                     {campaign.title}
                   </h1>
                   <p className="max-w-2xl text-body-sm leading-relaxed text-white/75 sm:text-body-lg">
@@ -293,9 +294,7 @@ function CampaignDetailInner({ id }: { id: string }) {
                       variant="primary"
                       size="lg"
                       className="w-full"
-                      leftIcon={
-                        full ? undefined : <PaperPlaneTiltIcon size={16} weight="fill" />
-                      }
+                      leftIcon={full ? undefined : <PaperPlaneTiltIcon size={16} weight="fill" />}
                       disabled={shareable === null || full}
                       onClick={() => setShareOpen(true)}
                     >
@@ -333,12 +332,7 @@ function CampaignDetailInner({ id }: { id: string }) {
             with it gone there is nothing to put beside the body, and a 360px
             empty gutter is worse than full width. */}
         <div className="flex flex-col gap-5">
-          {isEvent ? (
-            <EventBody campaign={campaign} />
-          ) : (
-            <PromotionBody campaign={campaign} />
-          )}
-
+          {isEvent ? <EventBody campaign={campaign} /> : <PromotionBody campaign={campaign} />}
         </div>
       </div>
 
@@ -407,9 +401,7 @@ function MetaStrip({
       <div className={`hidden xl:flex xl:items-stretch ${frame}`}>
         {items.map((item, i) => (
           <Fragment key={item.label}>
-            {i > 0 && (
-              <div aria-hidden className="w-px shrink-0 self-stretch bg-border/50" />
-            )}
+            {i > 0 && <div aria-hidden className="w-px shrink-0 self-stretch bg-border/50" />}
             <MetaCell {...item} className="min-w-0 flex-1" />
           </Fragment>
         ))}
@@ -462,14 +454,11 @@ function MetaCell({
         <p className="text-meta font-semibold tracking-wider text-muted-foreground">
           <span className="uppercase">{label}</span>
           {labelHint ? (
-            <span className="normal-case font-medium text-destructive">
-              {" "}
-              ({labelHint})
-            </span>
+            <span className="font-medium text-destructive normal-case"> ({labelHint})</span>
           ) : null}
         </p>
         <p
-          className={`text-body-sm font-semibold leading-snug ${
+          className={`text-body-sm leading-snug font-semibold ${
             critical ? "text-destructive" : "text-foreground"
           }`}
         >
@@ -479,4 +468,3 @@ function MetaCell({
     </div>
   );
 }
-

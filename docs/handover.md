@@ -28,14 +28,14 @@ IC / RM  →  IC Portal (repo นี้)  →  BFF / API (ยังไม่ม�
 
 ระบบหลังบ้านที่ Portal ต้องได้ข้อมูล แบ่งเป็น 6 กลุ่ม
 
-| กลุ่ม | ระบบ | ชื่อในโค้ดแล้ว? |
-| --- | --- | --- |
-| Identity | SSO / IdP — login, ชื่อ ตำแหน่ง ทีมของ IC | — |
-| ลูกค้า & พอร์ต | CRM, Portfolio / Custody, Call log | — |
-| Compliance | Yuanta e-KYC, Wealth Declare, Risk Consent, Risk & compliance alerts | ✓ (3 ตัวแรก) |
-| สินค้า & ตลาด | Product master, ข้อมูลกองทุน / NAV, Market data, Research / House View | — |
-| การซื้อขาย | Order management / Back office, Transactions (Stock · TFEX · MF) | — |
-| ช่องทาง & AI | YSInvest, Email, LINE, Voice AI, NBA / AI engine | ✓ (ช่องทาง) |
+| กลุ่ม         | ระบบ                                                                 | ชื่อในโค้ดแล้ว? |
+| ----------- | -------------------------------------------------------------------- | ----------- |
+| Identity    | SSO / IdP — login, ชื่อ ตำแหน่ง ทีมของ IC                                | —           |
+| ลูกค้า & พอร์ต | CRM, Portfolio / Custody, Call log                                   | —           |
+| Compliance  | Yuanta e-KYC, Wealth Declare, Risk Consent, Risk & compliance alerts | ✓ (3 ตัวแรก) |
+| สินค้า & ตลาด | Product master, ข้อมูลกองทุน / NAV, Market data, Research / House View  | —           |
+| การซื้อขาย    | Order management / Back office, Transactions (Stock · TFEX · MF)     | —           |
+| ช่องทาง & AI | YSInvest, Email, LINE, Voice AI, NBA / AI engine                     | ✓ (ช่องทาง)  |
 
 ชื่อที่ไม่มีเครื่องหมาย ✓ เป็นชื่อที่เสนอจากข้อมูลที่หน้าจอใช้ — **ต้องยืนยันชื่อระบบจริงกับทีมหลังบ้าน**
 
@@ -51,8 +51,8 @@ IC / RM  →  IC Portal (repo นี้)  →  BFF / API (ยังไม่ม�
 type Resource<T> = {
   data: T;
   isLoading: boolean;
-  error: Error | null;   // โหลดไม่สำเร็จ
-  isStale: boolean;      // มีข้อมูลเก่าอยู่ แต่รอบล่าสุดดึงไม่สำเร็จ
+  error: Error | null; // โหลดไม่สำเร็จ
+  isStale: boolean; // มีข้อมูลเก่าอยู่ แต่รอบล่าสุดดึงไม่สำเร็จ
   retry: () => void;
 };
 ```
@@ -65,14 +65,14 @@ type Resource<T> = {
 
 ### ฝั่งอ่าน (read hooks)
 
-| ไฟล์ | hook ข้อมูล | ครอบคลุม |
-| --- | --- | --- |
-| `src/hooks/use-api.ts` | 8 | ลูกค้า, profile, call log, บัญชีสินทรัพย์, NBA, Pipeline, Mini Kanban |
-| `src/hooks/use-catalog.ts` | ~32 | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit) + Insights / Research |
-| `src/hooks/use-risk-alerts.ts` | 2 | Risk & Compliance alerts |
-| `src/hooks/use-campaigns.ts` | 2 | Promotion / Events |
-| `orders/use-order-books.ts` | 9 | Order book (อ่านจาก `OrdersProvider`) |
-| `orders/use-transactions.ts` | 1 | รายการซื้อขาย Stock / TFEX / MF |
+| ไฟล์                            | hook ข้อมูล | ครอบคลุม                                                                              |
+| ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `src/hooks/use-api.ts`         | 8         | ลูกค้า, profile, call log, บัญชีสินทรัพย์, NBA, Pipeline, Mini Kanban                       |
+| `src/hooks/use-catalog.ts`     | ~32       | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit) + Insights / Research |
+| `src/hooks/use-risk-alerts.ts` | 2         | Risk & Compliance alerts                                                             |
+| `src/hooks/use-campaigns.ts`   | 2         | Promotion / Events                                                                   |
+| `orders/use-order-books.ts`    | 9         | Order book (อ่านจาก `OrdersProvider`)                                                 |
+| `orders/use-transactions.ts`   | 1         | รายการซื้อขาย Stock / TFEX / MF                                                        |
 
 เปลี่ยน body จาก `useStatic(mock)` เป็น `useResource(label, fetcher, mock)`
 argument ตัวที่ 3 คือค่าเริ่มต้นก่อนข้อมูลมา **ให้ใส่ค่าว่าง (`[]`, `null`) ไม่ใช่ mock** —
@@ -85,11 +85,11 @@ target type อยู่ที่ `src/types/domain.ts`
 
 mutator ทุกตัวเป็น `async` และทุกที่เรียกใช้ `await` อยู่แล้ว — ต่อ endpoint จริงแก้ในไฟล์ store ไฟล์เดียว
 
-| Store | mutators | หมายเหตุ |
-| --- | --- | --- |
-| `contexts/orders-context.tsx` | `placeOrder`, `cancelBooking`, submit, `sendRequirementRequest`, `sendProposal` | มี **timer จำลองระบบภายนอก 3 ตัว** — ดูด้านล่าง |
-| `contexts/notes-context.tsx` | `addNote`, `editNote`, `removeNote` | React state ล้วน — reload แล้วหาย |
-| `contexts/campaigns-context.tsx` | `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus` | กฎ 3 ข้อในไฟล์ต้องบังคับที่ server ด้วย |
+| Store                            | mutators                                                                        | หมายเหตุ                                    |
+| -------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------ |
+| `contexts/orders-context.tsx`    | `placeOrder`, `cancelBooking`, submit, `sendRequirementRequest`, `sendProposal` | มี **timer จำลองระบบภายนอก 3 ตัว** — ดูด้านล่าง |
+| `contexts/notes-context.tsx`     | `addNote`, `editNote`, `removeNote`                                             | React state ล้วน — reload แล้วหาย            |
+| `contexts/campaigns-context.tsx` | `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus`          | กฎ 3 ข้อในไฟล์ต้องบังคับที่ server ด้วย            |
 
 ## ⚠️ ต้องรู้ก่อนออกแบบ API
 
@@ -139,18 +139,18 @@ plYtdPct  = 12.4        (percent)      → formatPlYtdPct() → "+12.4%"
 
 `src/lib/feature-flags.ts` — โค้ดยังอยู่ครบ เปลี่ยน `true`/`false` ได้เลย
 
-| Flag | สถานะ | ปิดแล้วหายอะไร |
-| --- | --- | --- |
-| `ORDER_BOOKING_ENABLED` | **เปิด** | ปุ่มจองบนหน้าสินค้า, `/orders`, แถวคำสั่งซื้อในกระดิ่ง |
-| `KYC_ALERTS_ENABLED` | **เปิด** | แถว KYC ในกระดิ่ง |
-| `NOTES_ENABLED` | **เปิด** | `/notes`, ปุ่ม New note, แท็บ/ไดอะล็อก Notes ใน Client 360 |
-| `CALENDAR_ENABLED` | **เปิด** | `/calendar` และ `/reminders` |
-| `REMINDERS_ENABLED` | **เปิด** | แถว reminder ในกระดิ่ง, แท็บ/การ์ด/ไดอะล็อก Reminders |
-| `CALL_LOG_ENABLED` | **เปิด** | แท็บ/ไดอะล็อก Call log ใน Client 360 |
-| `PROMOTIONS_ENABLED` | ปิด | ลิงก์ใน sidebar เท่านั้น |
-| `PERFORMANCE_ENABLED` | ปิด | ลิงก์ใน sidebar เท่านั้น |
-| `IC_LEARNING_ENABLED` | ปิด | ลิงก์ใน sidebar เท่านั้น |
-| `YAA_TEAM_HEAD_ENABLED` | ปิด | ลิงก์ใน sidebar เท่านั้น |
+| Flag                    | สถานะ   | ปิดแล้วหายอะไร                                           |
+| ----------------------- | ------- | ------------------------------------------------------ |
+| `ORDER_BOOKING_ENABLED` | **เปิด** | ปุ่มจองบนหน้าสินค้า, `/orders`, แถวคำสั่งซื้อในกระดิ่ง            |
+| `KYC_ALERTS_ENABLED`    | **เปิด** | แถว KYC ในกระดิ่ง                                        |
+| `NOTES_ENABLED`         | **เปิด** | `/notes`, ปุ่ม New note, แท็บ/ไดอะล็อก Notes ใน Client 360 |
+| `CALENDAR_ENABLED`      | **เปิด** | `/calendar` และ `/reminders`                           |
+| `REMINDERS_ENABLED`     | **เปิด** | แถว reminder ในกระดิ่ง, แท็บ/การ์ด/ไดอะล็อก Reminders       |
+| `CALL_LOG_ENABLED`      | **เปิด** | แท็บ/ไดอะล็อก Call log ใน Client 360                     |
+| `PROMOTIONS_ENABLED`    | ปิด      | ลิงก์ใน sidebar เท่านั้น                                    |
+| `PERFORMANCE_ENABLED`   | ปิด      | ลิงก์ใน sidebar เท่านั้น                                    |
+| `IC_LEARNING_ENABLED`   | ปิด      | ลิงก์ใน sidebar เท่านั้น                                    |
+| `YAA_TEAM_HEAD_ENABLED` | ปิด      | ลิงก์ใน sidebar เท่านั้น                                    |
 
 Notes / Calendar / Reminders พึ่งพากัน ถ้าจะปิดควรปิดพร้อมกันทั้งชุด
 
@@ -173,11 +173,11 @@ Reminders แสดงเป็นรายการ ทั้งคู่อย
 การจองคำสั่งซื้อสร้างข้อมูลใหม่ — เก็บใน React state (`src/contexts/orders-context.tsx`)
 และมี **สาม timer ที่จำลองระบบภายนอก** ต้องถอดออกตอนต่อ backend จริง
 
-| ค่าคงที่ | จำลองอะไร | ของจริงคือ |
-| --- | --- | --- |
-| `REQUIREMENT_TURNAROUND_MS` (15 วิ) | ลูกค้าไปกรอกฟอร์มในระบบอื่นจนเสร็จ | webhook หรือ poll ระบบนั้น |
-| `BACKOFFICE_PICKUP_MS` (10 วิ) | หลังบ้านรับงาน (basket ที่ครบ / bond order ที่ส่งมา) | job ฝั่งหลังบ้าน หรือ webhook |
-| `SUBMISSION_TURNAROUND_MS` (12 วิ) | หลังบ้านตอบผลคำสั่งซื้อ | สถานะบน order record ที่ส่งกลับมา |
+| ค่าคงที่                              | จำลองอะไร                                    | ของจริงคือ                      |
+| ---------------------------------- | -------------------------------------------- | ----------------------------- |
+| `REQUIREMENT_TURNAROUND_MS` (15 วิ) | ลูกค้าไปกรอกฟอร์มในระบบอื่นจนเสร็จ                 | webhook หรือ poll ระบบนั้น       |
+| `BACKOFFICE_PICKUP_MS` (10 วิ)      | หลังบ้านรับงาน (basket ที่ครบ / bond order ที่ส่งมา) | job ฝั่งหลังบ้าน หรือ webhook      |
+| `SUBMISSION_TURNAROUND_MS` (12 วิ)  | หลังบ้านตอบผลคำสั่งซื้อ                            | สถานะบน order record ที่ส่งกลับมา |
 
 ค่าคงที่อื่นที่ควรมาจาก backend: `USD_THB = 36.5`, โควตาหุ้นกู้ (`fixedIncomeQuotaThb`,
 `globalBondQuotaUsd`), `THAI_MIN_TICKET` / `THAI_NOTIONAL`
@@ -214,13 +214,13 @@ API ต้องส่งมาเป็นภาษาที่ขอ ตอน
 
 **path ภายในโค้ดไม่มีภาษานำหน้า** (`/client-hub`) — ตัวช่วยเติม / ตัดให้เอง:
 
-| ใช้ | แทน |
-| --- | --- |
-| `LocaleLink` (`@/i18n/navigation`) | `next/link` |
-| `useLocalizedRouter()` | `useRouter()` |
-| `useAppPathname()` (ตัด `/th` ออกแล้ว) | `usePathname()` |
+| ใช้                                                   | แทน              |
+| ---------------------------------------------------- | ---------------- |
+| `LocaleLink` (`@/i18n/navigation`)                   | `next/link`      |
+| `useLocalizedRouter()`                               | `useRouter()`    |
+| `useAppPathname()` (ตัด `/th` ออกแล้ว)                 | `usePathname()`  |
 | `setQueryState` / `withQuery` (`lib/query-state.ts`) | — เติมภาษาให้อยู่แล้ว |
-| `redirect(localizePath(path, locale))` | `redirect(path)` |
+| `redirect(localizePath(path, locale))`               | `redirect(path)` |
 
 ### Dictionary
 
@@ -271,13 +271,13 @@ isLoading → error → not-found → empty → data
 
 `ResourceView` ทำลำดับนี้ให้สำหรับ `Resource` ตัวเดียว
 
-| สถานะ | ใช้ | เมื่อไหร่ |
-| --- | --- | --- |
-| โหลดไม่สำเร็จ | `ErrorState` + ปุ่ม "ลองใหม่" (`resource.retry`) | `error` และไม่มีข้อมูลเก่า |
-| ข้อมูลเก่า | `StaleBanner` | `isStale` — ยังแสดงข้อมูลเดิม พร้อมแถบเตือน |
-| ไม่พบ record | `NotFoundState` + ปุ่มกลับ | id ใน URL ไม่มีอยู่ — **ห้าม fallback ไปแสดง record อื่น** |
-| ว่างจริง | `EmptyState` "ยังไม่มี…" | ไม่มีข้อมูลเลย |
-| ค้นหา / กรองไม่เจอ | `EmptyState` "ไม่พบ…" + "ล้างตัวกรอง" | มีข้อมูล แต่ตัวกรองซ่อนหมด |
+| สถานะ            | ใช้                                            | เมื่อไหร่                                              |
+| ---------------- | --------------------------------------------- | --------------------------------------------------- |
+| โหลดไม่สำเร็จ      | `ErrorState` + ปุ่ม "ลองใหม่" (`resource.retry`) | `error` และไม่มีข้อมูลเก่า                               |
+| ข้อมูลเก่า          | `StaleBanner`                                 | `isStale` — ยังแสดงข้อมูลเดิม พร้อมแถบเตือน               |
+| ไม่พบ record      | `NotFoundState` + ปุ่มกลับ                       | id ใน URL ไม่มีอยู่ — **ห้าม fallback ไปแสดง record อื่น** |
+| ว่างจริง           | `EmptyState` "ยังไม่มี…"                         | ไม่มีข้อมูลเลย                                          |
+| ค้นหา / กรองไม่เจอ | `EmptyState` "ไม่พบ…" + "ล้างตัวกรอง"            | มีข้อมูล แต่ตัวกรองซ่อนหมด                                |
 
 กฎเพิ่มเติม
 
@@ -312,11 +312,11 @@ filter อื่นรีเซ็ตทุก refresh โดยตั้งใ�
 
 ## เอกสารอื่น
 
-| ไฟล์                                               | เนื้อหา                                          |
-| -------------------------------------------------- | ------------------------------------------------ |
-| [`api-by-page.md`](api-by-page.md)                 | **แต่ละหน้า แต่ละส่วน ต้องการข้อมูลอะไรจาก API** — เริ่มที่นี่ถ้าจะออกแบบ API |
-| [`mock-data-inventory.md`](mock-data-inventory.md) | รายการข้อมูลทุกชุด — **ใช้อ้างอิงตอนออกแบบ API** |
-| [`order-booking.md`](order-booking.md)             | ฟีเจอร์จองคำสั่งซื้อ และจุดที่ต้องต่อ backend    |
-| [`phase-scope.md`](phase-scope.md)                 | ขอบเขตแต่ละเฟส และอะไรถูกซ่อน                   |
+| ไฟล์                                                  | เนื้อหา                                                            |
+| ---------------------------------------------------- | ---------------------------------------------------------------- |
+| [`api-by-page.md`](api-by-page.md)                   | **แต่ละหน้า แต่ละส่วน ต้องการข้อมูลอะไรจาก API** — เริ่มที่นี่ถ้าจะออกแบบ API  |
+| [`mock-data-inventory.md`](mock-data-inventory.md)   | รายการข้อมูลทุกชุด — **ใช้อ้างอิงตอนออกแบบ API**                        |
+| [`order-booking.md`](order-booking.md)               | ฟีเจอร์จองคำสั่งซื้อ และจุดที่ต้องต่อ backend                               |
+| [`phase-scope.md`](phase-scope.md)                   | ขอบเขตแต่ละเฟส และอะไรถูกซ่อน                                       |
 | [`system-one-i18n-spec.md`](system-one-i18n-spec.md) | prop ที่ต้องเพิ่มใน design system เพื่อให้แปลภาษาได้ครบ (Step 6 — ยังไม่ทำ) |
-| [`mock-json/`](mock-json/)                         | ข้อมูล mock แบบ JSON ล้วน                        |
+| [`mock-json/`](mock-json/)                           | ข้อมูล mock แบบ JSON ล้วน                                           |

@@ -58,30 +58,54 @@
   .sm\:h-screen,
   .md\:h-screen,
   .lg\:h-screen,
-  .xl\:h-screen { height: calc(var(--vh) * 100); }
-  .min-h-screen { min-height: calc(var(--vh) * 100); }
-  .max-h-screen { max-height: calc(var(--vh) * 100); }
+  .xl\:h-screen {
+    height: calc(var(--vh) * 100);
+  }
+  .min-h-screen {
+    min-height: calc(var(--vh) * 100);
+  }
+  .max-h-screen {
+    max-height: calc(var(--vh) * 100);
+  }
   .w-screen,
   .sm\:w-screen,
   .md\:w-screen,
   .lg\:w-screen,
-  .xl\:w-screen { width: calc(var(--vw) * 100); }
-  .min-w-screen { min-width: calc(var(--vw) * 100); }
-  .max-w-screen { max-width: calc(var(--vw) * 100); }
-  .h-\[calc\(100vh-56px\)\] { height: calc(var(--vh) * 100 - 56px); }
-  .min-h-\[calc\(100vh-64px\)\] { min-height: calc(var(--vh) * 100 - 64px); }
+  .xl\:w-screen {
+    width: calc(var(--vw) * 100);
+  }
+  .min-w-screen {
+    min-width: calc(var(--vw) * 100);
+  }
+  .max-w-screen {
+    max-width: calc(var(--vw) * 100);
+  }
+  .h-\[calc\(100vh-56px\)\] {
+    height: calc(var(--vh) * 100 - 56px);
+  }
+  .min-h-\[calc\(100vh-64px\)\] {
+    min-height: calc(var(--vh) * 100 - 64px);
+  }
   /* system-one's Dropdown places its option panel (portalled to <body>) at
      `getBoundingClientRect()` coordinates — screen pixels — which the zoom
      would scale a second time, dropping the panel 25% down and to the right of
      its trigger. Un-zooming the panel puts it back on the trigger, and its
      contents are zoomed again so the options read at the same size as
      everything else. App code does the same correction with `pageZoom()`. */
-  body > .bg-popover.overflow-clip { zoom: calc(1 / 1.2); }
-  body > .bg-popover.overflow-clip > * { zoom: 1.2; }
+  body > .bg-popover.overflow-clip {
+    zoom: calc(1 / 1.2);
+  }
+  body > .bg-popover.overflow-clip > * {
+    zoom: 1.2;
+  }
   /* Same for the Radix popper the library's Popover and Tooltip sit in: it is
      placed with a transform measured in screen pixels. */
-  [data-radix-popper-content-wrapper] { zoom: calc(1 / 1.2); }
-  [data-radix-popper-content-wrapper] > * { zoom: 1.2; }
+  [data-radix-popper-content-wrapper] {
+    zoom: calc(1 / 1.2);
+  }
+  [data-radix-popper-content-wrapper] > * {
+    zoom: 1.2;
+  }
   [data-vaul-drawer-direction="bottom"].data-\[vaul-drawer-direction\=bottom\]\:max-h-\[80vh\],
   [data-vaul-drawer-direction="top"].data-\[vaul-drawer-direction\=top\]\:max-h-\[80vh\] {
     max-height: calc(var(--vh) * 80);
@@ -97,36 +121,84 @@
   --text-xl: 22px;
 }
 
-.text-xxs { font-size: 12px; }
-.text-xs { font-size: 14px; }
-.text-sm { font-size: 16px; }
-.text-base { font-size: 18px; }
-.text-lg { font-size: 20px; }
-.text-xl { font-size: 22px; }
+.text-xxs {
+  font-size: 12px;
+}
+.text-xs {
+  font-size: 14px;
+}
+.text-sm {
+  font-size: 16px;
+}
+.text-base {
+  font-size: 18px;
+}
+.text-lg {
+  font-size: 20px;
+}
+.text-xl {
+  font-size: 22px;
+}
 
 @media (min-width: 40rem) {
-  .sm\:text-xxs { font-size: 12px; }
-  .sm\:text-xs { font-size: 14px; }
-  .sm\:text-sm { font-size: 16px; }
-  .sm\:text-base { font-size: 18px; }
-  .sm\:text-lg { font-size: 20px; }
-  .sm\:text-xl { font-size: 22px; }
+  .sm\:text-xxs {
+    font-size: 12px;
+  }
+  .sm\:text-xs {
+    font-size: 14px;
+  }
+  .sm\:text-sm {
+    font-size: 16px;
+  }
+  .sm\:text-base {
+    font-size: 18px;
+  }
+  .sm\:text-lg {
+    font-size: 20px;
+  }
+  .sm\:text-xl {
+    font-size: 22px;
+  }
 }
 @media (min-width: 48rem) {
-  .md\:text-xxs { font-size: 12px; }
-  .md\:text-xs { font-size: 14px; }
-  .md\:text-sm { font-size: 16px; }
-  .md\:text-base { font-size: 18px; }
-  .md\:text-lg { font-size: 20px; }
-  .md\:text-xl { font-size: 22px; }
+  .md\:text-xxs {
+    font-size: 12px;
+  }
+  .md\:text-xs {
+    font-size: 14px;
+  }
+  .md\:text-sm {
+    font-size: 16px;
+  }
+  .md\:text-base {
+    font-size: 18px;
+  }
+  .md\:text-lg {
+    font-size: 20px;
+  }
+  .md\:text-xl {
+    font-size: 22px;
+  }
 }
 @media (min-width: 64rem) {
-  .lg\:text-xxs { font-size: 12px; }
-  .lg\:text-xs { font-size: 14px; }
-  .lg\:text-sm { font-size: 16px; }
-  .lg\:text-base { font-size: 18px; }
-  .lg\:text-lg { font-size: 20px; }
-  .lg\:text-xl { font-size: 22px; }
+  .lg\:text-xxs {
+    font-size: 12px;
+  }
+  .lg\:text-xs {
+    font-size: 14px;
+  }
+  .lg\:text-sm {
+    font-size: 16px;
+  }
+  .lg\:text-base {
+    font-size: 18px;
+  }
+  .lg\:text-lg {
+    font-size: 20px;
+  }
+  .lg\:text-xl {
+    font-size: 22px;
+  }
 }
 
 /* The library's `type-*` styles take their size from the tokens above, so they
@@ -135,16 +207,28 @@
    example), so each gets the same +4px as its size. `type-h4` and up keep
    their sizes, and so keep their line heights too. */
 .type-description,
-.type-description-bold { line-height: 18px; }
+.type-description-bold {
+  line-height: 18px;
+}
 .type-caption,
-.type-caption-bold { line-height: 20px; }
+.type-caption-bold {
+  line-height: 20px;
+}
 .type-body-2,
 .type-subtitle-2,
-.type-button { line-height: 24px; }
+.type-button {
+  line-height: 24px;
+}
 .type-body-1,
-.type-subtitle-1 { line-height: 28px; }
-.type-h6 { line-height: 32px; }
-.type-h5 { line-height: 34px; }
+.type-subtitle-1 {
+  line-height: 28px;
+}
+.type-h6 {
+  line-height: 32px;
+}
+.type-h5 {
+  line-height: 34px;
+}
 
 /* Count pills with a fixed height, so the larger digits need a larger pill.
    Selected the same way `globals.css` selects them for colour: the tab
@@ -168,18 +252,40 @@ span.rounded-\[60px\].min-h-3\.5.bg-visual-red-default {
 
 /* The library's internal arbitrary sizes. */
 .text-\[8px\],
-.text-\[9px\] { font-size: 12px; }
+.text-\[9px\] {
+  font-size: 12px;
+}
 .text-\[10px\],
-.text-\[11px\] { font-size: 13px; }
-.text-\[12px\] { font-size: 14px; }
-.text-\[13px\] { font-size: 15px; }
-.text-\[14px\] { font-size: 16px; }
-.text-\[15px\] { font-size: 17px; }
-.text-\[16px\] { font-size: 18px; }
-.text-\[18px\] { font-size: 20px; }
-.text-\[20px\] { font-size: 22px; }
-.text-\[length\:var\(--text-xs\)\] { font-size: var(--text-xs); }
-.text-\[length\:var\(--text-xxs\)\] { font-size: var(--text-xxs); }
+.text-\[11px\] {
+  font-size: 13px;
+}
+.text-\[12px\] {
+  font-size: 14px;
+}
+.text-\[13px\] {
+  font-size: 15px;
+}
+.text-\[14px\] {
+  font-size: 16px;
+}
+.text-\[15px\] {
+  font-size: 17px;
+}
+.text-\[16px\] {
+  font-size: 18px;
+}
+.text-\[18px\] {
+  font-size: 20px;
+}
+.text-\[20px\] {
+  font-size: 22px;
+}
+.text-\[length\:var\(--text-xs\)\] {
+  font-size: var(--text-xs);
+}
+.text-\[length\:var\(--text-xxs\)\] {
+  font-size: var(--text-xxs);
+}
 
 /* Line heights the library pairs with those sizes, +4px to match. Without
    these, its dropdowns and inputs would set 18px text on a 20px line.
@@ -189,16 +295,42 @@ span.rounded-\[60px\].min-h-3\.5.bg-visual-red-default {
    writes the line height out in px instead (`text-sm leading-[24px]`), so
    none of these rules ever reach it. Keep that rule for new code. A
    `text-sm leading-5` written in the app gets a 24px line here, not 20px. */
-.text-xs.leading-4 { line-height: 20px; }
-.text-sm.leading-5 { line-height: 24px; }
-.text-base.leading-5 { line-height: 24px; }
-.text-base.leading-6 { line-height: 28px; }
-.text-\[9px\].leading-3 { line-height: 18px; }
-.text-\[9px\].leading-\[14px\] { line-height: 18px; }
-.text-\[12px\].leading-\[16px\] { line-height: 20px; }
-.text-\[12px\].leading-\[18px\] { line-height: 22px; }
-.text-\[14px\].leading-\[20px\] { line-height: 24px; }
-.text-\[14px\].leading-\[22px\] { line-height: 26px; }
-.text-\[16px\].leading-\[20px\] { line-height: 24px; }
-.text-\[16px\].leading-\[24px\] { line-height: 28px; }
-.text-\[18px\].leading-7 { line-height: 32px; }
+.text-xs.leading-4 {
+  line-height: 20px;
+}
+.text-sm.leading-5 {
+  line-height: 24px;
+}
+.text-base.leading-5 {
+  line-height: 24px;
+}
+.text-base.leading-6 {
+  line-height: 28px;
+}
+.text-\[9px\].leading-3 {
+  line-height: 18px;
+}
+.text-\[9px\].leading-\[14px\] {
+  line-height: 18px;
+}
+.text-\[12px\].leading-\[16px\] {
+  line-height: 20px;
+}
+.text-\[12px\].leading-\[18px\] {
+  line-height: 22px;
+}
+.text-\[14px\].leading-\[20px\] {
+  line-height: 24px;
+}
+.text-\[14px\].leading-\[22px\] {
+  line-height: 26px;
+}
+.text-\[16px\].leading-\[20px\] {
+  line-height: 24px;
+}
+.text-\[16px\].leading-\[24px\] {
+  line-height: 28px;
+}
+.text-\[18px\].leading-7 {
+  line-height: 32px;
+}

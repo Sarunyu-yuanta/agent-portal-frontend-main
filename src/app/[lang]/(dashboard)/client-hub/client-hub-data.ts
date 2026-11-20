@@ -13,11 +13,7 @@
 
 import { mockClientDetails, mockKYCData } from "@/lib/mock-data";
 import { ALLOCATION_SLICES } from "@/components/AssetSummarySection";
-import {
-  ASSET_CLASS,
-  LIABILITIES_MULTIPLIER,
-  displayAssetLabel,
-} from "@/lib/client-utils";
+import { ASSET_CLASS, LIABILITIES_MULTIPLIER, displayAssetLabel } from "@/lib/client-utils";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { getNineBoxCell } from "./NineBoxTab";
 import type { ProductSortKey, SortKey } from "./types";
@@ -44,21 +40,36 @@ export function getClientSliceAmount(client: Client, label: string): number {
 /** Sortable value for a client column. Strings sort lexically, numbers numerically. */
 export function getSortValue(client: Client, key: SortKey): number | string {
   switch (key) {
-    case "id": return client.id;
-    case "name": return client.name;
-    case "aum": return client.aum;
-    case "thaiStock": return getClientSliceAmount(client, ASSET_CLASS.thaiStock);
-    case "foreignStock": return getClientSliceAmount(client, ASSET_CLASS.foreignStock);
-    case "derivatives": return getClientSliceAmount(client, ASSET_CLASS.derivatives);
-    case "mutualFund": return getClientSliceAmount(client, ASSET_CLASS.mutualFund);
-    case "bond": return getClientSliceAmount(client, ASSET_CLASS.bond);
-    case "foreignBond": return getClientSliceAmount(client, ASSET_CLASS.foreignBond);
-    case "structuredBond": return getClientSliceAmount(client, ASSET_CLASS.structuredBond);
-    case "plYtd": return client.plYtdPct;
-    case "liabilities": return client.aum * LIABILITIES_MULTIPLIER;
-    case "cashIdle": return client.aum * (client.cashIdlePct / 100);
-    case "nineBox": return getNineBoxCell(client).heat;
-    default: return 0;
+    case "id":
+      return client.id;
+    case "name":
+      return client.name;
+    case "aum":
+      return client.aum;
+    case "thaiStock":
+      return getClientSliceAmount(client, ASSET_CLASS.thaiStock);
+    case "foreignStock":
+      return getClientSliceAmount(client, ASSET_CLASS.foreignStock);
+    case "derivatives":
+      return getClientSliceAmount(client, ASSET_CLASS.derivatives);
+    case "mutualFund":
+      return getClientSliceAmount(client, ASSET_CLASS.mutualFund);
+    case "bond":
+      return getClientSliceAmount(client, ASSET_CLASS.bond);
+    case "foreignBond":
+      return getClientSliceAmount(client, ASSET_CLASS.foreignBond);
+    case "structuredBond":
+      return getClientSliceAmount(client, ASSET_CLASS.structuredBond);
+    case "plYtd":
+      return client.plYtdPct;
+    case "liabilities":
+      return client.aum * LIABILITIES_MULTIPLIER;
+    case "cashIdle":
+      return client.aum * (client.cashIdlePct / 100);
+    case "nineBox":
+      return getNineBoxCell(client).heat;
+    default:
+      return 0;
   }
 }
 
@@ -73,11 +84,16 @@ export function getProductSortValue(
   t: Pick<Dictionary, "assetClass">,
 ): number | string {
   switch (key) {
-    case "label": return displayAssetLabel(row.label, t);
-    case "clientCount": return row.clientCount;
-    case "totalAmountThb": return row.totalAmountThb;
-    case "avgAllocationPct": return row.avgAllocationPct;
-    default: return 0;
+    case "label":
+      return displayAssetLabel(row.label, t);
+    case "clientCount":
+      return row.clientCount;
+    case "totalAmountThb":
+      return row.totalAmountThb;
+    case "avgAllocationPct":
+      return row.avgAllocationPct;
+    default:
+      return 0;
   }
 }
 
@@ -92,7 +108,8 @@ export function buildProductRows(clients: Client[]): ProductRow[] {
     const aumThb = client.aum;
     for (const slice of slicesFor(client)) {
       if (slice.percent <= 0) continue;
-      if (!map.has(slice.label)) map.set(slice.label, { statusIcon: slice.statusIcon, holders: [] });
+      if (!map.has(slice.label))
+        map.set(slice.label, { statusIcon: slice.statusIcon, holders: [] });
       map.get(slice.label)!.holders.push({
         clientId: client.id,
         clientName: client.name,
@@ -156,7 +173,10 @@ export type KycDueEntry = ReturnType<typeof getKycDueClients>[number];
  * `daysUntilExpiry === 0` counts as upcoming — due today, not yet missed. Both
  * halves inherit the ascending sort, so each still reads most-urgent-first.
  */
-export function splitKycByExpiry(due: KycDueEntry[]): { expired: KycDueEntry[]; upcoming: KycDueEntry[] } {
+export function splitKycByExpiry(due: KycDueEntry[]): {
+  expired: KycDueEntry[];
+  upcoming: KycDueEntry[];
+} {
   return {
     expired: due.filter((k) => k.daysUntilExpiry < 0),
     upcoming: due.filter((k) => k.daysUntilExpiry >= 0),

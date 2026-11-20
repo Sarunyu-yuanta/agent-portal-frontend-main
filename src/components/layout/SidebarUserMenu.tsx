@@ -105,10 +105,7 @@ export function SidebarUserMenu({
       width,
       // Clamped to keep the panel on-screen once the floor makes it wider than
       // the rail it was measured from.
-      left: Math.max(
-        MENU_GAP,
-        Math.min(rect.left + MENU_GAP, viewport.width - width - MENU_GAP),
-      ),
+      left: Math.max(MENU_GAP, Math.min(rect.left + MENU_GAP, viewport.width - width - MENU_GAP)),
       bottom: viewport.height - rect.top + MENU_GAP,
     });
   }
@@ -160,27 +157,28 @@ export function SidebarUserMenu({
         aria-expanded={open}
         aria-label={t.nav.accountOf(name)}
         title={collapsed ? name : undefined}
-        className={`group w-full flex items-center gap-3 py-2 px-2 transition-colors cursor-pointer ${open ? "bg-slate-700/50" : "hover:bg-slate-700/50"}`}
+        className={`group flex w-full cursor-pointer items-center gap-3 px-2 py-2 transition-colors ${open ? "bg-slate-700/50" : "hover:bg-slate-700/50"}`}
       >
         {/* Same fixed icon zone the nav glyphs and the logo line up on, so the
             avatar holds its place as the sidebar collapses. */}
         {/* The avatar's initial is the library's `text-xl`, which
             `app/typography.css` enlarges; held at its original 20px here like
             the rest of the sidebar. `!` to beat that unlayered rule. */}
-        <div className="w-[34px] flex items-center justify-center shrink-0 [&_span.text-xl]:text-[length:20px]!">
+        <div className="flex w-[34px] shrink-0 items-center justify-center [&_span.text-xl]:text-[length:20px]!">
           <Avatar type="text" initials={initials} size="m" />
         </div>
         <div
-          className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[180px] opacity-100 flex-1"
-            }`}
+          className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ease-in-out ${
+            collapsed ? "max-w-0 opacity-0" : "max-w-[180px] flex-1 opacity-100"
+          }`}
         >
-          <div className="flex-1 min-w-0 text-left">
+          <div className="min-w-0 flex-1 text-left">
             {/* Original sidebar sizes, written `text-[length:Npx]` so
                 `app/typography.css` does not enlarge them — see `AppSidebar`. */}
-            <p className="text-[length:13px] font-medium text-white truncate leading-tight whitespace-nowrap">
+            <p className="truncate text-[length:13px] leading-tight font-medium whitespace-nowrap text-white">
               {name}
             </p>
-            <p className="text-[length:11px] text-slate-400 truncate leading-tight whitespace-nowrap">
+            <p className="truncate text-[length:11px] leading-tight whitespace-nowrap text-slate-400">
               {role}
             </p>
           </div>
@@ -197,15 +195,15 @@ export function SidebarUserMenu({
           role="menu"
           aria-label={t.nav.accountOf(name)}
           style={{ left: placement.left, bottom: placement.bottom, width: placement.width }}
-          className="fixed z-50 overflow-hidden rounded-xl border border-border bg-card shadow-lg animate-in fade-in duration-150"
+          className="fixed z-50 animate-in overflow-hidden rounded-xl border border-border bg-card shadow-lg duration-150 fade-in"
         >
           {/* Repeated here because the collapsed rail hides the row's own
               labels — without it the menu gives no clue whose account it is. */}
-          <div className="px-3 py-2.5 border-b border-[var(--border-default)]">
-            <p className="text-[length:13px] font-medium text-foreground truncate leading-tight">
+          <div className="border-b border-[var(--border-default)] px-3 py-2.5">
+            <p className="truncate text-[length:13px] leading-tight font-medium text-foreground">
               {name}
             </p>
-            <p className="text-[length:11px] text-muted-foreground truncate leading-tight">
+            <p className="truncate text-[length:11px] leading-tight text-muted-foreground">
               {role}
             </p>
           </div>
@@ -228,7 +226,9 @@ export function SidebarUserMenu({
           the avatar since there is room for it here. */}
       <Sheet
         open={open && isMobile}
-        onOpenChange={(next) => { if (!next) setPlacement(null); }}
+        onOpenChange={(next) => {
+          if (!next) setPlacement(null);
+        }}
       >
         {/* Own backdrop, so the dimming covers the sidebar drawer instead of
             stopping at its edge and leaving it lit beside a dimmed page.
@@ -251,13 +251,13 @@ export function SidebarUserMenu({
           className="z-[61] gap-0 rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
         >
           <div className="mx-auto mt-3 mb-1 h-1 w-9 shrink-0 rounded-full bg-[var(--border-default)]" />
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-default)]">
+          <div className="flex items-center gap-3 border-b border-[var(--border-default)] px-4 py-3">
             <Avatar type="text" initials={initials} size="m" />
             <div className="min-w-0">
-              <p className="text-[length:15px] font-medium text-foreground truncate leading-tight">
+              <p className="truncate text-[length:15px] leading-tight font-medium text-foreground">
                 {name}
               </p>
-              <p className="text-[length:12px] text-muted-foreground truncate leading-tight">
+              <p className="truncate text-[length:12px] leading-tight text-muted-foreground">
                 {role}
               </p>
             </div>

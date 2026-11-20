@@ -4,15 +4,15 @@ import { CompactCardSkeleton } from "../InsightsSkeletons";
 /** Mirrors the PDF report card: icon + two-line blurb on the left, a button on the right. */
 function PdfButtonSkeleton() {
   return (
-    <div className="rounded-2xl border border-border p-6 flex items-center justify-between gap-4">
-      <div className="flex flex-col gap-2 min-w-0 flex-1">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-6">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-center gap-2.5">
-          <Skeleton className="size-6 rounded shrink-0" />
+          <Skeleton className="size-6 shrink-0 rounded" />
           <Skeleton className="h-4 w-36" />
         </div>
         <Skeleton className="h-3 w-48" />
       </div>
-      <Skeleton className="h-10 w-32 rounded-lg shrink-0" />
+      <Skeleton className="h-10 w-32 shrink-0 rounded-lg" />
     </div>
   );
 }
@@ -20,9 +20,9 @@ function PdfButtonSkeleton() {
 /** Mirrors the gradient-bordered AI Summary card: icon chip + title, then a few text lines. */
 function AiSummarySkeleton() {
   return (
-    <div className="rounded-2xl border border-border p-6 flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-2xl border border-border p-6">
       <div className="flex items-center gap-2.5">
-        <Skeleton className="size-9 rounded-xl shrink-0" />
+        <Skeleton className="size-9 shrink-0 rounded-xl" />
         <Skeleton className="h-4 w-32" />
       </div>
       <div className="flex flex-col gap-2">
@@ -51,18 +51,18 @@ function ArticleSectionSkeleton({ withImage = false }: { withImage?: boolean }) 
 /** Mirrors a related-product card: logo/name/value row, then a 3-column stat strip. */
 function RelatedProductCardSkeleton() {
   return (
-    <div className="rounded-xl border border-border p-4 flex flex-col gap-3 w-full">
+    <div className="flex w-full flex-col gap-3 rounded-xl border border-border p-4">
       <div className="flex items-center gap-2">
-        <Skeleton className="size-8 rounded shrink-0" />
-        <div className="flex-1 min-w-0 flex flex-col gap-1">
+        <Skeleton className="size-8 shrink-0 rounded" />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-3 w-16" />
         </div>
         <Skeleton className="h-4 w-12 shrink-0" />
       </div>
-      <div className="flex bg-[#f9fafb] rounded-lg p-2 gap-2">
+      <div className="flex gap-2 rounded-lg bg-[#f9fafb] p-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div key={i} className="flex flex-1 flex-col items-center gap-1">
             <Skeleton className="h-2.5 w-10" />
             <Skeleton className="h-3 w-8" />
           </div>
@@ -77,7 +77,7 @@ function RelatedProductsSkeleton() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2.5">
-        <Skeleton className="size-6 rounded shrink-0" />
+        <Skeleton className="size-6 shrink-0 rounded" />
         <Skeleton className="h-5 w-36" />
       </div>
       <div className="flex flex-col gap-3">
@@ -93,11 +93,11 @@ function AnalystsSkeleton() {
   return (
     <div className="flex flex-col gap-4">
       <Skeleton className="h-5 w-32" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-1">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 min-w-0">
-            <Skeleton className="w-16 h-16 rounded-lg shrink-0" />
-            <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div key={i} className="flex min-w-0 items-center gap-3">
+            <Skeleton className="h-16 w-16 shrink-0 rounded-lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-3 w-24" />
             </div>
@@ -120,21 +120,21 @@ export function InsightDetailSkeleton() {
       className="flex flex-col gap-8 lg:grid lg:gap-6"
       style={{ gridTemplateColumns: "1fr 400px" }}
     >
-      <div className="flex flex-col gap-6 pb-12 min-w-0 max-lg:max-w-xl max-lg:mx-auto max-lg:w-full">
-        <Skeleton className="h-8 w-16 rounded-lg hidden xl:block" />
+      <div className="flex min-w-0 flex-col gap-6 pb-12 max-lg:mx-auto max-lg:w-full max-lg:max-w-xl">
+        <Skeleton className="hidden h-8 w-16 rounded-lg xl:block" />
 
         <div className="flex flex-col gap-4">
           <Skeleton className="h-5 w-20 rounded-full" />
-          <Skeleton className="h-8 sm:h-10 w-3/4" />
+          <Skeleton className="h-8 w-3/4 sm:h-10" />
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <Skeleton className="h-4 w-1/3" />
           <Skeleton className="h-3 w-24 sm:shrink-0" />
         </div>
         <div className="border-t border-border" />
 
-        <div className="lg:hidden flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:hidden">
           <PdfButtonSkeleton />
           <AiSummarySkeleton />
         </div>
@@ -143,20 +143,20 @@ export function InsightDetailSkeleton() {
         <ArticleSectionSkeleton />
         <ArticleSectionSkeleton />
 
-        <div className="lg:hidden border-t border-border mt-4" />
+        <div className="mt-4 border-t border-border lg:hidden" />
         <div className="lg:hidden">
           <AnalystsSkeleton />
         </div>
 
-        <div className="lg:hidden border-t border-border mt-4" />
+        <div className="mt-4 border-t border-border lg:hidden" />
         <div className="lg:hidden">
           <RelatedProductsSkeleton />
         </div>
 
-        <div className="flex flex-col gap-4 mt-4">
+        <div className="mt-4 flex flex-col gap-4">
           <div className="border-t border-border" />
-          <Skeleton className="h-5 w-56 mt-2" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Skeleton className="mt-2 h-5 w-56" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <CompactCardSkeleton />
             <CompactCardSkeleton />
           </div>
@@ -167,10 +167,10 @@ export function InsightDetailSkeleton() {
         <div className="flex flex-col gap-5">
           <PdfButtonSkeleton />
           <AiSummarySkeleton />
-          <div className="border-t border-border mt-3 pt-6">
+          <div className="mt-3 border-t border-border pt-6">
             <RelatedProductsSkeleton />
           </div>
-          <div className="border-t border-border mt-3 pt-6">
+          <div className="mt-3 border-t border-border pt-6">
             <AnalystsSkeleton />
           </div>
         </div>

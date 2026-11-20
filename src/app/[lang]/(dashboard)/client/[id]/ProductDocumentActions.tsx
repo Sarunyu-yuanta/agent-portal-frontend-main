@@ -53,13 +53,13 @@ export function ProductDocumentActions({
   return (
     <div className={`relative w-full ${className}`}>
       <div
-        className="flex w-full items-stretch h-12 rounded-xl overflow-hidden text-white"
+        className="flex h-12 w-full items-stretch overflow-hidden rounded-xl text-white"
         style={{ backgroundColor: "#0a6ee7" }}
       >
         <button
           type="button"
           onClick={onSendProposal}
-          className="flex flex-1 items-center justify-center gap-2 px-4 font-medium text-sm cursor-pointer transition-opacity hover:opacity-90"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 text-sm font-medium transition-opacity hover:opacity-90"
         >
           <PaperPlaneTiltIcon size={16} weight="fill" />
           <span>{t.products.common.sendProposalToClient}</span>
@@ -73,12 +73,15 @@ export function ProductDocumentActions({
           aria-expanded={open}
           aria-label={labels.download}
           title={labels.download}
-          className="flex shrink-0 items-center justify-center px-3.5 cursor-pointer transition-opacity hover:opacity-90"
+          className="flex shrink-0 cursor-pointer items-center justify-center px-3.5 transition-opacity hover:opacity-90"
         >
           <CaretDownIcon
             size={14}
             color="white"
-            style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+            style={{
+              transition: "transform 0.2s",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            }}
           />
         </button>
       </div>
@@ -87,7 +90,7 @@ export function ProductDocumentActions({
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} role="presentation" />
           <div
-            className="absolute bottom-full mb-2 right-0 w-full rounded-xl overflow-hidden z-20 shadow-lg"
+            className="absolute right-0 bottom-full z-20 mb-2 w-full overflow-hidden rounded-xl shadow-lg"
             style={{ border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "white" }}
           >
             <button
@@ -96,18 +99,26 @@ export function ProductDocumentActions({
                 setOpen(false);
                 onPresentation();
               }}
-              className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
+              className="group flex w-full cursor-pointer items-start gap-3 px-4 py-3 text-left transition-colors"
               style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
             >
-              <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#fee2e2] group-hover:bg-transparent transition-colors">
-                <FilePdfIcon size={16} color="#dc2626" className="transition-opacity group-hover:opacity-0" />
-                <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#fee2e2] transition-colors group-hover:bg-transparent">
+                <FilePdfIcon
+                  size={16}
+                  color="#dc2626"
+                  className="transition-opacity group-hover:opacity-0"
+                />
+                <EyeIcon
+                  size={16}
+                  color="#0a6ee7"
+                  className="absolute opacity-0 transition-opacity group-hover:opacity-100"
+                />
               </div>
               <div>
-                <p className="font-medium text-sm text-[#101828]">{labels.presentation}</p>
-                <p className="text-xs text-[#6a7282] mt-0.5">{labels.presentationHint}</p>
+                <p className="text-sm font-medium text-[#101828]">{labels.presentation}</p>
+                <p className="mt-0.5 text-xs text-[#6a7282]">{labels.presentationHint}</p>
               </div>
             </button>
             <button
@@ -116,17 +127,27 @@ export function ProductDocumentActions({
                 setOpen(false);
                 onPackage();
               }}
-              className="group flex items-start gap-3 w-full px-4 py-3 text-left cursor-pointer transition-colors"
+              className="group flex w-full cursor-pointer items-start gap-3 px-4 py-3 text-left transition-colors"
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
             >
-              <div className="relative flex shrink-0 size-8 items-center justify-center rounded-lg bg-[#eff6ff] group-hover:bg-transparent transition-colors">
-                <PackageIcon size={16} color="#0a6ee7" className="transition-opacity group-hover:opacity-0" />
-                <EyeIcon size={16} color="#0a6ee7" className="absolute opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff] transition-colors group-hover:bg-transparent">
+                <PackageIcon
+                  size={16}
+                  color="#0a6ee7"
+                  className="transition-opacity group-hover:opacity-0"
+                />
+                <EyeIcon
+                  size={16}
+                  color="#0a6ee7"
+                  className="absolute opacity-0 transition-opacity group-hover:opacity-100"
+                />
               </div>
               <div>
-                <p className="font-medium text-sm text-[#101828]">{t.products.packageFiles.title}</p>
-                <p className="text-xs text-[#6a7282] mt-0.5">{labels.packageHint}</p>
+                <p className="text-sm font-medium text-[#101828]">
+                  {t.products.packageFiles.title}
+                </p>
+                <p className="mt-0.5 text-xs text-[#6a7282]">{labels.packageHint}</p>
               </div>
             </button>
           </div>

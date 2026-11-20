@@ -17,21 +17,23 @@ const CARD_STYLE = {
 
 function GroupLabel({ children }: { children: string }) {
   return (
-    <p className="text-meta font-bold uppercase tracking-wide text-muted-foreground">{children}</p>
+    <p className="text-meta font-bold tracking-wide text-muted-foreground uppercase">{children}</p>
   );
 }
 
 function StatRow({ stats }: { stats: { label: string; value: string }[] }) {
   return (
-    <div className="flex items-center justify-center text-center bg-[#f9fafb] rounded-lg w-full py-1.5">
+    <div className="flex w-full items-center justify-center rounded-lg bg-[#f9fafb] py-1.5 text-center">
       {stats.map((s, i) => (
         <div
           key={s.label}
-          className="flex flex-col gap-0.5 items-center justify-center flex-1 min-w-0 h-full"
+          className="flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-0.5"
           style={i < stats.length - 1 ? { borderRight: "1px solid rgba(0,0,0,0.1)" } : {}}
         >
-          <p className="text-micro leading-[18px] text-[#6a7282] w-full truncate">{s.label}</p>
-          <p className="text-label leading-[20px] font-semibold text-[#4a5565] w-full truncate">{s.value}</p>
+          <p className="w-full truncate text-micro leading-[18px] text-[#6a7282]">{s.label}</p>
+          <p className="w-full truncate text-label leading-[20px] font-semibold text-[#4a5565]">
+            {s.value}
+          </p>
         </div>
       ))}
     </div>
@@ -41,17 +43,23 @@ function StatRow({ stats }: { stats: { label: string; value: string }[] }) {
 function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
   const r = useT().research.related;
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl w-full" style={CARD_STYLE}>
+    <div className="flex w-full flex-col gap-3 rounded-xl p-4" style={CARD_STYLE}>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <BondLogo src={BOND_LOGOS[bond.logoIdx]} logoCrop={bond.logoCrop} className="size-8 rounded" />
-          <div className="flex flex-col min-w-0">
-            <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate">{bond.symbol}</p>
-            <p className="text-label leading-[20px] text-[#6a7282] truncate">{bond.companyName}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <BondLogo
+            src={BOND_LOGOS[bond.logoIdx]}
+            logoCrop={bond.logoCrop}
+            className="size-8 rounded"
+          />
+          <div className="flex min-w-0 flex-col">
+            <p className="truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+              {bond.symbol}
+            </p>
+            <p className="truncate text-label leading-[20px] text-[#6a7282]">{bond.companyName}</p>
           </div>
         </div>
-        <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
-          <p className="font-bold text-title-sm leading-[28px] text-[#101828]">{bond.ytm}</p>
+        <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
+          <p className="text-title-sm leading-[28px] font-bold text-[#101828]">{bond.ytm}</p>
           <p className="text-label leading-[20px] text-[#6a7282]">{r.ytm}</p>
         </div>
       </div>
@@ -69,20 +77,27 @@ function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
 function GlobalBondRelatedCard({ issuer }: { issuer: GlobalBondIssuer }) {
   const r = useT().research.related;
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl w-full" style={CARD_STYLE}>
+    <div className="flex w-full flex-col gap-3 rounded-xl p-4" style={CARD_STYLE}>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="relative shrink-0 size-8 rounded overflow-hidden" style={{ border: "1px solid rgba(0,0,0,0.08)" }}>
+        <div className="flex min-w-0 items-center gap-2">
+          <div
+            className="relative size-8 shrink-0 overflow-hidden rounded"
+            style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size logo, no responsive sizes needed */}
             <img alt="" className="absolute inset-0 size-full object-cover" src={issuer.logo} />
           </div>
-          <div className="flex flex-col min-w-0">
-            <p className="font-bold text-title-sm leading-[28px] text-[#101828] truncate">{issuer.title}</p>
-            <p className="text-label leading-[20px] text-[#6a7282] truncate">{issuer.ticker}</p>
+          <div className="flex min-w-0 flex-col">
+            <p className="truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+              {issuer.title}
+            </p>
+            <p className="truncate text-label leading-[20px] text-[#6a7282]">{issuer.ticker}</p>
           </div>
         </div>
-        <div className="flex flex-col items-end shrink-0 whitespace-nowrap">
-          <p className="font-bold text-title-sm leading-[28px] text-[#101828]">{issuer.estimatedYield}</p>
+        <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
+          <p className="text-title-sm leading-[28px] font-bold text-[#101828]">
+            {issuer.estimatedYield}
+          </p>
           <p className="text-label leading-[20px] text-[#6a7282]">{r.estYield}</p>
         </div>
       </div>
@@ -118,13 +133,16 @@ export function RelatedProductsCard({
   const mutualFund = strategy?.id ? getRecommendedFundsForInsight(strategy.id) : [];
 
   const isEmpty =
-    structured.length === 0 && fixedIncome.length === 0 && globalBond.length === 0 && mutualFund.length === 0;
+    structured.length === 0 &&
+    fixedIncome.length === 0 &&
+    globalBond.length === 0 &&
+    mutualFund.length === 0;
 
   return (
     <div
       className={
         variant === "card"
-          ? "rounded-2xl border border-border bg-card p-6 flex flex-col gap-4"
+          ? "flex flex-col gap-4 rounded-2xl border border-border bg-card p-6"
           : "flex flex-col gap-4"
       }
     >
@@ -134,7 +152,7 @@ export function RelatedProductsCard({
       </div>
 
       {isEmpty ? (
-        <p className="text-body-sm text-muted-foreground text-center py-4">{r.empty}</p>
+        <p className="py-4 text-center text-body-sm text-muted-foreground">{r.empty}</p>
       ) : (
         <div className="flex flex-col gap-6">
           {mutualFund.length > 0 && (
@@ -152,7 +170,11 @@ export function RelatedProductsCard({
               <GroupLabel>{r.groups.structured}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {structured.map((product) => (
-                  <Link key={product.id} href={`/product-catalog/product/${product.id}`} className="block">
+                  <Link
+                    key={product.id}
+                    href={`/product-catalog/product/${product.id}`}
+                    className="block"
+                  >
                     <StructuredProductCard {...product} variant="grid" />
                   </Link>
                 ))}
@@ -164,7 +186,11 @@ export function RelatedProductsCard({
               <GroupLabel>{r.groups.fixedIncome}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {fixedIncome.map((bond) => (
-                  <Link key={bond.id} href={`/product-catalog/fixed-income/bond/${bond.id}`} className="block">
+                  <Link
+                    key={bond.id}
+                    href={`/product-catalog/fixed-income/bond/${bond.id}`}
+                    className="block"
+                  >
                     <FixedIncomeRelatedCard bond={bond} />
                   </Link>
                 ))}
@@ -176,7 +202,11 @@ export function RelatedProductsCard({
               <GroupLabel>{r.groups.globalBond}</GroupLabel>
               <div className="flex flex-col gap-3">
                 {globalBond.map((issuer) => (
-                  <Link key={issuer.id} href={`/product-catalog/global-bond/${issuer.id}`} className="block">
+                  <Link
+                    key={issuer.id}
+                    href={`/product-catalog/global-bond/${issuer.id}`}
+                    className="block"
+                  >
                     <GlobalBondRelatedCard issuer={issuer} />
                   </Link>
                 ))}

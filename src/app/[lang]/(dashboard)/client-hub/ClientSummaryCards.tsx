@@ -32,18 +32,28 @@ const SEGMENT_COLORS: Record<string, string> = {
 
 function PopoverChevron({ open }: { open: boolean }) {
   return (
-    <div className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-200 ${open ? "bg-primary-action text-white" : "bg-muted text-muted-foreground"}`}>
+    <div
+      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${open ? "bg-primary-action text-white" : "bg-muted text-muted-foreground"}`}
+    >
       <InfoIcon size={12} weight="bold" />
     </div>
   );
 }
 
-function CardShell({ open, onClick, children }: { open: boolean; onClick: () => void; children: React.ReactNode }) {
+function CardShell({
+  open,
+  onClick,
+  children,
+}: {
+  open: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`w-full h-full text-left flex flex-col gap-2 p-4 rounded-2xl bg-white border transition-colors cursor-pointer ${open ? "border-primary-action" : "border-border hover:border-primary-action/40"}`}
+      className={`flex h-full w-full cursor-pointer flex-col gap-2 rounded-2xl border bg-white p-4 text-left transition-colors ${open ? "border-primary-action" : "hover:border-primary-action/40 border-border"}`}
     >
       {children}
     </button>
@@ -54,11 +64,23 @@ function CardShell({ open, onClick, children }: { open: boolean; onClick: () => 
    three stacked lines: a small-caps label, one big number, one caption. */
 
 function CardLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-meta font-semibold uppercase tracking-wider text-muted-foreground">{children}</p>;
+  return (
+    <p className="text-meta font-semibold tracking-wider text-muted-foreground uppercase">
+      {children}
+    </p>
+  );
 }
 
-function CardValue({ colorClass = "text-foreground", children }: { colorClass?: string; children: React.ReactNode }) {
-  return <p className={`text-[24px] font-bold leading-none tabular-nums ${colorClass}`}>{children}</p>;
+function CardValue({
+  colorClass = "text-foreground",
+  children,
+}: {
+  colorClass?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <p className={`text-[24px] leading-none font-bold tabular-nums ${colorClass}`}>{children}</p>
+  );
 }
 
 function CardSub({ children }: { children: React.ReactNode }) {
@@ -67,7 +89,7 @@ function CardSub({ children }: { children: React.ReactNode }) {
 
 function StaticCard({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="flex flex-col gap-2 p-4 rounded-2xl bg-white border border-border">
+    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4">
       <CardLabel>{label}</CardLabel>
       <CardValue>{value}</CardValue>
       <CardSub>{sub}</CardSub>
@@ -78,7 +100,7 @@ function StaticCard({ label, value, sub }: { label: string; value: string; sub: 
 /** Matches StaticCard's shape — label, value, sub line. */
 function SummaryCardSkeleton() {
   return (
-    <div className="flex flex-col gap-2 p-4 rounded-2xl bg-white border border-border">
+    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4">
       <Skeleton className="h-3 w-24" />
       <Skeleton className="h-6 w-16" />
       <Skeleton className="h-3 w-20" />
@@ -153,13 +175,15 @@ function PopoverList({
   const t = useT();
   return (
     <div
-      className={`absolute top-full mt-1 z-50 bg-white border border-border rounded-xl shadow-xl overflow-hidden ${POPOVER_PANEL_W} ${position}`}
+      className={`absolute top-full z-50 mt-1 overflow-hidden rounded-xl border border-border bg-white shadow-xl ${POPOVER_PANEL_W} ${position}`}
     >
       {/* `min-h-7` keeps the heading in one place whether or not a panel has the
           expand control beside it. `-mr-1` pulls the icon's own padding back so
           it optically lines up with the 16px margin the rows' amounts end on. */}
       <div className="flex min-h-7 items-center justify-between gap-2 px-4 pt-2 pb-1">
-        <p className="text-meta font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
+        <p className="text-meta font-bold tracking-wider text-muted-foreground uppercase">
+          {title}
+        </p>
         {onExpand && (
           <button
             type="button"
@@ -187,17 +211,35 @@ function PopoverList({
  * and needs the bar to supply it. Sticky in all three, so it survives the
  * scroll that a capped list implies.
  */
-function ListStickyHeader({ className, children }: { className?: string; children: React.ReactNode }) {
+function ListStickyHeader({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
   return <div className={`sticky top-0 z-10 bg-white pb-2 ${className ?? ""}`}>{children}</div>;
 }
 
-function ClientListRow({ rank, name, sub, right }: { rank?: number; name: string; sub: string; right: React.ReactNode }) {
+function ClientListRow({
+  rank,
+  name,
+  sub,
+  right,
+}: {
+  rank?: number;
+  name: string;
+  sub: string;
+  right: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 border-t border-border">
-      {rank !== undefined && <span className="text-label text-muted-foreground w-4 text-right shrink-0">{rank}</span>}
+    <div className="flex items-center gap-3 border-t border-border px-4 py-2.5">
+      {rank !== undefined && (
+        <span className="w-4 shrink-0 text-right text-label text-muted-foreground">{rank}</span>
+      )}
       <Avatar type="text" initials={getInitials(name)} size="xs" />
-      <div className="flex-1 min-w-0">
-        <p className="text-body-sm font-semibold text-foreground truncate">{name}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-body-sm font-semibold text-foreground">{name}</p>
         <p className="text-meta text-muted-foreground">{sub}</p>
       </div>
       {right}
@@ -335,7 +377,13 @@ function ClientListCard({
   );
 }
 
-export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; isLoading?: boolean }) {
+export function ClientSummaryCards({
+  clients,
+  isLoading,
+}: {
+  clients: Client[];
+  isLoading?: boolean;
+}) {
   const t = useT();
   const s = t.client.summary;
   const { isPrivate } = usePrivacy();
@@ -371,20 +419,31 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
 
   const segmentBreakdownContent = (
     <>
-      <div className="flex h-2 rounded-full overflow-hidden mb-3">
+      <div className="mb-3 flex h-2 overflow-hidden rounded-full">
         {segmentBreakdown.map(([tier, count]) => (
-          <div key={tier} style={{ width: `${(count / clients.length) * 100}%`, backgroundColor: SEGMENT_COLORS[tier] ?? "#94a3b8" }} />
+          <div
+            key={tier}
+            style={{
+              width: `${(count / clients.length) * 100}%`,
+              backgroundColor: SEGMENT_COLORS[tier] ?? "#94a3b8",
+            }}
+          />
         ))}
       </div>
       {segmentBreakdown.map(([tier, count]) => (
         <div key={tier} className="flex items-center justify-between gap-6 py-1">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: SEGMENT_COLORS[tier] ?? "#94a3b8" }} />
+            <div
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: SEGMENT_COLORS[tier] ?? "#94a3b8" }}
+            />
             <span className="text-body-sm text-foreground">{tier}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-body font-bold text-foreground">{count}</span>
-            <span className="text-meta text-muted-foreground">({Math.round((count / clients.length) * 100)}%)</span>
+            <span className="text-meta text-muted-foreground">
+              ({Math.round((count / clients.length) * 100)}%)
+            </span>
           </div>
         </div>
       ))}
@@ -394,7 +453,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
   const assetListContent = (
     <>
       {topClients.length === 0 && (
-        <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noAssetClients}</p>
+        <p className="px-4 py-3 text-body-sm text-muted-foreground">{s.noAssetClients}</p>
       )}
       {topClients.map((c, i) => {
         const name = maskName(c.name, isPrivate);
@@ -404,7 +463,11 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
             rank={i + 1}
             name={name}
             sub={c.tier}
-            right={<span className="text-label font-bold text-foreground shrink-0">{formatAumThb(c.aum)}</span>}
+            right={
+              <span className="shrink-0 text-label font-bold text-foreground">
+                {formatAumThb(c.aum)}
+              </span>
+            }
           />
         );
       })}
@@ -417,22 +480,23 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
      idle out of ฿ 890M is a different conversation from ฿ 57M out of ฿ 180M. */
   const cashListContent = (
     <>
-      {cashClients.length === 0
-        ? <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noIdleCash}</p>
-        : cashClients.map(({ client, cashThb }, i) => (
-            <ClientListRow
-              key={client.id}
-              rank={i + 1}
-              name={maskName(client.name, isPrivate)}
-              sub={s.cashSub(client.tier, client.cashIdlePct)}
-              right={
-                <span className="text-label font-bold text-foreground shrink-0">
-                  {formatMillionThb(cashThb)}
-                </span>
-              }
-            />
-          ))
-      }
+      {cashClients.length === 0 ? (
+        <p className="px-4 py-3 text-body-sm text-muted-foreground">{s.noIdleCash}</p>
+      ) : (
+        cashClients.map(({ client, cashThb }, i) => (
+          <ClientListRow
+            key={client.id}
+            rank={i + 1}
+            name={maskName(client.name, isPrivate)}
+            sub={s.cashSub(client.tier, client.cashIdlePct)}
+            right={
+              <span className="shrink-0 text-label font-bold text-foreground">
+                {formatMillionThb(cashThb)}
+              </span>
+            }
+          />
+        ))
+      )}
     </>
   );
 
@@ -446,7 +510,9 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
       name={maskName(k.client.name, isPrivate)}
       sub={`${k.client.tier} · ${k.nextReview}`}
       right={
-        <span className={`text-label font-bold shrink-0 ${k.daysUntilExpiry <= 7 ? "text-[var(--text-danger-primary)]" : "text-[var(--text-warning-primary)]"}`}>
+        <span
+          className={`shrink-0 text-label font-bold ${k.daysUntilExpiry <= 7 ? "text-[var(--text-danger-primary)]" : "text-[var(--text-warning-primary)]"}`}
+        >
           {s.kycDays(k.daysUntilExpiry)}
         </span>
       }
@@ -497,7 +563,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
           before instead of forcing a tall panel. */}
       <div style={{ minHeight: kycDueClients.length * LIST_ROW_H }}>
         {kycRows.length === 0 ? (
-          <p className="text-body-sm text-muted-foreground px-4 py-3">{s.noKycDue}</p>
+          <p className="px-4 py-3 text-body-sm text-muted-foreground">{s.noKycDue}</p>
         ) : (
           kycRows.map(renderKycRow)
         )}
@@ -507,7 +573,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {Array.from({ length: 5 }).map((_, i) => (
           <SummaryCardSkeleton key={i} />
         ))}
@@ -516,7 +582,7 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {/* 1. Total Clients */}
       <div ref={segmentRef} className="relative min-w-0" {...segmentHoverProps}>
         <CardShell open={segmentOpen} onClick={() => setSegmentOpen((p) => !p)}>
@@ -528,8 +594,10 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
           <CardSub>{s.clientsUnit}</CardSub>
         </CardShell>
         {!isMobile && segmentOpen && clients.length > 0 && (
-          <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-border rounded-xl shadow-xl p-4 min-w-[200px]">
-            <p className="text-meta font-bold uppercase tracking-wider text-muted-foreground mb-2.5">{s.bySegment}</p>
+          <div className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-xl border border-border bg-white p-4 shadow-xl">
+            <p className="mb-2.5 text-meta font-bold tracking-wider text-muted-foreground uppercase">
+              {s.bySegment}
+            </p>
             {segmentBreakdownContent}
           </div>
         )}
@@ -549,7 +617,11 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
       </div>
 
       {/* 2. Wealth Under Advice */}
-      <StaticCard label={s.wealthUnderAdvice} value={formatMillionThb(animatedTotalAum)} sub={s.totalAumSub} />
+      <StaticCard
+        label={s.wealthUnderAdvice}
+        value={formatMillionThb(animatedTotalAum)}
+        sub={s.totalAumSub}
+      />
 
       {/* 3. มูลค่าทรัพย์สิน — last in the row at 3 columns (768–1023px), third
              of five above that, so which edge its panel hangs from flips at
@@ -571,7 +643,9 @@ export function ClientSummaryCards({ clients, isLoading }: { clients: Client[]; 
         label={s.kycDue}
         value={String(Math.round(animatedKycCount))}
         sub={s.within30Days}
-        valueColorClass={kycDueClients.length > 0 ? "text-[var(--text-warning-primary)]" : "text-foreground"}
+        valueColorClass={
+          kycDueClients.length > 0 ? "text-[var(--text-warning-primary)]" : "text-foreground"
+        }
         title={s.kycDueTitle}
         listHeader={kycFilterBar}
       >

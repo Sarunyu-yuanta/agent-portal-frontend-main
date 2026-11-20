@@ -90,7 +90,6 @@ const SUBMISSION_TURNAROUND_MS = 12_000;
  */
 const BACKOFFICE_PICKUP_MS = 10_000;
 
-
 type BookingDraft = {
   productId: string;
   clientId: string;
@@ -242,9 +241,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const sendRequirementRequest = useCallback<
-    OrdersContextValue["sendRequirementRequest"]
-  >(
+  const sendRequirementRequest = useCallback<OrdersContextValue["sendRequirementRequest"]>(
     async ({ clientId, clientName, productId, keys }) => {
       const request: RequirementRequest = {
         id: localId("rq"),
@@ -316,9 +313,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
    */
   const stillLive = useCallback(
     (bookingIds: string[]) =>
-      bookingIds.some(
-        (id) => bookingsRef.current.find((b) => b.id === id)?.status === "booked",
-      ),
+      bookingIds.some((id) => bookingsRef.current.find((b) => b.id === id)?.status === "booked"),
     [],
   );
 
@@ -337,12 +332,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
    *   `OrderSubmissionStatus`.
    */
   const placeSubmission = useCallback(
-    (
-      productId: string,
-      bookingIds: string[],
-      by: string,
-      startAt: "sent" | "processing",
-    ) => {
+    (productId: string, bookingIds: string[], by: string, startAt: "sent" | "processing") => {
       const submission: OrderSubmission = {
         id: localId("sub"),
         productId,
@@ -408,7 +398,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       // reasoning `shareMaterial` spells out in `contexts/campaigns-context`.
       if (evidenceRequired(mode) && !evidenceComplete(draft.evidence)) {
         throw new Error(
-          "A booking on this desk needs evidence of the client's instruction (and a note, for \"other\").",
+          'A booking on this desk needs evidence of the client\'s instruction (and a note, for "other").',
         );
       }
       const booking: Booking = {

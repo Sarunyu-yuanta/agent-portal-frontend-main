@@ -29,11 +29,7 @@ import { CatalogNotFound } from "../../../product-catalog/CatalogNotFound";
 import { normalizeOrderTab } from "../../order-tabs";
 import { ClientOrdersDetail } from "./ClientOrdersDetail";
 
-export default function ClientOrdersPage({
-  params,
-}: {
-  params: Promise<{ clientId: string }>;
-}) {
+export default function ClientOrdersPage({ params }: { params: Promise<{ clientId: string }> }) {
   const locale = useLocale();
   // Same gate as the rest of Order Management — above every hook, so flipping
   // the flag cannot change the hook order.
@@ -45,11 +41,7 @@ export default function ClientOrdersPage({
   );
 }
 
-function ClientOrdersPageInner({
-  params,
-}: {
-  params: Promise<{ clientId: string }>;
-}) {
+function ClientOrdersPageInner({ params }: { params: Promise<{ clientId: string }> }) {
   const { clientId } = use(params);
   const id = decodeURIComponent(clientId);
   const t = useT();

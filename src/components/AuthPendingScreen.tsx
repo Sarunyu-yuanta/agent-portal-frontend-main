@@ -23,7 +23,7 @@ export function AuthPendingScreen({ label }: { label?: string }) {
     <div
       role="status"
       aria-live="polite"
-      className="fixed inset-0 z-50 flex items-center justify-center animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center duration-200 fade-in"
       style={{
         backgroundImage: "linear-gradient(125.89deg, #015AC0 0%, #019BE5 100.6%)",
       }}
@@ -38,7 +38,7 @@ export function AuthPendingScreen({ label }: { label?: string }) {
         alt=""
         width={423}
         height={109}
-        className="w-[220px] sm:w-[320px] max-w-[calc(var(--vw)*100-3rem)] animate-breathe motion-reduce:animate-none"
+        className="w-[220px] max-w-[calc(var(--vw)*100-3rem)] animate-breathe motion-reduce:animate-none sm:w-[320px]"
       />
 
       <span className="sr-only">{label ?? t.auth.signingIn}</span>

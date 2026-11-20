@@ -2,14 +2,7 @@ import globalBondsRaw from "@/data/global-bonds.json";
 import type { StructuredProduct } from "./structured-product-data";
 
 export type GlobalBondIssuerId =
-  | "apple"
-  | "microsoft"
-  | "meta"
-  | "amazon"
-  | "coke"
-  | "amex"
-  | "nvidia"
-  | "walmart";
+  "apple" | "microsoft" | "meta" | "amazon" | "coke" | "amex" | "nvidia" | "walmart";
 
 export type YieldFilter = "all" | "lt2" | "2-3" | "3-4" | "gt4";
 export type MaturityFilter = "all" | "short" | "long";
@@ -74,10 +67,9 @@ export function getIssuerIdForBondRow(row: GlobalBondRow): GlobalBondIssuerId | 
   return ISSUER_ID_BY_LOGO[row.logo];
 }
 
-export const GLOBAL_BOND_ISSUERS: Record<GlobalBondIssuerId, GlobalBondIssuer> =
-  Object.fromEntries(
-    (globalBondsRaw.issuers as GlobalBondIssuer[]).map((issuer) => [issuer.id, issuer]),
-  ) as Record<GlobalBondIssuerId, GlobalBondIssuer>;
+export const GLOBAL_BOND_ISSUERS: Record<GlobalBondIssuerId, GlobalBondIssuer> = Object.fromEntries(
+  (globalBondsRaw.issuers as GlobalBondIssuer[]).map((issuer) => [issuer.id, issuer]),
+) as Record<GlobalBondIssuerId, GlobalBondIssuer>;
 
 export const TOP_PICK_ROWS = globalBondsRaw.topPickRows as GlobalBondRow[];
 export const RECOMMENDED_ISSUERS = globalBondsRaw.recommendedIssuers as GlobalBondIssuerId[];
@@ -97,22 +89,21 @@ export type RecommendedIssuerRow = {
   alt: boolean;
 };
 
-export const RECOMMENDED_ISSUER_ROWS: RecommendedIssuerRow[] =
-  RECOMMENDED_ISSUERS.map((id, i) => {
-    const issuer = GLOBAL_BOND_ISSUERS[id];
-    return {
-      id,
-      issuer: issuer.fullName,
-      logo: issuer.logo,
-      couponRate: issuer.couponRateRange,
-      maturity: issuer.maturityRange,
-      sp: issuer.sp,
-      moodys: issuer.moodys,
-      fitch: issuer.fitch,
-      estimatedYield: issuer.estimatedYield,
-      alt: i % 2 === 0,
-    };
-  });
+export const RECOMMENDED_ISSUER_ROWS: RecommendedIssuerRow[] = RECOMMENDED_ISSUERS.map((id, i) => {
+  const issuer = GLOBAL_BOND_ISSUERS[id];
+  return {
+    id,
+    issuer: issuer.fullName,
+    logo: issuer.logo,
+    couponRate: issuer.couponRateRange,
+    maturity: issuer.maturityRange,
+    sp: issuer.sp,
+    moodys: issuer.moodys,
+    fitch: issuer.fitch,
+    estimatedYield: issuer.estimatedYield,
+    alt: i % 2 === 0,
+  };
+});
 export const DETAIL_RECOMMENDED_ISSUERS: GlobalBondIssuerId[] = ["meta", "microsoft", "amazon"];
 export const DETAIL_RECOMMENDED_CARDS =
   globalBondsRaw.detailRecommendedCards as DetailRecommendedCard[];
@@ -123,7 +114,8 @@ export const ALL_OVERSEAS_BONDS_UPDATED_AT = globalBondsRaw.meta.allOverseasBond
 export const ALL_OVERSEAS_BONDS: GlobalBondRow[] = Array.from(
   { length: ALL_OVERSEAS_BONDS_COUNT },
   (_, i) => {
-    const seed = globalBondsRaw.allOverseasBondsSeed[i % globalBondsRaw.allOverseasBondsSeed.length];
+    const seed =
+      globalBondsRaw.allOverseasBondsSeed[i % globalBondsRaw.allOverseasBondsSeed.length];
     return { ...(seed as GlobalBondRow), id: `aob-${i + 1}` };
   },
 );

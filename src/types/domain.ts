@@ -81,12 +81,7 @@ export type RequirementKey = "wealth" | "acknowledge" | "kyc" | "risk-profile";
  *   rating below the product's does, and calling it `missing` would print
  *   "ยังไม่มีข้อมูล" next to the rating it just read.
  */
-export type RequirementStatus =
-  | "passed"
-  | "pending"
-  | "expired"
-  | "missing"
-  | "failed";
+export type RequirementStatus = "passed" | "pending" | "expired" | "missing" | "failed";
 
 export type RequirementItem = {
   key: RequirementKey;
@@ -347,12 +342,7 @@ export type OrderLogEntry = {
  * 4. `completed` — รับคำสั่งซื้อสำเร็จ.
  * 5. `rejected` — ยกเลิก.
  */
-export type OrderBookStatus =
-  | "collecting"
-  | "ready"
-  | "processing"
-  | "completed"
-  | "rejected";
+export type OrderBookStatus = "collecting" | "ready" | "processing" | "completed" | "rejected";
 
 export type OrderBook = {
   productId: string;
@@ -496,12 +486,7 @@ export type CampaignFormat = "online" | "onsite";
  * Which desk's products a campaign is about — the same axis the Product
  * Catalog's tabs use, narrowed to what a campaign is ever run on.
  */
-export type CampaignProduct =
-  | "stock"
-  | "mutual-fund"
-  | "global"
-  | "fcn"
-  | "bond";
+export type CampaignProduct = "stock" | "mutual-fund" | "global" | "fcn" | "bond";
 
 /**
  * Who a campaign is for, in terms the client data can actually answer.
@@ -514,12 +499,7 @@ export type CampaignProduct =
  * campaign's eligible-clients table reads to say *why* a client qualifies.
  */
 export type ClientSegment =
-  | "uhnw"
-  | "hnw"
-  | "aggressive"
-  | "moderate"
-  | "conservative"
-  | "idle-cash";
+  "uhnw" | "hnw" | "aggressive" | "moderate" | "conservative" | "idle-cash";
 
 export type CampaignMaterialType = "line-image" | "pdf" | "script";
 
@@ -642,11 +622,7 @@ export type Campaign = {
  * segment match decides the *default*; see `campaignClientRows` in
  * `campaign-data`.
  */
-export type CampaignClientStatus =
-  | "not-sent"
-  | "sent"
-  | "interested"
-  | "redeemed";
+export type CampaignClientStatus = "not-sent" | "sent" | "interested" | "redeemed";
 
 export type CampaignClient = {
   campaignId: string;

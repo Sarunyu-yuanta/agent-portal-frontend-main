@@ -19,11 +19,7 @@ import {
   severityMeta,
   categoryMeta,
 } from "./risk-config";
-import {
-  countRiskByCategory,
-  countRiskBySeverity,
-  type RiskAlertRow,
-} from "./risk-feed";
+import { countRiskByCategory, countRiskBySeverity, type RiskAlertRow } from "./risk-feed";
 import { useRiskCta } from "./use-risk-cta";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
@@ -129,9 +125,7 @@ export function RiskAlertsPanel({
    *  the sub page uses, and the reason the tabs sit above the chips: family is
    *  the coarser cut, severity refines inside it. */
   const inCategory =
-    category === "all"
-      ? rows
-      : rows.filter((row) => row.alert.category === category);
+    category === "all" ? rows : rows.filter((row) => row.alert.category === category);
   const counts = countRiskBySeverity(inCategory);
   const visible = severity
     ? inCategory.filter((row) => row.alert.severity === severity)
@@ -176,14 +170,10 @@ export function RiskAlertsPanel({
               className="text-[var(--text-default-placeholder)]"
             />
           }
-          title={
-            severity ? t.commandCenter.risk.emptySeverity : t.commandCenter.risk.emptyCategory
-          }
+          title={severity ? t.commandCenter.risk.emptySeverity : t.commandCenter.risk.emptyCategory}
           body={t.commandCenter.risk.emptyFilteredBody}
           action={
-            onClearFilters
-              ? { label: t.states.clearFilters, onClick: onClearFilters }
-              : undefined
+            onClearFilters ? { label: t.states.clearFilters, onClick: onClearFilters } : undefined
           }
         />
       ) : (
@@ -205,7 +195,7 @@ export function RiskAlertsPanel({
            the list, and the half row showing under the fold is what says there
            is more. "ดูทั้งหมด" in the header still goes to the page — that is
            where the acknowledged archive lives, which this list never shows. */
-        <div className="max-h-[560px] overflow-y-auto rounded-2xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+        <div className="max-h-[560px] divide-y divide-black/[0.05] overflow-y-auto rounded-2xl bg-[var(--bg-default-secondary)]">
           {visible.map((row) => (
             <RiskAlertRowItem
               key={row.alert.id}
@@ -277,8 +267,7 @@ export function RiskCategoryTabs({
           title: tab.title,
           // `|| undefined` so a family with nothing open shows no badge at all
           // rather than a "0" the eye has to read and discard.
-          notification:
-            (tab.id === "all" ? total : counts[tab.id]) || undefined,
+          notification: (tab.id === "all" ? total : counts[tab.id]) || undefined,
         }))}
         activeId={value}
         size="md"
@@ -430,30 +419,28 @@ export function RiskAlertRowItem({
         {/* Line one: **who**, how bad — and, hard right, since when. */}
         <div className="flex min-w-0 items-center gap-2">
           <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <p className="truncate text-body font-bold text-foreground">
-            {row.displayName}
-          </p>
-          {/* `shrink-0` on the `Tag` itself, not on a wrapper. A wrapper
+            <p className="truncate text-body font-bold text-foreground">{row.displayName}</p>
+            {/* `shrink-0` on the `Tag` itself, not on a wrapper. A wrapper
               `<span>` is `display: block`, so the `inline-flex` Tag inside it
               sat on that block's *baseline* rather than being centred — two
               pixels low against the name, which `items-center` on the row could
               not fix, because it was centring the wrapper and the wrapper was
               already centred. As a direct flex item the Tag centres itself. */}
-          {acknowledged ? (
-            <Tag
-              text={t.commandCenter.risk.acknowledged}
-              variant="gray"
-              size="small"
-              className="shrink-0"
-            />
-          ) : (
-            <Tag
-              text={severity.label}
-              variant={severity.variant}
-              size="small"
-              className="shrink-0"
-            />
-          )}
+            {acknowledged ? (
+              <Tag
+                text={t.commandCenter.risk.acknowledged}
+                variant="gray"
+                size="small"
+                className="shrink-0"
+              />
+            ) : (
+              <Tag
+                text={severity.label}
+                variant={severity.variant}
+                size="small"
+                className="shrink-0"
+              />
+            )}
           </div>
 
           {/* **Since when** — the quiet one, up beside the name where a list
@@ -462,7 +449,7 @@ export function RiskAlertRowItem({
           <span
             suppressHydrationWarning
             title={detectedAtLabel(alert.detectedAt, new Date(), t, locale)}
-            className="shrink-0 text-label tabular-nums text-muted-foreground"
+            className="shrink-0 text-label text-muted-foreground tabular-nums"
           >
             {detectedAgoLabel(alert.detectedAt, new Date(), t)}
           </span>

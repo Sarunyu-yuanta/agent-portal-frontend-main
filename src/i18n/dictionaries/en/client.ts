@@ -71,7 +71,8 @@ const client = {
     forms: {
       wealthDeclaration: {
         title: "Wealth Declaration",
-        description: "Declaration of high-net-worth, ultra-high-net-worth or qualified investor status",
+        description:
+          "Declaration of high-net-worth, ultra-high-net-worth or qualified investor status",
       },
       fatcaCrs: {
         title: "FATCA and CRS",
@@ -133,8 +134,14 @@ const client = {
     searchClients: "Search clients…",
     searchProducts: "Search products…",
     perPage: "Show per page",
-    showingClients: <T,>(from: T, to: T, total: T): (string | T)[] => [
-      "Showing ", from, " – ", to, " of ", total, " clients",
+    showingClients: <T>(from: T, to: T, total: T): (string | T)[] => [
+      "Showing ",
+      from,
+      " – ",
+      to,
+      " of ",
+      total,
+      " clients",
     ],
     rowNo: "No.",
     viewClientProfile: "View client profile",
@@ -271,7 +278,7 @@ const client = {
   netValueInfo: {
     title: "Details",
     heading: "Net wealth (THB)",
-    description: <T,>(bold: (text: string) => T): (string | T)[] => [
+    description: <T>(bold: (text: string) => T): (string | T)[] => [
       "Net wealth is what remains of ",
       bold("total assets"),
       " (THB) after deducting ",

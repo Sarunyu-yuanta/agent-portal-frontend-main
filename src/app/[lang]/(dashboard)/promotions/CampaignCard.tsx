@@ -119,7 +119,7 @@ export function CampaignCard({
       {/* Over the cover rather than in the body: the card has no slot for a
           second tag, and the corner is where a glance lands first. */}
       {isNew && (
-        <span className="pointer-events-none absolute left-3 top-3 z-10">
+        <span className="pointer-events-none absolute top-3 left-3 z-10">
           <Tag text={t.campaigns.list.newTag} variant="red" size="large" />
         </span>
       )}

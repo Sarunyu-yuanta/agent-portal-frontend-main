@@ -12,22 +12,22 @@
 `/orders` แบ่งเป็นแท็บตามสินทรัพย์ (ลำดับเดียวกับ Product Catalog) — ดู
 [`orders/order-tabs.ts`](<../src/app/(dashboard)/orders/order-tabs.ts>) แต่ละแท็บเป็นหนึ่งในสามแบบ:
 
-| แบบ | แท็บ | flow |
-| --- | --- | --- |
-| **basket** | Thai Structured, Global Structured | จองจนครบ basket (notional) → ส่งคำสั่งซื้อครั้งเดียว → สินค้าปิด |
-| **quota** | Fixed Income, Global Bond | แต่ละรายการจองส่งคำสั่งซื้อได้ทันทีเมื่อวงเงินผ่าน ไม่ต้องรอครบ → สินค้าปิดเมื่อใช้โควตาครบ |
-| **transactions** | Stock, TFEX, Mutual Fund | ไม่มีการจอง — แสดงรายการซื้อขายของลูกค้าผ่านแพลตฟอร์มต่าง ๆ (อ่านอย่างเดียว) |
+| แบบ              | แท็บ                                | flow                                                                   |
+| ---------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| **basket**       | Thai Structured, Global Structured | จองจนครบ basket (notional) → ส่งคำสั่งซื้อครั้งเดียว → สินค้าปิด                  |
+| **quota**        | Fixed Income, Global Bond          | แต่ละรายการจองส่งคำสั่งซื้อได้ทันทีเมื่อวงเงินผ่าน ไม่ต้องรอครบ → สินค้าปิดเมื่อใช้โควตาครบ |
+| **transactions** | Stock, TFEX, Mutual Fund           | ไม่มีการจอง — แสดงรายการซื้อขายของลูกค้าผ่านแพลตฟอร์มต่าง ๆ (อ่านอย่างเดียว)       |
 
 ค่าเริ่มต้นของ `/orders` คือแท็บ Stock (`?tab=` ว่าง)
 
 ### โต๊ะที่จองได้
 
-| โต๊ะ | แบบ | หน้าสินค้า | id ของ book |
-| --- | --- | --- | --- |
-| **Global Structured** | basket | `/product-catalog/product/:id` | id ของสินค้าตรง ๆ (`ko-wmt`) |
-| **Thai Structured** | basket | `/product-catalog/thai-structured/:theme` | `thai-` + theme (`thai-chips`) |
-| **Fixed Income** | quota | `/product-catalog/fixed-income/bond/:id` | `fi-` + bond id (`fi-mqdc482b-0`) — จองได้เฉพาะหุ้นกู้ที่ `action: "invest"` |
-| **Global Bond** | quota | `/product-catalog/global-bond/:issuer` | `gb-` + bond row ของ issuer (`gb-m1`) |
+| โต๊ะ                   | แบบ    | หน้าสินค้า                                   | id ของ book                                                           |
+| --------------------- | ------ | ----------------------------------------- | --------------------------------------------------------------------- |
+| **Global Structured** | basket | `/product-catalog/product/:id`            | id ของสินค้าตรง ๆ (`ko-wmt`)                                            |
+| **Thai Structured**   | basket | `/product-catalog/thai-structured/:theme` | `thai-` + theme (`thai-chips`)                                        |
+| **Fixed Income**      | quota  | `/product-catalog/fixed-income/bond/:id`  | `fi-` + bond id (`fi-mqdc482b-0`) — จองได้เฉพาะหุ้นกู้ที่ `action: "invest"` |
+| **Global Bond**       | quota  | `/product-catalog/global-bond/:issuer`    | `gb-` + bond row ของ issuer (`gb-m1`)                                 |
 
 เพิ่มโต๊ะทีหลัง = แก้ [`orders/bookable-products.ts`](<../src/app/(dashboard)/orders/bookable-products.ts>)
 (id prefix, `findBookableProduct`, `bookingModeFor`) + ติดปุ่มที่หน้าสินค้าของโต๊ะนั้น +
@@ -97,12 +97,12 @@ Product Catalog → สินค้า (Global / Thai Structured)
 ชิปเหนือตารางในหน้า book คือ 4 ขั้นนี้ตามลำดับที่มันเกิดจริง
 ([`bookingPhase`](<../src/app/(dashboard)/orders/order-book.ts>)):
 
-| ขั้น | หมายถึง | ข้อมูลที่อยู่เบื้องหลัง |
-| --- | --- | --- |
-| **Offer** | IC ส่งสินค้าไปให้ลูกค้า ยังไม่ตอบ | `ProductOffer` — ยังไม่มีรายการจอง ไม่มีจำนวนเงิน |
-| **ตรวจสอบ** | ลูกค้าตอบรับ (หรือ IC จองให้) | `Booking` — เงินถูกเช็คตั้งแต่ตอนจองแล้ว |
-| **รับคำสั่งซื้อสำเร็จ** | ระบบหลังบ้านรับคำสั่งซื้อแล้ว | submission `completed` |
-| **ยกเลิก** | ลูกค้าปฏิเสธ Offer / ยกเลิกการจอง / คำสั่งซื้อถูกปฏิเสธ | offer `declined` หรือ booking `cancelled` |
+| ขั้น                | หมายถึง                                        | ข้อมูลที่อยู่เบื้องหลัง                              |
+| ----------------- | --------------------------------------------- | ------------------------------------------- |
+| **Offer**         | IC ส่งสินค้าไปให้ลูกค้า ยังไม่ตอบ                     | `ProductOffer` — ยังไม่มีรายการจอง ไม่มีจำนวนเงิน |
+| **ตรวจสอบ**       | ลูกค้าตอบรับ (หรือ IC จองให้)                      | `Booking` — เงินถูกเช็คตั้งแต่ตอนจองแล้ว           |
+| **รับคำสั่งซื้อสำเร็จ** | ระบบหลังบ้านรับคำสั่งซื้อแล้ว                         | submission `completed`                      |
+| **ยกเลิก**         | ลูกค้าปฏิเสธ Offer / ยกเลิกการจอง / คำสั่งซื้อถูกปฏิเสธ | offer `declined` หรือ booking `cancelled`    |
 
 **มีรายการจองเมื่อไหร่ = เลย Offer ไปแล้วเสมอ** — การจองคือคำตอบของ Offer ดังนั้น
 Offer ที่ลูกค้าจองแล้วจะหายจากลิสต์ (แถวการจองพูดแทนได้ครบกว่า พร้อมจำนวนเงิน)
@@ -140,12 +140,12 @@ Notional Amount ขึ้น error และปุ่ม "จองซื้อ"
 
 **4 ข้อ** ตามฟอร์มจริง มาจากสองที่ แต่ฟอร์มไม่แยกให้ IC เห็น
 
-| ข้อ | ค่าที่แสดง | มาจาก | ส่งให้ลูกค้าทำเองได้? |
-| --- | --- | --- | --- |
-| Wealth Status | Yes / No / Pending / Expired | `order-requirements.json` | ✓ Wealth Declare |
-| Acknowledge Status | Yes / No / Pending / Expired | `order-requirements.json` | ✓ Wealth Declare |
-| KYC Status | Yes / Expired / NOT FOUND | `kycExpiry()` — ตัวเดียวกับหน้า Client 360 | **ไม่ได้** |
-| Risk Profile Status | ระดับความเสี่ยง / NOT FOUND | `client.riskProfile` เทียบกับที่สินค้าต้องการ | ✓ Risk Consent |
+| ข้อ                  | ค่าที่แสดง                      | มาจาก                                  | ส่งให้ลูกค้าทำเองได้? |
+| ------------------- | ---------------------------- | -------------------------------------- | ---------------- |
+| Wealth Status       | Yes / No / Pending / Expired | `order-requirements.json`              | ✓ Wealth Declare |
+| Acknowledge Status  | Yes / No / Pending / Expired | `order-requirements.json`              | ✓ Wealth Declare |
+| KYC Status          | Yes / Expired / NOT FOUND    | `kycExpiry()` — ตัวเดียวกับหน้า Client 360 | **ไม่ได้**         |
+| Risk Profile Status | ระดับความเสี่ยง / NOT FOUND     | `client.riskProfile` เทียบกับที่สินค้าต้องการ | ✓ Risk Consent   |
 
 Wealth กับ Acknowledge เป็นผลสองอย่างจากแบบแจ้งใบเดียว จึงไปที่เดียวกัน แต่
 **ตกคนละข้อได้** (แจ้งความมั่งคั่งแล้วแต่ยังไม่รับทราบความเสี่ยงของผลิตภัณฑ์) จึงเป็นสองแถว
@@ -173,7 +173,7 @@ KYC ส่งให้ลูกค้าทำเองไม่ได้ (`self
 
 dropdown แสดงได้แค่ชื่อ — IC เลือกไปแล้วถึงรู้ว่าลูกค้าขาดเอกสาร 3 อย่าง
 list มีที่พอจะตอบตั้งแต่ยังไม่เลือก ทุกแถวบอกผลตรวจของลูกค้าคนนั้นกับสินค้าตัวนี้เลย
-("พร้อมจอง" / "ขาด N รายการ") เปลี่ยนคำถามจาก *เลือกลูกค้า* เป็น *เลือกลูกค้าที่ซื้อได้จริง*
+("พร้อมจอง" / "ขาด N รายการ") เปลี่ยนคำถามจาก _เลือกลูกค้า_ เป็น _เลือกลูกค้าที่ซื้อได้จริง_
 
 ด้วยเหตุผลเดียวกัน คนที่พร้อมถูกเรียงขึ้นบน และหัวลิสต์สรุปว่า "จองได้เลย 2 จาก 8 ราย"
 ตัวเลขนี้นับจาก**ผลค้นหา** ไม่ใช่ทั้ง book — ถ้านับทั้ง book มันจะเป็นตัวเลขของสิ่งที่คนอ่าน
@@ -204,13 +204,13 @@ list มีที่พอจะตอบตั้งแต่ยังไม่
 ที่เหลือเป็น **การ์ดพื้นเทา** (`#f9fafb` + ขอบ `black/10` + `rounded-xl`) มี label อยู่ใน
 การ์ด — เดิมทำเป็นกล่องสูงเท่า input ซึ่งชวนให้คลิกทั้งที่คลิกไม่ได้สักอัน
 
-| สถานะ | บนการ์ด | ความหมาย | สิ่งที่ต้องทำ |
-| --- | --- | --- | --- |
-| `passed` | 🟢 ✓ เขียว | มีข้อมูลแล้ว | — |
-| `pending` | 🟡 ⏱ เหลือง | ทำแล้ว รอตรวจ | **รอ** — ส่งซ้ำคือขอสิ่งที่ลูกค้าทำไปแล้ว |
-| `expired` | 🟠 ⚠ ส้ม | เคยมี แต่หมดอายุ | ยื่นใหม่ |
-| `missing` | 🔴 ✕ แดง | ยังไม่มีในระบบ | เปิดระบบที่เป็นเจ้าของ record |
-| `failed` | 🔴 ✕ แดง | อ่านแล้วไม่ผ่านเกณฑ์ | ไม่มีอะไรที่ลูกค้าเซ็นแล้วแก้ได้ |
+| สถานะ     | บนการ์ด     | ความหมาย        | สิ่งที่ต้องทำ                        |
+| --------- | ---------- | --------------- | ------------------------------- |
+| `passed`  | 🟢 ✓ เขียว  | มีข้อมูลแล้ว        | —                               |
+| `pending` | 🟡 ⏱ เหลือง | ทำแล้ว รอตรวจ    | **รอ** — ส่งซ้ำคือขอสิ่งที่ลูกค้าทำไปแล้ว |
+| `expired` | 🟠 ⚠ ส้ม    | เคยมี แต่หมดอายุ   | ยื่นใหม่                           |
+| `missing` | 🔴 ✕ แดง   | ยังไม่มีในระบบ     | เปิดระบบที่เป็นเจ้าของ record        |
+| `failed`  | 🔴 ✕ แดง   | อ่านแล้วไม่ผ่านเกณฑ์ | ไม่มีอะไรที่ลูกค้าเซ็นแล้วแก้ได้          |
 
 สีอยู่ที่ **ไอคอน + ตัวค่า** ไม่ได้ทำเป็น pill ซ้อนในการ์ด — การ์ดเป็นพื้นผิวอยู่แล้ว
 ซ้อนอีกชั้นไม่ได้อะไรเพิ่ม
@@ -257,11 +257,11 @@ caret เปิดเมนู 3 ช่องทาง (SMS / LINE / นัด�
 ทั้งสามอยู่ใน [`src/contexts/orders-context.tsx`](../src/contexts/orders-context.tsx)
 และมีคอมเมนต์กำกับไว้ที่ตัวมันเอง
 
-| ค่าคงที่ | จำลองอะไร | ของจริงคือ |
-| --- | --- | --- |
-| `REQUIREMENT_TURNAROUND_MS` (15 วิ) | ลูกค้าไปกรอกฟอร์มในระบบอื่นจนเสร็จ | webhook หรือ poll ระบบนั้น |
-| `BACKOFFICE_PICKUP_MS` (10 วิ) | ระบบหลังบ้านรับงาน — เก็บ basket ที่ครบ หรือเริ่มทำ bond order ที่ IC ส่งมา | job ฝั่งหลังบ้าน หรือ webhook ที่แอปนี้รับ |
-| `SUBMISSION_TURNAROUND_MS` (12 วิ) | ระบบหลังบ้านตอบผลคำสั่งซื้อ | สถานะบน order record ที่ส่งกลับมา |
+| ค่าคงที่                              | จำลองอะไร                                                       | ของจริงคือ                         |
+| ---------------------------------- | --------------------------------------------------------------- | -------------------------------- |
+| `REQUIREMENT_TURNAROUND_MS` (15 วิ) | ลูกค้าไปกรอกฟอร์มในระบบอื่นจนเสร็จ                                    | webhook หรือ poll ระบบนั้น          |
+| `BACKOFFICE_PICKUP_MS` (10 วิ)      | ระบบหลังบ้านรับงาน — เก็บ basket ที่ครบ หรือเริ่มทำ bond order ที่ IC ส่งมา | job ฝั่งหลังบ้าน หรือ webhook ที่แอปนี้รับ |
+| `SUBMISSION_TURNAROUND_MS` (12 วิ)  | ระบบหลังบ้านตอบผลคำสั่งซื้อ                                           | สถานะบน order record ที่ส่งกลับมา    |
 
 `sendProposal` (ส่ง Offer) ยังไม่ได้ส่งอะไรจริง — ไม่มีบริการ YSInvest / Email / LINE /
 Voice AI ต่ออยู่ แค่บันทึก log ที่ใช้วัดผล Offer ไว้ ต่อบริการจริงเมื่อไหร่ แก้ที่ฟังก์ชันนี้ที่เดียว
@@ -274,20 +274,20 @@ Voice AI ต่ออยู่ แค่บันทึก log ที่ใช�
 
 ## โครงไฟล์
 
-| ไฟล์ | หน้าที่ |
-| --- | --- |
-| `src/data/order-requirements.json` | สถานะแบบฟอร์มรายลูกค้า |
-| `src/data/order-books.json` | การจอง / คำสั่งซื้อ / คำขอข้อมูล ตั้งต้น |
-| `src/lib/order-mock-data.ts` | ประทับเวลาจาก `daysAgo` + join ชื่อลูกค้า |
-| `src/contexts/orders-context.tsx` | store (เขียนได้) — mount ใน dashboard layout |
-| `orders/bookable-products.ts` | **ขอบเขต** — โต๊ะไหนจองได้ และ id → สินค้า |
-| `orders/order-requirements.ts` | ตรรกะ 4 ข้อ + ลิงก์ที่ใช้แก้แต่ละข้อ |
-| `src/lib/current-ic.ts` | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม |
-| `orders/order-book.ts` | ประกอบสินค้า + การจอง เป็น `OrderBook` + log |
-| `orders/use-order-books.ts` | hooks ฝั่งอ่าน คืน `Resource<T>` |
-| `orders/OrderBookingModal.tsx` | flow 2 ขั้น (เลือกลูกค้า → สถานะ + จำนวนเงินในหน้าเดียว) |
-| `orders/page.tsx` · `orders/[productId]/page.tsx` | Order Management + หน้ารวมการจอง |
-| `orders/use-order-notification-feed.tsx` | แถวแจ้งเตือนในกระดิ่ง |
+| ไฟล์                                               | หน้าที่                                             |
+| ------------------------------------------------- | ------------------------------------------------ |
+| `src/data/order-requirements.json`                | สถานะแบบฟอร์มรายลูกค้า                              |
+| `src/data/order-books.json`                       | การจอง / คำสั่งซื้อ / คำขอข้อมูล ตั้งต้น                  |
+| `src/lib/order-mock-data.ts`                      | ประทับเวลาจาก `daysAgo` + join ชื่อลูกค้า             |
+| `src/contexts/orders-context.tsx`                 | store (เขียนได้) — mount ใน dashboard layout       |
+| `orders/bookable-products.ts`                     | **ขอบเขต** — โต๊ะไหนจองได้ และ id → สินค้า           |
+| `orders/order-requirements.ts`                    | ตรรกะ 4 ข้อ + ลิงก์ที่ใช้แก้แต่ละข้อ                      |
+| `src/lib/current-ic.ts`                           | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม                   |
+| `orders/order-book.ts`                            | ประกอบสินค้า + การจอง เป็น `OrderBook` + log        |
+| `orders/use-order-books.ts`                       | hooks ฝั่งอ่าน คืน `Resource<T>`                     |
+| `orders/OrderBookingModal.tsx`                    | flow 2 ขั้น (เลือกลูกค้า → สถานะ + จำนวนเงินในหน้าเดียว) |
+| `orders/page.tsx` · `orders/[productId]/page.tsx` | Order Management + หน้ารวมการจอง                  |
+| `orders/use-order-notification-feed.tsx`          | แถวแจ้งเตือนในกระดิ่ง                                |
 
 ### สิ่งที่ไม่ได้เก็บเป็นข้อมูล — เพราะคำนวณได้
 
@@ -299,6 +299,7 @@ Voice AI ต่ออยู่ แค่บันทึก log ที่ใช�
   > จึงใส่ไว้เป็นค่าคงที่สองตัว (`THAI_MIN_TICKET` / `THAI_NOTIONAL`) ใน
   > `thai-structured-data.ts` ข้าง ๆ แถวที่มันอธิบาย — ตอนต่อ backend ถ้าโต๊ะไทยส่ง
   > เงื่อนไขรายตัวมา ให้เปลี่ยนเป็นฟิลด์แล้วลบค่าคงที่ทิ้ง
+
 - **ชื่อลูกค้า** join ที่ import time จาก `clients.json` เหมือน dataset อื่นทั้งหมด
 
 ### เรื่องรอบ (round)

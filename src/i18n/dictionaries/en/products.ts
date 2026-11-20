@@ -114,7 +114,10 @@ const products = {
         "5to7": "Coupon 5 - 7%",
         gt7: "Coupon above 7%",
       },
-      riskOptions: { lt3: "Below 3", "4to5": "4 - 5", "6to7": "6 - 7", "8": "8" } as Record<string, string>,
+      riskOptions: { lt3: "Below 3", "4to5": "4 - 5", "6to7": "6 - 7", "8": "8" } as Record<
+        string,
+        string
+      >,
       riskChip: (label: string) => `Risk ${label}`,
     },
   },
@@ -189,7 +192,8 @@ const products = {
     },
     sentRef: (ref: string) => `Sent (${ref})`,
     notSentYet: "Order not sent yet",
-    tenorMonths: (months: number | string) => `${months} ${Number(months) === 1 ? "month" : "months"}`,
+    tenorMonths: (months: number | string) =>
+      `${months} ${Number(months) === 1 ? "month" : "months"}`,
   },
 
   fcn: {
@@ -209,7 +213,10 @@ const products = {
     downloadZip: "Download .zip",
     downloadAll: "Download all (.zip)",
     summary: (count: number, em: (s: string) => ReactNode, zipName: string) =>
-      rich(`${count} ${plural(count, { one: "file", other: "files" })} · bundled into `, em(zipName)),
+      rich(
+        `${count} ${plural(count, { one: "file", other: "files" })} · bundled into `,
+        em(zipName),
+      ),
     downloading: (zipName: string, count: number) =>
       `Downloading ${zipName}\n(${count} ${plural(count, { one: "file", other: "files" })})`,
     docs: {
@@ -251,8 +258,10 @@ const products = {
     sortBy: "Sort by",
     sorts: { "best-seller": "Best sellers", highlight: "Yuanta Highlight", "cio-view": "CIO View" },
     emptyBestSeller: "Nothing on sale in this group yet",
-    emptyCurated: (sortLabel: string) => `${sortLabel} hasn't picked any products in this group yet`,
-    orderCount: (n: number) => `${n.toLocaleString("en-US")} ${plural(n, { one: "order", other: "orders" })}`,
+    emptyCurated: (sortLabel: string) =>
+      `${sortLabel} hasn't picked any products in this group yet`,
+    orderCount: (n: number) =>
+      `${n.toLocaleString("en-US")} ${plural(n, { one: "order", other: "orders" })}`,
     columns: {
       rank: "Rank",
       product: "Product",
@@ -272,10 +281,15 @@ const products = {
 
   advisory: {
     sectionTitle: "Portfolio advisory",
-    sectionSubtitle: "Let Yuanta manage your assets with Robo Advisory investment plans and our experts",
+    sectionSubtitle:
+      "Let Yuanta manage your assets with Robo Advisory investment plans and our experts",
     robo: {
       tagline: {
-        cardCompact: ["An automated, AI-driven investment", "service that helps you reach your", "investment goals with ease"] as string[],
+        cardCompact: [
+          "An automated, AI-driven investment",
+          "service that helps you reach your",
+          "investment goals with ease",
+        ] as string[],
         cardDesktop: [
           "An automated, AI-driven investment service that helps",
           "you reach your investment goals with ease",
@@ -289,9 +303,20 @@ const products = {
     },
     definit: {
       tagline: {
-        card: ["For investors in the Thai market, ", "analysing fundamentals, ", "valuation and technicals "] as string[],
-        heroDesktop: ["For investors in the Thai market, analysing", "fundamentals, valuation and technicals"] as string[],
-        heroMobile: ["For investors in the Thai market,", "analysing fundamentals,", "valuation and technicals"] as string[],
+        card: [
+          "For investors in the Thai market, ",
+          "analysing fundamentals, ",
+          "valuation and technicals ",
+        ] as string[],
+        heroDesktop: [
+          "For investors in the Thai market, analysing",
+          "fundamentals, valuation and technicals",
+        ] as string[],
+        heroMobile: [
+          "For investors in the Thai market,",
+          "analysing fundamentals,",
+          "valuation and technicals",
+        ] as string[],
       },
     },
     allPlans: (n: number) => `All plans (${n})`,
@@ -326,7 +351,8 @@ const products = {
     },
     picker: {
       title: "Select client",
-      intro: (service: string) => `Pick a client to see the ${service} plans that fit their risk level`,
+      intro: (service: string) =>
+        `Pick a client to see the ${service} plans that fit their risk level`,
       searchPlaceholder: "Search by client name or ID",
       noClients: "No clients yet",
       clientParamNotFound: "Client from the link not found — pick one from the list",

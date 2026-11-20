@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useSyncExternalStore, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 
 type PrivacyContextValue = {
   isPrivate: boolean;
@@ -42,9 +48,7 @@ export function PrivacyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <PrivacyContext.Provider value={{ isPrivate, toggle }}>
-      {children}
-    </PrivacyContext.Provider>
+    <PrivacyContext.Provider value={{ isPrivate, toggle }}>{children}</PrivacyContext.Provider>
   );
 }
 

@@ -8,12 +8,7 @@ import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/contexts/notes-context";
 import { NOTE_AUTHOR } from "./note-constants";
 import { useT } from "@/i18n/I18nProvider";
-import {
-  NoteComposer,
-  draftHasContent,
-  emptyDraft,
-  type ComposerDraft,
-} from "./NoteComposer";
+import { NoteComposer, draftHasContent, emptyDraft, type ComposerDraft } from "./NoteComposer";
 
 const CLIENT_PAGE = /^\/client\/([^/]+)/;
 
@@ -110,7 +105,7 @@ export function FloatingNoteButton() {
       // answer `false` on the server, so the button would ship in the HTML and
       // blink out on hydration. A media query in the stylesheet has the
       // answer before first paint.
-      className="fixed bottom-8 right-8 z-40 hidden xl:block"
+      className="fixed right-8 bottom-8 z-40 hidden xl:block"
     >
       <Popover
         open={open}
@@ -163,9 +158,9 @@ export function FloatingNoteButton() {
       {unfinished && !open && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center"
+          className="pointer-events-none absolute -top-0.5 -right-0.5 flex size-3.5 items-center justify-center"
         >
-          <span className="absolute inline-flex size-full rounded-full bg-[var(--bg-warning-primary)] opacity-75 animate-ping motion-reduce:animate-none" />
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--bg-warning-primary)] opacity-75 motion-reduce:animate-none" />
           <span className="relative inline-flex size-3 rounded-full bg-[var(--bg-warning-primary)] ring-2 ring-white" />
         </span>
       )}

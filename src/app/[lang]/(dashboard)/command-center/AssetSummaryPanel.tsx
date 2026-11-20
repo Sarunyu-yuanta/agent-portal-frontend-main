@@ -58,8 +58,10 @@ export function AssetSummaryPanel({ clients }: { clients: Client[] }) {
          */
         color:
           ALLOCATION_COLORS[
-            Math.max(0, ALLOCATION_SLICES.findIndex((s) => s.label === r.label)) %
-              ALLOCATION_COLORS.length
+            Math.max(
+              0,
+              ALLOCATION_SLICES.findIndex((s) => s.label === r.label),
+            ) % ALLOCATION_COLORS.length
           ],
       })),
     };
@@ -74,7 +76,13 @@ export function AssetSummaryPanel({ clients }: { clients: Client[] }) {
     return (
       <EmptyState
         size="compact"
-        icon={<ChartPieSliceIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        icon={
+          <ChartPieSliceIcon
+            size={40}
+            weight="duotone"
+            className="text-[var(--text-default-placeholder)]"
+          />
+        }
         title={t.commandCenter.assetSummary.emptyTitle}
         body={t.commandCenter.assetSummary.emptyBody}
       />
@@ -88,8 +96,8 @@ export function AssetSummaryPanel({ clients }: { clients: Client[] }) {
           rather than above keeps the card short. */}
       <div className="flex items-center gap-4">
         <AllocationDonut slices={slices} size={116} />
-        <div className="min-w-0 flex flex-col gap-1">
-          <p className="text-[28px] font-bold leading-none tabular-nums text-foreground">
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-[28px] leading-none font-bold text-foreground tabular-nums">
             {formatAumThb(animatedAum)}
           </p>
           <p className="text-label leading-tight text-muted-foreground">

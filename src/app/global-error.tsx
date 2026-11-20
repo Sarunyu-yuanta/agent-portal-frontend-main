@@ -31,7 +31,7 @@ export default function GlobalError({
 
   return (
     <html lang={locale}>
-      <body className="min-h-screen flex items-center justify-center bg-[var(--bg-default-secondary)] antialiased">
+      <body className="flex min-h-screen items-center justify-center bg-[var(--bg-default-secondary)] antialiased">
         <title>{`${t.globalError.title} · Yuanta Agent Portal`}</title>
         <ErrorState
           title={t.globalError.title}

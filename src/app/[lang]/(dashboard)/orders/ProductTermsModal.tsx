@@ -85,7 +85,7 @@ export function ProductTermsModal({
         titleId="product-terms-title"
         desktopMaxWidth="max-w-[614px]"
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4 pt-3 md:px-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pt-3 pb-4 md:px-6">
           <div className="flex items-center gap-3">
             <ProductLogos logos={product.logos} />
             <div className="flex min-w-0 flex-1 flex-col">

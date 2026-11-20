@@ -18,7 +18,8 @@ import {
  * imported *by* `page.tsx` and would otherwise have to import back out of it.
  */
 /** A sub-tab's id — also its `?tab=` value and its key in `t.client.tabs`. */
-export type ClientTabId = "overview" | "kyc" | "assets" | "orders" | "call-log" | "reminders" | "notes";
+export type ClientTabId =
+  "overview" | "kyc" | "assets" | "orders" | "call-log" | "reminders" | "notes";
 
 /** Ids only — the tab strip reads each title from `t.client.tabs[id]`. */
 export const CLIENT_TAB_ITEMS: { id: ClientTabId }[] = [

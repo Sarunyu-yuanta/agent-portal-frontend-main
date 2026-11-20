@@ -24,11 +24,13 @@ function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
 
   return (
     <div className={`flex flex-col ${mobile ? "gap-4" : "gap-4"} w-full`}>
-      <div className="flex flex-col gap-1 w-full">
+      <div className="flex w-full flex-col gap-1">
         <p className={titleClass}>{m.heading}</p>
         <p className={descriptionClass}>
           {m.description((text) => (
-            <span key={text} className={boldClass}>{text}</span>
+            <span key={text} className={boldClass}>
+              {text}
+            </span>
           ))}
         </p>
         <DashedDivider />
@@ -40,13 +42,9 @@ function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
         </ul>
       </div>
 
-      <div className="flex gap-1.5 items-start bg-[var(--bg-info-light)] rounded px-2 py-1 pl-2 pr-3 w-full">
-        <InfoIcon
-          size={16}
-          weight="fill"
-          className="text-[var(--fill-blue-700)] shrink-0 mt-0.5"
-        />
-        <p className="type-body-2 text-[var(--fill-blue-700)] leading-5 flex-1 min-w-0">
+      <div className="flex w-full items-start gap-1.5 rounded bg-[var(--bg-info-light)] px-2 py-1 pr-3 pl-2">
+        <InfoIcon size={16} weight="fill" className="mt-0.5 shrink-0 text-[var(--fill-blue-700)]" />
+        <p className="type-body-2 min-w-0 flex-1 leading-5 text-[var(--fill-blue-700)]">
           {m.fxNote}
         </p>
       </div>
@@ -54,13 +52,7 @@ function NetValueInfoContent({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-export function NetValueSummaryModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function NetValueSummaryModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useT();
   const isMobile = useIsMobile();
 
@@ -72,7 +64,7 @@ export function NetValueSummaryModal({
           if (!next) onClose();
         }}
         headerType="icon"
-        leftIcon={<InfoIcon size={22} className="text-[var(--text-default-primary)] shrink-0" />}
+        leftIcon={<InfoIcon size={22} className="shrink-0 text-[var(--text-default-primary)]" />}
         title={t.client.netValueInfo.title}
         showHandle
         rightSide="action"
@@ -96,7 +88,9 @@ export function NetValueSummaryModal({
       desktopMaxWidth="max-w-[380px]"
       desktopRoundedClassName="rounded-[24px]"
       desktopTitleClassName="text-[rgba(0,0,0,0.85)] leading-6"
-      desktopTitleIcon={<InfoIcon size={24} className="text-[var(--text-default-tertiary)] shrink-0" />}
+      desktopTitleIcon={
+        <InfoIcon size={24} className="shrink-0 text-[var(--text-default-tertiary)]" />
+      }
     >
       <div className="overflow-y-auto p-4 pb-6">
         <NetValueInfoContent />

@@ -8,19 +8,15 @@ export default function NotFound() {
   const t = useT();
   const locale = useLocale();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-10 bg-[var(--bg-default-secondary)] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-[var(--bg-default-secondary)] px-4">
       {/* Logo */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/logo-ic-portal-blue.svg"
-        alt="Yuanta"
-        className="w-auto h-9 opacity-70"
-      />
+      <img src="/brand/logo-ic-portal-blue.svg" alt="Yuanta" className="h-9 w-auto opacity-70" />
 
       {/* Content */}
-      <div className="flex flex-col items-center gap-5 max-w-xs text-center">
+      <div className="flex max-w-xs flex-col items-center gap-5 text-center">
         <span
-          className="text-[120px] font-bold leading-none select-none"
+          className="text-[120px] leading-none font-bold select-none"
           style={{ color: "var(--primary-action)", opacity: 0.22 }}
         >
           404
@@ -35,12 +31,14 @@ export default function NotFound() {
           </p>
         </div>
 
-        <div className="flex items-center justify-center mt-1">
+        <div className="mt-1 flex items-center justify-center">
           <Button
             variant="outline"
             size="lg"
             leftIcon={<HouseIcon size={20} />}
-            onClick={() => { window.location.href = `/${locale}`; }}
+            onClick={() => {
+              window.location.href = `/${locale}`;
+            }}
           >
             {t.common.backHome}
           </Button>

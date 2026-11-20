@@ -1,12 +1,102 @@
 [
-  { "id": "p1",  "clientId": "110001", "product": "Structured Note",    "dealSize": "฿ 50M",  "probability": 85, "stage": "Proposed",    "daysInStage": 5,  "stalled": false },
-  { "id": "p2",  "clientId": "110004", "product": "Global Equity Fund", "dealSize": "฿ 120M", "probability": 72, "stage": "Under Review","daysInStage": 12, "stalled": false },
-  { "id": "p3",  "clientId": "110007", "product": "Bond Portfolio",     "dealSize": "฿ 200M", "probability": 91, "stage": "Negotiation", "daysInStage": 8,  "stalled": false },
-  { "id": "p4",  "clientId": "110008", "product": "DCA Equity Fund",    "dealSize": "฿ 30M",  "probability": 45, "stage": "Qualified",   "daysInStage": 3,  "stalled": false },
-  { "id": "p5",  "clientId": "110003", "product": "REITs",              "dealSize": "฿ 25M",  "probability": 60, "stage": "Proposed",    "daysInStage": 18, "stalled": true  },
-  { "id": "p6",  "clientId": "110006", "product": "Fixed Income",       "dealSize": "฿ 40M",  "probability": 78, "stage": "Under Review","daysInStage": 7,  "stalled": false },
-  { "id": "p7",  "clientId": "110002", "product": "Structured Note",    "dealSize": "฿ 60M",  "probability": 55, "stage": "Qualified",   "daysInStage": 2,  "stalled": false },
-  { "id": "p8",  "clientId": "110005", "product": "Bond",               "dealSize": "฿ 45M",  "probability": 30, "stage": "Qualified",   "daysInStage": 25, "stalled": true  },
-  { "id": "p9",  "clientId": "110007", "product": "Hedge Fund",         "dealSize": "฿ 150M", "probability": 95, "stage": "Closed Won",  "daysInStage": 0,  "stalled": false },
-  { "id": "p10", "clientId": "110001", "product": "Private Credit",     "dealSize": "฿ 80M",  "probability": 0,  "stage": "Closed Lost", "daysInStage": 0,  "stalled": false }
+  {
+    "id": "p1",
+    "clientId": "110001",
+    "product": "Structured Note",
+    "dealSize": "฿ 50M",
+    "probability": 85,
+    "stage": "Proposed",
+    "daysInStage": 5,
+    "stalled": false
+  },
+  {
+    "id": "p2",
+    "clientId": "110004",
+    "product": "Global Equity Fund",
+    "dealSize": "฿ 120M",
+    "probability": 72,
+    "stage": "Under Review",
+    "daysInStage": 12,
+    "stalled": false
+  },
+  {
+    "id": "p3",
+    "clientId": "110007",
+    "product": "Bond Portfolio",
+    "dealSize": "฿ 200M",
+    "probability": 91,
+    "stage": "Negotiation",
+    "daysInStage": 8,
+    "stalled": false
+  },
+  {
+    "id": "p4",
+    "clientId": "110008",
+    "product": "DCA Equity Fund",
+    "dealSize": "฿ 30M",
+    "probability": 45,
+    "stage": "Qualified",
+    "daysInStage": 3,
+    "stalled": false
+  },
+  {
+    "id": "p5",
+    "clientId": "110003",
+    "product": "REITs",
+    "dealSize": "฿ 25M",
+    "probability": 60,
+    "stage": "Proposed",
+    "daysInStage": 18,
+    "stalled": true
+  },
+  {
+    "id": "p6",
+    "clientId": "110006",
+    "product": "Fixed Income",
+    "dealSize": "฿ 40M",
+    "probability": 78,
+    "stage": "Under Review",
+    "daysInStage": 7,
+    "stalled": false
+  },
+  {
+    "id": "p7",
+    "clientId": "110002",
+    "product": "Structured Note",
+    "dealSize": "฿ 60M",
+    "probability": 55,
+    "stage": "Qualified",
+    "daysInStage": 2,
+    "stalled": false
+  },
+  {
+    "id": "p8",
+    "clientId": "110005",
+    "product": "Bond",
+    "dealSize": "฿ 45M",
+    "probability": 30,
+    "stage": "Qualified",
+    "daysInStage": 25,
+    "stalled": true
+  },
+  {
+    "id": "p9",
+    "clientId": "110007",
+    "product": "Hedge Fund",
+    "dealSize": "฿ 150M",
+    "probability": 95,
+    "stage": "Closed Won",
+    "daysInStage": 0,
+    "stalled": false
+  },
+  {
+    "id": "p10",
+    "clientId": "110001",
+    "product": "Private Credit",
+    "dealSize": "฿ 80M",
+    "probability": 0,
+    "stage": "Closed Lost",
+    "daysInStage": 0,
+    "stalled": false
+  }
 ]

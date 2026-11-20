@@ -197,8 +197,8 @@ export function TransactionsPanel({
     }));
     const all = [...offers, ...traded];
     const theirs = clientId
-      ? all.filter((r) =>
-          (r.kind === "trade" ? r.trade.clientId : r.proposal.clientId) === clientId,
+      ? all.filter(
+          (r) => (r.kind === "trade" ? r.trade.clientId : r.proposal.clientId) === clientId,
         )
       : all;
     return theirs.sort((a, b) => b.at.localeCompare(a.at));
@@ -272,7 +272,7 @@ export function TransactionsPanel({
           >
             {dict.orders.list.filter}
             {activeFilters > 0 && (
-              <span className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary-action px-1 text-meta font-bold tabular-nums text-on-primary-action">
+              <span className="bg-primary-action text-on-primary-action ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full px-1 text-meta font-bold tabular-nums">
                 {activeFilters}
               </span>
             )}
@@ -348,25 +348,37 @@ export function TransactionsPanel({
         )
       ) : (
         <FadeIn key={`${status}|${side}|${channel}`} className="flex flex-col gap-3">
-          <div className="relative overflow-x-auto overflow-y-hidden table-scroll rounded-lg border border-[var(--border-default)]">
-            <Table className="table-fixed min-w-[1100px]">
+          <div className="table-scroll relative overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)]">
+            <Table className="min-w-[1100px] table-fixed">
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell className="w-[13%] whitespace-nowrap">{dict.orders.list.col.time}</TableHeaderCell>
-                  <TableHeaderCell className="w-[14%] whitespace-nowrap">{dict.orders.list.col.client}</TableHeaderCell>
-                  <TableHeaderCell className="w-[19%] whitespace-nowrap">{dict.orders.list.col.product}</TableHeaderCell>
-                  <TableHeaderCell className="w-[7%] whitespace-nowrap">{dict.orders.list.col.side}</TableHeaderCell>
-                  <TableHeaderCell className="w-[10%] whitespace-nowrap text-right">
+                  <TableHeaderCell className="w-[13%] whitespace-nowrap">
+                    {dict.orders.list.col.time}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[14%] whitespace-nowrap">
+                    {dict.orders.list.col.client}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[19%] whitespace-nowrap">
+                    {dict.orders.list.col.product}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[7%] whitespace-nowrap">
+                    {dict.orders.list.col.side}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[10%] text-right whitespace-nowrap">
                     {dict.orders.quantityLabel[asset]}
                   </TableHeaderCell>
-                  <TableHeaderCell className="w-[8%] whitespace-nowrap text-right">
+                  <TableHeaderCell className="w-[8%] text-right whitespace-nowrap">
                     {dict.orders.priceLabel[asset]}
                   </TableHeaderCell>
-                  <TableHeaderCell className="w-[11%] whitespace-nowrap text-right">
+                  <TableHeaderCell className="w-[11%] text-right whitespace-nowrap">
                     {dict.orders.list.col.amount}
                   </TableHeaderCell>
-                  <TableHeaderCell className="w-[9%] whitespace-nowrap">{dict.orders.list.col.channel}</TableHeaderCell>
-                  <TableHeaderCell className="w-[9%] whitespace-nowrap">{dict.orders.list.col.status}</TableHeaderCell>
+                  <TableHeaderCell className="w-[9%] whitespace-nowrap">
+                    {dict.orders.list.col.channel}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="w-[9%] whitespace-nowrap">
+                    {dict.orders.list.col.status}
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -394,14 +406,16 @@ export function TransactionsPanel({
           {!isLoading && (
             <div className="flex flex-wrap-reverse items-center justify-end gap-3">
               <div className="flex items-center gap-2">
-                <p className="text-label text-muted-foreground whitespace-nowrap">{dict.orders.list.perPage}</p>
+                <p className="text-label whitespace-nowrap text-muted-foreground">
+                  {dict.orders.list.perPage}
+                </p>
                 <select
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="text-label border border-border rounded-md px-2 py-1 bg-background text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-action"
+                  className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => (
                     <option key={n} value={n}>
@@ -418,7 +432,9 @@ export function TransactionsPanel({
                       to: Math.min(safePage * pageSize, visible.length),
                       total: visible.length,
                     },
-                    (n) => <span className="font-medium text-foreground">{n}</span>,
+                    (n) => (
+                      <span className="font-medium text-foreground">{n}</span>
+                    ),
                   )}
                 </p>
                 <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setPage} />
@@ -449,13 +465,15 @@ function ProposalRow({
   return (
     <TableRow>
       <TableCell>
-        <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
+        <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">
           {formatLogTime(p.sentAt, locale)}
         </p>
       </TableCell>
       <TableCell>
         <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="type-body-2 truncate text-foreground">{maskName(p.clientName, isPrivate)}</p>
+          <p className="type-body-2 truncate text-foreground">
+            {maskName(p.clientName, isPrivate)}
+          </p>
           <p className="type-caption text-muted-foreground">{p.clientId}</p>
         </div>
       </TableCell>
@@ -494,77 +512,75 @@ function TradeRow({
   const locale = useLocale();
   const dict = useT();
   return (
-                    // The whole row opens the trade — same as a booking row on
-                    // a product's tab, and cheaper than a column of arrows in a
-                    // table already scrolling sideways.
-                    <TableRow
-                      hoverable
-                      tabIndex={0}
-                      aria-label={dict.orders.list.openTradeAria(t.symbol, maskName(t.clientName, isPrivate))}
-                      onClick={onOpen}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onOpen();
-                        }
-                      }}
-                      className="cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7] active:bg-[var(--bg-default-pressed)]"
-                    >
-                      <TableCell>
-                        <p className="type-caption whitespace-nowrap tabular-nums text-muted-foreground">
-                          {formatLogTime(t.at, locale)}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex min-w-0 flex-col gap-0.5">
-                          <p className="type-body-2 truncate text-foreground">
-                            {maskName(t.clientName, isPrivate)}
-                          </p>
-                          <p className="type-caption text-muted-foreground">{t.clientId}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex min-w-0 flex-col gap-0.5">
-                          <p className="type-body-2 truncate !font-semibold text-foreground">
-                            {t.symbol}
-                          </p>
-                          <p className="type-caption truncate text-muted-foreground">{t.name}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`type-body-2 !font-semibold ${SIDE_CLASS[t.side]}`}>
-                          {dict.orders.side[t.side]}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className="type-body-2 tabular-nums text-foreground">
-                          {formatQuantity(asset, t.quantity)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className="type-body-2 tabular-nums text-foreground">
-                          {formatPrice(asset, t.price)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className="type-body-2 tabular-nums !font-semibold text-foreground">
-                          {formatAmount(t.amount)}
-                        </span>
-                        <span className="type-caption ml-1 text-muted-foreground">{t.currency}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="type-caption text-foreground">{t.channel}</span>
-                      </TableCell>
-                      <TableCell>
-                        {/* `large`, the component's own default — the สถานะ
+    // The whole row opens the trade — same as a booking row on
+    // a product's tab, and cheaper than a column of arrows in a
+    // table already scrolling sideways.
+    <TableRow
+      hoverable
+      tabIndex={0}
+      aria-label={dict.orders.list.openTradeAria(t.symbol, maskName(t.clientName, isPrivate))}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
+    >
+      <TableCell>
+        <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">
+          {formatLogTime(t.at, locale)}
+        </p>
+      </TableCell>
+      <TableCell>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="type-body-2 truncate text-foreground">
+            {maskName(t.clientName, isPrivate)}
+          </p>
+          <p className="type-caption text-muted-foreground">{t.clientId}</p>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="type-body-2 truncate !font-semibold text-foreground">{t.symbol}</p>
+          <p className="type-caption truncate text-muted-foreground">{t.name}</p>
+        </div>
+      </TableCell>
+      <TableCell>
+        <span className={`type-body-2 !font-semibold ${SIDE_CLASS[t.side]}`}>
+          {dict.orders.side[t.side]}
+        </span>
+      </TableCell>
+      <TableCell className="text-right">
+        <span className="type-body-2 text-foreground tabular-nums">
+          {formatQuantity(asset, t.quantity)}
+        </span>
+      </TableCell>
+      <TableCell className="text-right">
+        <span className="type-body-2 text-foreground tabular-nums">
+          {formatPrice(asset, t.price)}
+        </span>
+      </TableCell>
+      <TableCell className="text-right">
+        <span className="type-body-2 !font-semibold text-foreground tabular-nums">
+          {formatAmount(t.amount)}
+        </span>
+        <span className="type-caption ml-1 text-muted-foreground">{t.currency}</span>
+      </TableCell>
+      <TableCell>
+        <span className="type-caption text-foreground">{t.channel}</span>
+      </TableCell>
+      <TableCell>
+        {/* `large`, the component's own default — the สถานะ
                             column is the one an IC scans down, and it reads at
                             the same size as the booking tabs' beside it. */}
-                        <Tag
-                          text={dict.orders.tradeStatus[t.status]}
-                          variant={STATUS_TAG[t.status].variant}
-                          size="large"
-                        />
-                      </TableCell>
-                    </TableRow>
+        <Tag
+          text={dict.orders.tradeStatus[t.status]}
+          variant={STATUS_TAG[t.status].variant}
+          size="large"
+        />
+      </TableCell>
+    </TableRow>
   );
 }

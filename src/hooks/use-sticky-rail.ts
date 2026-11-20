@@ -82,8 +82,7 @@ export function useStickyRailTop<T extends HTMLElement = HTMLElement>() {
       // The rects are screen pixels; `scrollTop`, the paddings and the `top`
       // this feeds are the page's own (see `pageZoom`).
       const y =
-        (rail.getBoundingClientRect().top - (main?.getBoundingClientRect().top ?? 0)) /
-          pageZoom() +
+        (rail.getBoundingClientRect().top - (main?.getBoundingClientRect().top ?? 0)) / pageZoom() +
         (main?.scrollTop ?? 0) -
         padTop;
       rail.style.top = restore;

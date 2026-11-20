@@ -88,7 +88,8 @@ const research = {
       highPriorityTag: "Urgent",
       highPrioritySub: "Requires action today",
       revenueImpact: "Est. Revenue Impact",
-      revenueImpactSub: (n: number) => `Across ${n} ${plural(n, { one: "insight", other: "insights" })}`,
+      revenueImpactSub: (n: number) =>
+        `Across ${n} ${plural(n, { one: "insight", other: "insights" })}`,
       riskAlerts: "Critical Risk Alerts",
       riskAlertsTag: (n: number) => `${n} New`,
       riskAlertsSub: "Portfolio concentration",

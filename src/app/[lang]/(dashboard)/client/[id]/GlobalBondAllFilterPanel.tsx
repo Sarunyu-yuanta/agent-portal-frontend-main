@@ -1,12 +1,7 @@
 "use client";
 
 import { CaretDownIcon } from "@phosphor-icons/react";
-import type {
-  CouponFilter,
-  MaturityFilter,
-  TickerFilter,
-  YieldFilter,
-} from "./global-bond-data";
+import type { CouponFilter, MaturityFilter, TickerFilter, YieldFilter } from "./global-bond-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 
@@ -68,7 +63,7 @@ export function FilterDropdown<T extends string>({
           </option>
         ))}
       </select>
-      <div className="flex w-full min-h-[32px] items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3 py-2">
+      <div className="flex min-h-[32px] w-full items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3 py-2">
         <span
           className={`min-w-0 flex-1 truncate text-sm leading-[26px] ${
             isPlaceholder ? "text-[rgba(0,0,0,0.3)]" : "text-[#101828]"
@@ -110,11 +105,15 @@ export function GlobalBondAllFilterPanel({
       <FilterDropdown value={tickerFilter} options={options.ticker} onChange={onTickerChange} />
       <FilterDropdown value={couponFilter} options={options.coupon} onChange={onCouponChange} />
       <FilterDropdown value={yieldFilter} options={options.yield} onChange={onYieldChange} />
-      <FilterDropdown value={maturityFilter} options={options.maturity} onChange={onMaturityChange} />
+      <FilterDropdown
+        value={maturityFilter}
+        options={options.maturity}
+        onChange={onMaturityChange}
+      />
       <button
         type="button"
         onClick={onClear}
-        className="self-start cursor-pointer rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm font-medium leading-[26px] text-[#0a6ee7] whitespace-nowrap"
+        className="cursor-pointer self-start rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm leading-[26px] font-medium whitespace-nowrap text-[#0a6ee7]"
       >
         {t.products.common.clearAllSelection}
       </button>

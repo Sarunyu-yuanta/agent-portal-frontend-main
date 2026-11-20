@@ -23,11 +23,7 @@
  * where an IC sees they have already chased this one twice.
  */
 
-import {
-  CheckIcon,
-  PaperPlaneTiltIcon,
-  XIcon,
-} from "@phosphor-icons/react";
+import { CheckIcon, PaperPlaneTiltIcon, XIcon } from "@phosphor-icons/react";
 import { Tag } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ResponsiveBottomSheetModal";
 import { usePrivacy } from "@/contexts/privacy-context";
@@ -71,7 +67,6 @@ const OUTCOME_DISC: Record<ProposalOutcome, { tone: Tone; glyph: React.ReactNode
   won: { tone: "green", glyph: <CheckIcon size={30} weight="bold" /> },
   lost: { tone: "gray", glyph: <XIcon size={30} weight="bold" /> },
 };
-
 
 export function ProposalDetailModal({
   proposal,
@@ -128,7 +123,7 @@ function Body({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
+        <div className="flex flex-col items-center px-6 pt-2 pb-6 text-center">
           <StatusDisc variant={disc.tone}>{disc.glyph}</StatusDisc>
           <p className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[disc.tone].text}`}>
             {t.orders.proposalOutcome[outcome]}
@@ -148,14 +143,20 @@ function Body({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
+        <div className="flex flex-col gap-3 px-5 pt-2 pb-5 md:px-6">
           <div className={`flex flex-col gap-3 ${SHEET_PANEL}`}>
             <SheetBlock title={t.orders.proposalDetail.section}>
               <ClientRow clientId={proposal.clientId} name={name} />
-              <SheetRow label={t.orders.field.fullNameTh} value={maskName(profile.nameTh, isPrivate)} />
+              <SheetRow
+                label={t.orders.field.fullNameTh}
+                value={maskName(profile.nameTh, isPrivate)}
+              />
               <SheetRow label={t.orders.field.accountNo} value={profile.accountNo} />
               <SheetRow label={t.orders.field.icName} value={proposal.sentBy} />
-              <SheetRow label={t.orders.proposalDetail.sentAt} value={formatLogTime(proposal.sentAt, locale)} />
+              <SheetRow
+                label={t.orders.proposalDetail.sentAt}
+                value={formatLogTime(proposal.sentAt, locale)}
+              />
               <SheetRow label={t.orders.proposalDetail.outcome}>
                 {outcome === "open" ? (
                   <ProposalChip label={t.orders.proposalOutcome.open} size="lg" />
@@ -174,7 +175,7 @@ function Body({
                     return (
                       <span
                         key={c}
-                        className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-[var(--border-default)] bg-white px-2 py-0.5 text-meta font-semibold text-muted-foreground"
+                        className="inline-flex items-center gap-1 rounded-full border border-[var(--border-default)] bg-white px-2 py-0.5 text-meta font-semibold whitespace-nowrap text-muted-foreground"
                       >
                         <Icon size={11} weight="fill" className="shrink-0" />
                         {label}
@@ -194,7 +195,11 @@ function Body({
                   {history.map((p, i) => (
                     <SheetRow
                       key={p.id}
-                      label={i === 0 ? t.orders.proposalDetail.latest : t.orders.proposalDetail.nth(history.length - i)}
+                      label={
+                        i === 0
+                          ? t.orders.proposalDetail.latest
+                          : t.orders.proposalDetail.nth(history.length - i)
+                      }
                       value={formatLogTime(p.sentAt, locale)}
                     />
                   ))}

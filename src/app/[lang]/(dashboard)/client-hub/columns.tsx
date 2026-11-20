@@ -6,7 +6,13 @@
 
 import { Avatar } from "@sarunyu/system-one";
 import { maskName } from "@/lib/mask-name";
-import { getInitials, formatThbAmount, formatPlYtdPct, LIABILITIES_MULTIPLIER, ASSET_CLASS } from "@/lib/client-utils";
+import {
+  getInitials,
+  formatThbAmount,
+  formatPlYtdPct,
+  LIABILITIES_MULTIPLIER,
+  ASSET_CLASS,
+} from "@/lib/client-utils";
 import { getClientSliceAmount } from "./client-hub-data";
 import type { ColumnId, SortKey } from "./types";
 import type { Client } from "@/types/domain";
@@ -55,9 +61,7 @@ export const CUSTOMER_COLUMNS: CustomerColumn[] = [
     sortKey: "id",
     required: true,
     headerClassName: NOWRAP,
-    render: (client) => (
-      <p className="text-body-sm text-muted-foreground font-mono">{client.id}</p>
-    ),
+    render: (client) => <p className="font-mono text-body-sm text-muted-foreground">{client.id}</p>,
   },
   {
     id: "client",
@@ -68,7 +72,7 @@ export const CUSTOMER_COLUMNS: CustomerColumn[] = [
     render: (client, { isPrivate }) => (
       <div className="flex items-center gap-3">
         <Avatar type="text" initials={getInitials(maskName(client.name, isPrivate))} size="s" />
-        <p className="text-body font-semibold text-foreground leading-tight truncate">
+        <p className="truncate text-body leading-tight font-semibold text-foreground">
           {maskName(client.name, isPrivate)}
         </p>
       </div>
@@ -86,8 +90,20 @@ export const CUSTOMER_COLUMNS: CustomerColumn[] = [
   sliceColumn("derivatives", "derivatives", "TFEX (บาท)", ASSET_CLASS.derivatives, 140),
   sliceColumn("mutualFund", "mutualFund", "กองทุนรวม (บาท)", ASSET_CLASS.mutualFund, 150),
   sliceColumn("bond", "bond", "ตราสารหนี้ (บาท)", ASSET_CLASS.bond, 150),
-  sliceColumn("foreignBond", "foreignBond", "ตราสารหนี้ต่างประเทศ (บาท)", ASSET_CLASS.foreignBond, 200),
-  sliceColumn("structuredBond", "structuredBond", "หุ้นกู้ที่มีอนุพันธ์แฝง (บาท)", ASSET_CLASS.structuredBond, 210),
+  sliceColumn(
+    "foreignBond",
+    "foreignBond",
+    "ตราสารหนี้ต่างประเทศ (บาท)",
+    ASSET_CLASS.foreignBond,
+    200,
+  ),
+  sliceColumn(
+    "structuredBond",
+    "structuredBond",
+    "หุ้นกู้ที่มีอนุพันธ์แฝง (บาท)",
+    ASSET_CLASS.structuredBond,
+    210,
+  ),
   {
     id: "cashIdle",
     label: "เงินสด (บาท)",
@@ -103,7 +119,9 @@ export const CUSTOMER_COLUMNS: CustomerColumn[] = [
     sortKey: "plYtd",
     headerClassName: NOWRAP,
     render: (client) => (
-      <p className={`text-body font-semibold leading-tight ${client.plYtdPct >= 0 ? "text-success" : "text-destructive"}`}>
+      <p
+        className={`text-body leading-tight font-semibold ${client.plYtdPct >= 0 ? "text-success" : "text-destructive"}`}
+      >
         {formatPlYtdPct(client.plYtdPct)}
       </p>
     ),

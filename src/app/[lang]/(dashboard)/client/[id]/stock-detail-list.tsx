@@ -8,14 +8,7 @@
  * instruments — so the list half lives here rather than being copied.
  */
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type RefObject,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import {
   CaretDownIcon,
   CircleNotchIcon,
@@ -41,13 +34,7 @@ export const HERO_TREND_TEXT: Record<Trend, string> = {
   flat: "#6a7282",
 };
 
-export function HeroPercentPill({
-  trend,
-  percentBody,
-}: {
-  trend: Trend;
-  percentBody: string;
-}) {
+export function HeroPercentPill({ trend, percentBody }: { trend: Trend; percentBody: string }) {
   if (trend === "flat") return null;
   const sign = trend === "up" ? "+" : "-";
   const body = percentBody.replace(/^[+-]/, "");
@@ -81,13 +68,7 @@ function percentValue(changePercent: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
-function SortDropdown({
-  value,
-  onChange,
-}: {
-  value: SortId;
-  onChange: (id: SortId) => void;
-}) {
+function SortDropdown({ value, onChange }: { value: SortId; onChange: (id: SortId) => void }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const selected = SORT_OPTIONS.find((o) => o.id === value) ?? SORT_OPTIONS[0];
@@ -137,7 +118,7 @@ function SortDropdown({
         className="flex w-[136px] shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2 transition-colors hover:bg-black/[0.02]"
       >
         <SelectedIcon size={20} className="shrink-0 text-[#4a5565]" />
-        <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold leading-[24px] text-[#4a5565]">
+        <span className="min-w-0 flex-1 truncate text-left text-sm leading-[24px] font-semibold text-[#4a5565]">
           {selectedLabel}
         </span>
         <CaretDownIcon
@@ -308,33 +289,35 @@ export function StockDetailList({
           // Nothing to page in either — no sentinel, or it would "load more" forever.
           <StockSectionEmpty title={t.stock.empty.list} />
         ) : (
-        <>
-        <div className="grid w-full grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2">
-          {sortedStocks.map((row, index) => (
-            <div key={`${row.symbol}-${index}`} className="min-w-0">
-              <StockLargeAssetCard
-                symbol={row.symbol}
-                subtitle={row.name}
-                price={row.price}
-                changeAmount={row.changeAmount}
-                changePercent={row.changePercent}
-                trend={row.trend}
-                series={row.series}
-                figmaSectorAmountColors
-                onSelect={() => onSelect(row)}
-              />
+          <>
+            <div className="grid w-full grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2">
+              {sortedStocks.map((row, index) => (
+                <div key={`${row.symbol}-${index}`} className="min-w-0">
+                  <StockLargeAssetCard
+                    symbol={row.symbol}
+                    subtitle={row.name}
+                    price={row.price}
+                    changeAmount={row.changeAmount}
+                    changePercent={row.changePercent}
+                    trend={row.trend}
+                    series={row.series}
+                    figmaSectorAmountColors
+                    onSelect={() => onSelect(row)}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        {isLoadingMore ? (
-          <div className="flex w-full items-center justify-center gap-1 py-2.5 px-3">
-            <CircleNotchIcon size={20} className="animate-spin text-[#6a7282]" />
-            <span className="text-sm font-bold leading-[24px] text-[#6a7282]">{t.stock.detailList.loadingMore}</span>
-          </div>
-        ) : (
-          <div ref={sentinelRef} aria-hidden className="h-px w-full" />
-        )}
-        </>
+            {isLoadingMore ? (
+              <div className="flex w-full items-center justify-center gap-1 px-3 py-2.5">
+                <CircleNotchIcon size={20} className="animate-spin text-[#6a7282]" />
+                <span className="text-sm leading-[24px] font-bold text-[#6a7282]">
+                  {t.stock.detailList.loadingMore}
+                </span>
+              </div>
+            ) : (
+              <div ref={sentinelRef} aria-hidden className="h-px w-full" />
+            )}
+          </>
         )}
       </div>
     </div>

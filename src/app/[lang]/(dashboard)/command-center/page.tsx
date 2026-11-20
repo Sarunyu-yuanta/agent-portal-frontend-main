@@ -21,10 +21,7 @@ import { useDayItemModals } from "../calendar/use-day-item-modals";
 import { StatTiles, type StatTile } from "./StatTiles";
 import { MiniCalendar } from "./MiniCalendar";
 import { RemindersPanel } from "./RemindersPanel";
-import {
-  NBA_MESSAGE_BOOK,
-  NbaComingSoonCard,
-} from "./NbaComingSoonCard";
+import { NBA_MESSAGE_BOOK, NbaComingSoonCard } from "./NbaComingSoonCard";
 import { CallLogPanel } from "./CallLogPanel";
 import { AssetSummaryModal } from "./AssetSummaryModal";
 import { ClientListModal } from "./ClientListModal";
@@ -100,12 +97,7 @@ function DashboardPageInner() {
   const searchParams = useSearchParams();
   const clientsResource = useClientsResource();
   const { data: clients } = clientsResource;
-  const {
-    notes,
-    isLoading: notesLoading,
-    error: notesError,
-    retry: retryNotes,
-  } = useNotes();
+  const { notes, isLoading: notesLoading, error: notesError, retry: retryNotes } = useNotes();
   const { isPrivate } = usePrivacy();
 
   /**
@@ -114,10 +106,7 @@ function DashboardPageInner() {
    * memory would do. The id carries the checkpoint, so it does come back when
    * the expiry gets closer.
    */
-  const [hiddenIds] = useStoredIds<string>(
-    HIDDEN_QUEUE_IDS_PREF,
-    isQueueId,
-  );
+  const [hiddenIds] = useStoredIds<string>(HIDDEN_QUEUE_IDS_PREF, isQueueId);
   const { rows: nbaRows, dismiss: dismissNba } = useNbaRows();
   const {
     rows: riskRows,
@@ -151,9 +140,7 @@ function DashboardPageInner() {
    *  back — and the view can be linked to. `null` is ทั้งหมด. */
   const riskSeverity = useMemo(() => {
     const value = searchParams.get("risk");
-    return SEVERITY_ORDER.includes(value as RiskSeverity)
-      ? (value as RiskSeverity)
-      : null;
+    return SEVERITY_ORDER.includes(value as RiskSeverity) ? (value as RiskSeverity) : null;
   }, [searchParams]);
 
   /** And which rule family, on the same terms. Its own param rather than one
@@ -176,16 +163,10 @@ function DashboardPageInner() {
     () => buildQueue({ clients, notes, today, isPrivate, t, locale }),
     [clients, notes, today, isPrivate, t, locale],
   );
-  const live = useMemo(
-    () => queue.filter((item) => !hiddenIds.has(item.id)),
-    [queue, hiddenIds],
-  );
+  const live = useMemo(() => queue.filter((item) => !hiddenIds.has(item.id)), [queue, hiddenIds]);
 
   /** The card is always today. A day on the calendar opens its own popover. */
-  const dayReminders = useMemo(
-    () => remindersOnDay(notes, today, today, t),
-    [notes, today, t],
-  );
+  const dayReminders = useMemo(() => remindersOnDay(notes, today, today, t), [notes, today, t]);
   const monthReminders = useMemo(
     () => remindersByDay(notes, viewDate, today, t),
     [notes, viewDate, today, t],
@@ -232,14 +213,8 @@ function DashboardPageInner() {
     [searchParams],
   );
 
-  const { totalAum } = useMemo(
-    () => getClientTotals(clients ?? []),
-    [clients],
-  );
-  const kycSoon = useMemo(
-    () => live.filter((i) => !i.done && i.source === "kyc").length,
-    [live],
-  );
+  const { totalAum } = useMemo(() => getClientTotals(clients ?? []), [clients]);
+  const kycSoon = useMemo(() => live.filter((i) => !i.done && i.source === "kyc").length, [live]);
 
   const openKycAll = useCallback(() => setKycAllOpen(true), []);
   const openClients = useCallback(() => setClientsOpen(true), []);
@@ -247,31 +222,31 @@ function DashboardPageInner() {
 
   const tiles: StatTile[] = useMemo(
     () => [
-    {
-      id: "clients",
-      label: t.commandCenter.statTiles.clients,
-      value: clients?.length ?? 0,
-      tone: "violet",
-      icon: "users",
-      onClick: openClients,
-    },
-    {
-      id: "aum",
-      label: t.commandCenter.statTiles.totalAum,
-      value: totalAum,
-      tone: "green",
-      icon: "coins",
-      formatValue: formatAumThb,
-      onClick: openAsset,
-    },
-    {
-      id: "kyc",
-      label: t.commandCenter.kyc.title,
-      value: kycSoon,
-      tone: "warning",
-      icon: "kyc",
-      onClick: openKycAll,
-    },
+      {
+        id: "clients",
+        label: t.commandCenter.statTiles.clients,
+        value: clients?.length ?? 0,
+        tone: "violet",
+        icon: "users",
+        onClick: openClients,
+      },
+      {
+        id: "aum",
+        label: t.commandCenter.statTiles.totalAum,
+        value: totalAum,
+        tone: "green",
+        icon: "coins",
+        formatValue: formatAumThb,
+        onClick: openAsset,
+      },
+      {
+        id: "kyc",
+        label: t.commandCenter.kyc.title,
+        value: kycSoon,
+        tone: "warning",
+        icon: "kyc",
+        onClick: openKycAll,
+      },
     ],
     [clients, totalAum, kycSoon, openKycAll, openClients, openAsset, t],
   );
@@ -288,8 +263,8 @@ function DashboardPageInner() {
             only, so their width matches the NBA card below. The calendar sits
             at the top of the right rail, level with the greeting, like the
             fitness-dashboard reference. */}
-        <div className="dashboard-split grid grid-cols-1 gap-4 xl:gap-5 xl:items-start">
-          <div className="min-w-0 flex flex-col gap-4 xl:gap-5 xl:col-start-1 xl:row-start-1 row-start-2">
+        <div className="dashboard-split grid grid-cols-1 gap-4 xl:items-start xl:gap-5">
+          <div className="row-start-2 flex min-w-0 flex-col gap-4 xl:col-start-1 xl:row-start-1 xl:gap-5">
             {/* Flex, not grid: `system-one` ships an unlayered `.grid-cols-1` that
                 wins over responsive `grid-cols-*` and keeps this row stacked. */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch xl:gap-5">
@@ -311,29 +286,28 @@ function DashboardPageInner() {
             <div className="flex flex-col gap-4 xl:gap-5">
               <Card variant="default" className="gap-4">
                 {riskError ? (
-                  <ErrorState size="compact" title={t.commandCenter.risk.loadError} onRetry={retryRisk} />
+                  <ErrorState
+                    size="compact"
+                    title={t.commandCenter.risk.loadError}
+                    onRetry={retryRisk}
+                  />
                 ) : (
-                <RiskAlertsPanel
-                  rows={riskRows}
-                  onAcknowledge={acknowledgeRisk}
-                  category={riskCategory}
-                  onCategoryChange={(next) =>
-                    updateQuery({ riskCat: next === "all" ? null : next })
-                  }
-                  severity={riskSeverity}
-                  onSeverityChange={(next) => updateQuery({ risk: next })}
-                  onClearFilters={() => updateQuery({ riskCat: null, risk: null })}
-                />
+                  <RiskAlertsPanel
+                    rows={riskRows}
+                    onAcknowledge={acknowledgeRisk}
+                    category={riskCategory}
+                    onCategoryChange={(next) =>
+                      updateQuery({ riskCat: next === "all" ? null : next })
+                    }
+                    severity={riskSeverity}
+                    onSeverityChange={(next) => updateQuery({ risk: next })}
+                    onClearFilters={() => updateQuery({ riskCat: null, risk: null })}
+                  />
                 )}
               </Card>
 
-              <NbaComingSoonCard
-                rows={nbaRows}
-                message={NBA_MESSAGE_BOOK}
-                onDismiss={dismissNba}
-              />
+              <NbaComingSoonCard rows={nbaRows} message={NBA_MESSAGE_BOOK} onDismiss={dismissNba} />
             </div>
-
           </div>
 
           {/* Sticky from `xl`, where the two columns actually sit side by side.
@@ -363,7 +337,7 @@ function DashboardPageInner() {
               inside keeps its natural height — so sticky still has a shorter
               box to pin, and at scroll end the aside's last card lands on the
               same baseline as the work column's last card. */}
-          <div className="dashboard-rail min-w-0 w-full self-stretch xl:col-start-2 xl:row-start-1 row-start-1">
+          <div className="dashboard-rail row-start-1 w-full min-w-0 self-stretch xl:col-start-2 xl:row-start-1">
             <aside
               ref={railRef}
               style={{ top: railTop }}
@@ -372,7 +346,11 @@ function DashboardPageInner() {
               {/* Today's reminders first, then the month, then call log. */}
               <Card variant="default" className="gap-4">
                 {notesError ? (
-                  <ErrorState size="compact" title={t.commandCenter.reminders.loadError} onRetry={retryNotes} />
+                  <ErrorState
+                    size="compact"
+                    title={t.commandCenter.reminders.loadError}
+                    onRetry={retryNotes}
+                  />
                 ) : (
                   <RemindersPanel
                     dayItems={dayReminders}
@@ -440,8 +418,8 @@ function DashboardPageInner() {
 function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-4 xl:gap-5">
-      <div className="dashboard-split grid grid-cols-1 gap-4 xl:gap-5 xl:items-start">
-        <div className="min-w-0 flex flex-col gap-4 xl:gap-5 xl:col-start-1 xl:row-start-1 row-start-2">
+      <div className="dashboard-split grid grid-cols-1 gap-4 xl:items-start xl:gap-5">
+        <div className="row-start-2 flex min-w-0 flex-col gap-4 xl:col-start-1 xl:row-start-1 xl:gap-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch xl:gap-5">
             <Skeleton className="min-h-[96px] flex-[8] rounded-2xl" />
             <Skeleton className="min-h-[96px] flex-[17] rounded-2xl" />
@@ -463,7 +441,7 @@ function DashboardSkeleton() {
             </Card>
           </div>
         </div>
-        <div className="dashboard-rail min-w-0 w-full self-stretch xl:col-start-2 xl:row-start-1 row-start-1">
+        <div className="dashboard-rail row-start-1 w-full min-w-0 self-stretch xl:col-start-2 xl:row-start-1">
           <aside className="flex w-full flex-col gap-4 xl:gap-5">
             {/* Reminders */}
             <Card variant="default" className="gap-4">

@@ -67,13 +67,11 @@ export function itemBadge(
     const palette = actionPalette(item.kind);
     return {
       icon: (
-        <span className="text-meta font-semibold leading-none tracking-tight">{item.kind}</span>
+        <span className="text-meta leading-none font-semibold tracking-tight">{item.kind}</span>
       ),
       label: actionKindName(item.kind, t),
       className: item.done ? DONE_BADGE_TONE : "",
-      style: item.done
-        ? undefined
-        : { backgroundColor: palette.tint, color: palette.text },
+      style: item.done ? undefined : { backgroundColor: palette.tint, color: palette.text },
     };
   }
 
@@ -83,9 +81,7 @@ export function itemBadge(
       icon: category.icon,
       label: category.label,
       className: item.done ? DONE_BADGE_TONE : "",
-      style: item.done
-        ? undefined
-        : { backgroundColor: category.tint, color: category.text },
+      style: item.done ? undefined : { backgroundColor: category.tint, color: category.text },
     };
   }
 
@@ -142,7 +138,7 @@ export function SourceBadgeIcon({
       aria-label={label ?? badge.label}
       style={badge.style}
       className={`flex shrink-0 items-center justify-center rounded-full ${
-        selfCenter ? "self-center " : ""
+        selfCenter ? "self-center" : ""
       }${size === "small" ? "size-7" : "size-8"} ${badge.className}`}
     >
       {badge.icon}

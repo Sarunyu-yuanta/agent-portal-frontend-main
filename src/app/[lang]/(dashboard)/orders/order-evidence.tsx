@@ -82,7 +82,6 @@ export function evidenceComplete(e: OrderEvidence | null | undefined): boolean {
   return !noteRequired(e.channel) || Boolean(e.note?.trim());
 }
 
-
 /**
  * Whether a booking on this desk needs evidence before it can be placed.
  *

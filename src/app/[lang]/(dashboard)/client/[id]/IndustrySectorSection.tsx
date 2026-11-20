@@ -17,13 +17,13 @@ import { useT } from "@/i18n/I18nProvider";
 function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?: () => void }) {
   const inner = (
     <>
-      <div className="flex gap-4 items-center flex-1 min-w-0">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
         {/* Figma "Sector_list" row icons render solid brand blue regardless of
          *  the sector's own trend color (node 26739:57814 family). */}
         <span style={{ color: "#0a6ee7" }}>
           <SectorGlyph id={sector.id} size={24} />
         </span>
-        <p className="flex-1 text-base truncate" style={{ color: "#4a5565" }}>
+        <p className="flex-1 truncate text-base" style={{ color: "#4a5565" }}>
           {sector.name}
         </p>
       </div>
@@ -32,36 +32,38 @@ function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?:
           {sector.changePercent}
         </span>
       ) : sector.listAccent === "teal" ? (
-        <div className="flex gap-2 items-center justify-end">
+        <div className="flex items-center justify-end gap-2">
           <span className="text-sm" style={{ color: "#00786f" }}>
             {sector.changeAmount}
           </span>
           <span
-            className="inline-flex shrink-0 items-center rounded font-normal whitespace-nowrap text-xs px-1.5 py-0.5"
+            className="inline-flex shrink-0 items-center rounded px-1.5 py-0.5 text-xs font-normal whitespace-nowrap"
             style={{ backgroundColor: "#f0fdfa" }}
           >
             <span style={{ color: "#008236" }}>+</span>
-            <span style={{ color: "#00786f" }}>
-              {sector.changePercent.replace(/^[+-]/, "")}
-            </span>
+            <span style={{ color: "#00786f" }}>{sector.changePercent.replace(/^[+-]/, "")}</span>
           </span>
         </div>
       ) : (
-        <div className="flex gap-2 items-center justify-end">
+        <div className="flex items-center justify-end gap-2">
           <span className="text-sm" style={{ color: TREND_TEXT[sector.trend] }}>
             {sector.changeAmount}
           </span>
           <PercentPill trend={sector.trend} value={sector.changePercent} />
         </div>
       )}
-      <CaretRightIcon size={24} className="text-[#4a5565] shrink-0" />
+      <CaretRightIcon size={24} className="shrink-0 text-[#4a5565]" />
     </>
   );
   // Figma's "Sector_list" carries the divider on every row, last one included.
   const className = "flex gap-4 items-center px-6 py-4 w-full border-b border-black/10";
   if (onNavigate) {
     return (
-      <button type="button" onClick={onNavigate} className={`${className} text-left w-full cursor-pointer hover:bg-black/[0.02] transition-colors`}>
+      <button
+        type="button"
+        onClick={onNavigate}
+        className={`${className} w-full cursor-pointer text-left transition-colors hover:bg-black/[0.02]`}
+      >
         {inner}
       </button>
     );
@@ -70,14 +72,34 @@ function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?:
 }
 
 const HEATMAP_TILE_BG: Record<Trend, string> = { up: "#f0fdf4", down: "#fef2f2", flat: "#f9fafb" };
-const HEATMAP_TILE_BORDER: Record<Trend, string> = { up: "#b9f8cf", down: "#ffe2e2", flat: "#e5e7eb" };
+const HEATMAP_TILE_BORDER: Record<Trend, string> = {
+  up: "#b9f8cf",
+  down: "#ffe2e2",
+  flat: "#e5e7eb",
+};
 /** Figma's "Heat map เมื่อมีแค่ 2 Sectors" permutation (node 25177:23062) uses
  *  a bolder green/300 & red/400 palette for its two hero tiles instead of the
  *  soft pastel one the crowded 8-sector grid uses. */
-const HEATMAP_TILE_BG_BOLD: Record<Trend, string> = { up: "#b9f8cf", down: "#ffa2a2", flat: "#e5e7eb" };
-const HEATMAP_TILE_BORDER_BOLD: Record<Trend, string> = { up: "#7bf1a8", down: "#ff6467", flat: "#d1d5dc" };
-const HEATMAP_TILE_BG_MID: Record<Trend, string> = { up: "#dbfce7", down: "#ffe2e2", flat: "#f3f3f3" };
-const HEATMAP_TILE_BORDER_MID: Record<Trend, string> = { up: "#b9f8cf", down: "#ffc9c9", flat: "rgba(0,0,0,0.08)" };
+const HEATMAP_TILE_BG_BOLD: Record<Trend, string> = {
+  up: "#b9f8cf",
+  down: "#ffa2a2",
+  flat: "#e5e7eb",
+};
+const HEATMAP_TILE_BORDER_BOLD: Record<Trend, string> = {
+  up: "#7bf1a8",
+  down: "#ff6467",
+  flat: "#d1d5dc",
+};
+const HEATMAP_TILE_BG_MID: Record<Trend, string> = {
+  up: "#dbfce7",
+  down: "#ffe2e2",
+  flat: "#f3f3f3",
+};
+const HEATMAP_TILE_BORDER_MID: Record<Trend, string> = {
+  up: "#b9f8cf",
+  down: "#ffc9c9",
+  flat: "rgba(0,0,0,0.08)",
+};
 const HEATMAP_TEXT: Record<Trend, string> = { up: "#008236", down: "#c10007", flat: "#6a7282" };
 
 /** Figma "Sector_list" heatmap tile (node 22907:32081 family) has 3 distinct
@@ -108,8 +130,18 @@ function HeatmapTile({
   const trend = sector.heatmapTrend ?? sector.trend;
   const changeAmount = sector.heatmapChangeAmount ?? sector.changeAmount;
   const changePercent = sector.heatmapChangePercent ?? sector.changePercent;
-  const bg = palette === "bold" ? HEATMAP_TILE_BG_BOLD : palette === "mid" ? HEATMAP_TILE_BG_MID : HEATMAP_TILE_BG;
-  const border = palette === "bold" ? HEATMAP_TILE_BORDER_BOLD : palette === "mid" ? HEATMAP_TILE_BORDER_MID : HEATMAP_TILE_BORDER;
+  const bg =
+    palette === "bold"
+      ? HEATMAP_TILE_BG_BOLD
+      : palette === "mid"
+        ? HEATMAP_TILE_BG_MID
+        : HEATMAP_TILE_BG;
+  const border =
+    palette === "bold"
+      ? HEATMAP_TILE_BORDER_BOLD
+      : palette === "mid"
+        ? HEATMAP_TILE_BORDER_MID
+        : HEATMAP_TILE_BORDER;
   const iconSize = variant === "lg" ? 24 : variant === "xs" ? 16 : 20;
   const label = sector.heatmapName ?? sector.name;
   const wrap = label.includes("\n");
@@ -123,10 +155,14 @@ function HeatmapTile({
       // Nesting the quote beside the icon instead would starve it of width and
       // push the pill past the tile edge. `overflow-hidden` matches Figma's
       // overflow-clip, so a long label can never bleed outside the tile.
-      className={`flex flex-wrap rounded-lg p-2 min-h-0 min-w-0 w-full self-stretch overflow-hidden ${
+      className={`flex min-h-0 w-full min-w-0 flex-wrap self-stretch overflow-hidden rounded-lg p-2 ${
         variant === "sm" ? "items-start" : "items-center"
       } ${
-        variant === "lg" ? "gap-2 content-start" : variant === "xs" ? "gap-1 content-center" : "gap-1.5 content-start"
+        variant === "lg"
+          ? "content-start gap-2"
+          : variant === "xs"
+            ? "content-center gap-1"
+            : "content-start gap-1.5"
       }`}
       style={{
         backgroundColor: bg[trend],
@@ -139,7 +175,10 @@ function HeatmapTile({
       </span>
       {variant === "lg" && (
         <>
-          <span className={`text-sm shrink-0 ${wrap ? "whitespace-pre" : "whitespace-nowrap"}`} style={{ color: labelColor }}>
+          <span
+            className={`shrink-0 text-sm ${wrap ? "whitespace-pre" : "whitespace-nowrap"}`}
+            style={{ color: labelColor }}
+          >
             {label}
           </span>
           <span className="text-sm" style={{ color: HEATMAP_TEXT[trend] }}>
@@ -150,7 +189,10 @@ function HeatmapTile({
       )}
       {variant === "md" && (
         <>
-          <span className={`text-sm min-w-10 shrink-0 ${wrap ? "whitespace-pre" : ""}`} style={{ color: "#4a5565" }}>
+          <span
+            className={`min-w-10 shrink-0 text-sm ${wrap ? "whitespace-pre" : ""}`}
+            style={{ color: "#4a5565" }}
+          >
             {label}
           </span>
           <span className="text-sm" style={{ color: HEATMAP_TEXT[trend] }}>
@@ -162,7 +204,7 @@ function HeatmapTile({
       {variant === "sm" && (
         <>
           <span
-            className={`text-xs shrink-0 leading-[20px] ${wrap ? "whitespace-pre" : ""}`}
+            className={`shrink-0 text-xs leading-[20px] ${wrap ? "whitespace-pre" : ""}`}
             style={{ color: labelColor }}
           >
             {label}
@@ -175,10 +217,10 @@ function HeatmapTile({
       )}
       {variant === "xs" && (
         <>
-          <span className="text-micro flex-1 min-w-10 truncate" style={{ color: "#4a5565" }}>
+          <span className="min-w-10 flex-1 truncate text-micro" style={{ color: "#4a5565" }}>
             {label}
           </span>
-          <span className="text-micro shrink-0" style={{ color: "#6a7282" }}>
+          <span className="shrink-0 text-micro" style={{ color: "#6a7282" }}>
             {changePercent}
           </span>
         </>
@@ -189,21 +231,36 @@ function HeatmapTile({
 
 function UsSectorHeatmap({ byId }: { byId: Record<string, SectorRow> }) {
   return (
-    <div className="hidden lg:flex gap-1.5 w-[556px] shrink-0 self-stretch">
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+    <div className="hidden w-[556px] shrink-0 gap-1.5 self-stretch lg:flex">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <HeatmapTile sector={byId.energy} variant="lg" palette="bold" style={{ flex: "1 1 0%" }} />
-        <HeatmapTile sector={byId.material} variant="lg" palette="bold" style={{ flex: "1 1 0%" }} />
+        <HeatmapTile
+          sector={byId.material}
+          variant="lg"
+          palette="bold"
+          style={{ flex: "1 1 0%" }}
+        />
       </div>
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        <div className="flex flex-col gap-1.5 flex-1 min-h-0">
-          <HeatmapTile sector={byId.industrials} variant="lg" palette="mid" style={{ flex: "1 1 0%" }} />
-          <div className="flex gap-1.5 min-h-0" style={{ flex: "1 1 0%" }}>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+          <HeatmapTile
+            sector={byId.industrials}
+            variant="lg"
+            palette="mid"
+            style={{ flex: "1 1 0%" }}
+          />
+          <div className="flex min-h-0 gap-1.5" style={{ flex: "1 1 0%" }}>
             <HeatmapTile sector={byId["consumer-discretionary"]} variant="md" />
             <HeatmapTile sector={byId["consumer-staples"]} variant="md" palette="mid" />
           </div>
-          <div className="flex gap-1.5 shrink-0">
-            <HeatmapTile sector={byId["health-care"]} variant="sm" palette="mid" style={{ flex: "1 1 0%" }} />
-            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+          <div className="flex shrink-0 gap-1.5">
+            <HeatmapTile
+              sector={byId["health-care"]}
+              variant="sm"
+              palette="mid"
+              style={{ flex: "1 1 0%" }}
+            />
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <HeatmapTile
                 sector={byId["communication-services"]}
                 variant="sm"
@@ -213,9 +270,14 @@ function UsSectorHeatmap({ byId }: { byId: Record<string, SectorRow> }) {
             </div>
           </div>
         </div>
-        <div className="flex gap-1.5 shrink-0" style={{ height: 50 }}>
-          <HeatmapTile sector={byId.financials} variant="sm" palette="mid" style={{ flex: "1 1 0%" }} />
-          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        <div className="flex shrink-0 gap-1.5" style={{ height: 50 }}>
+          <HeatmapTile
+            sector={byId.financials}
+            variant="sm"
+            palette="mid"
+            style={{ flex: "1 1 0%" }}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <HeatmapTile sector={byId["information-technology"]} variant="xs" />
             <HeatmapTile sector={byId["real-estate"]} variant="xs" />
           </div>
@@ -241,10 +303,15 @@ function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: Heat
     // Two rows of list can't hold the card open on their own, so the hero tiles
     // keep Figma's 448px content height (node 25177:23750) as a floor.
     return (
-      <div className="hidden lg:flex flex-col gap-1.5 w-[556px] shrink-0 self-stretch min-h-[448px]">
+      <div className="hidden min-h-[448px] w-[556px] shrink-0 flex-col gap-1.5 self-stretch lg:flex">
         <HeatmapTile sector={sectors[0]} variant="lg" palette="bold" style={{ flex: "235 1 0%" }} />
         {sectors[1] && (
-          <HeatmapTile sector={sectors[1]} variant="lg" palette="bold" style={{ flex: "207 1 0%" }} />
+          <HeatmapTile
+            sector={sectors[1]}
+            variant="lg"
+            palette="bold"
+            style={{ flex: "207 1 0%" }}
+          />
         )}
       </div>
     );
@@ -257,17 +324,32 @@ function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: Heat
   }
 
   return (
-    <div className="hidden lg:flex gap-1.5 w-[556px] shrink-0 self-stretch">
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        <HeatmapTile sector={byId.resources} variant="lg" palette="bold" style={{ flex: "235 1 0%" }} />
-        <HeatmapTile sector={byId.services} variant="lg" palette="bold" style={{ flex: "207 1 0%" }} />
+    <div className="hidden w-[556px] shrink-0 gap-1.5 self-stretch lg:flex">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <HeatmapTile
+          sector={byId.resources}
+          variant="lg"
+          palette="bold"
+          style={{ flex: "235 1 0%" }}
+        />
+        <HeatmapTile
+          sector={byId.services}
+          variant="lg"
+          palette="bold"
+          style={{ flex: "207 1 0%" }}
+        />
       </div>
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        <div className="flex flex-col gap-1.5 flex-1 min-h-0">
-          <HeatmapTile sector={byId.industrials} variant="lg" palette="mid" style={{ flex: "118 1 0%" }} />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+          <HeatmapTile
+            sector={byId.industrials}
+            variant="lg"
+            palette="mid"
+            style={{ flex: "118 1 0%" }}
+          />
           {/* Both tiles sit directly in the flex row — a wrapper div would swallow
            *  their `self-stretch` and leave the shorter one floating. */}
-          <div className="flex gap-1.5 min-h-0" style={{ flex: "94 1 0%" }}>
+          <div className="flex min-h-0 gap-1.5" style={{ flex: "94 1 0%" }}>
             <HeatmapTile
               sector={byId["consumer-products"]}
               variant="sm"
@@ -282,13 +364,17 @@ function SectorHeatmap({ sectors, layout }: { sectors: SectorRow[]; layout: Heat
             />
           </div>
         </div>
-        <div className="flex gap-1.5 flex-1 min-h-0">
+        <div className="flex min-h-0 flex-1 gap-1.5">
           <HeatmapTile sector={byId.financials} variant="xs" style={{ flex: "1 1 0%" }} />
           {/* Figma pins this stack to the width of its widest tile (123px) and
            *  lets Financials take the slack. */}
-          <div className="flex flex-col gap-1.5 shrink-0 w-[123px]">
+          <div className="flex w-[123px] shrink-0 flex-col gap-1.5">
             <HeatmapTile sector={byId.technology} variant="xs" style={{ flex: "1 1 0%" }} />
-            <HeatmapTile sector={byId["property-construction"]} variant="xs" style={{ flex: "1 1 0%" }} />
+            <HeatmapTile
+              sector={byId["property-construction"]}
+              variant="xs"
+              style={{ flex: "1 1 0%" }}
+            />
           </div>
         </div>
       </div>
@@ -316,35 +402,35 @@ export function SetIndustrySectorSection({
     [feedSectors, sectorsMarket, t],
   );
   return (
-    <div className={`flex flex-col gap-4 bg-white rounded-xl p-6 w-full ${CARD_SHADOW}`}>
-      <div className="flex gap-4 items-center justify-between w-full flex-wrap">
+    <div className={`flex w-full flex-col gap-4 rounded-xl bg-white p-6 ${CARD_SHADOW}`}>
+      <div className="flex w-full flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <p className="font-bold text-lg" style={{ color: "#101828" }}>
+          <p className="text-lg font-bold" style={{ color: "#101828" }}>
             {t.stock.sectorSection.title}
           </p>
           <p className="text-sm" style={{ color: "#4a5565" }}>
             {t.stock.sectorSection.desc}
           </p>
         </div>
-        <p className="text-xs shrink-0" style={{ color: "#6a7282" }}>
+        <p className="shrink-0 text-xs" style={{ color: "#6a7282" }}>
           {t.stock.latestUpdate(MARKET_LATEST_UPDATE)}
         </p>
       </div>
       {sectors.length === 0 ? (
         <StockSectionEmpty title={t.stock.empty.sectors} />
       ) : (
-      <div className="flex gap-10 items-stretch w-full">
-        <div className="flex-1 min-w-0">
-          {sectors.map((s) => (
-            <SectorListRow
-              key={s.id}
-              sector={s}
-              onNavigate={() => router.push(industrySectorHref(s.id, sectorsMarket))}
-            />
-          ))}
+        <div className="flex w-full items-stretch gap-10">
+          <div className="min-w-0 flex-1">
+            {sectors.map((s) => (
+              <SectorListRow
+                key={s.id}
+                sector={s}
+                onNavigate={() => router.push(industrySectorHref(s.id, sectorsMarket))}
+              />
+            ))}
+          </div>
+          <SectorHeatmap sectors={sectors} layout={layout} />
         </div>
-        <SectorHeatmap sectors={sectors} layout={layout} />
-      </div>
       )}
     </div>
   );

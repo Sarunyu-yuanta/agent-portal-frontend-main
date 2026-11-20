@@ -97,16 +97,12 @@ function Body({ t }: { t: ClientTransaction }) {
         {/* The verdict, centred, on the sheet's own white. The disc says what
             happened and the heading says it in words — one for the glance, one
             for the reader who came for the detail. */}
-        <div className="flex flex-col items-center px-6 pb-6 pt-2 text-center">
-          <StatusDisc variant={tag.variant}>
-            {STATUS_GLYPH[t.status]}
-          </StatusDisc>
+        <div className="flex flex-col items-center px-6 pt-2 pb-6 text-center">
+          <StatusDisc variant={tag.variant}>{STATUS_GLYPH[t.status]}</StatusDisc>
           {/* The status alone, in its own colour — the side rides the badge
               below, so a heading reading "ขายสำเร็จ" was saying half of that
               twice. Coloured because it is the word the sheet was opened for. */}
-          <p
-            className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[tag.variant].text}`}
-          >
+          <p className={`pt-3 text-title-lg leading-[32px] font-bold ${TONE[tag.variant].text}`}>
             {tag.text}
           </p>
           {/* Side and symbol on one line, the company under it. The badge is a
@@ -125,7 +121,9 @@ function Body({ t }: { t: ClientTransaction }) {
               >
                 {dict.orders.side[t.side]}
               </span>
-              <span className="text-title-sm leading-[28px] font-bold text-foreground">{t.symbol}</span>
+              <span className="text-title-sm leading-[28px] font-bold text-foreground">
+                {t.symbol}
+              </span>
             </span>
             {/* Wraps rather than ellipsising: the name is on its own line to
                 be read in full, so cutting it here would undo the point. */}
@@ -135,7 +133,7 @@ function Body({ t }: { t: ClientTransaction }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-5 pb-5 pt-2 md:px-6">
+        <div className="flex flex-col gap-3 px-5 pt-2 pb-5 md:px-6">
           {/* Everything that is read off the record sits on one grey panel;
               the total stays outside it, on the sheet's white, which is what
               makes it the answer rather than the last of eight rows. */}
@@ -162,7 +160,10 @@ function Body({ t }: { t: ClientTransaction }) {
                 label={dict.orders.transaction.quantity}
                 value={`${formatQuantity(t.asset, t.quantity)} ${dict.orders.quantityUnit[t.asset]}`}
               />
-              <SheetRow label={dict.orders.priceLabel[t.asset]} value={formatPrice(t.asset, t.price)} />
+              <SheetRow
+                label={dict.orders.priceLabel[t.asset]}
+                value={formatPrice(t.asset, t.price)}
+              />
             </SheetBlock>
           </div>
 
@@ -177,7 +178,9 @@ function Body({ t }: { t: ClientTransaction }) {
               cancelled ? "bg-[var(--fill-gray-100)]" : "bg-[var(--fill-p1-100)]"
             }`}
           >
-            <p className="text-body-sm font-bold text-foreground">{dict.orders.transaction.total}</p>
+            <p className="text-body-sm font-bold text-foreground">
+              {dict.orders.transaction.total}
+            </p>
             <p
               className={`text-title-lg leading-[32px] font-bold tabular-nums ${
                 cancelled ? "text-muted-foreground line-through" : "text-primary-action"
@@ -198,4 +201,3 @@ function Body({ t }: { t: ClientTransaction }) {
     </div>
   );
 }
-

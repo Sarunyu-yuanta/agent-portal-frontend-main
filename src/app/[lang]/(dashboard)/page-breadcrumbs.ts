@@ -17,18 +17,12 @@ import {
   type NavSectionKey,
 } from "@/lib/nav-memory";
 import { findProductById } from "./client/[id]/structured-product-data";
-import {
-  TOP_IDEA_THEMES,
-  type TopIdeaSector,
-} from "./client/[id]/top-idea-data";
+import { TOP_IDEA_THEMES, type TopIdeaSector } from "./client/[id]/top-idea-data";
 import {
   getInvestmentSolution,
   type InvestmentSolutionId,
 } from "./client/[id]/investment-solution-data";
-import {
-  getFixedIncomeBond,
-  resolveFixedIncomeCompany,
-} from "./client/[id]/fixed-income-data";
+import { getFixedIncomeBond, resolveFixedIncomeCompany } from "./client/[id]/fixed-income-data";
 import { getGlobalBondIssuer } from "./client/[id]/global-bond-data";
 import { getTrendingGroup } from "./client/[id]/product-trending-data";
 import {
@@ -93,10 +87,7 @@ const sectionLabel = (section: NavSectionKey, t: Dictionary) =>
  * Rendered in the top bar on desktop, and at the top of the content area on
  * mobile where the bar has no room for it beside the logo.
  */
-export function usePageBreadcrumb(
-  pathname: string,
-  ctx: BreadcrumbContext,
-): Crumb[] | null {
+export function usePageBreadcrumb(pathname: string, ctx: BreadcrumbContext): Crumb[] | null {
   const hydrated = useSyncExternalStore(subscribeNever, onClient, onServer);
   // Re-read session trail once recordVisit lands — otherwise the first paint
   // after a cross-section jump can stick on the route fallback (House View).
@@ -128,10 +119,7 @@ const onServer = () => false;
 
 // ── Assembly ────────────────────────────────────────────────────────────────
 
-function trailBreadcrumb(
-  pathname: string,
-  ctx: LabelContext,
-): Crumb[] | null {
+function trailBreadcrumb(pathname: string, ctx: LabelContext): Crumb[] | null {
   const section = sectionForPath(pathname);
   if (!section || pathname === SECTION_ROOT[section].path) return null;
 
@@ -148,9 +136,7 @@ function trailBreadcrumb(
     // A bare `/product-catalog` still *shows* a tab (the first one), so
     // normalize rather than treating a missing param as "tab unknown".
     if (!isCurrent && isCatalogList(urlPathname(url))) {
-      rungs.push(
-        ...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url)), ctx.t, url),
-      );
+      rungs.push(...catalogRootCrumbs(normalizeProductCategory(categoryOfUrl(url)), ctx.t, url));
       continue;
     }
     const label = labelFor(urlPathname(url), ctx);
@@ -168,26 +154,18 @@ function trailBreadcrumb(
   // Category is taken from the *origin* of the trail, not the current page —
   // opening a Thai / FI / bond detail from a stock related-product list should
   // keep "Stock" in the crumb, not jump to that product's native catalog tab.
-  if (
-    !crossTrail &&
-    rungs[0].label !== sectionLabel(section, ctx.t)
-  ) {
+  if (!crossTrail && rungs[0].label !== sectionLabel(section, ctx.t)) {
     rungs.unshift(...rootCrumbs(section, urlPathname(trail[0]), ctx.t));
   }
   return rungs.length > 1 ? finish(rungs) : null;
 }
 
 /** Section root + this page. Deterministic, so it is safe to server-render. */
-function routeBreadcrumb(
-  pathname: string,
-  ctx: LabelContext,
-): Crumb[] | null {
+function routeBreadcrumb(pathname: string, ctx: LabelContext): Crumb[] | null {
   const section = sectionForPath(pathname);
   if (!section || pathname === SECTION_ROOT[section].path) return null;
   const leaf = labelFor(pathname, ctx);
-  return leaf
-    ? finish([...rootCrumbs(section, pathname, ctx.t), { label: leaf }])
-    : null;
+  return leaf ? finish([...rootCrumbs(section, pathname, ctx.t), { label: leaf }]) : null;
 }
 
 const isCatalogList = (pathname: string) => pathname === CATALOG_PATH;
@@ -199,19 +177,13 @@ const isCatalogList = (pathname: string) => pathname === CATALOG_PATH;
  * has one, so the rung carries the tab's own view state (Stock's `?market=`)
  * and not just which tab it was. Without a trail the category is all we know.
  */
-function catalogRootCrumbs(
-  category: string | null,
-  t: Dictionary,
-  tabUrl?: string,
-): Crumb[] {
+function catalogRootCrumbs(category: string | null, t: Dictionary, tabUrl?: string): Crumb[] {
   const root: Crumb = {
     label: sectionLabel("product-catalog", t),
     href: CATALOG_PATH,
   };
   const tab = productCategoryTitle(category);
-  return tab
-    ? [root, { label: tab, href: tabUrl ?? catalogListHref(category) }]
-    : [root];
+  return tab ? [root, { label: tab, href: tabUrl ?? catalogListHref(category) }] : [root];
 }
 
 /**
@@ -219,11 +191,7 @@ function catalogRootCrumbs(
  * session restore. Only the catalog routes that belong to exactly one tab can
  * name it; the rest fall back to the section alone.
  */
-function rootCrumbs(
-  section: NavSectionKey,
-  pathname: string,
-  t: Dictionary,
-): Crumb[] {
+function rootCrumbs(section: NavSectionKey, pathname: string, t: Dictionary): Crumb[] {
   if (section === "product-catalog") {
     return catalogRootCrumbs(catalogCategoryForPath(pathname), t);
   }
@@ -264,11 +232,7 @@ export function crumbVariants(crumbs: Crumb[]): Crumb[][] {
   if (crumbs.length < 4) return [crumbs];
   return [
     crumbs,
-    [
-      crumbs[0],
-      { label: "…", href: crumbs[crumbs.length - 2].href },
-      crumbs[crumbs.length - 1],
-    ],
+    [crumbs[0], { label: "…", href: crumbs[crumbs.length - 2].href }, crumbs[crumbs.length - 1]],
   ];
 }
 
@@ -324,9 +288,7 @@ function labelFor(pathname: string, ctx: LabelContext): string | null {
   // "Promotion/Events / เทรดนอกสุดคุ้ม…", not "… / cmp-global-rewards".
   const campaign = /^\/promotions\/([^/]+)/.exec(pathname);
   if (campaign) {
-    const found = mockCampaigns.find(
-      (c) => c.id === decodeURIComponent(campaign[1]),
-    );
+    const found = mockCampaigns.find((c) => c.id === decodeURIComponent(campaign[1]));
     return found?.title ?? t.shell.breadcrumb.fallback.campaign;
   }
 
@@ -391,9 +353,7 @@ function catalogLabel(pathname: string, t: Dictionary): string | null {
   if (theme) {
     const product = getThaiStructuredProduct(theme);
     // Matches the detail page's own heading, which names the underlyings.
-    return product
-      ? [product.bbg1, product.bbg2, product.bbg3].filter(Boolean).join(" - ")
-      : theme;
+    return product ? [product.bbg1, product.bbg2, product.bbg3].filter(Boolean).join(" - ") : theme;
   }
 
   const performersCategory = segment(MUTUAL_FUND_TOP_PERFORMERS);

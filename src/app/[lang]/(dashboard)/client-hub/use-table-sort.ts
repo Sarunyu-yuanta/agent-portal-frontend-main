@@ -31,11 +31,7 @@ export function useTableSort<K>(onSort?: () => void) {
 }
 
 /** Ascending/descending comparison for two sort values of the same column. */
-export function compareBy(
-  a: number | string,
-  b: number | string,
-  dir: SortDir,
-): number {
+export function compareBy(a: number | string, b: number | string, dir: SortDir): number {
   const cmp = a < b ? -1 : a > b ? 1 : 0;
   return dir === "asc" ? cmp : -cmp;
 }

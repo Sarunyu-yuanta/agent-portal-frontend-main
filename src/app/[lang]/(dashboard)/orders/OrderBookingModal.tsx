@@ -226,7 +226,9 @@ export function OrderBookingModal({
         desktopMaxWidth="max-w-[614px]"
         desktopTitleIcon={
           atLead ? (
-            lead?.onBack ? <BackButton label={t.orders.back} onClick={lead.onBack} /> : undefined
+            lead?.onBack ? (
+              <BackButton label={t.orders.back} onClick={lead.onBack} />
+            ) : undefined
           ) : proposalStep === "channels" ? (
             <BackButton label={t.orders.back} onClick={() => setProposalStep("clients")} />
           ) : onBack ? (
@@ -280,11 +282,15 @@ export function OrderBookingModal({
       // a step of its own (`onBack`).
       desktopTitleIcon={
         atLead ? (
-          lead?.onBack ? <BackButton label={t.orders.back} onClick={lead.onBack} /> : undefined
+          lead?.onBack ? (
+            <BackButton label={t.orders.back} onClick={lead.onBack} />
+          ) : undefined
         ) : clientId && reviewing ? (
           <BackButton label={t.orders.backToEdit} onClick={() => setReviewing(false)} />
         ) : clientId ? (
-          fixedClientId && !onBack ? undefined : <BackButton onClick={leaveForm} />
+          fixedClientId && !onBack ? undefined : (
+            <BackButton onClick={leaveForm} />
+          )
         ) : onBack ? (
           <BackButton onClick={onBack} />
         ) : undefined
@@ -446,7 +452,7 @@ function BookingForm({
           and that box never scrolls — so clipping on the track would have left
           the picker's search header scrolling away with the rows. Hidden on the
           same element that scrolls is the one place it costs nothing. */}
-      <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <div ref={bodyRef} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
         {/* The form is two screens in one modal: choose, then fill in. Until a
             customer is chosen there is nothing to show but their statuses, and
             every one of them would read "—" — so the list gets the whole body
@@ -460,15 +466,9 @@ function BookingForm({
             blank scroll inside `bodyRef` — `SlideSteps` clips it with
             `overflow-clip`, not `hidden`, so the picker's sticky search header
             still sticks to that scroller. It also `inert`s the hidden pane. */}
-        <SlideSteps
-          index={stepIndex}
-          initialHeight={initialHeight}
-          onHeightChange={onHeightChange}
-        >
+        <SlideSteps index={stepIndex} initialHeight={initialHeight} onHeightChange={onHeightChange}>
           {[
-            ...(lead?.panes ?? []).map((pane, i) => (
-              <Fragment key={`lead-${i}`}>{pane}</Fragment>
-            )),
+            ...(lead?.panes ?? []).map((pane, i) => <Fragment key={`lead-${i}`}>{pane}</Fragment>),
             <div key="customers">
               {product && (
                 <>
@@ -501,7 +501,7 @@ function BookingForm({
               // first block was sitting nearer the title than the blocks are to
               // each other, which read as the header's padding rather than as
               // the form starting.
-              className="px-4 pb-4 pt-5 md:px-6"
+              className="px-4 pt-5 pb-4 md:px-6"
             >
               {shown && product && (
                 <>
@@ -606,12 +606,15 @@ function BookingForm({
             </div>,
             // The order as it will go — read through once before it is sent,
             // with nothing on it left to edit. Changing anything is Back.
-            <div key="summary" className="px-4 pb-4 pt-5 md:px-6">
+            <div key="summary" className="px-4 pt-5 pb-4 md:px-6">
               {shown && product && (
                 <>
                   {isMobile && (
                     <div className="mb-2">
-                      <BackButton label={t.orders.backToEdit} onClick={() => onReviewChange(false)} />
+                      <BackButton
+                        label={t.orders.backToEdit}
+                        onClick={() => onReviewChange(false)}
+                      />
                     </div>
                   )}
                   <BookingSummary
@@ -670,10 +673,7 @@ function BookingForm({
               // a failure used to leave `booking` true, disabling both the
               // primary and Cancel with only the ✕ as a way out.
               console.warn("[placeOrder]", err);
-              onNotice(
-                t.orders.words[bookingModeFor(product)].actionFailed,
-                "critical",
-              );
+              onNotice(t.orders.words[bookingModeFor(product)].actionFailed, "critical");
               return;
             } finally {
               setBooking(false);
@@ -724,8 +724,12 @@ function CustomerPicker({
   onSelect: (clientId: string) => void;
 }) {
   const t = useT();
-  const { data: clients, isLoading: clientsLoading, error: clientsError, retry: retryClients } =
-    useClientsResource();
+  const {
+    data: clients,
+    isLoading: clientsLoading,
+    error: clientsError,
+    retry: retryClients,
+  } = useClientsResource();
   const { isPrivate } = usePrivacy();
   const [search, setSearch] = useState("");
   const readiness = useRosterReadiness(clients, product);
@@ -748,9 +752,7 @@ function CustomerPicker({
     const query = search.trim().toLowerCase();
     const matched = query
       ? clients.filter(
-          (c) =>
-            maskName(c.name, isPrivate).toLowerCase().includes(query) ||
-            c.id.includes(query),
+          (c) => maskName(c.name, isPrivate).toLowerCase().includes(query) || c.id.includes(query),
         )
       : clients;
     // Stable within each group — `sort` is stable in every engine this runs
@@ -776,9 +778,11 @@ function CustomerPicker({
           It carries the same padding as the list below, so the two line up: the
           scroller and the pane around it are both unpadded precisely so this can
           be stated once per side rather than as a margin cancelling one. */}
-      <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pb-2 pt-3 md:px-6">
+      <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white px-4 pt-3 pb-2 md:px-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="type-body-2 !font-semibold text-foreground">{t.orders.booking.pickClient}</span>
+          <span className="type-body-2 !font-semibold text-foreground">
+            {t.orders.booking.pickClient}
+          </span>
           <span className="type-caption text-muted-foreground tabular-nums">
             {t.orders.words[bookingModeFor(product)].readyCount(readyCount, results.length)}
           </span>
@@ -800,14 +804,20 @@ function CustomerPicker({
             {t.orders.booking.loadingClients}
           </p>
         ) : clientsError ? (
-          <ErrorState size="compact" title={t.orders.booking.clientsLoadFailed} onRetry={retryClients} />
+          <ErrorState
+            size="compact"
+            title={t.orders.booking.clientsLoadFailed}
+            onRetry={retryClients}
+          />
         ) : results.length === 0 ? (
           // "Nothing matched" only when there was a search; an empty book is
           // a different fact and gets its own words.
           search.trim() ? (
             <EmptyState
               size="compact"
-              icon={<MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+              icon={
+                <MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />
+              }
               title={t.orders.booking.noClientMatch(search.trim())}
               action={{ label: t.states.clearFilters, onClick: () => setSearch("") }}
             />
@@ -898,7 +908,7 @@ function CustomerRow({
         // `py-4`, where the single-line pair it was built for took `py-3`: a
         // chip sitting right on top of the line that explains it reads as one
         // stacked object, and the row needed the height for them to be two.
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--fill-gray-200)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0a6ee7]"
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--fill-gray-200)] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset"
       >
         <Avatar type="text" initials={getInitial(displayName)} size="m" />
         {/* Still tight. A name and the tier under it are one label in two
@@ -928,7 +938,7 @@ function CustomerRow({
             chip is the only alarm in the row. */}
         <span className="flex min-w-0 shrink flex-col items-end gap-2">
           <span
-            className={`type-caption flex shrink-0 items-center gap-1 rounded-full py-0.5 pl-1.5 pr-2 !font-semibold ${verdict.chip}`}
+            className={`type-caption flex shrink-0 items-center gap-1 rounded-full py-0.5 pr-2 pl-1.5 !font-semibold ${verdict.chip}`}
           >
             <verdict.icon size={14} weight="fill" />
             {t.orders.readiness[status].text}
@@ -1003,10 +1013,7 @@ function StatusGrid({
       // Always cleared, so the row never sits on "กำลังส่ง…" after a failure.
       setSendingKey(null);
     }
-    onNotice(
-      t.orders.booking.requestSent(item.label, displayName),
-      "success",
-    );
+    onNotice(t.orders.booking.requestSent(item.label, displayName), "success");
   };
 
   const verdictText = t.orders.readiness[readiness.status].text;
@@ -1070,7 +1077,7 @@ function StatusGrid({
                   type="button"
                   disabled={inFlight}
                   onClick={() => void sendOne(item)}
-                  className="shrink-0 cursor-pointer text-label font-semibold text-primary-action hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
+                  className="text-primary-action shrink-0 cursor-pointer text-label font-semibold hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
                 >
                   {inFlight ? t.common.sending : t.orders.booking.sendToClient}
                 </button>
@@ -1289,7 +1296,6 @@ export function ReadOnlyField({ label, value }: { label: string; value: string }
   );
 }
 
-
 // ── Amount ───────────────────────────────────────────────────────────────────
 
 /**
@@ -1472,7 +1478,7 @@ function AmountSection({
         inert={blocked}
         aria-disabled={blocked}
         className={`flex flex-col gap-3 transition-opacity ${
-          blocked ? "pointer-events-none select-none opacity-40" : ""
+          blocked ? "pointer-events-none opacity-40 select-none" : ""
         }`}
       >
         {/* The amount as a figure, not a field.
@@ -1491,10 +1497,7 @@ function AmountSection({
             `FIT` in `ProductOrderSection`). The validation it would have drawn
             is drawn below instead — same four messages, same order. */}
         <div className="flex flex-col items-center gap-4 py-2">
-          <label
-            htmlFor="booking-amount"
-            className="type-caption text-muted-foreground"
-          >
+          <label htmlFor="booking-amount" className="type-caption text-muted-foreground">
             {`Notional Amount (${currency})`}
           </label>
 
@@ -1520,7 +1523,7 @@ function AmountSection({
             <span className="inline-grid">
               <span
                 aria-hidden
-                className="invisible whitespace-pre pr-[0.1em] text-[48px] leading-[1.3] font-bold tabular-nums [grid-area:1/1]"
+                className="invisible pr-[0.1em] text-[48px] leading-[1.3] font-bold whitespace-pre tabular-nums [grid-area:1/1]"
               >
                 {raw || "0"}
               </span>
@@ -1588,21 +1591,16 @@ function AmountSection({
               account's own currency — where the amount above exceeds it, the
               error line says so in the product's. */}
           <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5">
-            <span className="type-caption text-muted-foreground">{t.orders.amount.cashBalance}</span>
-            <span className="type-body-2 !font-semibold tabular-nums text-foreground">
+            <span className="type-caption text-muted-foreground">
+              {t.orders.amount.cashBalance}
+            </span>
+            <span className="type-body-2 !font-semibold text-foreground tabular-nums">
               ฿ {formatThbAmount(cashThb)}
             </span>
           </div>
         </div>
 
-        {overCash && (
-          <Alert
-            status="critical"
-            message={t.orders.amount.overCashAlert}
-            multiline
-          />
-        )}
-
+        {overCash && <Alert status="critical" message={t.orders.amount.overCashAlert} multiline />}
       </div>
     </div>
   );
@@ -1651,9 +1649,11 @@ function EvidenceSection({
    * `OrderEvidence`), so the progress is a short stand-in; the backend's own
    * progress replaces the timer.
    */
-  const [uploading, setUploading] = useState<{ name: string; size: number; progress: number } | null>(
-    null,
-  );
+  const [uploading, setUploading] = useState<{
+    name: string;
+    size: number;
+    progress: number;
+  } | null>(null);
   const uploadTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const uploadDone = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Stops an in-flight upload — on delete, on a new file, on unmount. */
@@ -1747,7 +1747,9 @@ function EvidenceSection({
         </span>
         {/* Said once, here, rather than only by a disabled button: the IC
             should know it is required before they go looking for the file. */}
-        <span className="type-caption text-[var(--fill-red-600)]">{t.orders.evidenceForm.required}</span>
+        <span className="type-caption text-[var(--fill-red-600)]">
+          {t.orders.evidenceForm.required}
+        </span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -1766,7 +1768,7 @@ function EvidenceSection({
                 type="button"
                 aria-pressed={on}
                 onClick={() => pickChannel(c)}
-                className={`flex h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] ${
+                className={`flex h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-center transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none ${
                   on
                     ? "border-primary-action bg-primary-action-light"
                     : "border-border bg-white hover:border-[var(--border-hover)] hover:bg-[var(--bg-default-secondary)]"
@@ -1818,9 +1820,7 @@ function EvidenceSection({
 
         {byLog && (
           <>
-            <p className="type-caption text-muted-foreground">
-              {t.orders.evidenceForm.pickCall}
-            </p>
+            <p className="type-caption text-muted-foreground">{t.orders.evidenceForm.pickCall}</p>
             {calls.length === 0 ? (
               <p className="type-caption rounded-xl border border-dashed border-border px-3 py-4 text-center text-muted-foreground">
                 {t.orders.evidenceForm.noCalls}
@@ -1867,7 +1867,7 @@ function EvidenceSection({
                         <CheckCircleIcon
                           size={18}
                           weight="fill"
-                          className="mt-0.5 shrink-0 text-primary-action"
+                          className="text-primary-action mt-0.5 shrink-0"
                         />
                       )}
                     </button>
@@ -1897,7 +1897,11 @@ function EvidenceSection({
                 UploadItem, loading and then done, with its own delete. */}
             <UploadArea
               className="mt-2"
-              label={value?.source === "file" ? t.orders.evidenceForm.changeFile : t.orders.evidenceForm.pickFile}
+              label={
+                value?.source === "file"
+                  ? t.orders.evidenceForm.changeFile
+                  : t.orders.evidenceForm.pickFile
+              }
               disabled={uploading !== null}
               onClick={() => fileRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
@@ -1907,7 +1911,9 @@ function EvidenceSection({
               }}
             />
             {/* What to attach, under the area it is attached through. */}
-            <p className="type-caption -mt-1.5 text-center text-muted-foreground">{t.orders.evidence[channel!].hint}</p>
+            <p className="type-caption -mt-1.5 text-center text-muted-foreground">
+              {t.orders.evidence[channel!].hint}
+            </p>
             {uploading ? (
               <UploadItem
                 variant="card"
@@ -1939,7 +1945,8 @@ function EvidenceSection({
                   // the asterisk needs its own colour.
                   ((
                     <>
-                      {t.orders.evidenceForm.note} <span className="text-[var(--fill-red-600)]">*</span>
+                      {t.orders.evidenceForm.note}{" "}
+                      <span className="text-[var(--fill-red-600)]">*</span>
                     </>
                   ) as unknown as string)
                 : t.orders.evidenceForm.noteOptional
@@ -1961,7 +1968,6 @@ function EvidenceSection({
             errorMessage={t.orders.evidenceForm.noteRequired}
           />
         )}
-
       </div>
     </div>
   );
@@ -2008,9 +2014,7 @@ function BookingSummary({
     <div className="flex flex-col gap-5">
       <div className="flex flex-col items-center gap-1 text-center">
         <p className="type-body-2 !font-semibold text-foreground">{words.summaryTitle}</p>
-        <p className="type-caption text-muted-foreground">
-          {words.summaryHint}
-        </p>
+        <p className="type-caption text-muted-foreground">{words.summaryHint}</p>
       </div>
 
       {/* The figure first and largest: it is the one value a slip of the
@@ -2019,7 +2023,7 @@ function BookingSummary({
         <span className="type-caption text-muted-foreground">
           {`Notional Amount (${product.currency})`}
         </span>
-        <span className="text-[32px] leading-[1.3] font-bold tabular-nums text-primary-action">
+        <span className="text-primary-action text-[32px] leading-[1.3] font-bold tabular-nums">
           {formatOrderAmount(amount, product.currency)}
         </span>
       </div>
@@ -2028,14 +2032,20 @@ function BookingSummary({
         <SheetRow label={t.orders.summary.product}>
           <span className="truncate text-body-sm font-semibold text-foreground">
             {product.underlying}
-            {product.coupon && (
-              <span className="ml-1.5 text-primary-action">{product.coupon}</span>
-            )}
+            {product.coupon && <span className="text-primary-action ml-1.5">{product.coupon}</span>}
           </span>
         </SheetRow>
-        {product.productType && <SheetRow label={t.orders.summary.type} value={product.productType} />}
-        <SheetRow label={t.orders.sheet.client} value={`${client.id} - ${maskName(client.name, isPrivate)}`} />
-        <SheetRow label={t.orders.field.accountNo} value={getAccountIdentity(client.id).accountNo} />
+        {product.productType && (
+          <SheetRow label={t.orders.summary.type} value={product.productType} />
+        )}
+        <SheetRow
+          label={t.orders.sheet.client}
+          value={`${client.id} - ${maskName(client.name, isPrivate)}`}
+        />
+        <SheetRow
+          label={t.orders.field.accountNo}
+          value={getAccountIdentity(client.id).accountNo}
+        />
         <SheetRow label={t.orders.field.ic} value={`${IC_NAME} · ${IC_TEAM}`} />
       </SheetBlock>
 
@@ -2154,11 +2164,7 @@ function Footer({
           disabled={!canBook}
           onClick={() => (reviewing ? onBooked(amount) : onReview())}
         >
-          {!reviewing
-            ? t.orders.summary.review
-            : booking
-              ? words.actionBusy
-              : words.confirm}
+          {!reviewing ? t.orders.summary.review : booking ? words.actionBusy : words.confirm}
         </Button>
       </div>
     </div>

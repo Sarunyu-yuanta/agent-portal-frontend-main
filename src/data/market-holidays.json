@@ -9,7 +9,12 @@
     { "month": 5, "day": 4, "name": "Coronation Day", "market": "SET" },
     { "month": 6, "day": 3, "name": "HM Queen Suthida's Birthday", "market": "SET" },
     { "month": 7, "day": 28, "name": "HM King Vajiralongkorn's Birthday", "market": "SET" },
-    { "month": 8, "day": 12, "name": "HM Queen Sirikit The Queen Mother's Birthday", "market": "SET" },
+    {
+      "month": 8,
+      "day": 12,
+      "name": "HM Queen Sirikit The Queen Mother's Birthday",
+      "market": "SET"
+    },
     { "month": 10, "day": 13, "name": "HM King Bhumibol Adulyadej Memorial Day", "market": "SET" },
     { "month": 10, "day": 23, "name": "Chulalongkorn Day", "market": "SET" },
     { "month": 12, "day": 5, "name": "HM King Bhumibol Adulyadej's Birthday", "market": "SET" },

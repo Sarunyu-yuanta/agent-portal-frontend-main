@@ -108,7 +108,10 @@ export function formatUpdatedAt(now: Date, locale: Locale): { date: string; time
   return { date: formatDate(locale, now, "short"), time: formatTime(locale, now) };
 }
 
-export function buildHeroSummaryFromClient(client: ClientSummaryInput, locale: Locale): AssetHeroSummary {
+export function buildHeroSummaryFromClient(
+  client: ClientSummaryInput,
+  locale: Locale,
+): AssetHeroSummary {
   const updatedAt = formatUpdatedAt(new Date(), locale);
   const aumThb = client.aum;
   const cash = aumThb * (client.cashIdlePct / 100);
@@ -155,7 +158,12 @@ export function getInitials(name: string): string {
  * (here "S*****" → "S"); kept as a distinct helper to preserve existing output.
  */
 export function getInitialsFromWords(name: string): string {
-  return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 /**

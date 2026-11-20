@@ -16,7 +16,11 @@ export function proxy(request: NextRequest) {
   if (current) {
     const response = NextResponse.next();
     if (request.cookies.get(LOCALE_COOKIE)?.value !== current) {
-      response.cookies.set(LOCALE_COOKIE, current, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+      response.cookies.set(LOCALE_COOKIE, current, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      });
     }
     return response;
   }

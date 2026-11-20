@@ -151,14 +151,10 @@ export function usePageChrome(): PageChrome {
         ? (t.pageTitles[titleKey as keyof typeof t.pageTitles] ?? PAGE_TITLES[titleKey])
         : "",
     titleIcon:
-      breadcrumb || !titleKey
-        ? null
-        : (PAGE_ICONS[titleKey as keyof typeof PAGE_ICONS] ?? null),
+      breadcrumb || !titleKey ? null : (PAGE_ICONS[titleKey as keyof typeof PAGE_ICONS] ?? null),
     breadcrumb,
     isPerformance: pathname.startsWith("/performance"),
-    isFullWidth:
-      pathname.startsWith("/product-catalog") ||
-      pathname.startsWith("/client-hub"),
+    isFullWidth: pathname.startsWith("/product-catalog") || pathname.startsWith("/client-hub"),
     // Notes and Calendar: each is one surface rather than a document on a
     // background, which is exactly the shape that gains nothing from a frame
     // and a heading on a phone.
@@ -168,10 +164,8 @@ export function usePageChrome(): PageChrome {
     // Notes is master/detail, Calendar's six weeks split the height between
     // them (each cell counts how many pills fit), and Reminders' timeline
     // scrolls inside itself.
-    isFullHeight:
-      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
-    isEdgeToEdge:
-      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+    isFullHeight: pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+    isEdgeToEdge: pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
     // Full Profile puts the breadcrumb inside its own sticky identity bar (and
     // pulls itself up over the layout's padding to do it), so a second one
     // above would overlap.

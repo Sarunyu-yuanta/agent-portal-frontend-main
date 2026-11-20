@@ -14,11 +14,11 @@ export function statusVariant(s: string): "green" | "yellow" | "blue" {
 }
 
 export const PRODUCT_COLORS: Record<string, string> = {
-  "Equity Funds":    "var(--bg-brand-secondary)",
-  "Fixed Income":    "var(--bg-brand-primary)",
-  "Structured Notes":"var(--bg-success-primary)",
-  "REITs":           "var(--bg-warning-primary)",
-  "Alternatives":    "var(--bg-theme-pink)",
+  "Equity Funds": "var(--bg-brand-secondary)",
+  "Fixed Income": "var(--bg-brand-primary)",
+  "Structured Notes": "var(--bg-success-primary)",
+  REITs: "var(--bg-warning-primary)",
+  Alternatives: "var(--bg-theme-pink)",
 };
 
 /** Labels: `t.performance.gap.items[id]`. */

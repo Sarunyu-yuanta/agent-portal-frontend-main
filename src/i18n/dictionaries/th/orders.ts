@@ -209,8 +209,14 @@ const orders = {
     mine: "ของฉัน",
     otherIcs: "IC อื่น",
     remaining: "คงเหลือ",
-    progressAria: (label: string, mine: string, others: string, remaining: string, target: string, currency: string) =>
-      `${label}: ของฉัน ${mine}, IC อื่น ${others}, คงเหลือ ${remaining} จาก ${target} ${currency}`,
+    progressAria: (
+      label: string,
+      mine: string,
+      others: string,
+      remaining: string,
+      target: string,
+      currency: string,
+    ) => `${label}: ของฉัน ${mine}, IC อื่น ${others}, คงเหลือ ${remaining} จาก ${target} ${currency}`,
   },
 
   /** `detail-sheet-ui` — rows shared by every detail sheet. */
@@ -222,12 +228,14 @@ const orders = {
   clientPage: {
     noBookingsInDesk: "หมวดนี้ไม่มีรายการจอง",
     backToOrders: "กลับไป Order Management",
-    subtitle: (clientId: string, accountNo: string, desk: string) => `${clientId} · บัญชี ${accountNo} · ${desk}`,
+    subtitle: (clientId: string, accountNo: string, desk: string) =>
+      `${clientId} · บัญชี ${accountNo} · ${desk}`,
     clientTotal: "ยอดรวมของลูกค้า",
     products: "สินค้า",
     productCount: (n: number) => `${n} รายการ`,
     emptyTitle: "ยังไม่มีรายการจองในหมวดนี้",
-    emptyBody: (name: string, desk: string) => `${name} ยังไม่มีการจอง ${desk} — เริ่มจองได้จากหน้าสินค้าใน Product Catalog`,
+    emptyBody: (name: string, desk: string) =>
+      `${name} ยังไม่มีการจอง ${desk} — เริ่มจองได้จากหน้าสินค้าใน Product Catalog`,
     col: {
       product: "สินค้า",
       booked: "ยอดจอง",
@@ -289,7 +297,8 @@ const orders = {
     backOfficeNote: "ระบบหลังบ้านจะส่งเอกสารผ่านช่องทางที่เลือก และบันทึกการส่งไว้เพื่อวัดผล",
     send: "ส่ง Proposal",
     sendToN: (n: number) => `ส่ง Proposal ${n} คน`,
-    sheetTitle: (underlying: string, coupon: string) => `ส่ง Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
+    sheetTitle: (underlying: string, coupon: string) =>
+      `ส่ง Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
   },
 
   /** `ProposalDetailModal`. */
@@ -360,14 +369,16 @@ const orders = {
     basketEmptyHint: "เริ่มจองให้ลูกค้าได้จากหน้าสินค้าใน Product Catalog — การจองจะมารวมกันที่นี่",
     quotaEmptyHint:
       "ส่งคำสั่งซื้อให้ลูกค้าได้จากหน้าสินค้าใน Product Catalog — กดครั้งเดียวส่งถึงหลังบ้านเลย ทำได้จนกว่าจะเต็มโควตา",
-    quotaEmptyHintInline: "กด \"สร้างคำสั่งซื้อ\" ที่หุ้นกู้ด้านบน — กดครั้งเดียวส่งถึงหลังบ้านเลย ทำได้จนกว่าจะเต็มโควตา",
+    quotaEmptyHintInline: 'กด "สร้างคำสั่งซื้อ" ที่หุ้นกู้ด้านบน — กดครั้งเดียวส่งถึงหลังบ้านเลย ทำได้จนกว่าจะเต็มโควตา',
     goToCatalog: "ไปที่ Product Catalog",
   },
 
   /** `OrderRecordsTable` — the deal's fill under each product. */
   records: {
-    quotaFill: (used: string, target: string, pct: number) => `โควตาใช้ไป ${used} / ${target} · ${pct}%`,
-    basketFill: (amount: string, target: string, pct: number) => `ตะกร้า ${amount} / ${target} · ${pct}%`,
+    quotaFill: (used: string, target: string, pct: number) =>
+      `โควตาใช้ไป ${used} / ${target} · ${pct}%`,
+    basketFill: (amount: string, target: string, pct: number) =>
+      `ตะกร้า ${amount} / ${target} · ${pct}%`,
   },
 
   orderRef: "เลขที่คำสั่งซื้อ",
@@ -461,7 +472,8 @@ const orders = {
   /** `OrderBookingModal` — client picker, checks and toasts. */
   booking: {
     change: "เปลี่ยน",
-    orderSent: (amount: string, client: string, ref: string) => `ส่งคำสั่งซื้อ ${amount} ของ ${client} แล้ว (${ref})`,
+    orderSent: (amount: string, client: string, ref: string) =>
+      `ส่งคำสั่งซื้อ ${amount} ของ ${client} แล้ว (${ref})`,
     booked: (amount: string, client: string) => `จอง ${amount} ให้ ${client} แล้ว`,
     pickClient: "เลือกลูกค้า",
     searchClient: "ค้นหาชื่อหรือรหัสลูกค้า",
@@ -491,7 +503,8 @@ const orders = {
   amount: {
     quotaFull: (product: string) => `${product} เต็มโควตาแล้ว — ไม่สามารถจองเพิ่มได้`,
     orderSent: (product: string) => `ส่งคำสั่งซื้อของ ${product} แล้ว — สินค้านี้ปิดรับจอง`,
-    orderProcessing: (product: string) => `คำสั่งซื้อของ ${product} กำลังดำเนินการที่ระบบหลังบ้าน — ไม่สามารถจองเพิ่มได้`,
+    orderProcessing: (product: string) =>
+      `คำสั่งซื้อของ ${product} กำลังดำเนินการที่ระบบหลังบ้าน — ไม่สามารถจองเพิ่มได้`,
     digitsOnly: "กรอกได้เฉพาะตัวเลข 0–9 เท่านั้น",
     belowMinimum: (amount: string) => `ต่ำกว่าขั้นต่ำ ${amount}`,
     overCash: (amount: string) => `เกินเงินสดคงเหลือของลูกค้า ${amount}`,

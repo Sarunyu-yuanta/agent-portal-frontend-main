@@ -11,11 +11,7 @@
  */
 
 import { maskName } from "@/lib/mask-name";
-import type {
-  RiskAlert,
-  RiskAlertCategory,
-  RiskSeverity,
-} from "@/types/domain";
+import type { RiskAlert, RiskAlertCategory, RiskSeverity } from "@/types/domain";
 
 /** One finding, as a row: the alert, the name as it may be shown, and whether
  *  this IC has already waved it through. */
@@ -121,9 +117,7 @@ export function buildRiskAlertRows({
       // An un-attributed finding's label is not a name, so it is not masked —
       // "ยังระบุตัวตนไม่ได้" survives privacy mode intact.
       displayName:
-        alert.clientId === null
-          ? alert.clientName
-          : maskName(alert.clientName, isPrivate),
+        alert.clientId === null ? alert.clientName : maskName(alert.clientName, isPrivate),
       acknowledged: acknowledgedIds.has(riskAckId(alert)),
     }))
     .sort(
@@ -145,17 +139,13 @@ export function openRiskAlerts(rows: RiskAlertRow[]): RiskAlertRow[] {
   return rows.filter((row) => !row.acknowledged);
 }
 
-export function countRiskBySeverity(
-  rows: RiskAlertRow[],
-): Record<RiskSeverity, number> {
+export function countRiskBySeverity(rows: RiskAlertRow[]): Record<RiskSeverity, number> {
   const out: Record<RiskSeverity, number> = { critical: 0, warning: 0, watch: 0 };
   for (const row of rows) out[row.alert.severity] += 1;
   return out;
 }
 
-export function countRiskByCategory(
-  rows: RiskAlertRow[],
-): Record<RiskAlertCategory, number> {
+export function countRiskByCategory(rows: RiskAlertRow[]): Record<RiskAlertCategory, number> {
   const out: Record<RiskAlertCategory, number> = {
     margin: 0,
     suitability: 0,

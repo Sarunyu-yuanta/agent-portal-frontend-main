@@ -5,10 +5,7 @@ import { CaretLeftIcon, CaretRightIcon, InfoIcon, TrayIcon } from "@phosphor-ico
 import { EmptyState } from "@/components/ui/empty-state";
 import { TagFilterChip } from "./MutualFundCard";
 import { MF_ASSETS } from "./mutual-fund-assets";
-import {
-  MOBILE_PERFORMANCE_PERIODS,
-  type MobilePerformancePeriod,
-} from "./mutual-fund-data";
+import { MOBILE_PERFORMANCE_PERIODS, type MobilePerformancePeriod } from "./mutual-fund-data";
 import { useT } from "@/i18n/I18nProvider";
 
 /**
@@ -125,7 +122,12 @@ export function MobilePeriodTabs({
   const t = useT();
   return (
     <div className="flex h-10 w-full items-center gap-1 px-3">
-      <Button variant="plain" size="icon-xs" aria-label={t.fund.list.previousPeriod} className="shrink-0">
+      <Button
+        variant="plain"
+        size="icon-xs"
+        aria-label={t.fund.list.previousPeriod}
+        className="shrink-0"
+      >
         <CaretLeftIcon size={16} />
       </Button>
       <div className="min-w-0 flex-1 overflow-x-auto rounded-full bg-[#f3f3f3] p-1">
@@ -137,7 +139,7 @@ export function MobilePeriodTabs({
                 key={period}
                 type="button"
                 onClick={() => onChange(period)}
-                className={`flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold leading-[20px] ${
+                className={`flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-xs leading-[20px] font-semibold ${
                   selected
                     ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                     : "text-[#4a5565]"
@@ -149,7 +151,12 @@ export function MobilePeriodTabs({
           })}
         </div>
       </div>
-      <Button variant="plain" size="icon-xs" aria-label={t.fund.list.nextPeriod} className="shrink-0">
+      <Button
+        variant="plain"
+        size="icon-xs"
+        aria-label={t.fund.list.nextPeriod}
+        className="shrink-0"
+      >
         <CaretRightIcon size={16} />
       </Button>
     </div>
@@ -161,7 +168,9 @@ export function MutualFundSectionEmpty({ title }: { title: string }) {
   return (
     <EmptyState
       size="compact"
-      icon={<TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      icon={
+        <TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />
+      }
       title={title}
     />
   );

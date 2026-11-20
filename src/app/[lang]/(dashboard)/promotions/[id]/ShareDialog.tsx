@@ -101,10 +101,7 @@ export function ShareDialog({
     () => rows.filter((row) => row.eligible && row.status !== "redeemed"),
     [rows],
   );
-  const selectable = useMemo(
-    () => eligibleRows.map((row) => row.client.id),
-    [eligibleRows],
-  );
+  const selectable = useMemo(() => eligibleRows.map((row) => row.client.id), [eligibleRows]);
 
   const allPicked = selectable.length > 0 && picked.size === selectable.length;
 
@@ -126,13 +123,11 @@ export function ShareDialog({
     >
       <div className="flex flex-col gap-4 pt-1">
         {joinUrl && (
-          <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 py-1.5 pl-3 pr-1.5">
-            <LinkSimpleIcon size={16} weight="bold" className="shrink-0 text-primary-action" />
+          <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 py-1.5 pr-1.5 pl-3">
+            <LinkSimpleIcon size={16} weight="bold" className="text-primary-action shrink-0" />
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="text-meta text-muted-foreground">{s.joinLink}</span>
-              <span className="truncate text-label font-medium text-foreground">
-                {joinUrl}
-              </span>
+              <span className="truncate text-label font-medium text-foreground">{joinUrl}</span>
             </div>
             <Button
               variant="plain"
@@ -153,15 +148,11 @@ export function ShareDialog({
 
         {selectable.length > 0 && (
           <div className="-mb-1 flex items-center justify-between pl-1">
-            <span className="text-label font-semibold text-muted-foreground">
-              {s.clientList}
-            </span>
+            <span className="text-label font-semibold text-muted-foreground">{s.clientList}</span>
             <Button
               variant="plain"
               size="sm"
-              onClick={() =>
-                setPicked(allPicked ? new Set() : new Set(selectable))
-              }
+              onClick={() => setPicked(allPicked ? new Set() : new Set(selectable))}
             >
               {allPicked ? s.clearPicked : s.pickAll}
             </Button>
@@ -186,10 +177,7 @@ export function ShareDialog({
                     : "border-border/60 hover:border-border hover:bg-muted/40"
                 }`}
               >
-                <Checkbox
-                  checked={checked}
-                  onChange={(next) => toggle(row.client.id, next)}
-                />
+                <Checkbox checked={checked} onChange={(next) => toggle(row.client.id, next)} />
                 <Avatar type="text" initials={getInitials(name)} size="s" />
                 <span className="min-w-0 flex-1 truncate text-body-sm font-semibold text-foreground">
                   {name}
@@ -198,7 +186,6 @@ export function ShareDialog({
               </label>
             );
           })}
-
         </div>
 
         <div className="flex flex-col gap-3 border-t border-border pt-4">

@@ -46,15 +46,15 @@ export function ProductDetailDrawer({
   };
 
   return (
-    <div className="flex flex-col h-full relative overflow-hidden">
+    <div className="relative flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border-default)] shrink-0">
-        <span className="relative shrink-0 size-3">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border-default)] px-5 py-4">
+        <span className="relative size-3 shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG status dot; the image optimizer rejects SVG */}
           <img alt="" className="block size-full max-w-none" src={product.statusIcon} />
         </span>
-        <div className="flex-1 min-w-0">
-          <p className="type-subtitle-1 font-bold text-foreground truncate">{product.label}</p>
+        <div className="min-w-0 flex-1">
+          <p className="type-subtitle-1 truncate font-bold text-foreground">{product.label}</p>
           <p className="type-caption text-muted-foreground">{d.clientCount(product.clientCount)}</p>
         </div>
       </div>
@@ -95,16 +95,16 @@ export function ProductDetailDrawer({
         </div>
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar">
+      <div className="hide-scrollbar min-h-0 flex-1 overflow-y-auto">
         {/* Sub-products tab */}
         {hasSub && tab === "sub" && (
           <div className="flex flex-col gap-2 p-4">
             {/* Expand / Collapse All */}
-            <div className="flex justify-end sticky top-0 bg-white py-1 -mx-4 px-4 z-10">
+            <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4 py-1">
               {expandedSubIds.size === subProducts.length ? (
                 <button
                   type="button"
-                  className="text-label text-blue-600 hover:underline cursor-pointer"
+                  className="cursor-pointer text-label text-blue-600 hover:underline"
                   onClick={() => setExpandedSubIds(new Set())}
                 >
                   {t.client.assets.collapseAll}
@@ -112,7 +112,7 @@ export function ProductDetailDrawer({
               ) : (
                 <button
                   type="button"
-                  className="text-label text-blue-600 hover:underline cursor-pointer"
+                  className="cursor-pointer text-label text-blue-600 hover:underline"
                   onClick={() => setExpandedSubIds(new Set(subProducts.map((s) => s.id)))}
                 >
                   {t.client.assets.expandAll}
@@ -126,42 +126,52 @@ export function ProductDetailDrawer({
               return (
                 <div
                   key={sub.id}
-                  className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden"
+                  className="overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white"
                 >
                   {/* Card header — clickable */}
                   <button
                     type="button"
-                    className="w-full text-left p-3 flex items-center gap-3 hover:bg-[var(--bg-default-secondary)] transition-colors cursor-pointer"
-                    onClick={() => setExpandedSubIds((prev) => {
-                      const next = new Set(prev);
-                      if (isExpanded) next.delete(sub.id);
-                      else next.add(sub.id);
-                      return next;
-                    })}
+                    className="flex w-full cursor-pointer items-center gap-3 p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
+                    onClick={() =>
+                      setExpandedSubIds((prev) => {
+                        const next = new Set(prev);
+                        if (isExpanded) next.delete(sub.id);
+                        else next.add(sub.id);
+                        return next;
+                      })
+                    }
                   >
                     {/* Ticker + name */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
                         {sub.ticker && (
-                          <span className="text-meta font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded shrink-0">
+                          <span className="shrink-0 rounded bg-blue-50 px-1.5 py-0.5 text-meta font-bold text-blue-600">
                             {sub.ticker}
                           </span>
                         )}
-                        <p className="text-body-sm font-semibold text-foreground truncate">{sub.name}</p>
+                        <p className="truncate text-body-sm font-semibold text-foreground">
+                          {sub.name}
+                        </p>
                       </div>
-                      <p className="text-label text-muted-foreground">{formatThbAmount(sub.totalAmountThb)} THB</p>
+                      <p className="text-label text-muted-foreground">
+                        {formatThbAmount(sub.totalAmountThb)} THB
+                      </p>
                     </div>
 
                     {/* Client count badge (prominent) */}
-                    <div className="shrink-0 flex flex-col items-center bg-[var(--bg-default-secondary)] rounded-lg px-3 py-1.5 min-w-[52px]">
-                      <span className="text-title font-bold text-foreground leading-none">{sub.clientCount}</span>
-                      <span className="text-meta text-muted-foreground leading-tight mt-0.5">{d.clientsBadge(sub.clientCount)}</span>
+                    <div className="flex min-w-[52px] shrink-0 flex-col items-center rounded-lg bg-[var(--bg-default-secondary)] px-3 py-1.5">
+                      <span className="text-title leading-none font-bold text-foreground">
+                        {sub.clientCount}
+                      </span>
+                      <span className="mt-0.5 text-meta leading-tight text-muted-foreground">
+                        {d.clientsBadge(sub.clientCount)}
+                      </span>
                     </div>
 
                     {/* Chevron */}
                     <CaretDownIcon
                       size={20}
-                      className={`text-[var(--text-default-tertiary)] shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                      className={`shrink-0 text-[var(--text-default-tertiary)] transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                     />
                   </button>
 
@@ -172,19 +182,34 @@ export function ProductDetailDrawer({
                         <button
                           key={holder.clientId}
                           type="button"
-                          className="w-full text-left flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--bg-default-secondary)] transition-colors cursor-pointer"
+                          className="flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                           onClick={() => openClient(holder.clientId)}
                         >
-                          <Avatar type="text" initials={getInitials(maskName(holder.clientName, isPrivate))} size="s" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-body-sm font-semibold text-foreground truncate">{maskName(holder.clientName, isPrivate)}</p>
-                            <p className="type-caption text-muted-foreground">{holder.clientId} · {holder.tier}</p>
+                          <Avatar
+                            type="text"
+                            initials={getInitials(maskName(holder.clientName, isPrivate))}
+                            size="s"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-body-sm font-semibold text-foreground">
+                              {maskName(holder.clientName, isPrivate)}
+                            </p>
+                            <p className="type-caption text-muted-foreground">
+                              {holder.clientId} · {holder.tier}
+                            </p>
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-label font-bold text-foreground">{holder.allocationPct.toFixed(1)}%</p>
-                            <p className="type-caption text-muted-foreground">{formatThbAmount(holder.amountThb)} THB</p>
+                          <div className="shrink-0 text-right">
+                            <p className="text-label font-bold text-foreground">
+                              {holder.allocationPct.toFixed(1)}%
+                            </p>
+                            <p className="type-caption text-muted-foreground">
+                              {formatThbAmount(holder.amountThb)} THB
+                            </p>
                           </div>
-                          <CaretRightIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+                          <CaretRightIcon
+                            size={20}
+                            className="shrink-0 text-[var(--text-default-tertiary)]"
+                          />
                         </button>
                       ))}
                     </div>
@@ -201,7 +226,13 @@ export function ProductDetailDrawer({
             {product.holders.length === 0 && (
               <EmptyState
                 size="compact"
-                icon={<UsersIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                icon={
+                  <UsersIcon
+                    size={32}
+                    weight="duotone"
+                    className="text-[var(--text-default-placeholder)]"
+                  />
+                }
                 title={d.noHolders}
               />
             )}
@@ -209,19 +240,34 @@ export function ProductDetailDrawer({
               <button
                 key={holder.clientId}
                 type="button"
-                className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg p-3 flex items-center gap-3 w-full text-left hover:bg-[var(--bg-default-secondary)] transition-colors cursor-pointer"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                 onClick={() => openClient(holder.clientId)}
               >
-                <Avatar type="text" initials={getInitials(maskName(holder.clientName, isPrivate))} size="s" />
-                <div className="flex-1 min-w-0">
-                  <p className="type-subtitle-2 font-semibold text-foreground truncate">{maskName(holder.clientName, isPrivate)}</p>
-                  <p className="type-caption text-muted-foreground">{holder.clientId} · {holder.tier}</p>
+                <Avatar
+                  type="text"
+                  initials={getInitials(maskName(holder.clientName, isPrivate))}
+                  size="s"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="type-subtitle-2 truncate font-semibold text-foreground">
+                    {maskName(holder.clientName, isPrivate)}
+                  </p>
+                  <p className="type-caption text-muted-foreground">
+                    {holder.clientId} · {holder.tier}
+                  </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="type-subtitle-2 font-bold text-foreground">{holder.allocationPct.toFixed(1)}%</p>
-                  <p className="type-caption text-muted-foreground">{formatThbAmount(holder.amountThb)} THB</p>
+                <div className="shrink-0 text-right">
+                  <p className="type-subtitle-2 font-bold text-foreground">
+                    {holder.allocationPct.toFixed(1)}%
+                  </p>
+                  <p className="type-caption text-muted-foreground">
+                    {formatThbAmount(holder.amountThb)} THB
+                  </p>
                 </div>
-                <CaretRightIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+                <CaretRightIcon
+                  size={20}
+                  className="shrink-0 text-[var(--text-default-tertiary)]"
+                />
               </button>
             ))}
           </div>

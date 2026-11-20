@@ -59,33 +59,47 @@ export function StageAdvanceModal({
         <div className="flex flex-col gap-4">
           {/* Stage transition */}
           <div className="-mt-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: STAGE_META[deal.stage as Stage]?.dot }} />
-            <span className="text-label text-muted-foreground">{t.pipeline.stage[deal.stage as Stage] ?? deal.stage}</span>
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: STAGE_META[deal.stage as Stage]?.dot }}
+            />
+            <span className="text-label text-muted-foreground">
+              {t.pipeline.stage[deal.stage as Stage] ?? deal.stage}
+            </span>
             <ArrowRightIcon size={11} className="text-muted-foreground/30" weight="bold" />
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: STAGE_META[next]?.dot }} />
-            <span className="text-label font-semibold text-foreground">{t.pipeline.stage[next]}</span>
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: STAGE_META[next]?.dot }}
+            />
+            <span className="text-label font-semibold text-foreground">
+              {t.pipeline.stage[next]}
+            </span>
           </div>
 
           {/* Deal summary strip */}
-          <div className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2.5">
+          <div className="flex items-center gap-3 rounded-xl bg-muted/50 px-3 py-2.5">
             <Avatar type="text" initials={getInitialsFromWords(maskedClient)} size="s" />
-            <div className="flex-1 min-w-0">
-              <p className="text-body-sm font-semibold text-foreground truncate">{maskedClient}</p>
-              <p className="text-meta text-muted-foreground truncate">{deal.dealSize} · {deal.product}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-body-sm font-semibold text-foreground">{maskedClient}</p>
+              <p className="truncate text-meta text-muted-foreground">
+                {deal.dealSize} · {deal.product}
+              </p>
             </div>
           </div>
 
           {/* Progress */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <p className="text-meta font-semibold text-muted-foreground uppercase tracking-wide">
+              <p className="text-meta font-semibold tracking-wide text-muted-foreground uppercase">
                 {t.pipeline.advanceModal.checklist}
               </p>
-              <span className={`text-label font-bold tabular-nums transition-colors ${allDone ? "text-success" : "text-muted-foreground"}`}>
+              <span
+                className={`text-label font-bold tabular-nums transition-colors ${allDone ? "text-success" : "text-muted-foreground"}`}
+              >
                 {doneCount} / {total}
               </span>
             </div>
-            <div className="h-1 rounded-full bg-muted overflow-hidden">
+            <div className="h-1 overflow-hidden rounded-full bg-muted">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${allDone ? "bg-success" : "bg-primary-action"}`}
                 style={{ width: `${total > 0 ? (doneCount / total) * 100 : 100}%` }}
@@ -101,10 +115,12 @@ export function StageAdvanceModal({
                 <div
                   key={item.id}
                   onClick={() => toggle(item.id)}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-colors ${done ? "bg-success/10" : "hover:bg-muted/60"}`}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 transition-colors ${done ? "bg-success/10" : "hover:bg-muted/60"}`}
                 >
                   <Checkbox checked={done} onChange={() => toggle(item.id)} />
-                  <p className={`text-body-sm leading-snug flex-1 transition-colors ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                  <p
+                    className={`flex-1 text-body-sm leading-snug transition-colors ${done ? "text-muted-foreground line-through" : "text-foreground"}`}
+                  >
                     {t.pipeline.checklist[item.id]}
                   </p>
                 </div>
@@ -125,7 +141,9 @@ export function StageAdvanceModal({
               rightIcon={<ArrowRightIcon size={14} weight="bold" />}
               onClick={onConfirm}
             >
-              {advance ? t.pipeline.advance[deal.stage as keyof typeof t.pipeline.advance] : t.pipeline.advanceFallback}
+              {advance
+                ? t.pipeline.advance[deal.stage as keyof typeof t.pipeline.advance]
+                : t.pipeline.advanceFallback}
             </Button>
           </div>
         </div>

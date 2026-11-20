@@ -31,18 +31,12 @@ export const RISK_ALERTS_PAGE = "/command-center/risk-alerts";
 export const SEVERITY_ORDER: RiskSeverity[] = ["critical", "warning", "watch"];
 
 /** The order of the category tabs. */
-export const RISK_CATEGORY_ORDER: RiskAlertCategory[] = [
-  "margin",
-  "suitability",
-  "conduct",
-];
+export const RISK_CATEGORY_ORDER: RiskAlertCategory[] = ["margin", "suitability", "conduct"];
 
 /** A query param read back as a category. Anything unrecognised — a stale
  *  bookmark, a renamed family — degrades to "ทั้งหมด" rather than filtering the
  *  list down to nothing. */
-export function parseRiskCategory(
-  value: string | null,
-): RiskAlertCategory | "all" {
+export function parseRiskCategory(value: string | null): RiskAlertCategory | "all" {
   return RISK_CATEGORY_ORDER.includes(value as RiskAlertCategory)
     ? (value as RiskAlertCategory)
     : "all";
@@ -121,7 +115,9 @@ export const RISK_CATEGORY_META: Record<
 /** What the category strip is made of — "ทั้งหมด" and then the three families.
  *  Built here rather than in the component so the card and the sub page cannot
  *  end up offering different tabs. */
-export function riskCategoryTabs(t: Dictionary): { id: RiskAlertCategory | "all"; title: string }[] {
+export function riskCategoryTabs(
+  t: Dictionary,
+): { id: RiskAlertCategory | "all"; title: string }[] {
   return [
     { id: "all", title: t.risk.all },
     ...RISK_CATEGORY_ORDER.map((id) => ({ id, title: t.risk.category[id] })),
@@ -260,9 +256,7 @@ export function detectedAgoLabel(detectedAt: string, now: Date, t: Dictionary): 
 
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfThatDay = new Date(at.getFullYear(), at.getMonth(), at.getDate());
-  const daysAgo = Math.round(
-    (startOfToday.getTime() - startOfThatDay.getTime()) / 86_400_000,
-  );
+  const daysAgo = Math.round((startOfToday.getTime() - startOfThatDay.getTime()) / 86_400_000);
   const m = t.dates;
 
   if (daysAgo <= 0) {
@@ -284,7 +278,12 @@ export function detectedAgoLabel(detectedAt: string, now: Date, t: Dictionary): 
  * record, and a record says when, not how long ago. Past two days the date is
  * the clearer answer, the same cut `daysAgoLabelTh` makes for the bell.
  */
-export function detectedAtLabel(detectedAt: string, now: Date, t: Dictionary, locale: Locale): string {
+export function detectedAtLabel(
+  detectedAt: string,
+  now: Date,
+  t: Dictionary,
+  locale: Locale,
+): string {
   const at = new Date(detectedAt);
   const time = formatTime(locale, at);
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -307,7 +306,10 @@ export function severityMeta(severity: string, t: Dictionary) {
 }
 
 /** The meta for a rule family, with a neutral fallback for one this app doesn't know. */
-export function categoryMeta(category: string, t: Dictionary): { label: string; Icon: ElementType } {
+export function categoryMeta(
+  category: string,
+  t: Dictionary,
+): { label: string; Icon: ElementType } {
   const meta = RISK_CATEGORY_META[category as RiskAlertCategory];
   return meta
     ? { ...meta, label: t.risk.category[category as RiskAlertCategory] }

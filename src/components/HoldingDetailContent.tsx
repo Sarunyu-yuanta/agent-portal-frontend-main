@@ -39,8 +39,11 @@ function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
         {
           label: t.client.assets.pl,
           value: (
-            <span className={isPositive ? "text-[var(--text-success-primary)]" : "text-destructive"}>
-              {isPositive ? "+" : ""}{formatThbDecimal(totalChange)}
+            <span
+              className={isPositive ? "text-[var(--text-success-primary)]" : "text-destructive"}
+            >
+              {isPositive ? "+" : ""}
+              {formatThbDecimal(totalChange)}
             </span>
           ),
         },
@@ -52,20 +55,17 @@ function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
 function PositionSummaryPanel({ position }: { position: PositionSummary }) {
   const t = useT();
   return (
-    <div className="flex flex-col gap-2 px-1 pb-1 w-full">
-      <p className="type-caption font-semibold text-[var(--text-default-secondary)] leading-4">
+    <div className="flex w-full flex-col gap-2 px-1 pb-1">
+      <p className="type-caption leading-4 font-semibold text-[var(--text-default-secondary)]">
         {t.client.assets.positionSummary}
       </p>
-      <div className="flex flex-wrap gap-2 w-full">
+      <div className="flex w-full flex-wrap gap-2">
         {position.fields.map((field) => (
-          <div
-            key={field.id}
-            className="flex flex-col h-9 items-start shrink-0 w-[calc(50%-4px)]"
-          >
-            <p className="type-caption text-[var(--text-default-placeholder)] leading-4 truncate w-full h-4">
+          <div key={field.id} className="flex h-9 w-[calc(50%-4px)] shrink-0 flex-col items-start">
+            <p className="type-caption h-4 w-full truncate leading-4 text-[var(--text-default-placeholder)]">
               {t.client.assets.position[field.id]}
             </p>
-            <p className="type-body-2 text-[var(--text-default-primary)] leading-5 w-full">
+            <p className="type-body-2 w-full leading-5 text-[var(--text-default-primary)]">
               {field.value}
             </p>
           </div>
@@ -89,25 +89,25 @@ function HoldingCard({
 
   const header = (
     <>
-      <div className="flex flex-1 flex-col items-end justify-center min-w-0">
-        <div className="flex items-center justify-between w-full gap-2">
-          <div className="flex gap-1 items-center min-w-0 self-stretch">
-            <p className="type-subtitle-2 font-bold text-[var(--text-default-primary)] leading-5 shrink-0">
+      <div className="flex min-w-0 flex-1 flex-col items-end justify-center">
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1 self-stretch">
+            <p className="type-subtitle-2 shrink-0 leading-5 font-bold text-[var(--text-default-primary)]">
               {item.symbol}
             </p>
             {item.collateral && (
               <Tag text={t.client.assets.collateral} variant="blue" size="small" />
             )}
           </div>
-          <div className="flex gap-1 items-center text-right whitespace-nowrap shrink-0">
-            <p className="type-subtitle-2 font-bold text-[var(--text-default-primary)] leading-5">
+          <div className="flex shrink-0 items-center gap-1 text-right whitespace-nowrap">
+            <p className="type-subtitle-2 leading-5 font-bold text-[var(--text-default-primary)]">
               {item.value}
             </p>
-            <p className="type-body-2 text-[var(--text-default-tertiary)] leading-5">THB</p>
+            <p className="type-body-2 leading-5 text-[var(--text-default-tertiary)]">THB</p>
           </div>
         </div>
-        <div className="flex gap-2 items-center w-full">
-          <p className="type-caption text-[var(--text-default-tertiary)] leading-4 truncate flex-1 min-w-0">
+        <div className="flex w-full items-center gap-2">
+          <p className="type-caption min-w-0 flex-1 truncate leading-4 text-[var(--text-default-tertiary)]">
             {item.fullName}
           </p>
           <ProfitLossBadge
@@ -117,27 +117,27 @@ function HoldingCard({
           />
         </div>
         {avgCost && (
-          <div className="flex items-center justify-end w-full">
-            <p className="type-caption text-[var(--text-default-tertiary)] leading-4 whitespace-nowrap">
+          <div className="flex w-full items-center justify-end">
+            <p className="type-caption leading-4 whitespace-nowrap text-[var(--text-default-tertiary)]">
               {t.client.assets.avgCost(avgCost)}
             </p>
           </div>
         )}
       </div>
       {expanded ? (
-        <CaretUpIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+        <CaretUpIcon size={20} className="shrink-0 text-[var(--text-default-tertiary)]" />
       ) : (
-        <CaretDownIcon size={20} className="text-[var(--text-default-tertiary)] shrink-0" />
+        <CaretDownIcon size={20} className="shrink-0 text-[var(--text-default-tertiary)]" />
       )}
     </>
   );
 
   if (!expanded) {
     return (
-      <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden w-full">
+      <div className="w-full overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white">
         <button
           type="button"
-          className="flex gap-2 items-center px-3 py-2 w-full cursor-pointer hover:bg-[var(--bg-default-secondary)] transition-colors text-left"
+          className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
           onClick={onToggle}
           aria-expanded={false}
         >
@@ -148,10 +148,10 @@ function HoldingCard({
   }
 
   return (
-    <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden w-full flex flex-col gap-2 px-3 py-2">
+    <div className="flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white px-3 py-2">
       <button
         type="button"
-        className="flex gap-2 items-center w-full cursor-pointer hover:opacity-80 transition-opacity text-left"
+        className="flex w-full cursor-pointer items-center gap-2 text-left transition-opacity hover:opacity-80"
         onClick={onToggle}
         aria-expanded
       >
@@ -189,18 +189,14 @@ function HoldingSectionBlock({
   const sectionX = compactHorizontalPadding ? "px-4" : "px-6";
 
   return (
-    <div className="flex flex-col w-full">
-      <div className={`flex items-center ${sectionX} py-2 w-full`}>
-        <p className="type-caption font-semibold text-[var(--text-default-tertiary)] leading-4 flex-1">
+    <div className="flex w-full flex-col">
+      <div className={`flex items-center ${sectionX} w-full py-2`}>
+        <p className="type-caption flex-1 leading-4 font-semibold text-[var(--text-default-tertiary)]">
           {displayAssetLabel(title, t)}
         </p>
         {headerRight}
       </div>
-      <div
-        className={`flex flex-col gap-2 items-start ${sectionX} w-full ${
-          isLast ? "" : "pb-4"
-        }`}
-      >
+      <div className={`flex flex-col items-start gap-2 ${sectionX} w-full ${isLast ? "" : "pb-4"}`}>
         {items.map((item) => (
           <HoldingCard
             key={item.id}
@@ -239,7 +235,13 @@ export function HoldingDetailContent({ detail }: { detail: AssetAccountDetail })
     return (
       <EmptyState
         size="compact"
-        icon={<WalletIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        icon={
+          <WalletIcon
+            size={40}
+            weight="duotone"
+            className="text-[var(--text-default-placeholder)]"
+          />
+        }
         title={t.client.assets.noHoldingsTitle}
         body={t.client.assets.noHoldingsBody}
       />
@@ -264,7 +266,7 @@ export function HoldingDetailContent({ detail }: { detail: AssetAccountDetail })
               <button
                 type="button"
                 onClick={handleExpandAll}
-                className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
+                className="type-caption text-primary-action cursor-pointer font-medium hover:underline"
               >
                 {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
               </button>

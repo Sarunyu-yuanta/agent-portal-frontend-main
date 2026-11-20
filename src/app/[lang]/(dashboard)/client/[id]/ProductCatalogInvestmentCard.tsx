@@ -59,26 +59,19 @@ export function InvestmentCard({
             }
           : undefined
       }
-      className={`relative overflow-hidden rounded-xl flex gap-4 p-3 flex-1
-        md:flex-none md:w-full md:h-30 md:gap-6 md:px-8 md:py-3
-        lg:flex-1 lg:h-auto lg:gap-4 lg:p-3
-        items-center${onClick ? " cursor-pointer" : ""}`}
+      className={`relative flex flex-1 gap-4 overflow-hidden rounded-xl p-3 md:h-30 md:w-full md:flex-none md:gap-6 md:px-8 md:py-3 lg:h-auto lg:flex-1 lg:gap-4 lg:p-3 items-center${onClick ? "cursor-pointer" : ""}`}
       style={{
         backgroundImage: gradient,
-        boxShadow:
-          "0px 4px 6px -1px rgba(0,0,0,0.1),0px 2px 4px -2px rgba(0,0,0,0.1)",
+        boxShadow: "0px 4px 6px -1px rgba(0,0,0,0.1),0px 2px 4px -2px rgba(0,0,0,0.1)",
       }}
     >
       {/* Secure Income / Balanced Growth: image in fixed container on left */}
       {crop && (
-        <div
-          className="relative shrink-0 overflow-hidden"
-          style={{ width: 72, height: imgH }}
-        >
+        <div className="relative shrink-0 overflow-hidden" style={{ width: 72, height: imgH }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- Figma crop layer: `left`/`width` are computed from the crop transform against the image's own intrinsic size, which `fill` (inset-0 + 100%/100%) cannot express */}
           <img
             alt=""
-            className="absolute h-full max-w-none top-0 pointer-events-none"
+            className="pointer-events-none absolute top-0 h-full max-w-none"
             style={{
               left: `${((-crop.tx / crop.scaleX) * 100).toFixed(1)}%`,
               width: `${(100 / crop.scaleX).toFixed(1)}%`,
@@ -89,16 +82,12 @@ export function InvestmentCard({
       )}
       {/* High Conviction: invisible spacer — aligns content with other cards' 72px image slot */}
       {isHighConviction && (
-        <div
-          className="shrink-0 relative z-10"
-          style={{ width: 72 }}
-          aria-hidden
-        />
+        <div className="relative z-10 shrink-0" style={{ width: 72 }} aria-hidden />
       )}
       {/* High Conviction: absolute image behind content */}
       {isHighConviction && (
         <div
-          className="absolute z-0 flex items-center justify-center pointer-events-none"
+          className="pointer-events-none absolute z-0 flex items-center justify-center"
           style={{ left: imgLeft, top: 0, width: imgW, height: imgH }}
         >
           <div style={{ transform: "rotate(180deg)", flexShrink: 0 }}>
@@ -119,28 +108,18 @@ export function InvestmentCard({
       )}
       {/* Content — mobile/desktop: flex-col; tablet (md): flex-row */}
       <div
-        className={`flex flex-col gap-3 items-start min-w-0 flex-1
-        ${isHighConviction ? "relative z-10" : ""}
-        md:flex-row md:gap-6 md:items-center
-        lg:flex-col lg:gap-3 lg:items-start`}
+        className={`flex min-w-0 flex-1 flex-col items-start gap-3 ${isHighConviction ? "relative z-10" : ""} md:flex-row md:items-center md:gap-6 lg:flex-col lg:items-start lg:gap-3`}
       >
         {/* Name + Desc — mobile/desktop: row with button; tablet: col without button */}
-        <div
-          className="flex gap-2 items-center shrink-0 w-full
-          md:flex-col md:items-start md:gap-0 md:flex-1 md:min-w-0 md:w-auto md:shrink-0
-          lg:flex-row lg:gap-2 lg:items-center lg:w-full lg:shrink-0"
-        >
-          <div className="flex flex-col flex-1 min-w-0 whitespace-nowrap">
+        <div className="flex w-full shrink-0 items-center gap-2 md:w-auto md:min-w-0 md:flex-1 md:shrink-0 md:flex-col md:items-start md:gap-0 lg:w-full lg:shrink-0 lg:flex-row lg:items-center lg:gap-2">
+          <div className="flex min-w-0 flex-1 flex-col whitespace-nowrap">
             <p
-              className="font-bold truncate"
+              className="truncate font-bold"
               style={{ color: "#101828", fontSize: 18, lineHeight: "28px" }}
             >
               {name}
             </p>
-            <p
-              className="truncate"
-              style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}
-            >
+            <p className="truncate" style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}>
               {desc}
             </p>
           </div>
@@ -160,23 +139,16 @@ export function InvestmentCard({
         </div>
         {/* Stats — mobile/desktop: full-width below; tablet: flex-1 beside name */}
         <div
-          className="flex gap-4 items-start justify-center shrink-0 w-full
-          md:flex-1 md:w-auto md:shrink
-          lg:shrink-0 lg:w-full"
+          className="flex w-full shrink-0 items-start justify-center gap-4 md:w-auto md:flex-1 md:shrink lg:w-full lg:shrink-0"
           style={{
             backgroundColor: "rgba(255,255,255,0.5)",
             borderRadius: 8,
             padding: 8,
           }}
         >
-          <div className="flex flex-col items-center flex-1 min-w-0 text-center">
-            <p style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}>
-              Coupon
-            </p>
-            <p
-              className="font-bold"
-              style={{ color: "#101828", fontSize: 18, lineHeight: "28px" }}
-            >
+          <div className="flex min-w-0 flex-1 flex-col items-center text-center">
+            <p style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}>Coupon</p>
+            <p className="font-bold" style={{ color: "#101828", fontSize: 18, lineHeight: "28px" }}>
               {coupon}
             </p>
           </div>
@@ -187,14 +159,9 @@ export function InvestmentCard({
               backgroundColor: "rgba(0,0,0,0.1)",
             }}
           />
-          <div className="flex flex-col items-center flex-1 min-w-0 text-center">
-            <p style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}>
-              Tenor
-            </p>
-            <p
-              className="font-bold"
-              style={{ color: "#101828", fontSize: 18, lineHeight: "28px" }}
-            >
+          <div className="flex min-w-0 flex-1 flex-col items-center text-center">
+            <p style={{ color: "#6a7282", fontSize: 14, lineHeight: "20px" }}>Tenor</p>
+            <p className="font-bold" style={{ color: "#101828", fontSize: 18, lineHeight: "28px" }}>
               {tenor}
             </p>
           </div>
@@ -204,7 +171,7 @@ export function InvestmentCard({
           variant="outline"
           size="icon-xs"
           aria-label={t.products.common.viewDetails}
-          className="hidden md:flex lg:hidden shrink-0"
+          className="hidden shrink-0 md:flex lg:hidden"
           onClick={(e) => {
             e.stopPropagation();
             onClick?.();

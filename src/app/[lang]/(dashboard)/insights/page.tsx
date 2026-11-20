@@ -35,7 +35,7 @@ function InsightsLayout({ children }: { children: React.ReactNode }) {
 /** Sticky wrapper the sidebar and its skeleton share. */
 function SidebarColumn({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-5 sticky top-6 w-full max-w-sm mx-auto lg:max-w-none lg:mx-0">
+    <div className="sticky top-6 mx-auto flex w-full max-w-sm flex-col gap-5 lg:mx-0 lg:max-w-none">
       {children}
     </div>
   );
@@ -69,8 +69,7 @@ function InsightsPageInner() {
   const { isLoading: researchLoading } = useResearch();
 
   // The tab stays in the URL — it's a destination, not a refinement.
-  const activeTab =
-    searchParams.get("tab") === "research" ? "research" : "insights";
+  const activeTab = searchParams.get("tab") === "research" ? "research" : "insights";
 
   // Seeded from storage rather than held there: on a fresh load it has just
   // been cleared, so the server and the client both start at "All" and
@@ -85,9 +84,7 @@ function InsightsPageInner() {
 
   // `replace`, not `push` — refining a list shouldn't fill up history with
   // entries the user has to click through to leave the page.
-  const hasLoaded = useHasLoaded(
-    activeTab === "insights" ? strategiesLoading : researchLoading,
-  );
+  const hasLoaded = useHasLoaded(activeTab === "insights" ? strategiesLoading : researchLoading);
 
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) =>
@@ -100,19 +97,17 @@ function InsightsPageInner() {
       {!hasLoaded ? (
         <TabsSkeleton count={2} />
       ) : (
-      <div className="transparent-tabs scrollable-tabs -mx-4 xl:-mx-6 pl-4 xl:pl-6">
-        <TabGroup
-          items={[
-            { id: "insights", title: t.research.tabs.houseView },
-            { id: "research", title: t.research.tabs.research },
-          ]}
-          activeId={activeTab}
-          onChange={(id) =>
-            updateQuery({ tab: id === "insights" ? null : id })
-          }
-          size="md"
-        />
-      </div>
+        <div className="transparent-tabs scrollable-tabs -mx-4 pl-4 xl:-mx-6 xl:pl-6">
+          <TabGroup
+            items={[
+              { id: "insights", title: t.research.tabs.houseView },
+              { id: "research", title: t.research.tabs.research },
+            ]}
+            activeId={activeTab}
+            onChange={(id) => updateQuery({ tab: id === "insights" ? null : id })}
+            size="md"
+          />
+        </div>
       )}
 
       <FadeIn key={activeTab}>

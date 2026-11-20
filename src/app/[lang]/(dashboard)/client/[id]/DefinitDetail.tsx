@@ -32,7 +32,6 @@ import { RoboRiskLevel } from "./RoboRiskLevel";
 import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
 import { useT } from "@/i18n/I18nProvider";
 
-
 const DEFINIT_PROVIDER = "Definit x Yuanta";
 /** Figma 34315:85739 — DSS has 3 list items; DGS reserves empty 3rd row height. */
 const DEFINIT_FACTOR_SLOTS = 3;
@@ -47,19 +46,24 @@ const DEFINIT_HERO_BG = "bg-gradient-to-t from-white to-[#4886e0]";
  */
 function DefinitChartOverlay({ layout }: { layout: "mobile" | "tablet" | "desktop" }) {
   const lineObjectPosition =
-    layout === "tablet" ? "object-right-top" : layout === "mobile" ? "object-[32%_top]" : "object-left-top";
+    layout === "tablet"
+      ? "object-right-top"
+      : layout === "mobile"
+        ? "object-[32%_top]"
+        : "object-left-top";
 
   const containerClassName =
     layout === "desktop"
       ? "pointer-events-none absolute left-0 top-0 h-[347px] w-[768px] overflow-hidden mix-blend-color-dodge"
       : "pointer-events-none absolute inset-x-0 top-0 overflow-hidden mix-blend-color-dodge";
 
-  const containerStyle = layout === "desktop" ? undefined : { height: layout === "tablet" ? 347 : 280 };
+  const containerStyle =
+    layout === "desktop" ? undefined : { height: layout === "tablet" ? 347 : 280 };
 
   return (
     <div className={containerClassName} style={containerStyle} aria-hidden>
       <div
-        className={`absolute inset-0 ${layout === "desktop" ? "left-[8.53px]" : ""} mix-blend-hard-light opacity-20`}
+        className={`absolute inset-0 ${layout === "desktop" ? "left-[8.53px]" : ""} opacity-20 mix-blend-hard-light`}
       >
         <Image
           src={ROBO_ASSETS.definitCandlesticksBg}
@@ -71,7 +75,7 @@ function DefinitChartOverlay({ layout }: { layout: "mobile" | "tablet" | "deskto
         />
       </div>
       <div
-        className={`absolute left-0 w-full mix-blend-color-dodge opacity-20 ${layout === "desktop" ? "top-[29.56px] h-[306px]" : "inset-0"}`}
+        className={`absolute left-0 w-full opacity-20 mix-blend-color-dodge ${layout === "desktop" ? "top-[29.56px] h-[306px]" : "inset-0"}`}
       >
         <Image
           src={ROBO_ASSETS.definitLineChartBg}
@@ -105,10 +109,16 @@ function DesktopBackHeader({ onBack }: { onBack: () => void }) {
   const t = useT();
   return (
     <div className="flex w-full items-center gap-3 rounded-lg p-2">
-      <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="size-[34px] shrink-0 p-2">
+      <Button
+        variant="plain"
+        size="icon-sm"
+        onClick={onBack}
+        aria-label={t.products.common.back}
+        className="size-[34px] shrink-0 p-2"
+      >
         <ArrowLeftIcon size={18} />
       </Button>
-      <h1 className="shrink-0 text-lg font-bold leading-[28px] text-black">Definit x Yuanta</h1>
+      <h1 className="shrink-0 text-lg leading-[28px] font-bold text-black">Definit x Yuanta</h1>
     </div>
   );
 }
@@ -148,7 +158,11 @@ function DefinitStatItem({
             {labelLines?.[1]}
           </p>
         )}
-        <p className={`whitespace-nowrap ${valueTextClassName} ${valueClassName ?? "text-[#4a5565]"}`}>{value}</p>
+        <p
+          className={`whitespace-nowrap ${valueTextClassName} ${valueClassName ?? "text-[#4a5565]"}`}
+        >
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -203,12 +217,14 @@ function DefinitPlanCard({
             <div className="flex flex-col gap-1 pt-1">
               <p
                 className={
-                  isCompact ? "text-micro leading-[18px] text-[#4a5565]" : "text-xs leading-[20px] text-[#4a5565]"
+                  isCompact
+                    ? "text-micro leading-[18px] text-[#4a5565]"
+                    : "text-xs leading-[20px] text-[#4a5565]"
                 }
               >
                 {DEFINIT_PROVIDER}
               </p>
-              <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg font-bold leading-[28px] text-transparent">
+              <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg leading-[28px] font-bold text-transparent">
                 {plan.name}
               </p>
             </div>
@@ -220,12 +236,20 @@ function DefinitPlanCard({
             <div className="flex min-w-0 flex-1 items-center justify-end gap-1 whitespace-nowrap">
               <p
                 className={
-                  isCompact ? "text-xs font-bold leading-[20px] text-[#101828]" : "text-sm font-bold leading-[24px] text-[#101828]"
+                  isCompact
+                    ? "text-xs leading-[20px] font-bold text-[#101828]"
+                    : "text-sm leading-[24px] font-bold text-[#101828]"
                 }
               >
                 Available Room
               </p>
-              <p className={isCompact ? "text-xs leading-[20px] text-[#4a5565]" : "text-sm leading-[24px] text-[#4a5565]"}>
+              <p
+                className={
+                  isCompact
+                    ? "text-xs leading-[20px] text-[#4a5565]"
+                    : "text-sm leading-[24px] text-[#4a5565]"
+                }
+              >
                 {plan.availableRoom}
               </p>
             </div>
@@ -265,9 +289,15 @@ function DefinitPlanCard({
           variant="plain"
           size="lg"
           onClick={onDetailsClick}
-          className="gap-1 pl-3.5 pr-2.5"
+          className="gap-1 pr-2.5 pl-3.5"
           rightIcon={
-            <Image src={ROBO_ASSETS.iconCaretDown} alt="" width={20} height={20} className="size-5 shrink-0" />
+            <Image
+              src={ROBO_ASSETS.iconCaretDown}
+              alt=""
+              width={20}
+              height={20}
+              className="size-5 shrink-0"
+            />
           }
         >
           {t.products.common.details}
@@ -282,7 +312,7 @@ function DefinitPlanCard({
 function DefinitHeroDecoration({ compact }: { compact?: boolean }) {
   return (
     <div
-      className={`pointer-events-none absolute overflow-visible ${compact ? "right-0 top-2 h-[120px] w-[160px] md:h-[150px] md:w-[200px]" : "right-0 top-[30px] hidden h-[180px] w-[min(420px,45%)] lg:block"}`}
+      className={`pointer-events-none absolute overflow-visible ${compact ? "top-2 right-0 h-[120px] w-[160px] md:h-[150px] md:w-[200px]" : "top-[30px] right-0 hidden h-[180px] w-[min(420px,45%)] lg:block"}`}
       aria-hidden
     >
       <Image
@@ -315,15 +345,20 @@ function DefinitHeroMobile({
   // Figma mobile — compact hero lines.
   const DEFINIT_MOBILE_HERO_LINES = t.products.advisory.definit.tagline.heroMobile;
   return (
-    <div className={`relative flex w-full flex-1 flex-col items-center overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}>
+    <div
+      className={`relative flex w-full flex-1 flex-col items-center overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}
+    >
       <DefinitChartOverlay layout="mobile" />
-      <div className="relative z-10 flex min-h-[170px] w-full shrink-0 flex-col justify-center py-4 pl-5 pr-4">
+      <div className="relative z-10 flex min-h-[170px] w-full shrink-0 flex-col justify-center py-4 pr-4 pl-5">
         <DefinitHeroDecoration compact />
-        <div className="relative flex min-w-0 max-w-[75%] flex-col gap-2 text-white">
-          <p className="text-2xl font-bold leading-9">Definit x Yuanta</p>
+        <div className="relative flex max-w-[75%] min-w-0 flex-col gap-2 text-white">
+          <p className="text-2xl leading-9 font-bold">Definit x Yuanta</p>
           <div className="w-full text-sm leading-[24px]">
             {DEFINIT_MOBILE_HERO_LINES.map((line, index) => (
-              <p key={line} className={index < DEFINIT_MOBILE_HERO_LINES.length - 1 ? "mb-0" : undefined}>
+              <p
+                key={line}
+                className={index < DEFINIT_MOBILE_HERO_LINES.length - 1 ? "mb-0" : undefined}
+              >
                 {line}
               </p>
             ))}
@@ -336,18 +371,22 @@ function DefinitHeroMobile({
           <AdvisoryClientBar state={advisory} />
         </div>
         <div className="flex w-full items-center px-4">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
+          <p className="text-base leading-[28px] font-bold text-white">
+            {t.products.advisory.allPlans(plans.length)}
+          </p>
         </div>
         <div className="flex w-[343px] max-w-[calc(100%-32px)] flex-col gap-3">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <DefinitPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              layout="mobile"
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          {plans.length === 0
+            ? empty
+            : plans.map((plan) => (
+                <DefinitPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  client={client}
+                  layout="mobile"
+                  onDetailsClick={() => onPlanDetails(plan)}
+                />
+              ))}
         </div>
       </div>
     </div>
@@ -372,12 +411,14 @@ function DefinitHeroTablet({
   // Figma 34315:85726 — desktop hero subtitle (2 lines).
   const DEFINIT_HERO_DESCRIPTION_LINES = t.products.advisory.definit.tagline.heroDesktop;
   return (
-    <div className={`relative flex min-h-[910px] w-full flex-1 flex-col gap-3 overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}>
+    <div
+      className={`relative flex min-h-[910px] w-full flex-1 flex-col gap-3 overflow-x-clip pb-20 ${DEFINIT_HERO_BG}`}
+    >
       <DefinitChartOverlay layout="tablet" />
       <div className="relative z-10 flex min-h-[170px] w-full shrink-0 flex-col justify-center px-8 py-6">
         <DefinitHeroDecoration compact />
-        <div className="relative flex min-w-0 max-w-[65%] flex-col gap-2 text-white">
-          <p className="text-2xl font-bold leading-9">Definit x Yuanta</p>
+        <div className="relative flex max-w-[65%] min-w-0 flex-col gap-2 text-white">
+          <p className="text-2xl leading-9 font-bold">Definit x Yuanta</p>
           <p className="text-base leading-[24px]">{DEFINIT_HERO_DESCRIPTION_LINES.join(" ")}</p>
         </div>
       </div>
@@ -385,18 +426,22 @@ function DefinitHeroTablet({
       <div className="relative z-10 flex w-full flex-col gap-4 px-8">
         <AdvisoryClientBar state={advisory} />
         <div className="flex w-full items-center">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
+          <p className="text-base leading-[28px] font-bold text-white">
+            {t.products.advisory.allPlans(plans.length)}
+          </p>
         </div>
         <div className="flex w-full flex-col gap-4">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <DefinitPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              layout="tablet"
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          {plans.length === 0
+            ? empty
+            : plans.map((plan) => (
+                <DefinitPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  client={client}
+                  layout="tablet"
+                  onDetailsClick={() => onPlanDetails(plan)}
+                />
+              ))}
         </div>
       </div>
     </div>
@@ -422,16 +467,21 @@ function DefinitHeroDesktop({
   // Figma 34315:85726 — desktop hero subtitle (2 lines).
   const DEFINIT_HERO_DESCRIPTION_LINES = t.products.advisory.definit.tagline.heroDesktop;
   return (
-    <div className={`relative flex w-full flex-col items-center overflow-clip px-14 pb-12 ${DEFINIT_HERO_BG}`}>
+    <div
+      className={`relative flex w-full flex-col items-center overflow-clip px-14 pb-12 ${DEFINIT_HERO_BG}`}
+    >
       <DefinitChartOverlay layout="desktop" />
       <div className="relative z-10 flex w-full flex-col items-center">
         <div className="relative w-full shrink-0 py-8 pr-8">
           <DefinitHeroDecoration />
-          <div className="relative flex min-w-0 max-w-[55%] flex-col gap-2 text-white">
-            <p className="text-2xl font-bold leading-9">Definit x Yuanta</p>
-            <div className="text-base font-bold leading-[28px]">
+          <div className="relative flex max-w-[55%] min-w-0 flex-col gap-2 text-white">
+            <p className="text-2xl leading-9 font-bold">Definit x Yuanta</p>
+            <div className="text-base leading-[28px] font-bold">
               {DEFINIT_HERO_DESCRIPTION_LINES.map((line, index) => (
-                <p key={line} className={index < DEFINIT_HERO_DESCRIPTION_LINES.length - 1 ? "mb-0" : undefined}>
+                <p
+                  key={line}
+                  className={index < DEFINIT_HERO_DESCRIPTION_LINES.length - 1 ? "mb-0" : undefined}
+                >
                   {line}
                 </p>
               ))}
@@ -439,24 +489,28 @@ function DefinitHeroDesktop({
           </div>
         </div>
 
-      <div className="relative z-10 flex w-full max-w-[884px] flex-col gap-4">
-        <AdvisoryClientBar state={advisory} />
-        <div className="flex w-full items-center">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
-        </div>
+        <div className="relative z-10 flex w-full max-w-[884px] flex-col gap-4">
+          <AdvisoryClientBar state={advisory} />
+          <div className="flex w-full items-center">
+            <p className="text-base leading-[28px] font-bold text-white">
+              {t.products.advisory.allPlans(plans.length)}
+            </p>
+          </div>
 
-        <div className="flex w-full items-stretch gap-6">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <DefinitPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              layout="desktop"
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          <div className="flex w-full items-stretch gap-6">
+            {plans.length === 0
+              ? empty
+              : plans.map((plan) => (
+                  <DefinitPlanCard
+                    key={plan.id}
+                    plan={plan}
+                    client={client}
+                    layout="desktop"
+                    onDetailsClick={() => onPlanDetails(plan)}
+                  />
+                ))}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
@@ -488,7 +542,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pb-20 lg:pt-2">
+    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20">
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
         <DefinitMobileBreadcrumb />
         {client ? (
@@ -538,7 +592,9 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
         open={detailPlan != null}
         onClose={() => setDetailPlan(null)}
         cta={client ? advisoryCta(client, "definit") : undefined}
-        suitability={client && detailPlan ? planSuitability(client, detailPlan.riskTier) : undefined}
+        suitability={
+          client && detailPlan ? planSuitability(client, detailPlan.riskTier) : undefined
+        }
       />
     </div>
   );

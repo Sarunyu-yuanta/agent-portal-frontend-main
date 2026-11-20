@@ -1,11 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type {
-  GlobalBondIssuer,
-  MaturityFilter,
-  YieldFilter,
-} from "./global-bond-data";
+import type { GlobalBondIssuer, MaturityFilter, YieldFilter } from "./global-bond-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 
@@ -47,10 +43,10 @@ function AssetTag({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-0.5 rounded bg-[#f3f4f6] text-[rgba(0,0,0,0.6)] whitespace-nowrap ${
+      className={`inline-flex items-center gap-0.5 rounded bg-[#f3f4f6] whitespace-nowrap text-[rgba(0,0,0,0.6)] ${
         compact
-          ? "px-1 py-0.5 text-micro leading-[18px] md:px-2 md:py-1 md:text-xs md:leading-[22px] md:gap-0.5"
-          : "px-2 py-1 text-xs leading-[22px] gap-0.5"
+          ? "px-1 py-0.5 text-micro leading-[18px] md:gap-0.5 md:px-2 md:py-1 md:text-xs md:leading-[22px]"
+          : "gap-0.5 px-2 py-1 text-xs leading-[22px]"
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- 14px SVG tag icon; the image optimizer rejects SVG */}
@@ -73,7 +69,7 @@ function FilterPillGroup<T extends string>({
 }) {
   const group = (
     <div
-      className="inline-flex items-center p-1 rounded-lg bg-[#f3f3f3] shrink-0"
+      className="inline-flex shrink-0 items-center rounded-lg bg-[#f3f3f3] p-1"
       style={{ boxShadow: "0px 0px 0px 1px #e5e7eb" }}
     >
       {options.map((opt) => {
@@ -83,14 +79,13 @@ function FilterPillGroup<T extends string>({
             key={opt.id}
             type="button"
             onClick={() => onChange(opt.id)}
-            className={`px-3 py-1.5 rounded-lg border-none cursor-pointer text-sm font-semibold leading-[26px] text-[rgba(0,0,0,0.75)] whitespace-nowrap transition-colors ${
+            className={`cursor-pointer rounded-lg border-none px-3 py-1.5 text-sm leading-[26px] font-semibold whitespace-nowrap text-[rgba(0,0,0,0.75)] transition-colors ${
               active ? "bg-white" : "bg-transparent"
             }`}
             style={
               active
                 ? {
-                    boxShadow:
-                      "0px 0px 0px 1px #e5e7eb, 0px 1px 2px 0px rgba(0,0,0,0.05)",
+                    boxShadow: "0px 0px 0px 1px #e5e7eb, 0px 1px 2px 0px rgba(0,0,0,0.05)",
                   }
                 : undefined
             }
@@ -106,7 +101,7 @@ function FilterPillGroup<T extends string>({
 
   return (
     <div
-      className="max-w-full overflow-x-auto md:overflow-visible hide-scrollbar"
+      className="hide-scrollbar max-w-full overflow-x-auto md:overflow-visible"
       style={{ scrollbarWidth: "none" }}
     >
       {group}
@@ -140,27 +135,24 @@ export function GlobalBondDetailHero({
   const labels = t.products.globalBond.hero;
   const heroImage = issuer.heroImage ?? "/products/global-bond/global-bond-apple-hero.webp";
   return (
-    <div className="relative flex flex-col gap-6 px-4 py-6 md:p-8 rounded-xl overflow-hidden">
+    <div className="relative flex flex-col gap-6 overflow-hidden rounded-xl px-4 py-6 md:p-8">
       <Image
         alt=""
         src={heroImage}
         fill
         priority
         sizes="(max-width: 1280px) 100vw, 1280px"
-        className="object-cover pointer-events-none opacity-80"
+        className="pointer-events-none object-cover opacity-80"
       />
-      <div
-        className="absolute inset-0 rounded-xl"
-        style={{ background: HERO_GRADIENT }}
-      />
+      <div className="absolute inset-0 rounded-xl" style={{ background: HERO_GRADIENT }} />
 
       {/* Block 1: Logo, title, tags, description (tablet/desktop) */}
-      <div className="relative flex flex-col gap-2 md:gap-1.5 lg:min-h-[83px] lg:justify-between w-full">
-        <div className="flex flex-col gap-2 lg:pb-[9px] w-full">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between w-full">
-            <div className="flex gap-2 items-center min-w-0">
+      <div className="relative flex w-full flex-col gap-2 md:gap-1.5 lg:min-h-[83px] lg:justify-between">
+        <div className="flex w-full flex-col gap-2 lg:pb-[9px]">
+          <div className="flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-2">
               <div
-                className="flex items-center justify-center shrink-0 size-7 md:size-8 rounded-lg bg-white overflow-hidden"
+                className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white md:size-8"
                 style={{ boxShadow: "0px 0px 0px 1px #e5e7eb" }}
               >
                 {/* Sized by `size-full` against the fixed 28/32px box, not by
@@ -175,26 +167,20 @@ export function GlobalBondDetailHero({
                   className="size-full object-cover"
                 />
               </div>
-              <h2 className="text-lg font-bold leading-[30px] text-[rgba(0,0,0,0.85)] md:text-[32px] md:leading-[48px] whitespace-nowrap">
+              <h2 className="text-lg leading-[30px] font-bold whitespace-nowrap text-[rgba(0,0,0,0.85)] md:text-[32px] md:leading-[48px]">
                 {issuer.title}
               </h2>
             </div>
-            <div className="hidden lg:flex flex-wrap gap-[7px] items-center">
-              <AssetTag
-                iconSrc={ASSET_TAG_ICONS.ticker}
-                label={labels.ticker(issuer.ticker)}
-              />
+            <div className="hidden flex-wrap items-center gap-[7px] lg:flex">
+              <AssetTag iconSrc={ASSET_TAG_ICONS.ticker} label={labels.ticker(issuer.ticker)} />
               <AssetTag
                 iconSrc={ASSET_TAG_ICONS.currency}
                 label={labels.currency(issuer.currency)}
               />
-              <AssetTag
-                iconSrc={ASSET_TAG_ICONS.rating}
-                label={issuer.creditRating}
-              />
+              <AssetTag iconSrc={ASSET_TAG_ICONS.rating} label={issuer.creditRating} />
             </div>
           </div>
-          <div className="flex flex-wrap gap-[7px] items-center lg:hidden">
+          <div className="flex flex-wrap items-center gap-[7px] lg:hidden">
             <AssetTag
               compact
               iconSrc={ASSET_TAG_ICONS.ticker}
@@ -205,30 +191,26 @@ export function GlobalBondDetailHero({
               iconSrc={ASSET_TAG_ICONS.currency}
               label={labels.currency(issuer.currency)}
             />
-            <AssetTag
-              compact
-              iconSrc={ASSET_TAG_ICONS.rating}
-              label={issuer.creditRating}
-            />
+            <AssetTag compact iconSrc={ASSET_TAG_ICONS.rating} label={issuer.creditRating} />
           </div>
         </div>
-        <p className="hidden md:block text-base font-semibold leading-[28px] text-[rgba(0,0,0,0.75)]">
+        <p className="hidden text-base leading-[28px] font-semibold text-[rgba(0,0,0,0.75)] md:block">
           {issuer.description}
         </p>
       </div>
 
       {/* Block 2: Description (mobile) + filters */}
-      <div className="relative flex flex-col gap-3 md:gap-2 w-full">
-        <p className="md:hidden text-sm font-semibold leading-[26px] text-[rgba(0,0,0,0.75)]">
+      <div className="relative flex w-full flex-col gap-3 md:gap-2">
+        <p className="text-sm leading-[26px] font-semibold text-[rgba(0,0,0,0.75)] md:hidden">
           {issuer.description}
         </p>
         <div
-          className={`flex-col gap-3 md:gap-2 lg:flex-row lg:gap-10 lg:items-start ${
+          className={`flex-col gap-3 md:gap-2 lg:flex-row lg:items-start lg:gap-10 ${
             showFilters ? "flex" : "hidden"
           }`}
         >
-          <div className="flex flex-col gap-2 min-w-0">
-            <span className="text-xs leading-[22px] text-[rgba(0,0,0,0.75)] md:text-sm md:leading-[26px] whitespace-nowrap">
+          <div className="flex min-w-0 flex-col gap-2">
+            <span className="text-xs leading-[22px] whitespace-nowrap text-[rgba(0,0,0,0.75)] md:text-sm md:leading-[26px]">
               {labels.estimatedYield}
             </span>
             <FilterPillGroup
@@ -238,8 +220,8 @@ export function GlobalBondDetailHero({
               onChange={onYieldChange}
             />
           </div>
-          <div className="flex flex-col gap-2 min-w-0">
-            <span className="text-sm leading-[26px] text-[rgba(0,0,0,0.75)] whitespace-nowrap">
+          <div className="flex min-w-0 flex-col gap-2">
+            <span className="text-sm leading-[26px] whitespace-nowrap text-[rgba(0,0,0,0.75)]">
               {labels.timeToMaturity}
             </span>
             <FilterPillGroup

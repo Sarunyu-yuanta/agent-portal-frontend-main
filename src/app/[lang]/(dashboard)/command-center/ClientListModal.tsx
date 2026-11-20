@@ -23,10 +23,7 @@ export function ClientListModal({
   const { isPrivate } = usePrivacy();
   const t = useT();
 
-  const sorted = useMemo(
-    () => [...clients].sort((a, b) => b.aum - a.aum),
-    [clients],
-  );
+  const sorted = useMemo(() => [...clients].sort((a, b) => b.aum - a.aum), [clients]);
 
   return (
     <ResponsiveBottomSheetModal
@@ -41,7 +38,7 @@ export function ClientListModal({
             {t.commandCenter.clientList.empty}
           </p>
         ) : (
-          <div className="overflow-hidden rounded-xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+          <div className="divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
             {sorted.map((client) => {
               const name = maskName(client.name, isPrivate);
               return (
@@ -52,15 +49,11 @@ export function ClientListModal({
                   className="flex items-center gap-3 p-3 no-underline transition-colors hover:bg-[var(--fill-p1-100)]"
                 >
                   <Avatar type="text" initials={getInitials(name)} size="m" />
-                  <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-                    <p className="truncate text-body font-bold text-foreground">
-                      {name}
-                    </p>
-                    <p className="truncate text-meta text-muted-foreground">
-                      {client.tier}
-                    </p>
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <p className="truncate text-body font-bold text-foreground">{name}</p>
+                    <p className="truncate text-meta text-muted-foreground">{client.tier}</p>
                   </div>
-                  <span className="shrink-0 text-label font-bold tabular-nums text-foreground">
+                  <span className="shrink-0 text-label font-bold text-foreground tabular-nums">
                     {formatAumThb(client.aum)}
                   </span>
                   <CaretRightIcon

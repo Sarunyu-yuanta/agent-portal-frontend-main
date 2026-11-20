@@ -45,7 +45,7 @@ function sequence(seed: number) {
   return {
     next,
     int: (min: number, max: number) => min + Math.floor(next() * (max - min + 1)),
-    pick: <T,>(items: readonly T[]) => items[Math.floor(next() * items.length)],
+    pick: <T>(items: readonly T[]) => items[Math.floor(next() * items.length)],
   };
 }
 
@@ -70,10 +70,34 @@ const STOCKS: Instrument[] = [...STOCK_TOP_PICK, ...getSectorStockBatch(0, 10)].
 
 /** Contract multipliers, so a contract's value reads like the real thing. */
 const TFEX: (Instrument & { multiplier: number })[] = [
-  { symbol: "S50H26", name: "SET50 Index Futures (Mar 2026)", price: 905.4, currency: "THB", multiplier: 200 },
-  { symbol: "S50M26", name: "SET50 Index Futures (Jun 2026)", price: 908.1, currency: "THB", multiplier: 200 },
-  { symbol: "USDH26", name: "USD Futures (Mar 2026)", price: 36.52, currency: "THB", multiplier: 1_000 },
-  { symbol: "GO10H26", name: "Gold Online Futures (Mar 2026)", price: 2_712.5, currency: "THB", multiplier: 10 },
+  {
+    symbol: "S50H26",
+    name: "SET50 Index Futures (Mar 2026)",
+    price: 905.4,
+    currency: "THB",
+    multiplier: 200,
+  },
+  {
+    symbol: "S50M26",
+    name: "SET50 Index Futures (Jun 2026)",
+    price: 908.1,
+    currency: "THB",
+    multiplier: 200,
+  },
+  {
+    symbol: "USDH26",
+    name: "USD Futures (Mar 2026)",
+    price: 36.52,
+    currency: "THB",
+    multiplier: 1_000,
+  },
+  {
+    symbol: "GO10H26",
+    name: "Gold Online Futures (Mar 2026)",
+    price: 2_712.5,
+    currency: "THB",
+    multiplier: 10,
+  },
 ];
 
 const FUNDS: Instrument[] = getTopPerformers("global-equity").map((f) => ({

@@ -57,7 +57,7 @@ export function MonthPicker({
           type="button"
           onClick={() => setYear((y) => y - 1)}
           aria-label={t.planner.calendar.previousYear}
-          className={`flex items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
+          className={`flex cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
             isMobile ? "size-9" : "size-7"
           }`}
         >
@@ -68,7 +68,7 @@ export function MonthPicker({
           type="button"
           onClick={() => setYear((y) => y + 1)}
           aria-label={t.planner.calendar.nextYear}
-          className={`flex items-center justify-center rounded-lg text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
+          className={`flex cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground ${
             isMobile ? "size-9" : "size-7"
           }`}
         >
@@ -97,11 +97,11 @@ export function MonthPicker({
                 onSelect(new Date(year, month, 1));
                 dismiss();
               }}
-              className={`rounded-lg type-body-2 transition-colors cursor-pointer ${
+              className={`type-body-2 cursor-pointer rounded-lg transition-colors ${
                 isMobile ? "py-3" : "py-1.5"
               } ${
                 selected
-                  ? "bg-primary-action text-white font-medium hover:bg-[var(--primary-action-hover)]!"
+                  ? "bg-primary-action font-medium text-white hover:bg-[var(--primary-action-hover)]!"
                   : isThisMonth
                     ? "text-primary-action font-medium hover:bg-[var(--bg-default-secondary)]!"
                     : "text-foreground hover:bg-[var(--bg-default-secondary)]!"
@@ -117,53 +117,53 @@ export function MonthPicker({
 
   return (
     <>
-    {/* Kept mounted on a phone even though it never opens there, for the reason
+      {/* Kept mounted on a phone even though it never opens there, for the reason
         `DayCell` documents: Radix's `asChild` trigger writes attributes onto the
         button below, and dropping the wrapper on the client only would leave the
         server's markup disagreeing with it. */}
-    <Popover
-      open={!isMobile && open}
-      onOpenChange={handleOpenChange}
-      side="bottom"
-      align="start"
-      sideOffset={6}
-      className="p-0 overflow-hidden shadow-lg"
-      content={!isMobile && open ? panel(() => setOpen(false)) : null}
-    >
-      <button
-        type="button"
-        aria-label={t.planner.calendar.changeMonth}
-        // On a phone the Popover isn't listening, so the trigger opens the sheet
-        // itself. Reset the browsed year here too — `handleOpenChange` is the
-        // Popover's callback and never fires on that path.
-        onClick={isMobile ? () => handleOpenChange(true) : undefined}
-        className="flex min-w-0 items-center gap-1 rounded-lg px-1.5 py-1 transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]!"
+      <Popover
+        open={!isMobile && open}
+        onOpenChange={handleOpenChange}
+        side="bottom"
+        align="start"
+        sideOffset={6}
+        className="overflow-hidden p-0 shadow-lg"
+        content={!isMobile && open ? panel(() => setOpen(false)) : null}
       >
-        <span className="type-body-1 font-semibold text-foreground truncate">
-          {monthLabel(value, locale)}
-        </span>
-        <CaretDownIcon
-          size={13}
-          className={`shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-    </Popover>
+        <button
+          type="button"
+          aria-label={t.planner.calendar.changeMonth}
+          // On a phone the Popover isn't listening, so the trigger opens the sheet
+          // itself. Reset the browsed year here too — `handleOpenChange` is the
+          // Popover's callback and never fires on that path.
+          onClick={isMobile ? () => handleOpenChange(true) : undefined}
+          className="flex min-w-0 cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 transition-colors hover:bg-[var(--bg-default-secondary)]!"
+        >
+          <span className="type-body-1 truncate font-semibold text-foreground">
+            {monthLabel(value, locale)}
+          </span>
+          <CaretDownIcon
+            size={13}
+            className={`shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </Popover>
 
-    {/* See `DayCell` for why this is mounted rather than gated on `open`, and
+      {/* See `DayCell` for why this is mounted rather than gated on `open`, and
         why the sheet's own padding is turned off — the grid sets its own, and
         its bottom edge already clears the home indicator. */}
-    {isMobile && (
-      <BottomSheet
-        open={open}
-        onOpenChange={handleOpenChange}
-        showHeader={false}
-        title={t.planner.calendar.changeMonth}
-        className="px-0 pb-0"
-        contentClassName="pt-0"
-      >
-        {panel(() => setOpen(false))}
-      </BottomSheet>
-    )}
+      {isMobile && (
+        <BottomSheet
+          open={open}
+          onOpenChange={handleOpenChange}
+          showHeader={false}
+          title={t.planner.calendar.changeMonth}
+          className="px-0 pb-0"
+          contentClassName="pt-0"
+        >
+          {panel(() => setOpen(false))}
+        </BottomSheet>
+      )}
     </>
   );
 }

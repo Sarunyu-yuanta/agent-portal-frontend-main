@@ -17,44 +17,109 @@
         { "label": "กองทุนรวม", "percent": 8, "statusIcon": "/asset-allocation/status-4.svg" },
         { "label": "ตราสารหนี้", "percent": 6, "statusIcon": "/asset-allocation/status-5.svg" },
         { "label": "อนุพันธ์", "percent": 3, "statusIcon": "/asset-allocation/status-6.svg" },
-        { "label": "ตราสารหนี้ต่างประเทศ", "percent": 1, "statusIcon": "/asset-allocation/status-7.svg" }
+        {
+          "label": "ตราสารหนี้ต่างประเทศ",
+          "percent": 1,
+          "statusIcon": "/asset-allocation/status-7.svg"
+        }
       ]
     },
     "allocationData": [
-      { "name": "Thai Equity",   "value": 35, "fill": "#3b82f6" },
-      { "name": "Fixed Income",  "value": 28, "fill": "#8b5cf6" },
+      { "name": "Thai Equity", "value": 35, "fill": "#3b82f6" },
+      { "name": "Fixed Income", "value": 28, "fill": "#8b5cf6" },
       { "name": "Global Equity", "value": 19, "fill": "#10b981" },
-      { "name": "Cash / MMF",    "value": 18, "fill": "#f59e0b" }
+      { "name": "Cash / MMF", "value": 18, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Thai Equity",   "value": "฿ 157M", "ytd": "+12.4%", "ytdPositive": true  },
-      { "label": "Fixed Income",  "value": "฿ 126M", "ytd": "-1.8%",  "ytdPositive": false },
-      { "label": "Global Equity", "value": "฿ 85M",  "ytd": "+15.6%", "ytdPositive": true  },
-      { "label": "Cash / MMF",    "value": "฿ 81M",  "ytd": "+0.5%",  "ytdPositive": true, "warning": "18% — above 10% target" }
+      { "label": "Thai Equity", "value": "฿ 157M", "ytd": "+12.4%", "ytdPositive": true },
+      { "label": "Fixed Income", "value": "฿ 126M", "ytd": "-1.8%", "ytdPositive": false },
+      { "label": "Global Equity", "value": "฿ 85M", "ytd": "+15.6%", "ytdPositive": true },
+      {
+        "label": "Cash / MMF",
+        "value": "฿ 81M",
+        "ytd": "+0.5%",
+        "ytdPositive": true,
+        "warning": "18% — above 10% target"
+      }
     ],
     "topHoldings": [
-      { "asset": "PTT PCL",            "value": "฿ 85M", "pnl": "+฿ 12.4M", "pnlPct": "+17.1%", "positive": true,  "pct": "18.9%" },
-      { "asset": "BBL Equity Fund",    "value": "฿ 63M", "pnl": "+฿ 4.1M",  "pnlPct": "+7.0%",  "positive": true,  "pct": "14.0%" },
-      { "asset": "Thai Gov Bond 2028", "value": "฿ 52M", "pnl": "-฿ 1.2M",  "pnlPct": "-2.3%",  "positive": false, "pct": "11.6%" },
-      { "asset": "Apple Inc (AAPL)",   "value": "฿ 47M", "pnl": "+฿ 8.9M",  "pnlPct": "+23.4%", "positive": true,  "pct": "10.4%" },
-      { "asset": "Cash / MMF",         "value": "฿ 81M", "pnl": "฿ 0",       "pnlPct": "0.0%",   "positive": true,  "pct": "18.0%" }
+      {
+        "asset": "PTT PCL",
+        "value": "฿ 85M",
+        "pnl": "+฿ 12.4M",
+        "pnlPct": "+17.1%",
+        "positive": true,
+        "pct": "18.9%"
+      },
+      {
+        "asset": "BBL Equity Fund",
+        "value": "฿ 63M",
+        "pnl": "+฿ 4.1M",
+        "pnlPct": "+7.0%",
+        "positive": true,
+        "pct": "14.0%"
+      },
+      {
+        "asset": "Thai Gov Bond 2028",
+        "value": "฿ 52M",
+        "pnl": "-฿ 1.2M",
+        "pnlPct": "-2.3%",
+        "positive": false,
+        "pct": "11.6%"
+      },
+      {
+        "asset": "Apple Inc (AAPL)",
+        "value": "฿ 47M",
+        "pnl": "+฿ 8.9M",
+        "pnlPct": "+23.4%",
+        "positive": true,
+        "pct": "10.4%"
+      },
+      {
+        "asset": "Cash / MMF",
+        "value": "฿ 81M",
+        "pnl": "฿ 0",
+        "pnlPct": "0.0%",
+        "positive": true,
+        "pct": "18.0%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "In-person + WhatsApp"               },
-      { "label": "Product Preference", "value": "Structured Products"                },
-      { "label": "Trade Frequency",    "value": "Monthly"                            },
-      { "label": "AI Observation",     "value": "Responds to yield-focused pitches"  }
+      { "label": "Engagement Style", "value": "In-person + WhatsApp" },
+      { "label": "Product Preference", "value": "Structured Products" },
+      { "label": "Trade Frequency", "value": "Monthly" },
+      { "label": "AI Observation", "value": "Responds to yield-focused pitches" }
     ],
     "tasks": [
-      { "id": "t1-1", "done": false, "task": "KYC renewal form — due Jun 11",   "urgent": true  },
-      { "id": "t1-2", "done": false, "task": "Q2 portfolio review meeting",      "urgent": false },
-      { "id": "t1-3", "done": true,  "task": "Annual risk profile update",       "urgent": false }
+      { "id": "t1-1", "done": false, "task": "KYC renewal form — due Jun 11", "urgent": true },
+      { "id": "t1-2", "done": false, "task": "Q2 portfolio review meeting", "urgent": false },
+      { "id": "t1-3", "done": true, "task": "Annual risk profile update", "urgent": false }
     ],
     "recentActivity": [
-      { "label": "Called — discussed Q2 portfolio",        "description": "Reviewed tech sector exposure. Client requested FX hedging options.", "date": "May 26", "dotColor": "bg-[var(--bg-brand-primary)]"            },
-      { "label": "Proposal sent — Structured Note ฿50M",  "description": "AI-drafted proposal emailed for client review.",                      "date": "May 22", "dotColor": "bg-[var(--bg-success-primary)]"          },
-      { "label": "KYC reminder sent via email",            "description": "Automated notification for upcoming renewal.",                         "date": "May 20", "dotColor": "bg-[var(--bg-warning-primary)]"          },
-      { "label": "Portfolio review completed",             "description": "Q1 allocation targets met. No rebalancing needed.",                    "date": "May 15", "dotColor": "bg-[var(--bg-default-secondary-medium)]" }
+      {
+        "label": "Called — discussed Q2 portfolio",
+        "description": "Reviewed tech sector exposure. Client requested FX hedging options.",
+        "date": "May 26",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Proposal sent — Structured Note ฿50M",
+        "description": "AI-drafted proposal emailed for client review.",
+        "date": "May 22",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "KYC reminder sent via email",
+        "description": "Automated notification for upcoming renewal.",
+        "date": "May 20",
+        "dotColor": "bg-[var(--bg-warning-primary)]"
+      },
+      {
+        "label": "Portfolio review completed",
+        "description": "Q1 allocation targets met. No rebalancing needed.",
+        "date": "May 15",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Revenue Opportunity",
@@ -80,38 +145,109 @@
       "lastUpdatedTime": "11:45"
     },
     "allocationData": [
-      { "name": "Thai Equity",  "value": 28, "fill": "#3b82f6" },
+      { "name": "Thai Equity", "value": 28, "fill": "#3b82f6" },
       { "name": "Fixed Income", "value": 40, "fill": "#8b5cf6" },
-      { "name": "Cash / MMF",   "value": 32, "fill": "#f59e0b" }
+      { "name": "Cash / MMF", "value": 32, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Thai Equity",  "value": "฿ 50M", "ytd": "-6.0%", "ytdPositive": false },
-      { "label": "Fixed Income", "value": "฿ 72M", "ytd": "+1.3%", "ytdPositive": true  },
-      { "label": "Cash / MMF",   "value": "฿ 58M", "ytd": "+0.3%", "ytdPositive": true, "warning": "32% — above 15% target" }
+      { "label": "Thai Equity", "value": "฿ 50M", "ytd": "-6.0%", "ytdPositive": false },
+      { "label": "Fixed Income", "value": "฿ 72M", "ytd": "+1.3%", "ytdPositive": true },
+      {
+        "label": "Cash / MMF",
+        "value": "฿ 58M",
+        "ytd": "+0.3%",
+        "ytdPositive": true,
+        "warning": "32% — above 15% target"
+      }
     ],
     "topHoldings": [
-      { "asset": "IG Corporate Bond Fund", "value": "฿ 42M", "pnl": "-฿ 2.1M", "pnlPct": "-4.8%", "positive": false, "pct": "23.3%" },
-      { "asset": "SET50 ETF",              "value": "฿ 28M", "pnl": "-฿ 1.8M", "pnlPct": "-6.0%", "positive": false, "pct": "15.6%" },
-      { "asset": "Thai Gov Bond 2030",     "value": "฿ 30M", "pnl": "+฿ 0.4M", "pnlPct": "+1.3%", "positive": true,  "pct": "16.7%" },
-      { "asset": "Money Market Fund",      "value": "฿ 22M", "pnl": "+฿ 0.3M", "pnlPct": "+1.4%", "positive": true,  "pct": "12.2%" },
-      { "asset": "Cash (Idle)",            "value": "฿ 58M", "pnl": "฿ 0",      "pnlPct": "0.0%",  "positive": true,  "pct": "32.2%" }
+      {
+        "asset": "IG Corporate Bond Fund",
+        "value": "฿ 42M",
+        "pnl": "-฿ 2.1M",
+        "pnlPct": "-4.8%",
+        "positive": false,
+        "pct": "23.3%"
+      },
+      {
+        "asset": "SET50 ETF",
+        "value": "฿ 28M",
+        "pnl": "-฿ 1.8M",
+        "pnlPct": "-6.0%",
+        "positive": false,
+        "pct": "15.6%"
+      },
+      {
+        "asset": "Thai Gov Bond 2030",
+        "value": "฿ 30M",
+        "pnl": "+฿ 0.4M",
+        "pnlPct": "+1.3%",
+        "positive": true,
+        "pct": "16.7%"
+      },
+      {
+        "asset": "Money Market Fund",
+        "value": "฿ 22M",
+        "pnl": "+฿ 0.3M",
+        "pnlPct": "+1.4%",
+        "positive": true,
+        "pct": "12.2%"
+      },
+      {
+        "asset": "Cash (Idle)",
+        "value": "฿ 58M",
+        "pnl": "฿ 0",
+        "pnlPct": "0.0%",
+        "positive": true,
+        "pct": "32.2%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "Email + Phone"                     },
-      { "label": "Product Preference", "value": "Fixed Income + Mutual Funds"       },
-      { "label": "Trade Frequency",    "value": "Quarterly"                         },
-      { "label": "AI Observation",     "value": "Risk-averse; prefers capital protection" }
+      { "label": "Engagement Style", "value": "Email + Phone" },
+      { "label": "Product Preference", "value": "Fixed Income + Mutual Funds" },
+      { "label": "Trade Frequency", "value": "Quarterly" },
+      { "label": "AI Observation", "value": "Risk-averse; prefers capital protection" }
     ],
     "tasks": [
-      { "id": "t2-1", "done": false, "task": "KYC renewal — expires Jun 11 (URGENT)",    "urgent": true  },
-      { "id": "t2-2", "done": false, "task": "Portfolio loss review — suitability check", "urgent": true  },
-      { "id": "t2-3", "done": false, "task": "Source of wealth documentation",            "urgent": false }
+      {
+        "id": "t2-1",
+        "done": false,
+        "task": "KYC renewal — expires Jun 11 (URGENT)",
+        "urgent": true
+      },
+      {
+        "id": "t2-2",
+        "done": false,
+        "task": "Portfolio loss review — suitability check",
+        "urgent": true
+      },
+      { "id": "t2-3", "done": false, "task": "Source of wealth documentation", "urgent": false }
     ],
     "recentActivity": [
-      { "label": "KYC Renewal Reminder Sent",  "description": "Automated email sent for upcoming KYC expiry.",                         "date": "Jun 1",  "dotColor": "bg-[var(--bg-warning-primary)]"          },
-      { "label": "Compliance Alert Triggered", "description": "Missing Source of Wealth flag raised by compliance system.",             "date": "May 28", "dotColor": "bg-[var(--bg-danger-primary)]"           },
-      { "label": "Phone Call",                 "description": "Brief check-in. Client asked about bond market outlook.",               "date": "May 20", "dotColor": "bg-[var(--bg-success-primary)]"          },
-      { "label": "Monthly Statement Sent",     "description": "Automated May statement delivered via email.",                           "date": "May 1",  "dotColor": "bg-[var(--bg-default-secondary-medium)]" }
+      {
+        "label": "KYC Renewal Reminder Sent",
+        "description": "Automated email sent for upcoming KYC expiry.",
+        "date": "Jun 1",
+        "dotColor": "bg-[var(--bg-warning-primary)]"
+      },
+      {
+        "label": "Compliance Alert Triggered",
+        "description": "Missing Source of Wealth flag raised by compliance system.",
+        "date": "May 28",
+        "dotColor": "bg-[var(--bg-danger-primary)]"
+      },
+      {
+        "label": "Phone Call",
+        "description": "Brief check-in. Client asked about bond market outlook.",
+        "date": "May 20",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Monthly Statement Sent",
+        "description": "Automated May statement delivered via email.",
+        "date": "May 1",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — KYC Expiry in 14 Days",
@@ -138,39 +274,104 @@
     },
     "allocationData": [
       { "name": "Fixed Income", "value": 55, "fill": "#8b5cf6" },
-      { "name": "Thai Equity",  "value": 30, "fill": "#3b82f6" },
-      { "name": "REITs",        "value": 7,  "fill": "#f97316" },
-      { "name": "Cash / MMF",   "value": 8,  "fill": "#f59e0b" }
+      { "name": "Thai Equity", "value": 30, "fill": "#3b82f6" },
+      { "name": "REITs", "value": 7, "fill": "#f97316" },
+      { "name": "Cash / MMF", "value": 8, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Fixed Income", "value": "฿ 52M",  "ytd": "+5.8%", "ytdPositive": true  },
-      { "label": "Thai Equity",  "value": "฿ 28M",  "ytd": "+6.4%", "ytdPositive": true  },
-      { "label": "REITs",        "value": "฿ 6.7M", "ytd": "-4.4%", "ytdPositive": false },
-      { "label": "Cash / MMF",   "value": "฿ 7.6M", "ytd": "+1.3%", "ytdPositive": true  }
+      { "label": "Fixed Income", "value": "฿ 52M", "ytd": "+5.8%", "ytdPositive": true },
+      { "label": "Thai Equity", "value": "฿ 28M", "ytd": "+6.4%", "ytdPositive": true },
+      { "label": "REITs", "value": "฿ 6.7M", "ytd": "-4.4%", "ytdPositive": false },
+      { "label": "Cash / MMF", "value": "฿ 7.6M", "ytd": "+1.3%", "ytdPositive": true }
     ],
     "topHoldings": [
-      { "asset": "Short Duration Bond ETF", "value": "฿ 30M",  "pnl": "+฿ 1.8M", "pnlPct": "+6.4%", "positive": true,  "pct": "31.6%" },
-      { "asset": "IG Corporate Bond Fund",  "value": "฿ 22M",  "pnl": "+฿ 1.1M", "pnlPct": "+5.3%", "positive": true,  "pct": "23.2%" },
-      { "asset": "SET50 ETF",               "value": "฿ 15M",  "pnl": "+฿ 0.9M", "pnlPct": "+6.4%", "positive": true,  "pct": "15.8%" },
-      { "asset": "Global REITs Fund",       "value": "฿ 6.5M", "pnl": "-฿ 0.3M", "pnlPct": "-4.4%", "positive": false, "pct": "6.8%"  },
-      { "asset": "Cash / MMF",              "value": "฿ 7.6M", "pnl": "+฿ 0.1M", "pnlPct": "+1.3%", "positive": true,  "pct": "8.0%"  }
+      {
+        "asset": "Short Duration Bond ETF",
+        "value": "฿ 30M",
+        "pnl": "+฿ 1.8M",
+        "pnlPct": "+6.4%",
+        "positive": true,
+        "pct": "31.6%"
+      },
+      {
+        "asset": "IG Corporate Bond Fund",
+        "value": "฿ 22M",
+        "pnl": "+฿ 1.1M",
+        "pnlPct": "+5.3%",
+        "positive": true,
+        "pct": "23.2%"
+      },
+      {
+        "asset": "SET50 ETF",
+        "value": "฿ 15M",
+        "pnl": "+฿ 0.9M",
+        "pnlPct": "+6.4%",
+        "positive": true,
+        "pct": "15.8%"
+      },
+      {
+        "asset": "Global REITs Fund",
+        "value": "฿ 6.5M",
+        "pnl": "-฿ 0.3M",
+        "pnlPct": "-4.4%",
+        "positive": false,
+        "pct": "6.8%"
+      },
+      {
+        "asset": "Cash / MMF",
+        "value": "฿ 7.6M",
+        "pnl": "+฿ 0.1M",
+        "pnlPct": "+1.3%",
+        "positive": true,
+        "pct": "8.0%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "Email only"                          },
-      { "label": "Product Preference", "value": "Fixed Income + REITs"               },
-      { "label": "Trade Frequency",    "value": "Semi-annual"                         },
-      { "label": "AI Observation",     "value": "Values stability; rarely switches products" }
+      { "label": "Engagement Style", "value": "Email only" },
+      { "label": "Product Preference", "value": "Fixed Income + REITs" },
+      { "label": "Trade Frequency", "value": "Semi-annual" },
+      { "label": "AI Observation", "value": "Values stability; rarely switches products" }
     ],
     "tasks": [
-      { "id": "t3-1", "done": false, "task": "Annual review meeting — book for Jun",     "urgent": false },
-      { "id": "t3-2", "done": true,  "task": "Bond ladder rebalancing completed",        "urgent": false },
-      { "id": "t3-3", "done": false, "task": "Pitch REITs diversification opportunity",  "urgent": false }
+      {
+        "id": "t3-1",
+        "done": false,
+        "task": "Annual review meeting — book for Jun",
+        "urgent": false
+      },
+      { "id": "t3-2", "done": true, "task": "Bond ladder rebalancing completed", "urgent": false },
+      {
+        "id": "t3-3",
+        "done": false,
+        "task": "Pitch REITs diversification opportunity",
+        "urgent": false
+      }
     ],
     "recentActivity": [
-      { "label": "Monthly Statement Viewed",  "description": "Client accessed May statement via portal.",                       "date": "Jun 1",  "dotColor": "bg-[var(--bg-brand-primary)]"            },
-      { "label": "Bond Ladder Rebalancing",   "description": "Executed per client instruction. New duration: 3.2 years.",      "date": "May 18", "dotColor": "bg-[var(--bg-success-primary)]"          },
-      { "label": "Annual Review Email Sent",  "description": "Pre-meeting summary of portfolio performance.",                   "date": "May 10", "dotColor": "bg-[var(--bg-default-secondary-medium)]" },
-      { "label": "Product Brochure Opened",   "description": "Client opened REITs fund brochure — high engagement.",           "date": "Apr 28", "dotColor": "bg-[var(--bg-brand-primary)]"            }
+      {
+        "label": "Monthly Statement Viewed",
+        "description": "Client accessed May statement via portal.",
+        "date": "Jun 1",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Bond Ladder Rebalancing",
+        "description": "Executed per client instruction. New duration: 3.2 years.",
+        "date": "May 18",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Annual Review Email Sent",
+        "description": "Pre-meeting summary of portfolio performance.",
+        "date": "May 10",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      },
+      {
+        "label": "Product Brochure Opened",
+        "description": "Client opened REITs fund brochure — high engagement.",
+        "date": "Apr 28",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      }
     ],
     "aiHighPriority": null,
     "aiRiskAlert": {
@@ -192,41 +393,106 @@
     },
     "allocationData": [
       { "name": "Global Equity", "value": 42, "fill": "#10b981" },
-      { "name": "Thai Equity",   "value": 28, "fill": "#3b82f6" },
-      { "name": "Fixed Income",  "value": 15, "fill": "#8b5cf6" },
-      { "name": "Alternatives",  "value": 10, "fill": "#f97316" },
-      { "name": "Cash / MMF",    "value": 5,  "fill": "#f59e0b" }
+      { "name": "Thai Equity", "value": 28, "fill": "#3b82f6" },
+      { "name": "Fixed Income", "value": 15, "fill": "#8b5cf6" },
+      { "name": "Alternatives", "value": 10, "fill": "#f97316" },
+      { "name": "Cash / MMF", "value": 5, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
       { "label": "Global Equity", "value": "฿ 260M", "ytd": "+22.1%", "ytdPositive": true },
-      { "label": "Thai Equity",   "value": "฿ 174M", "ytd": "+15.4%", "ytdPositive": true },
-      { "label": "Fixed Income",  "value": "฿ 93M",  "ytd": "+3.8%",  "ytdPositive": true },
-      { "label": "Alternatives",  "value": "฿ 62M",  "ytd": "+16.8%", "ytdPositive": true },
-      { "label": "Cash / MMF",    "value": "฿ 31M",  "ytd": "+1.3%",  "ytdPositive": true }
+      { "label": "Thai Equity", "value": "฿ 174M", "ytd": "+15.4%", "ytdPositive": true },
+      { "label": "Fixed Income", "value": "฿ 93M", "ytd": "+3.8%", "ytdPositive": true },
+      { "label": "Alternatives", "value": "฿ 62M", "ytd": "+16.8%", "ytdPositive": true },
+      { "label": "Cash / MMF", "value": "฿ 31M", "ytd": "+1.3%", "ytdPositive": true }
     ],
     "topHoldings": [
-      { "asset": "Nvidia Corp (NVDA)",        "value": "฿ 124M", "pnl": "+฿ 48.2M", "pnlPct": "+63.4%", "positive": true, "pct": "20.0%" },
-      { "asset": "Asia Growth ETF",           "value": "฿ 93M",  "pnl": "+฿ 14.1M", "pnlPct": "+17.9%", "positive": true, "pct": "15.0%" },
-      { "asset": "Private Equity Fund III",   "value": "฿ 62M",  "pnl": "+฿ 8.9M",  "pnlPct": "+16.8%", "positive": true, "pct": "10.0%" },
-      { "asset": "Structured Note Series 11", "value": "฿ 55M",  "pnl": "+฿ 4.7M",  "pnlPct": "+9.4%",  "positive": true, "pct": "8.9%"  },
-      { "asset": "Cash / MMF",                "value": "฿ 31M",  "pnl": "+฿ 0.4M",  "pnlPct": "+1.3%",  "positive": true, "pct": "5.0%"  }
+      {
+        "asset": "Nvidia Corp (NVDA)",
+        "value": "฿ 124M",
+        "pnl": "+฿ 48.2M",
+        "pnlPct": "+63.4%",
+        "positive": true,
+        "pct": "20.0%"
+      },
+      {
+        "asset": "Asia Growth ETF",
+        "value": "฿ 93M",
+        "pnl": "+฿ 14.1M",
+        "pnlPct": "+17.9%",
+        "positive": true,
+        "pct": "15.0%"
+      },
+      {
+        "asset": "Private Equity Fund III",
+        "value": "฿ 62M",
+        "pnl": "+฿ 8.9M",
+        "pnlPct": "+16.8%",
+        "positive": true,
+        "pct": "10.0%"
+      },
+      {
+        "asset": "Structured Note Series 11",
+        "value": "฿ 55M",
+        "pnl": "+฿ 4.7M",
+        "pnlPct": "+9.4%",
+        "positive": true,
+        "pct": "8.9%"
+      },
+      {
+        "asset": "Cash / MMF",
+        "value": "฿ 31M",
+        "pnl": "+฿ 0.4M",
+        "pnlPct": "+1.3%",
+        "positive": true,
+        "pct": "5.0%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "In-person (prefers office meetings)"  },
-      { "label": "Product Preference", "value": "Global Equity + Alternatives"         },
-      { "label": "Trade Frequency",    "value": "Bi-weekly"                            },
-      { "label": "AI Observation",     "value": "High conviction; fast decision maker" }
+      { "label": "Engagement Style", "value": "In-person (prefers office meetings)" },
+      { "label": "Product Preference", "value": "Global Equity + Alternatives" },
+      { "label": "Trade Frequency", "value": "Bi-weekly" },
+      { "label": "AI Observation", "value": "High conviction; fast decision maker" }
     ],
     "tasks": [
-      { "id": "t4-1", "done": false, "task": "Pitch Structured Note Series 12 (8.5%)", "urgent": false },
-      { "id": "t4-2", "done": false, "task": "Q3 strategy session — book venue",        "urgent": false },
-      { "id": "t4-3", "done": true,  "task": "Rebalancing to reduce equity overweight", "urgent": false }
+      {
+        "id": "t4-1",
+        "done": false,
+        "task": "Pitch Structured Note Series 12 (8.5%)",
+        "urgent": false
+      },
+      { "id": "t4-2", "done": false, "task": "Q3 strategy session — book venue", "urgent": false },
+      {
+        "id": "t4-3",
+        "done": true,
+        "task": "Rebalancing to reduce equity overweight",
+        "urgent": false
+      }
     ],
     "recentActivity": [
-      { "label": "Structured Note Pitch",          "description": "Presented Series 12. Client interested, requested term sheet.",    "date": "Jun 1",  "dotColor": "bg-[var(--bg-brand-primary)]"   },
-      { "label": "Portfolio Rebalancing Executed", "description": "Reduced Global Equity from 48% to 42% per target.",               "date": "May 24", "dotColor": "bg-[var(--bg-success-primary)]" },
-      { "label": "Q2 Review Meeting",              "description": "In-office session. Discussed AI sector outlook.",                  "date": "May 15", "dotColor": "bg-[var(--bg-success-primary)]" },
-      { "label": "Private Equity Commitment",      "description": "Client committed ฿ 62M to PE Fund III. Wire received.",           "date": "May 5",  "dotColor": "bg-[var(--bg-brand-primary)]"   }
+      {
+        "label": "Structured Note Pitch",
+        "description": "Presented Series 12. Client interested, requested term sheet.",
+        "date": "Jun 1",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Portfolio Rebalancing Executed",
+        "description": "Reduced Global Equity from 48% to 42% per target.",
+        "date": "May 24",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Q2 Review Meeting",
+        "description": "In-office session. Discussed AI sector outlook.",
+        "date": "May 15",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Private Equity Commitment",
+        "description": "Client committed ฿ 62M to PE Fund III. Wire received.",
+        "date": "May 5",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Product Match: Series 12",
@@ -248,38 +514,109 @@
       "lastUpdatedTime": "16:30"
     },
     "allocationData": [
-      { "name": "Thai Equity",  "value": 50, "fill": "#3b82f6" },
+      { "name": "Thai Equity", "value": 50, "fill": "#3b82f6" },
       { "name": "Fixed Income", "value": 22, "fill": "#8b5cf6" },
-      { "name": "Cash / MMF",   "value": 28, "fill": "#f59e0b" }
+      { "name": "Cash / MMF", "value": 28, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Thai Equity",  "value": "฿ 65M", "ytd": "-1.5%", "ytdPositive": false },
-      { "label": "Fixed Income", "value": "฿ 29M", "ytd": "+2.1%", "ytdPositive": true  },
-      { "label": "Cash / MMF",   "value": "฿ 36M", "ytd": "+0.3%", "ytdPositive": true, "warning": "28% — above 15% target" }
+      { "label": "Thai Equity", "value": "฿ 65M", "ytd": "-1.5%", "ytdPositive": false },
+      { "label": "Fixed Income", "value": "฿ 29M", "ytd": "+2.1%", "ytdPositive": true },
+      {
+        "label": "Cash / MMF",
+        "value": "฿ 36M",
+        "ytd": "+0.3%",
+        "ytdPositive": true,
+        "warning": "28% — above 15% target"
+      }
     ],
     "topHoldings": [
-      { "asset": "SET50 ETF",          "value": "฿ 38M", "pnl": "-฿ 2.6M", "pnlPct": "-6.4%", "positive": false, "pct": "29.2%" },
-      { "asset": "BBL Equity Fund",    "value": "฿ 27M", "pnl": "-฿ 0.8M", "pnlPct": "-2.9%", "positive": false, "pct": "20.8%" },
-      { "asset": "IG Corporate Bond",  "value": "฿ 29M", "pnl": "+฿ 0.6M", "pnlPct": "+2.1%", "positive": true,  "pct": "22.3%" },
-      { "asset": "Money Market Fund",  "value": "฿ 18M", "pnl": "+฿ 0.2M", "pnlPct": "+1.1%", "positive": true,  "pct": "13.8%" },
-      { "asset": "Cash (Idle)",        "value": "฿ 18M", "pnl": "฿ 0",      "pnlPct": "0.0%",  "positive": true,  "pct": "13.8%" }
+      {
+        "asset": "SET50 ETF",
+        "value": "฿ 38M",
+        "pnl": "-฿ 2.6M",
+        "pnlPct": "-6.4%",
+        "positive": false,
+        "pct": "29.2%"
+      },
+      {
+        "asset": "BBL Equity Fund",
+        "value": "฿ 27M",
+        "pnl": "-฿ 0.8M",
+        "pnlPct": "-2.9%",
+        "positive": false,
+        "pct": "20.8%"
+      },
+      {
+        "asset": "IG Corporate Bond",
+        "value": "฿ 29M",
+        "pnl": "+฿ 0.6M",
+        "pnlPct": "+2.1%",
+        "positive": true,
+        "pct": "22.3%"
+      },
+      {
+        "asset": "Money Market Fund",
+        "value": "฿ 18M",
+        "pnl": "+฿ 0.2M",
+        "pnlPct": "+1.1%",
+        "positive": true,
+        "pct": "13.8%"
+      },
+      {
+        "asset": "Cash (Idle)",
+        "value": "฿ 18M",
+        "pnl": "฿ 0",
+        "pnlPct": "0.0%",
+        "positive": true,
+        "pct": "13.8%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "LINE + Phone"                         },
-      { "label": "Product Preference", "value": "Equity Funds"                         },
-      { "label": "Trade Frequency",    "value": "Irregular"                            },
-      { "label": "AI Observation",     "value": "Disengaged; responds to market alerts"}
+      { "label": "Engagement Style", "value": "LINE + Phone" },
+      { "label": "Product Preference", "value": "Equity Funds" },
+      { "label": "Trade Frequency", "value": "Irregular" },
+      { "label": "AI Observation", "value": "Disengaged; responds to market alerts" }
     ],
     "tasks": [
-      { "id": "t5-1", "done": false, "task": "Re-engage — call to discuss market outlook",  "urgent": true  },
-      { "id": "t5-2", "done": false, "task": "Missing Source of Wealth documentation",       "urgent": false },
-      { "id": "t5-3", "done": false, "task": "DCA Equity Fund pitch",                        "urgent": false }
+      {
+        "id": "t5-1",
+        "done": false,
+        "task": "Re-engage — call to discuss market outlook",
+        "urgent": true
+      },
+      {
+        "id": "t5-2",
+        "done": false,
+        "task": "Missing Source of Wealth documentation",
+        "urgent": false
+      },
+      { "id": "t5-3", "done": false, "task": "DCA Equity Fund pitch", "urgent": false }
     ],
     "recentActivity": [
-      { "label": "No Recent Contact",       "description": "Last engagement 14 days ago — engagement score -22 points.", "date": "May 19", "dotColor": "bg-[var(--bg-danger-primary)]"           },
-      { "label": "Product Brochure Opened", "description": "Client opened Bond Fund brochure sent via LINE.",            "date": "May 15", "dotColor": "bg-[var(--bg-brand-primary)]"            },
-      { "label": "Portfolio Alert Sent",    "description": "Thai Equity down -6.4% vs benchmark alert.",                 "date": "May 10", "dotColor": "bg-[var(--bg-warning-primary)]"          },
-      { "label": "Last Phone Call",         "description": "Brief check-in. Client requested callback.",                 "date": "May 5",  "dotColor": "bg-[var(--bg-default-secondary-medium)]" }
+      {
+        "label": "No Recent Contact",
+        "description": "Last engagement 14 days ago — engagement score -22 points.",
+        "date": "May 19",
+        "dotColor": "bg-[var(--bg-danger-primary)]"
+      },
+      {
+        "label": "Product Brochure Opened",
+        "description": "Client opened Bond Fund brochure sent via LINE.",
+        "date": "May 15",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Portfolio Alert Sent",
+        "description": "Thai Equity down -6.4% vs benchmark alert.",
+        "date": "May 10",
+        "dotColor": "bg-[var(--bg-warning-primary)]"
+      },
+      {
+        "label": "Last Phone Call",
+        "description": "Brief check-in. Client requested callback.",
+        "date": "May 5",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Re-engage Client",
@@ -306,37 +643,102 @@
     },
     "allocationData": [
       { "name": "Fixed Income", "value": 48, "fill": "#8b5cf6" },
-      { "name": "Thai Equity",  "value": 40, "fill": "#3b82f6" },
-      { "name": "Cash / MMF",   "value": 12, "fill": "#f59e0b" }
+      { "name": "Thai Equity", "value": 40, "fill": "#3b82f6" },
+      { "name": "Cash / MMF", "value": 12, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
       { "label": "Fixed Income", "value": "฿ 36M", "ytd": "+5.2%", "ytdPositive": true },
-      { "label": "Thai Equity",  "value": "฿ 30M", "ytd": "+7.8%", "ytdPositive": true },
-      { "label": "Cash / MMF",   "value": "฿ 9M",  "ytd": "+1.1%", "ytdPositive": true }
+      { "label": "Thai Equity", "value": "฿ 30M", "ytd": "+7.8%", "ytdPositive": true },
+      { "label": "Cash / MMF", "value": "฿ 9M", "ytd": "+1.1%", "ytdPositive": true }
     ],
     "topHoldings": [
-      { "asset": "IG Corporate Bond Fund",  "value": "฿ 22M", "pnl": "+฿ 1.2M", "pnlPct": "+5.8%", "positive": true, "pct": "29.3%" },
-      { "asset": "Short Duration Bond ETF", "value": "฿ 14M", "pnl": "+฿ 0.6M", "pnlPct": "+4.5%", "positive": true, "pct": "18.7%" },
-      { "asset": "SET50 ETF",               "value": "฿ 18M", "pnl": "+฿ 1.5M", "pnlPct": "+9.1%", "positive": true, "pct": "24.0%" },
-      { "asset": "Dividend Stock Fund",     "value": "฿ 12M", "pnl": "+฿ 0.4M", "pnlPct": "+3.4%", "positive": true, "pct": "16.0%" },
-      { "asset": "Cash / MMF",              "value": "฿ 9M",  "pnl": "+฿ 0.1M", "pnlPct": "+1.1%", "positive": true, "pct": "12.0%" }
+      {
+        "asset": "IG Corporate Bond Fund",
+        "value": "฿ 22M",
+        "pnl": "+฿ 1.2M",
+        "pnlPct": "+5.8%",
+        "positive": true,
+        "pct": "29.3%"
+      },
+      {
+        "asset": "Short Duration Bond ETF",
+        "value": "฿ 14M",
+        "pnl": "+฿ 0.6M",
+        "pnlPct": "+4.5%",
+        "positive": true,
+        "pct": "18.7%"
+      },
+      {
+        "asset": "SET50 ETF",
+        "value": "฿ 18M",
+        "pnl": "+฿ 1.5M",
+        "pnlPct": "+9.1%",
+        "positive": true,
+        "pct": "24.0%"
+      },
+      {
+        "asset": "Dividend Stock Fund",
+        "value": "฿ 12M",
+        "pnl": "+฿ 0.4M",
+        "pnlPct": "+3.4%",
+        "positive": true,
+        "pct": "16.0%"
+      },
+      {
+        "asset": "Cash / MMF",
+        "value": "฿ 9M",
+        "pnl": "+฿ 0.1M",
+        "pnlPct": "+1.1%",
+        "positive": true,
+        "pct": "12.0%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "Email + quarterly calls"                       },
-      { "label": "Product Preference", "value": "Fixed Income + Dividend Stocks"               },
-      { "label": "Trade Frequency",    "value": "Quarterly"                                     },
-      { "label": "AI Observation",     "value": "Loyal; responds well to income-focused pitch"  }
+      { "label": "Engagement Style", "value": "Email + quarterly calls" },
+      { "label": "Product Preference", "value": "Fixed Income + Dividend Stocks" },
+      { "label": "Trade Frequency", "value": "Quarterly" },
+      { "label": "AI Observation", "value": "Loyal; responds well to income-focused pitch" }
     ],
     "tasks": [
-      { "id": "t6-1", "done": false, "task": "Birthday contact — Jun 9 (3 days away)",  "urgent": true  },
-      { "id": "t6-2", "done": false, "task": "Fixed Income upsell proposal review",      "urgent": false },
-      { "id": "t6-3", "done": true,  "task": "Q1 portfolio review completed",            "urgent": false }
+      {
+        "id": "t6-1",
+        "done": false,
+        "task": "Birthday contact — Jun 9 (3 days away)",
+        "urgent": true
+      },
+      {
+        "id": "t6-2",
+        "done": false,
+        "task": "Fixed Income upsell proposal review",
+        "urgent": false
+      },
+      { "id": "t6-3", "done": true, "task": "Q1 portfolio review completed", "urgent": false }
     ],
     "recentActivity": [
-      { "label": "Fixed Income Proposal Sent", "description": "Emailed ฿ 40M Fixed Income upsell proposal.",              "date": "Jun 1",  "dotColor": "bg-[var(--bg-brand-primary)]"            },
-      { "label": "Video Call",                 "description": "Discussed interest rates and bond ladder strategy.",        "date": "May 22", "dotColor": "bg-[var(--bg-success-primary)]"          },
-      { "label": "Market Outlook Email",       "description": "Sent personalized bond market update.",                    "date": "May 10", "dotColor": "bg-[var(--bg-default-secondary-medium)]" },
-      { "label": "Q1 Portfolio Review",        "description": "Conservative allocation performing well; client satisfied.","date": "Apr 15", "dotColor": "bg-[var(--bg-success-primary)]"          }
+      {
+        "label": "Fixed Income Proposal Sent",
+        "description": "Emailed ฿ 40M Fixed Income upsell proposal.",
+        "date": "Jun 1",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Video Call",
+        "description": "Discussed interest rates and bond ladder strategy.",
+        "date": "May 22",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Market Outlook Email",
+        "description": "Sent personalized bond market update.",
+        "date": "May 10",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      },
+      {
+        "label": "Q1 Portfolio Review",
+        "description": "Conservative allocation performing well; client satisfied.",
+        "date": "Apr 15",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Birthday Engagement",
@@ -359,41 +761,111 @@
     },
     "allocationData": [
       { "name": "Global Equity", "value": 50, "fill": "#10b981" },
-      { "name": "Thai Equity",   "value": 28, "fill": "#3b82f6" },
-      { "name": "Alternatives",  "value": 10, "fill": "#f97316" },
-      { "name": "Fixed Income",  "value": 7,  "fill": "#8b5cf6" },
-      { "name": "Cash / MMF",    "value": 5,  "fill": "#f59e0b" }
+      { "name": "Thai Equity", "value": 28, "fill": "#3b82f6" },
+      { "name": "Alternatives", "value": 10, "fill": "#f97316" },
+      { "name": "Fixed Income", "value": 7, "fill": "#8b5cf6" },
+      { "name": "Cash / MMF", "value": 5, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Global Equity", "value": "฿ 445M",  "ytd": "+22.1%", "ytdPositive": true },
-      { "label": "Thai Equity",   "value": "฿ 249M",  "ytd": "+15.1%", "ytdPositive": true },
-      { "label": "Alternatives",  "value": "฿ 89M",   "ytd": "+19.8%", "ytdPositive": true },
-      { "label": "Fixed Income",  "value": "฿ 62M",   "ytd": "+3.5%",  "ytdPositive": true },
-      { "label": "Cash / MMF",    "value": "฿ 44.5M", "ytd": "+1.3%",  "ytdPositive": true }
+      { "label": "Global Equity", "value": "฿ 445M", "ytd": "+22.1%", "ytdPositive": true },
+      { "label": "Thai Equity", "value": "฿ 249M", "ytd": "+15.1%", "ytdPositive": true },
+      { "label": "Alternatives", "value": "฿ 89M", "ytd": "+19.8%", "ytdPositive": true },
+      { "label": "Fixed Income", "value": "฿ 62M", "ytd": "+3.5%", "ytdPositive": true },
+      { "label": "Cash / MMF", "value": "฿ 44.5M", "ytd": "+1.3%", "ytdPositive": true }
     ],
     "topHoldings": [
-      { "asset": "Microsoft Corp (MSFT)", "value": "฿ 178M",  "pnl": "+฿ 52.4M", "pnlPct": "+41.7%", "positive": true, "pct": "20.0%" },
-      { "asset": "Asia Growth ETF",       "value": "฿ 133M",  "pnl": "+฿ 23.1M", "pnlPct": "+21.0%", "positive": true, "pct": "14.9%" },
-      { "asset": "Hedge Fund Series A",   "value": "฿ 89M",   "pnl": "+฿ 14.7M", "pnlPct": "+19.8%", "positive": true, "pct": "10.0%" },
-      { "asset": "PTT PCL",               "value": "฿ 71M",   "pnl": "+฿ 9.3M",  "pnlPct": "+15.1%", "positive": true, "pct": "8.0%"  },
-      { "asset": "Cash / MMF",            "value": "฿ 44.5M", "pnl": "+฿ 0.6M",  "pnlPct": "+1.3%",  "positive": true, "pct": "5.0%"  }
+      {
+        "asset": "Microsoft Corp (MSFT)",
+        "value": "฿ 178M",
+        "pnl": "+฿ 52.4M",
+        "pnlPct": "+41.7%",
+        "positive": true,
+        "pct": "20.0%"
+      },
+      {
+        "asset": "Asia Growth ETF",
+        "value": "฿ 133M",
+        "pnl": "+฿ 23.1M",
+        "pnlPct": "+21.0%",
+        "positive": true,
+        "pct": "14.9%"
+      },
+      {
+        "asset": "Hedge Fund Series A",
+        "value": "฿ 89M",
+        "pnl": "+฿ 14.7M",
+        "pnlPct": "+19.8%",
+        "positive": true,
+        "pct": "10.0%"
+      },
+      {
+        "asset": "PTT PCL",
+        "value": "฿ 71M",
+        "pnl": "+฿ 9.3M",
+        "pnlPct": "+15.1%",
+        "positive": true,
+        "pct": "8.0%"
+      },
+      {
+        "asset": "Cash / MMF",
+        "value": "฿ 44.5M",
+        "pnl": "+฿ 0.6M",
+        "pnlPct": "+1.3%",
+        "positive": true,
+        "pct": "5.0%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "In-person + golf outings"               },
-      { "label": "Product Preference", "value": "Global Equity + Hedge Funds"            },
-      { "label": "Trade Frequency",    "value": "Weekly"                                  },
-      { "label": "AI Observation",     "value": "Trophy client; strong referral potential"}
+      { "label": "Engagement Style", "value": "In-person + golf outings" },
+      { "label": "Product Preference", "value": "Global Equity + Hedge Funds" },
+      { "label": "Trade Frequency", "value": "Weekly" },
+      { "label": "AI Observation", "value": "Trophy client; strong referral potential" }
     ],
     "tasks": [
-      { "id": "t7-1", "done": false, "task": "Referral follow-up — 2 HNW prospects by Jun 15", "urgent": false },
-      { "id": "t7-2", "done": false, "task": "Year-end tax optimization discussion",             "urgent": false },
-      { "id": "t7-3", "done": true,  "task": "Hedge Fund commitment ฿ 150M executed",           "urgent": false }
+      {
+        "id": "t7-1",
+        "done": false,
+        "task": "Referral follow-up — 2 HNW prospects by Jun 15",
+        "urgent": false
+      },
+      {
+        "id": "t7-2",
+        "done": false,
+        "task": "Year-end tax optimization discussion",
+        "urgent": false
+      },
+      {
+        "id": "t7-3",
+        "done": true,
+        "task": "Hedge Fund commitment ฿ 150M executed",
+        "urgent": false
+      }
     ],
     "recentActivity": [
-      { "label": "Referral Discussion",     "description": "Client agreed to refer 2 colleagues. RM to follow up by Jun 15.", "date": "May 30", "dotColor": "bg-[var(--bg-success-primary)]" },
-      { "label": "Q3 Review Meeting",       "description": "Celebrated +22.1% YTD. Discussed year-end strategy.",            "date": "May 22", "dotColor": "bg-[var(--bg-success-primary)]" },
-      { "label": "Hedge Fund Commitment",   "description": "฿ 150M to Hedge Fund Series A executed. Wire confirmed.",        "date": "May 10", "dotColor": "bg-[var(--bg-brand-primary)]"   },
-      { "label": "Golf Event",              "description": "Client attended Yuanta Golf Day. High satisfaction noted.",       "date": "Apr 30", "dotColor": "bg-[var(--bg-success-primary)]" }
+      {
+        "label": "Referral Discussion",
+        "description": "Client agreed to refer 2 colleagues. RM to follow up by Jun 15.",
+        "date": "May 30",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Q3 Review Meeting",
+        "description": "Celebrated +22.1% YTD. Discussed year-end strategy.",
+        "date": "May 22",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "Hedge Fund Commitment",
+        "description": "฿ 150M to Hedge Fund Series A executed. Wire confirmed.",
+        "date": "May 10",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Golf Event",
+        "description": "Client attended Yuanta Golf Day. High satisfaction noted.",
+        "date": "Apr 30",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Referral Pipeline",
@@ -415,38 +887,114 @@
       "lastUpdatedTime": "13:20"
     },
     "allocationData": [
-      { "name": "Thai Equity",  "value": 45, "fill": "#3b82f6" },
+      { "name": "Thai Equity", "value": 45, "fill": "#3b82f6" },
       { "name": "Fixed Income", "value": 27, "fill": "#8b5cf6" },
-      { "name": "Cash / MMF",   "value": 28, "fill": "#f59e0b" }
+      { "name": "Cash / MMF", "value": 28, "fill": "#f59e0b" }
     ],
     "allocationBreakdown": [
-      { "label": "Thai Equity",  "value": "฿ 99M", "ytd": "+9.8%", "ytdPositive": true },
+      { "label": "Thai Equity", "value": "฿ 99M", "ytd": "+9.8%", "ytdPositive": true },
       { "label": "Fixed Income", "value": "฿ 59M", "ytd": "+4.8%", "ytdPositive": true },
-      { "label": "Cash / MMF",   "value": "฿ 62M", "ytd": "+0.0%", "ytdPositive": true, "warning": "28% — above 15% target" }
+      {
+        "label": "Cash / MMF",
+        "value": "฿ 62M",
+        "ytd": "+0.0%",
+        "ytdPositive": true,
+        "warning": "28% — above 15% target"
+      }
     ],
     "topHoldings": [
-      { "asset": "SET50 ETF",              "value": "฿ 55M", "pnl": "+฿ 5.8M", "pnlPct": "+11.8%", "positive": true, "pct": "25.0%" },
-      { "asset": "DCA Equity Fund",        "value": "฿ 44M", "pnl": "+฿ 2.9M", "pnlPct": "+7.1%",  "positive": true, "pct": "20.0%" },
-      { "asset": "IG Corporate Bond Fund", "value": "฿ 36M", "pnl": "+฿ 1.8M", "pnlPct": "+5.3%",  "positive": true, "pct": "16.4%" },
-      { "asset": "Short Duration Bond ETF","value": "฿ 24M", "pnl": "+฿ 0.9M", "pnlPct": "+3.9%",  "positive": true, "pct": "10.9%" },
-      { "asset": "Cash (Idle)",            "value": "฿ 62M", "pnl": "฿ 0",      "pnlPct": "0.0%",   "positive": true, "pct": "28.2%" }
+      {
+        "asset": "SET50 ETF",
+        "value": "฿ 55M",
+        "pnl": "+฿ 5.8M",
+        "pnlPct": "+11.8%",
+        "positive": true,
+        "pct": "25.0%"
+      },
+      {
+        "asset": "DCA Equity Fund",
+        "value": "฿ 44M",
+        "pnl": "+฿ 2.9M",
+        "pnlPct": "+7.1%",
+        "positive": true,
+        "pct": "20.0%"
+      },
+      {
+        "asset": "IG Corporate Bond Fund",
+        "value": "฿ 36M",
+        "pnl": "+฿ 1.8M",
+        "pnlPct": "+5.3%",
+        "positive": true,
+        "pct": "16.4%"
+      },
+      {
+        "asset": "Short Duration Bond ETF",
+        "value": "฿ 24M",
+        "pnl": "+฿ 0.9M",
+        "pnlPct": "+3.9%",
+        "positive": true,
+        "pct": "10.9%"
+      },
+      {
+        "asset": "Cash (Idle)",
+        "value": "฿ 62M",
+        "pnl": "฿ 0",
+        "pnlPct": "0.0%",
+        "positive": true,
+        "pct": "28.2%"
+      }
     ],
     "behavioralProfile": [
-      { "label": "Engagement Style",   "value": "WhatsApp + Phone"                          },
-      { "label": "Product Preference", "value": "Equity Funds + DCA"                        },
-      { "label": "Trade Frequency",    "value": "Monthly"                                    },
-      { "label": "AI Observation",     "value": "Growth-oriented; open to new opportunities" }
+      { "label": "Engagement Style", "value": "WhatsApp + Phone" },
+      { "label": "Product Preference", "value": "Equity Funds + DCA" },
+      { "label": "Trade Frequency", "value": "Monthly" },
+      { "label": "AI Observation", "value": "Growth-oriented; open to new opportunities" }
     ],
     "tasks": [
-      { "id": "t8-1", "done": false, "task": "DCA Fund proposal — pending client review",  "urgent": false },
-      { "id": "t8-2", "done": false, "task": "Deploy idle cash — pitch Structured Note",   "urgent": false },
-      { "id": "t8-3", "done": true,  "task": "Q2 statement sent and confirmed received",   "urgent": false }
+      {
+        "id": "t8-1",
+        "done": false,
+        "task": "DCA Fund proposal — pending client review",
+        "urgent": false
+      },
+      {
+        "id": "t8-2",
+        "done": false,
+        "task": "Deploy idle cash — pitch Structured Note",
+        "urgent": false
+      },
+      {
+        "id": "t8-3",
+        "done": true,
+        "task": "Q2 statement sent and confirmed received",
+        "urgent": false
+      }
     ],
     "recentActivity": [
-      { "label": "DCA Fund Proposal Viewed", "description": "Client spent 4 min on proposal. High engagement signal.",  "date": "May 31", "dotColor": "bg-[var(--bg-brand-primary)]"            },
-      { "label": "Cash Deployment Alert",    "description": "AI flagged ฿ 62M idle cash — above 15% target.",          "date": "May 25", "dotColor": "bg-[var(--bg-warning-primary)]"          },
-      { "label": "Phone Call",               "description": "Client asked about ESG fund options for H2.",              "date": "May 18", "dotColor": "bg-[var(--bg-success-primary)]"          },
-      { "label": "May Statement Sent",       "description": "Automated statement delivered via WhatsApp + email.",      "date": "May 1",  "dotColor": "bg-[var(--bg-default-secondary-medium)]" }
+      {
+        "label": "DCA Fund Proposal Viewed",
+        "description": "Client spent 4 min on proposal. High engagement signal.",
+        "date": "May 31",
+        "dotColor": "bg-[var(--bg-brand-primary)]"
+      },
+      {
+        "label": "Cash Deployment Alert",
+        "description": "AI flagged ฿ 62M idle cash — above 15% target.",
+        "date": "May 25",
+        "dotColor": "bg-[var(--bg-warning-primary)]"
+      },
+      {
+        "label": "Phone Call",
+        "description": "Client asked about ESG fund options for H2.",
+        "date": "May 18",
+        "dotColor": "bg-[var(--bg-success-primary)]"
+      },
+      {
+        "label": "May Statement Sent",
+        "description": "Automated statement delivered via WhatsApp + email.",
+        "date": "May 1",
+        "dotColor": "bg-[var(--bg-default-secondary-medium)]"
+      }
     ],
     "aiHighPriority": {
       "title": "HIGH PRIORITY — Deploy Idle Cash",

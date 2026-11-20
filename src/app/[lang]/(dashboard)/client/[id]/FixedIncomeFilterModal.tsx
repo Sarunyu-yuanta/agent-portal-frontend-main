@@ -35,14 +35,18 @@ function CompanyFilterChip({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-8 w-full min-w-0 items-center justify-center gap-1 overflow-hidden rounded-full border pl-2 pr-3 py-1.5 text-sm leading-[24px] cursor-pointer transition-colors"
+      className="flex h-8 w-full min-w-0 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-full border py-1.5 pr-3 pl-2 text-sm leading-[24px] transition-colors"
       style={{
         backgroundColor: selected ? "#0a6ee7" : "white",
         borderColor: selected ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.1)",
         color: selected ? "white" : "#4a5565",
       }}
     >
-      <BondLogo src={BOND_LOGOS[company.logoIdx]} logoCrop={company.logoCrop} className="size-5 rounded" />
+      <BondLogo
+        src={BOND_LOGOS[company.logoIdx]}
+        logoCrop={company.logoCrop}
+        className="size-5 rounded"
+      />
       <span className="min-w-0 flex-1 truncate text-center">{label}</span>
     </button>
   );
@@ -174,7 +178,7 @@ function FilterFooter({
       <Button
         variant="outline-black"
         size={mobile ? "lg" : "xl"}
-        className="min-w-0 flex-1 max-w-[343px] text-[#0a6ee7]"
+        className="max-w-[343px] min-w-0 flex-1 text-[#0a6ee7]"
         onClick={onClear}
       >
         {t.products.common.clearSelection}
@@ -182,7 +186,7 @@ function FilterFooter({
       <Button
         variant="primary"
         size={mobile ? "lg" : "xl"}
-        className="min-w-0 flex-1 max-w-[343px]"
+        className="max-w-[343px] min-w-0 flex-1"
         onClick={onApply}
       >
         {t.products.common.confirmSelection}
@@ -314,7 +318,7 @@ export function FixedIncomeFilterModal({
           type="button"
           onClick={onClose}
           aria-label={t.common.close}
-          className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full border-none p-1 cursor-pointer"
+          className="absolute top-3 right-3 flex size-6 cursor-pointer items-center justify-center rounded-full border-none p-1"
           style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
         >
           <XIcon size={18} color="white" />
@@ -322,7 +326,10 @@ export function FixedIncomeFilterModal({
 
         <div className="flex w-full items-center gap-2 pr-8">
           <FunnelSimpleIcon size={24} className="shrink-0 text-[#101828]" />
-          <p id="fixed-income-filter-title" className="min-w-0 flex-1 text-lg font-bold leading-[28px] text-[#101828]">
+          <p
+            id="fixed-income-filter-title"
+            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-[#101828]"
+          >
             {title}
           </p>
         </div>

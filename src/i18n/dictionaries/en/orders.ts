@@ -15,7 +15,8 @@ const words = {
     availabilityOpen: "Open for booking",
     remainingLabel: "Still bookable",
     modalTitle: (underlying: string, coupon: string) => `Book ${underlying} ${coupon}`,
-    detailTitle: (underlying: string, coupon: string) => `Booking details · ${underlying} ${coupon}`,
+    detailTitle: (underlying: string, coupon: string) =>
+      `Booking details · ${underlying} ${coupon}`,
     detailSection: "Booking details",
     prereqIncomplete: (done: number, total: number) =>
       `Requirements incomplete (${done}/${total}) — complete them before booking.`,
@@ -134,7 +135,11 @@ const orders = {
     pending: "Pending",
     cancelled: "Cancelled",
   },
-  quantityLabel: { stock: "Quantity (shares)", tfex: "Quantity (contracts)", "mutual-fund": "Quantity (units)" },
+  quantityLabel: {
+    stock: "Quantity (shares)",
+    tfex: "Quantity (contracts)",
+    "mutual-fund": "Quantity (units)",
+  },
   quantityUnit: { stock: "shares", tfex: "contracts", "mutual-fund": "units" },
   priceLabel: { stock: "Price", tfex: "Price", "mutual-fund": "NAV" },
   statusBucket: {
@@ -172,11 +177,13 @@ const orders = {
   backToEdit: "Back to edit",
   notice: {
     processingTitle: "Order in progress",
-    processing: (ref: string) => `Order ${ref} is being processed by the back office — closed to new bookings`,
+    processing: (ref: string) =>
+      `Order ${ref} is being processed by the back office — closed to new bookings`,
     completedTitle: "Order accepted",
     completed: (ref: string) => `Order ${ref} has completed — this product is closed for booking`,
     rejectedTitle: "Order cancelled",
-    rejected: (ref: string) => `The back office rejected order ${ref} — this product is closed for booking`,
+    rejected: (ref: string) =>
+      `The back office rejected order ${ref} — this product is closed for booking`,
   },
   progress: {
     dealTotal: "Deal total booked",
@@ -184,7 +191,14 @@ const orders = {
     mine: "Mine",
     otherIcs: "Other ICs",
     remaining: "Remaining",
-    progressAria: (label: string, mine: string, others: string, remaining: string, target: string, currency: string) =>
+    progressAria: (
+      label: string,
+      mine: string,
+      others: string,
+      remaining: string,
+      target: string,
+      currency: string,
+    ) =>
       `${label}: mine ${mine}, other ICs ${others}, remaining ${remaining} of ${target} ${currency}`,
   },
   sheet: {
@@ -194,7 +208,8 @@ const orders = {
   clientPage: {
     noBookingsInDesk: "This category has no bookings",
     backToOrders: "Back to Order Management",
-    subtitle: (clientId: string, accountNo: string, desk: string) => `${clientId} · Account ${accountNo} · ${desk}`,
+    subtitle: (clientId: string, accountNo: string, desk: string) =>
+      `${clientId} · Account ${accountNo} · ${desk}`,
     clientTotal: "Client total",
     products: "Products",
     productCount: (n: number) => `${n} ${plural(n, { one: "item", other: "items" })}`,
@@ -233,8 +248,10 @@ const orders = {
   },
   proposal: {
     sendToClients: "Send Proposal to clients",
-    tallyOffered: (n: number) => `Proposal sent to ${n} ${plural(n, { one: "client", other: "clients" })}`,
-    tallyBooked: (n: number) => `Proposal sent to ${n} ${plural(n, { one: "client", other: "clients" })} · booked`,
+    tallyOffered: (n: number) =>
+      `Proposal sent to ${n} ${plural(n, { one: "client", other: "clients" })}`,
+    tallyBooked: (n: number) =>
+      `Proposal sent to ${n} ${plural(n, { one: "client", other: "clients" })} · booked`,
     noClientsFound: "Proposal not sent — the selected clients weren't found",
     sendFailed: "Couldn't send the Proposal. Try again.",
     sentToOne: (underlying: string, name: string) => `Sent the ${underlying} Proposal to ${name}`,
@@ -246,17 +263,21 @@ const orders = {
     clearPicked: "Clear selection",
     pickAll: "Select all",
     hideRecipients: "Hide recipients",
-    showRecipients: (n: number) => `Show all ${n} ${plural(n, { one: "recipient", other: "recipients" })}`,
+    showRecipients: (n: number) =>
+      `Show all ${n} ${plural(n, { one: "recipient", other: "recipients" })}`,
     sendingTo: "Sending to",
     people: (n: number) => `${n} ${plural(n, { one: "client", other: "clients" })}`,
     removeRecipient: (name: string) => `Remove ${name}`,
     channels: "Channels",
     next: "Next",
     nextPicked: (n: number) => `Next · ${n} selected`,
-    backOfficeNote: "The back office will deliver the documents through the selected channels and log the send for tracking.",
+    backOfficeNote:
+      "The back office will deliver the documents through the selected channels and log the send for tracking.",
     send: "Send Proposal",
-    sendToN: (n: number) => `Send Proposal to ${n} ${plural(n, { one: "client", other: "clients" })}`,
-    sheetTitle: (underlying: string, coupon: string) => `Send Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
+    sendToN: (n: number) =>
+      `Send Proposal to ${n} ${plural(n, { one: "client", other: "clients" })}`,
+    sheetTitle: (underlying: string, coupon: string) =>
+      `Send Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
   },
   proposalDetail: {
     title: (underlying: string, coupon: string) => `Proposal details · ${underlying} ${coupon}`,
@@ -268,7 +289,8 @@ const orders = {
     sentTimes: (n: number) => `Sent ${n} ${plural(n, { one: "time", other: "times" })}`,
     latest: "Latest",
     nth: (n: number) => `Send #${n}`,
-    footOpen: "No booking from this Proposal yet — the client can book in the app, or ask their IC to book for them.",
+    footOpen:
+      "No booking from this Proposal yet — the client can book in the app, or ask their IC to book for them.",
     footWon: "The client booked after receiving this Proposal — see their booking for details.",
     footLost: "The product closed with no booking from this Proposal.",
   },
@@ -316,16 +338,19 @@ const orders = {
   },
   books: {
     searchHint: "Try a client name, Account No, product name or order number.",
-    basketEmptyHint: "Book for clients from a product page in the Product Catalog — bookings collect here.",
+    basketEmptyHint:
+      "Book for clients from a product page in the Product Catalog — bookings collect here.",
     quotaEmptyHint:
       "Send orders for clients from a product page in the Product Catalog — one press goes straight to the back office, until the quota is full.",
     quotaEmptyHintInline:
-      "Press \"Create order\" on a bond above — one press goes straight to the back office, until the quota is full.",
+      'Press "Create order" on a bond above — one press goes straight to the back office, until the quota is full.',
     goToCatalog: "Go to Product Catalog",
   },
   records: {
-    quotaFill: (used: string, target: string, pct: number) => `Quota used ${used} / ${target} · ${pct}%`,
-    basketFill: (amount: string, target: string, pct: number) => `Basket ${amount} / ${target} · ${pct}%`,
+    quotaFill: (used: string, target: string, pct: number) =>
+      `Quota used ${used} / ${target} · ${pct}%`,
+    basketFill: (amount: string, target: string, pct: number) =>
+      `Basket ${amount} / ${target} · ${pct}%`,
   },
   orderRef: "Order no.",
   keepBooking: "Keep it",
@@ -392,7 +417,8 @@ const orders = {
     requirementCompleted: (client: string) => `${client} completed the requested information`,
     orderCollected: (n: number) =>
       `Back office collected the order (${n} ${plural(n, { one: "booking", other: "bookings" })})`,
-    orderSent: (n: number) => `Sent an order (${n} ${plural(n, { one: "booking", other: "bookings" })})`,
+    orderSent: (n: number) =>
+      `Sent an order (${n} ${plural(n, { one: "booking", other: "bookings" })})`,
     orderCompleted: (ref: string) => `Order completed (${ref})`,
     orderRejected: (ref: string) => `Order rejected (${ref})`,
   },
@@ -401,11 +427,13 @@ const orders = {
     requirementCompleted: (n: number) =>
       `Completed ${n} requested ${plural(n, { one: "item", other: "items" })} — ready to review`,
     bookFullTitle: (product: string) => `${product} is fully booked`,
-    bookFull: (amount: string) => `${amount} booked in full — waiting for the back office to collect the order`,
+    bookFull: (amount: string) =>
+      `${amount} booked in full — waiting for the back office to collect the order`,
   },
   booking: {
     change: "Change",
-    orderSent: (amount: string, client: string, ref: string) => `Sent a ${amount} order for ${client} (${ref})`,
+    orderSent: (amount: string, client: string, ref: string) =>
+      `Sent a ${amount} order for ${client} (${ref})`,
     booked: (amount: string, client: string) => `Booked ${amount} for ${client}`,
     pickClient: "Choose a client",
     searchClient: "Search client name or ID",
@@ -420,17 +448,20 @@ const orders = {
     blockedTitle: "This client can't buy this product yet",
     blockedRisk: (risk: string) =>
       `The client's risk tolerance (${risk}) is below what this product requires — they need to retake the risk assessment first.`,
-    inReview: "The client has completed it and it's under review — you'll be notified when it passes.",
+    inReview:
+      "The client has completed it and it's under review — you'll be notified when it passes.",
   },
   readiness: {
     ready: { text: "Complete", outstanding: (items: string) => ` ${items}` },
     "in-review": { text: "In review", outstanding: (items: string) => `Awaiting ${items}` },
     blocked: { text: "Incomplete", outstanding: (items: string) => `Missing ${items}` },
-    withCount: (verdict: string, n: number) => `${verdict} (${n} ${plural(n, { one: "item", other: "items" })})`,
+    withCount: (verdict: string, n: number) =>
+      `${verdict} (${n} ${plural(n, { one: "item", other: "items" })})`,
   },
   amount: {
     quotaFull: (product: string) => `${product} quota is full — no more bookings can be taken`,
-    orderSent: (product: string) => `The ${product} order has been sent — this product is closed for booking`,
+    orderSent: (product: string) =>
+      `The ${product} order has been sent — this product is closed for booking`,
     orderProcessing: (product: string) =>
       `The ${product} order is being processed by the back office — no more bookings can be taken`,
     digitsOnly: "Digits 0–9 only",

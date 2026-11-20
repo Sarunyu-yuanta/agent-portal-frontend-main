@@ -14,7 +14,10 @@ const performance = {
     overall: "Overall",
     progressTarget: (progress: number, target: string) => `${progress}% · Target ${target}`,
   },
-  status: { "On Track": "On Track", Exceeded: "Exceeded", Lagging: "Lagging" } as Record<string, string>,
+  status: { "On Track": "On Track", Exceeded: "Exceeded", Lagging: "Lagging" } as Record<
+    string,
+    string
+  >,
   gap: {
     title: "Gap Analysis",
     items: {
@@ -37,7 +40,8 @@ const performance = {
     title: "Pipeline Coverage",
     insightBefore: "Your pipeline can cover",
     insightEmphasis: (pct: number) => `${pct}% of your revenue gap`,
-    insightAfter: (n: number) => `if executed. Focus on closing the ${n} ${plural(n, { one: "deal", other: "deals" })} in Negotiation.`,
+    insightAfter: (n: number) =>
+      `if executed. Focus on closing the ${n} ${plural(n, { one: "deal", other: "deals" })} in Negotiation.`,
     dealsInPipeline: "Deals in Pipeline",
     weightedValue: "Weighted Value",
   },

@@ -31,8 +31,7 @@ import { useLocale } from "@/i18n/I18nProvider";
  * exactly what the row lists rule themselves with (`divide-black/[0.05]`), so
  * the feature carries one hairline weight rather than two.
  */
-const INFO_BOX =
-  "rounded-xl border border-black/[0.05] bg-[var(--bg-default-secondary)]";
+const INFO_BOX = "rounded-xl border border-black/[0.05] bg-[var(--bg-default-secondary)]";
 
 /**
  * One finding, in full: what it is, the figures that triggered it, and what to
@@ -164,14 +163,14 @@ export function RiskAlertDetail({
                 <Link
                   href={`/client/${alert.clientId}`}
                   title={t.commandCenter.riskDetail.viewClientProfile}
-                  className="type-body-1 min-w-0 truncate font-bold! leading-snug text-foreground no-underline transition-colors hover:text-primary-action"
+                  className="type-body-1 hover:text-primary-action min-w-0 truncate leading-snug font-bold! text-foreground no-underline transition-colors"
                 >
                   {row.displayName}
                 </Link>
               ) : (
                 /* No client to go to — the sanctions screen that matched a name
                    before anyone could confirm whose it was. */
-                <p className="type-body-1 min-w-0 truncate font-bold! leading-snug text-foreground">
+                <p className="type-body-1 min-w-0 truncate leading-snug font-bold! text-foreground">
                   {row.displayName}
                 </p>
               )}
@@ -192,14 +191,12 @@ export function RiskAlertDetail({
               {/* The stamp, not the elapsed figure the rows carry. A list is
                   read for staleness; a compliance record is read for when, and
                   this panel is the record. */}
-              <span className="shrink-0 text-meta tabular-nums text-muted-foreground">
+              <span className="shrink-0 text-meta text-muted-foreground tabular-nums">
                 {detectedAtLabel(alert.detectedAt, new Date(), t, locale)}
               </span>
             </div>
 
-            <p className="type-body-2 leading-snug text-foreground">
-              {alert.title}
-            </p>
+            <p className="type-body-2 leading-snug text-foreground">{alert.title}</p>
 
             {/* Raw `text-meta` rather than `.type-caption`, which sets its own
                 `font-weight` from a stylesheet loading after `globals.css` — the
@@ -226,7 +223,7 @@ export function RiskAlertDetail({
             {alert.clientId && (
               <Link
                 href={`/client/${alert.clientId}`}
-                className="inline-flex w-fit items-center gap-0.5 self-start text-label font-semibold text-primary-action no-underline hover:underline"
+                className="text-primary-action inline-flex w-fit items-center gap-0.5 self-start text-label font-semibold no-underline hover:underline"
               >
                 {t.commandCenter.riskDetail.viewClientProfile}
                 <CaretRightIcon size={12} weight="bold" />
@@ -260,9 +257,7 @@ export function RiskAlertDetail({
 
         <Section title={t.commandCenter.riskDetail.details}>
           <div className={`${INFO_BOX} p-4`}>
-            <p className="type-body-2 leading-relaxed text-foreground">
-              {alert.message}
-            </p>
+            <p className="type-body-2 leading-relaxed text-foreground">{alert.message}</p>
           </div>
         </Section>
 
@@ -293,7 +288,7 @@ export function RiskAlertDetail({
                 >
                   <p className="text-meta text-muted-foreground">{metric.label}</p>
                   <p
-                    className={`tabular-nums font-bold text-foreground ${
+                    className={`font-bold text-foreground tabular-nums ${
                       metric.emphasis ? "text-title-sm" : "text-body"
                     }`}
                   >
@@ -370,7 +365,7 @@ export function RiskAlertDetail({
           the line mostly landed in open space, boxing off two buttons from the
           panel they belong to. `pt-1` against the content's own `py-4` keeps
           them from crowding the block above without a border to do it. */}
-      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 px-4 pb-4 pt-1">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 px-4 pt-1 pb-4">
         {/* `xl`, the top of the scale, where the list rows wear `sm`. A row's
             button is one of five on a card and has to sit inside 108px; this
             one is the single thing the sheet was opened to press, with a whole
@@ -390,13 +385,7 @@ export function RiskAlertDetail({
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-meta font-semibold text-muted-foreground">{title}</p>

@@ -44,19 +44,38 @@ function isFull(value: string): boolean {
   return parts.length === 2 && parts[0] === parts[1];
 }
 
-function AllocationSummary({ requestNotionalSize, confirmedRequest }: { requestNotionalSize: string; confirmedRequest: string }) {
+function AllocationSummary({
+  requestNotionalSize,
+  confirmedRequest,
+}: {
+  requestNotionalSize: string;
+  confirmedRequest: string;
+}) {
   return (
     <div
-      className="grid grid-cols-2 w-full rounded-md overflow-hidden"
+      className="grid w-full grid-cols-2 overflow-hidden rounded-md"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
-      <div className="flex flex-col gap-1 px-4 py-3 bg-[#f9fafb] items-center text-center" style={{ borderRight: `1px solid ${BORDER_COLOR}` }}>
-        <span className="text-xs leading-[20px] font-bold text-[#6a7282]">Request / Notional Size</span>
-        <span className={`text-base leading-[28px] font-semibold ${isFull(requestNotionalSize) ? "text-[#0a6ee7]" : "text-[#101828]"}`}>{requestNotionalSize}</span>
+      <div
+        className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3 text-center"
+        style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
+      >
+        <span className="text-xs leading-[20px] font-bold text-[#6a7282]">
+          Request / Notional Size
+        </span>
+        <span
+          className={`text-base leading-[28px] font-semibold ${isFull(requestNotionalSize) ? "text-[#0a6ee7]" : "text-[#101828]"}`}
+        >
+          {requestNotionalSize}
+        </span>
       </div>
-      <div className="flex flex-col gap-1 px-4 py-3 bg-[#f9fafb] items-center text-center">
+      <div className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3 text-center">
         <span className="text-xs leading-[20px] font-bold text-[#6a7282]">Confirmed / Request</span>
-        <span className={`text-base leading-[28px] font-semibold ${isFull(confirmedRequest) ? "text-[#008236]" : "text-[#101828]"}`}>{confirmedRequest}</span>
+        <span
+          className={`text-base leading-[28px] font-semibold ${isFull(confirmedRequest) ? "text-[#008236]" : "text-[#101828]"}`}
+        >
+          {confirmedRequest}
+        </span>
       </div>
     </div>
   );
@@ -65,19 +84,19 @@ function AllocationSummary({ requestNotionalSize, confirmedRequest }: { requestN
 export function DetailTable({ rows }: { rows: DetailRow[] }) {
   return (
     <div
-      className="flex flex-col w-full rounded-md overflow-hidden"
+      className="flex w-full flex-col overflow-hidden rounded-md"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       {rows.map((row, i) => (
         <div
           key={row.label}
-          className={`flex gap-3 items-start px-4 py-2 w-full text-base leading-[24px] ${
+          className={`flex w-full items-start gap-3 px-4 py-2 text-base leading-[24px] ${
             i % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
           }`}
         >
-          <span className="flex-1 min-w-0 text-[#4a5565]">{row.label}</span>
+          <span className="min-w-0 flex-1 text-[#4a5565]">{row.label}</span>
           {row.multiline ? (
-            <div className="flex flex-1 min-w-0 flex-col gap-3 items-start text-[#101828]">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-3 text-[#101828]">
               {row.multiline.map((line) => (
                 <span key={line} className="whitespace-nowrap">
                   {line}
@@ -87,12 +106,12 @@ export function DetailTable({ rows }: { rows: DetailRow[] }) {
           ) : row.link ? (
             <button
               type="button"
-              className="flex-1 min-w-0 text-left text-[#0a6ee7] underline border-none bg-transparent p-0 cursor-pointer text-base leading-[24px]"
+              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-[#0a6ee7] underline"
             >
               {row.value}
             </button>
           ) : (
-            <span className="flex-1 min-w-0 text-[#101828]">{row.value}</span>
+            <span className="min-w-0 flex-1 text-[#101828]">{row.value}</span>
           )}
         </div>
       ))}
@@ -118,11 +137,7 @@ export function structuredProductRows(product: StructuredProduct, t: Dictionary)
     {
       label: labels.moreInfo,
       value: "",
-      multiline: [
-        `KO: ${product.ko}`,
-        `Strike: ${product.strike}`,
-        `KI: ${product.ki}`,
-      ],
+      multiline: [`KO: ${product.ko}`, `Strike: ${product.strike}`, `KI: ${product.ki}`],
     },
   ];
 }
@@ -162,7 +177,6 @@ export function StructuredProductDetail({
   // Shares this page's toast stack rather than standing up a second one.
   const proposal = useSendProposal({ onNotice: notice });
 
-
   useEffect(() => {
     const main = document.querySelector("main");
     if (main) {
@@ -176,36 +190,42 @@ export function StructuredProductDetail({
 
   return (
     <div
-      className="flex flex-col items-center w-full pt-6 pb-20 px-4 md:px-8 lg:px-[221px]"
+      className="flex w-full flex-col items-center px-4 pt-6 pb-20 md:px-8 lg:px-[221px]"
       style={{ backgroundColor: "#f9fafb" }}
     >
       {/* Header — back + title */}
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+      <div className="flex h-[46px] w-full max-w-[998px] items-center gap-2 py-2">
+        <Button
+          variant="plain"
+          size="icon-sm"
+          onClick={onBack}
+          aria-label={t.products.common.back}
+          className="shrink-0"
+        >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
           {product.underlying}
         </h1>
       </div>
 
       {/* White card */}
       <div
-        className="flex flex-col gap-14 items-center w-full max-w-[998px] px-6 py-8 md:px-10 lg:px-14 lg:py-8 rounded-xl bg-white"
+        className="flex w-full max-w-[998px] flex-col items-center gap-14 rounded-xl bg-white px-6 py-8 md:px-10 lg:px-14 lg:py-8"
         style={{ boxShadow: "0px 0px 4px rgba(0,0,0,0.02)" }}
       >
         {/* Symbol + summary */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex w-full flex-col gap-4">
           {/* First thing in the card, so the order's state is read before the
               terms of a product that can no longer be booked. */}
           {ORDER_BOOKING_ENABLED && <ProductOrderNotice book={book} />}
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex gap-2 items-center w-full">
-              <div className="flex flex-1 min-w-0 gap-1 items-center">
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full items-center gap-2">
+              <div className="flex min-w-0 flex-1 items-center gap-1">
                 {product.logos.map((src, i) => (
                   <div
                     key={i}
-                    className="relative shrink-0 size-8 rounded overflow-hidden"
+                    className="relative size-8 shrink-0 overflow-hidden rounded"
                     style={{ border: "1px solid rgba(0,0,0,0.08)" }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- 32px underlying-asset logo, already ~2KB */}
@@ -214,24 +234,24 @@ export function StructuredProductDetail({
                 ))}
               </div>
               {showPrincipalTag && (
-                <span className="inline-flex items-center gap-0.5 shrink-0 rounded px-2 py-1 bg-[#eff6ff]">
+                <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-[#eff6ff] px-2 py-1">
                   <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" className="shrink-0" />
-                  <span className="text-xs leading-[20px] text-[#074ea4] whitespace-nowrap">
+                  <span className="text-xs leading-[20px] whitespace-nowrap text-[#074ea4]">
                     {t.products.structured.tags.principalProtected}
                   </span>
                 </span>
               )}
             </div>
 
-            <div className="flex gap-2 items-center w-full">
-              <div className="flex flex-1 min-w-0 flex-col gap-0.5">
-                <p className="text-base font-bold leading-[28px] text-[#101828] truncate w-full">
+            <div className="flex w-full items-center gap-2">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <p className="w-full truncate text-base leading-[28px] font-bold text-[#101828]">
                   {product.underlying}
                 </p>
                 <p className="text-xs leading-[20px] text-[#4a5565]">Underlying</p>
               </div>
-              <div className="flex flex-col gap-0.5 items-end shrink-0">
-                <p className="text-2xl font-bold leading-8 text-[#0a6ee7] whitespace-nowrap">
+              <div className="flex shrink-0 flex-col items-end gap-0.5">
+                <p className="text-2xl leading-8 font-bold whitespace-nowrap text-[#0a6ee7]">
                   {product.coupon}
                 </p>
                 <p className="text-xs leading-[20px] font-medium text-[#4a5565]">Coupon</p>
@@ -250,28 +270,31 @@ export function StructuredProductDetail({
           )}
 
           {tab === "detail" ? (
-          <div className="flex flex-col gap-3 items-center w-full">
-            <DetailTable rows={detailRows} />
-            <DealProgress productId={product.id} />
-            {round && book ? (
-              <AllocationSummary
-                requestNotionalSize={`${money(round.amount)} / ${money(book.targetAmount)}`}
-                confirmedRequest={`${money(round.confirmed)} / ${money(round.amount)}`}
-              />
-            ) : product.requestNotionalSize != null && product.confirmedRequest != null && (
-              <AllocationSummary
-                requestNotionalSize={product.requestNotionalSize}
-                confirmedRequest={product.confirmedRequest}
-              />
-            )}
-            <p className="text-xs leading-[20px] text-[#6a7282] text-center whitespace-nowrap">
-              {round
-                ? round.previousRef
-                  ? t.products.structured.sentRef(round.previousRef)
-                  : t.products.structured.notSentYet
-                : t.products.common.updatedAt(product.updatedAt)}
-            </p>
-          </div>
+            <div className="flex w-full flex-col items-center gap-3">
+              <DetailTable rows={detailRows} />
+              <DealProgress productId={product.id} />
+              {round && book ? (
+                <AllocationSummary
+                  requestNotionalSize={`${money(round.amount)} / ${money(book.targetAmount)}`}
+                  confirmedRequest={`${money(round.confirmed)} / ${money(round.amount)}`}
+                />
+              ) : (
+                product.requestNotionalSize != null &&
+                product.confirmedRequest != null && (
+                  <AllocationSummary
+                    requestNotionalSize={product.requestNotionalSize}
+                    confirmedRequest={product.confirmedRequest}
+                  />
+                )
+              )}
+              <p className="text-center text-xs leading-[20px] whitespace-nowrap text-[#6a7282]">
+                {round
+                  ? round.previousRef
+                    ? t.products.structured.sentRef(round.previousRef)
+                    : t.products.structured.notSentYet
+                  : t.products.common.updatedAt(product.updatedAt)}
+              </p>
+            </div>
           ) : (
             <ProductOrderSection
               newBookingId={newBookingId}
@@ -286,7 +309,7 @@ export function StructuredProductDetail({
         {/* CTA — the product's own actions, so only under Detail; the Order
             Management tab carries its own จองซื้อ. */}
         {tab === "detail" && (
-          <div className="flex flex-col gap-3 items-center w-full">
+          <div className="flex w-full flex-col items-center gap-3">
             <div className="flex w-full max-w-[343px] flex-col gap-1.5">
               <ProductDocumentActions
                 onSendProposal={() => proposal.send(product)}
@@ -306,7 +329,7 @@ export function StructuredProductDetail({
                 <button
                   type="button"
                   onClick={() => setBookingOpen(true)}
-                  className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+                  className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border bg-transparent px-4 text-sm font-medium transition-opacity hover:opacity-90"
                   style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
                 >
                   <UserPlusIcon size={16} />
@@ -318,14 +341,13 @@ export function StructuredProductDetail({
                 href="https://placeholder.example.com/create-order"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
+                className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-opacity hover:opacity-90"
                 style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
               >
                 <span>{t.products.common.createOrder}</span>
                 <ArrowSquareOutIcon size={16} />
               </a>
             )}
-  
           </div>
         )}
       </div>

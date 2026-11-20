@@ -59,9 +59,7 @@ const PROFILES: Record<string, ClientProfile> = {
     company: "Pongpipat Group",
     riskProfile: "Moderate",
     relationshipSince: "Mar 2016",
-    familyMembers: [
-      { relation: "Spouse", name: "Krit Pongpipat" },
-    ],
+    familyMembers: [{ relation: "Spouse", name: "Krit Pongpipat" }],
   },
   "110003": {
     accountNo: "11000322",

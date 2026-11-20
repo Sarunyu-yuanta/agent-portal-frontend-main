@@ -2,7 +2,11 @@
 
 import { Button, Tag } from "@sarunyu/system-one";
 import { ArrowSquareOutIcon, CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
-import type { AdvisoryAccountStatus, AdvisoryCta, PlanSuitability } from "./portfolio-advisory-client";
+import type {
+  AdvisoryAccountStatus,
+  AdvisoryCta,
+  PlanSuitability,
+} from "./portfolio-advisory-client";
 import { useT } from "@/i18n/I18nProvider";
 
 /**
@@ -27,7 +31,13 @@ export const SECTION_SHADOW =
 export function AdvisoryAccountTag({ status }: { status: AdvisoryAccountStatus }) {
   const t = useT();
   const open = status === "open";
-  return <Tag text={open ? t.products.advisory.account.open : t.products.advisory.account.none} variant={open ? "green" : "gray"} size="small" />;
+  return (
+    <Tag
+      text={open ? t.products.advisory.account.open : t.products.advisory.account.none}
+      variant={open ? "green" : "gray"}
+      size="small"
+    />
+  );
 }
 
 export function PlanSuitabilityBadge({ suitability }: { suitability: PlanSuitability }) {
@@ -37,12 +47,14 @@ export function PlanSuitabilityBadge({ suitability }: { suitability: PlanSuitabi
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-meta leading-[20px] ${
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-meta leading-[20px] whitespace-nowrap ${
         suitable ? "bg-[#dcfce7] text-[#016630]" : "bg-[#fef3c6] text-[#973c00]"
       }`}
     >
       <Icon size={12} weight="fill" />
-      {suitable ? t.products.advisory.suitability.suitable : t.products.advisory.suitability.exceeds}
+      {suitable
+        ? t.products.advisory.suitability.suitable
+        : t.products.advisory.suitability.exceeds}
     </span>
   );
 }

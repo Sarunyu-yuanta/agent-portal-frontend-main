@@ -205,7 +205,12 @@ export function CopyRow({ label, value }: { label: string; value: string }) {
 
   // The sheet is dismissed from outside this row, so a pending timer would
   // otherwise fire into a gone component.
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const copy = async () => {
     try {

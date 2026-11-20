@@ -20,7 +20,11 @@ import { AllocationDonutWithTiles } from "@/components/allocation-donut";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 
-export function CurrentAllocationSection({ slices }: { slices: { label: string; percent: number }[] }) {
+export function CurrentAllocationSection({
+  slices,
+}: {
+  slices: { label: string; percent: number }[];
+}) {
   return <AllocationDonutWithTiles slices={slices} donutSize={180} />;
 }
 
@@ -30,7 +34,14 @@ export function TopHoldingsSection({
   sortDir,
   onSort,
 }: {
-  holdings: { asset: string; value: string; pnl: string; pnlPct: string; pct: string; positive: boolean }[];
+  holdings: {
+    asset: string;
+    value: string;
+    pnl: string;
+    pnlPct: string;
+    pct: string;
+    positive: boolean;
+  }[];
   sortKey: "value" | "pnlPct" | "pct" | null;
   sortDir: SortDir;
   onSort: (key: "value" | "pnlPct" | "pct", dir: SortDir) => void;
@@ -40,7 +51,13 @@ export function TopHoldingsSection({
     return (
       <EmptyState
         size="compact"
-        icon={<ChartBarIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+        icon={
+          <ChartBarIcon
+            size={32}
+            weight="duotone"
+            className="text-[var(--text-default-placeholder)]"
+          />
+        }
         title={t.client.overview.noHoldings}
       />
     );
@@ -62,36 +79,60 @@ export function TopHoldingsSection({
       </colgroup>
       <TableHead>
         <TableRow>
-          <TableHeaderCell sortable={false} className="min-w-0 max-w-[160px]">{t.client.holdings.asset}</TableHeaderCell>
+          <TableHeaderCell sortable={false} className="max-w-[160px] min-w-0">
+            {t.client.holdings.asset}
+          </TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "value" ? sortDir : "none"}
             onSortChange={(d) => onSort("value", d)}
-          >{t.client.holdings.marketValue}</TableHeaderCell>
+          >
+            {t.client.holdings.marketValue}
+          </TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "pnlPct" ? sortDir : "none"}
             onSortChange={(d) => onSort("pnlPct", d)}
-          >{t.client.holdings.unrealizedPl}</TableHeaderCell>
+          >
+            {t.client.holdings.unrealizedPl}
+          </TableHeaderCell>
           <TableHeaderCell
             className="min-w-0 whitespace-nowrap"
             sortDirection={sortKey === "pct" ? sortDir : "none"}
             onSortChange={(d) => onSort("pct", d)}
-          >{t.client.holdings.portfolioPct}</TableHeaderCell>
+          >
+            {t.client.holdings.portfolioPct}
+          </TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {sorted.map((h) => (
           <TableRow key={h.asset}>
-            <TableCell className="min-w-0 max-w-[160px]"><span className="type-body-2 text-foreground font-medium truncate block">{h.asset}</span></TableCell>
-            <TableCell className="min-w-0 whitespace-nowrap"><span className="type-body-2 text-foreground">{h.value}</span></TableCell>
+            <TableCell className="max-w-[160px] min-w-0">
+              <span className="type-body-2 block truncate font-medium text-foreground">
+                {h.asset}
+              </span>
+            </TableCell>
+            <TableCell className="min-w-0 whitespace-nowrap">
+              <span className="type-body-2 text-foreground">{h.value}</span>
+            </TableCell>
             <TableCell className="min-w-0 whitespace-nowrap">
               <div className="flex flex-col">
-                <span className={`type-body-2 font-medium ${h.positive ? "text-success" : "text-destructive"}`}>{h.pnl}</span>
-                <span className={`type-caption ${h.positive ? "text-success" : "text-destructive"}`}>{h.pnlPct}</span>
+                <span
+                  className={`type-body-2 font-medium ${h.positive ? "text-success" : "text-destructive"}`}
+                >
+                  {h.pnl}
+                </span>
+                <span
+                  className={`type-caption ${h.positive ? "text-success" : "text-destructive"}`}
+                >
+                  {h.pnlPct}
+                </span>
               </div>
             </TableCell>
-            <TableCell className="min-w-0 whitespace-nowrap"><span className="type-body-2 text-foreground">{h.pct}</span></TableCell>
+            <TableCell className="min-w-0 whitespace-nowrap">
+              <span className="type-body-2 text-foreground">{h.pct}</span>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -117,20 +158,26 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
         {callLogs.map((log) => (
           <div key={log.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="type-body-2 text-foreground font-semibold">{log.date} · {log.time}</span>
-              <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground">
+              <span className="type-body-2 font-semibold text-foreground">
+                {log.date} · {log.time}
+              </span>
+              <div className="flex shrink-0 items-center gap-1.5 text-muted-foreground">
                 {log.direction === "outbound" ? (
                   <PhoneOutgoingIcon size={14} className="text-[var(--text-brand-primary)]" />
                 ) : (
                   <PhoneIncomingIcon size={14} className="text-[var(--icon-success)]" />
                 )}
-                <span className="type-caption">{log.direction === "outbound" ? t.client.callLog.outbound : t.client.callLog.inbound}</span>
+                <span className="type-caption">
+                  {log.direction === "outbound"
+                    ? t.client.callLog.outbound
+                    : t.client.callLog.inbound}
+                </span>
               </div>
             </div>
             <p className="type-caption text-muted-foreground">
               {relativeCallDate(log.date, t)} · {log.duration}
             </p>
-            <p className="type-body-2 text-foreground mt-1">{log.summary}</p>
+            <p className="type-body-2 mt-1 text-foreground">{log.summary}</p>
           </div>
         ))}
       </div>
@@ -140,10 +187,18 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.date}</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.direction}</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">{t.client.callLog.duration}</TableHeaderCell>
-              <TableHeaderCell sortable={false} className="min-w-0">{t.client.callLog.summary}</TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                {t.client.callLog.date}
+              </TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                {t.client.callLog.direction}
+              </TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0 whitespace-nowrap">
+                {t.client.callLog.duration}
+              </TableHeaderCell>
+              <TableHeaderCell sortable={false} className="min-w-0">
+                {t.client.callLog.summary}
+              </TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -151,8 +206,12 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
               <TableRow key={log.id}>
                 <TableCell className="min-w-0 whitespace-nowrap">
                   <div className="flex flex-col">
-                    <span className="type-body-2 text-foreground font-medium">{log.date} · {log.time}</span>
-                    <span className="type-caption text-muted-foreground">{relativeCallDate(log.date, t)}</span>
+                    <span className="type-body-2 font-medium text-foreground">
+                      {log.date} · {log.time}
+                    </span>
+                    <span className="type-caption text-muted-foreground">
+                      {relativeCallDate(log.date, t)}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell className="min-w-0 whitespace-nowrap">
@@ -162,11 +221,19 @@ export function CallLogTable({ callLogs }: { callLogs: CallLogEntry[] }) {
                     ) : (
                       <PhoneIncomingIcon size={16} className="text-[var(--icon-success)]" />
                     )}
-                    <span className="type-body-2 text-foreground">{log.direction === "outbound" ? t.client.callLog.outbound : t.client.callLog.inbound}</span>
+                    <span className="type-body-2 text-foreground">
+                      {log.direction === "outbound"
+                        ? t.client.callLog.outbound
+                        : t.client.callLog.inbound}
+                    </span>
                   </div>
                 </TableCell>
-                <TableCell className="min-w-0 whitespace-nowrap"><span className="type-body-2 text-foreground">{log.duration}</span></TableCell>
-                <TableCell className="min-w-0"><span className="type-body-2 text-foreground">{log.summary}</span></TableCell>
+                <TableCell className="min-w-0 whitespace-nowrap">
+                  <span className="type-body-2 text-foreground">{log.duration}</span>
+                </TableCell>
+                <TableCell className="min-w-0">
+                  <span className="type-body-2 text-foreground">{log.summary}</span>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

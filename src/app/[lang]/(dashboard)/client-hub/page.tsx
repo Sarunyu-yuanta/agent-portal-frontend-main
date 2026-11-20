@@ -76,7 +76,7 @@ function DebouncedSearchField({
 }) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <SearchInput
           size="sm"
           className={inputClassName}
@@ -115,15 +115,9 @@ function ClientHubPageInner() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [viewFilter, setViewFilter] = useState<ViewFilter>("customer");
-  const [hiddenColumns, setHiddenColumns] = useStoredIds<ColumnId>(
-    HIDDEN_COLUMNS_PREF,
-    isColumnId,
-  );
+  const [hiddenColumns, setHiddenColumns] = useStoredIds<ColumnId>(HIDDEN_COLUMNS_PREF, isColumnId);
   const visibleColumns = useMemo(
-    () =>
-      new Set(
-        CUSTOMER_COLUMNS.filter((c) => !hiddenColumns.has(c.id)).map((c) => c.id),
-      ),
+    () => new Set(CUSTOMER_COLUMNS.filter((c) => !hiddenColumns.has(c.id)).map((c) => c.id)),
     [hiddenColumns],
   );
 
@@ -131,14 +125,12 @@ function ClientHubPageInner() {
   const [productSearch, setProductSearch] = useState("");
   const debouncedProductSearch = useDebouncedValue(productSearch, 300);
 
-
   // Client quick view — URL-owned (`?client=110001`) so refresh, browser back
   // and a shared link all land on the same open panel. The one place that
   // *doesn't* reconstruct it is a return from that client's Full Profile: see
   // `goToProfile`, which clears the param out of the entry it leaves behind.
   const clientParam = searchParams.get("client");
-  const selectedClient =
-    (clientParam && clients.find((c) => c.id === clientParam)) || null;
+  const selectedClient = (clientParam && clients.find((c) => c.id === clientParam)) || null;
   const drawerOpen = !!selectedClient;
   // The drawer animates out after the param is gone — keep the last client
   // around so it slides away with content instead of collapsing to blank.
@@ -172,15 +164,16 @@ function ClientHubPageInner() {
   const toggleColumn = (id: ColumnId) => {
     if (CUSTOMER_COLUMNS.find((c) => c.id === id)?.required) return;
     const next = new Set(hiddenColumns);
-    if (next.has(id)) next.delete(id); else next.add(id);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     setHiddenColumns(next);
   };
 
   const tableWidth = useMemo(() => {
     const NO_COL_WIDTH = 60;
-    return NO_COL_WIDTH + CUSTOMER_COLUMNS.reduce(
-      (sum, c) => sum + (visibleColumns.has(c.id) ? c.width : 0),
-      0,
+    return (
+      NO_COL_WIDTH +
+      CUSTOMER_COLUMNS.reduce((sum, c) => sum + (visibleColumns.has(c.id) ? c.width : 0), 0)
     );
   }, [visibleColumns]);
 
@@ -203,9 +196,7 @@ function ClientHubPageInner() {
 
     const { key, dir } = customerSort;
     if (key && dir !== "none") {
-      const origIdx = key === "rowIndex"
-        ? new Map(clients.map((c, i) => [c.id, i]))
-        : null;
+      const origIdx = key === "rowIndex" ? new Map(clients.map((c, i) => [c.id, i])) : null;
       list = [...list].sort((a, b) =>
         compareBy(
           origIdx ? (origIdx.get(a.id) ?? 0) : getSortValue(a, key),
@@ -218,10 +209,7 @@ function ClientHubPageInner() {
     return list;
   }, [debouncedSearch, customerSort, clients]);
 
-  const originalIndexMap = useMemo(
-    () => new Map(clients.map((c, i) => [c.id, i + 1])),
-    [clients],
-  );
+  const originalIndexMap = useMemo(() => new Map(clients.map((c, i) => [c.id, i + 1])), [clients]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -237,16 +225,12 @@ function ClientHubPageInner() {
 
   const filteredProductRows = useMemo(() => {
     const q = debouncedProductSearch.trim().toLowerCase();
-    let list = q
-      ? productRows.filter((r) => r.label.toLowerCase().includes(q))
-      : productRows;
+    let list = q ? productRows.filter((r) => r.label.toLowerCase().includes(q)) : productRows;
 
     const { key, dir } = productSort;
     if (key && dir !== "none") {
       const valueOf = (r: ProductRow) =>
-        key === "rowIndex"
-          ? (productIndexMap.get(r.label) ?? 0)
-          : getProductSortValue(r, key, t);
+        key === "rowIndex" ? (productIndexMap.get(r.label) ?? 0) : getProductSortValue(r, key, t);
       list = [...list].sort((a, b) => compareBy(valueOf(a), valueOf(b), dir));
     }
 
@@ -322,79 +306,83 @@ function ClientHubPageInner() {
     <>
       {/* Hero — own padding + max-width */}
       <div className="pt-4 pb-2 xl:pt-6 xl:pb-2">
-        <div className="max-w-[1280px] mx-auto px-4 xl:px-6 flex flex-col gap-4">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-4 px-4 xl:px-6">
           <ClientSummaryCards clients={clients} isLoading={isLoading} />
         </div>
       </div>
 
       {/* White section — full-width background, content constrained to max-w */}
-      <section className="flex-1 bg-white rounded-t-[16px] xl:rounded-t-2xl">
-        <div className="max-w-[1280px] mx-auto px-4 xl:px-6 flex flex-col gap-3 pt-4 xl:pt-6 pb-6">
+      <section className="flex-1 rounded-t-[16px] bg-white xl:rounded-t-2xl">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 pt-4 pb-6 xl:px-6 xl:pt-6">
           {/* Toolbar. First load: tabs are bars too — nothing is clickable
               yet. After that the tabs stay live; their counts and the Columns /
               Search controls (which act on the rows) wait for data. */}
-          <div className="flex flex-wrap items-center gap-3 min-h-10">
+          <div className="flex min-h-10 flex-wrap items-center gap-3">
             {!hasLoaded ? (
               <TabsSkeleton count={2} className="h-10" />
             ) : (
-            <TabGroup
-              items={[
-                {
-                  id: "customer",
-                  title: isLoading ? t.client.hub.customerTab : t.client.hub.customerTabCount(sorted.length),
-                },
-                {
-                  id: "product",
-                  title: isLoading ? t.client.hub.productTab : t.client.hub.productTabCount(filteredProductRows.length),
-                },
-              ]}
-              activeId={viewFilter}
-              size="md"
-              onChange={(id) => setViewFilter(id as ViewFilter)}
-            />
+              <TabGroup
+                items={[
+                  {
+                    id: "customer",
+                    title: isLoading
+                      ? t.client.hub.customerTab
+                      : t.client.hub.customerTabCount(sorted.length),
+                  },
+                  {
+                    id: "product",
+                    title: isLoading
+                      ? t.client.hub.productTab
+                      : t.client.hub.productTabCount(filteredProductRows.length),
+                  },
+                ]}
+                activeId={viewFilter}
+                size="md"
+                onChange={(id) => setViewFilter(id as ViewFilter)}
+              />
             )}
             {isLoading ? (
-              <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto" aria-busy="true">
+              <div className="flex w-full items-center gap-2 lg:ml-auto lg:w-auto" aria-busy="true">
                 {viewFilter === "customer" && <Skeleton className="h-10 w-[120px] rounded-lg" />}
-                <Skeleton className="h-10 flex-1 lg:w-64 rounded-lg" />
+                <Skeleton className="h-10 flex-1 rounded-lg lg:w-64" />
               </div>
             ) : (
               <>
-              {viewFilter === "customer" && (
-                <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto">
-                  <ColumnVisibilityMenu
-                    columns={CUSTOMER_COLUMNS}
-                    visibleColumns={visibleColumns}
-                    onToggle={toggleColumn}
-                    onReset={() => setHiddenColumns(new Set())}
-                  />
+                {viewFilter === "customer" && (
+                  <div className="flex w-full items-center gap-2 lg:ml-auto lg:w-auto">
+                    <ColumnVisibilityMenu
+                      columns={CUSTOMER_COLUMNS}
+                      visibleColumns={visibleColumns}
+                      onToggle={toggleColumn}
+                      onReset={() => setHiddenColumns(new Set())}
+                    />
+                    <DebouncedSearchField
+                      className="flex-1 lg:w-64"
+                      inputClassName="!h-10"
+                      placeholder={t.client.hub.searchClients}
+                      value={search}
+                      debouncedValue={debouncedSearch}
+                      onChange={(val) => {
+                        setSearch(val);
+                        setCurrentPage(1);
+                      }}
+                      onClear={() => {
+                        setSearch("");
+                        setCurrentPage(1);
+                      }}
+                    />
+                  </div>
+                )}
+                {viewFilter === "product" && (
                   <DebouncedSearchField
-                    className="flex-1 lg:w-64"
-                    inputClassName="!h-10"
-                    placeholder={t.client.hub.searchClients}
-                    value={search}
-                    debouncedValue={debouncedSearch}
-                    onChange={(val) => {
-                      setSearch(val);
-                      setCurrentPage(1);
-                    }}
-                    onClear={() => {
-                      setSearch("");
-                      setCurrentPage(1);
-                    }}
+                    className="w-full lg:ml-auto lg:w-56"
+                    placeholder={t.client.hub.searchProducts}
+                    value={productSearch}
+                    debouncedValue={debouncedProductSearch}
+                    onChange={setProductSearch}
+                    onClear={() => setProductSearch("")}
                   />
-                </div>
-              )}
-              {viewFilter === "product" && (
-                <DebouncedSearchField
-                  className="w-full lg:w-56 lg:ml-auto"
-                  placeholder={t.client.hub.searchProducts}
-                  value={productSearch}
-                  debouncedValue={debouncedProductSearch}
-                  onChange={setProductSearch}
-                  onClear={() => setProductSearch("")}
-                />
-              )}
+                )}
               </>
             )}
           </div>
@@ -428,49 +416,58 @@ function ClientHubPageInner() {
                 />
 
                 {isLoading ? (
-                  <div className="flex flex-wrap-reverse items-center justify-end gap-3" aria-hidden>
+                  <div
+                    className="flex flex-wrap-reverse items-center justify-end gap-3"
+                    aria-hidden
+                  >
                     <Skeleton className="h-8 w-40" />
                     <Skeleton className="h-8 w-48" />
                     <Skeleton className="h-10 w-[120px] rounded-lg" />
                   </div>
-                ) : sorted.length > 0 && (
-                <div className="flex flex-wrap-reverse items-center justify-end gap-3">
-                  <div className="flex items-center gap-2">
-                    <p className="text-label text-muted-foreground whitespace-nowrap">{t.client.hub.perPage}</p>
-                    <select
-                      value={pageSize}
-                      onChange={(e) => {
-                        setPageSize(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
-                      className="text-label border border-border rounded-md px-2 py-1 bg-background text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-action"
-                    >
-                      {PAGE_SIZE_OPTIONS.map((n) => (
-                        <option key={n} value={n}>{n}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-label text-muted-foreground">
-                      {t.client.hub.showingClients(
-                        <span key="from" className="font-medium text-foreground">
-                          {(safePage - 1) * pageSize + 1}
-                        </span>,
-                        <span key="to" className="font-medium text-foreground">
-                          {Math.min(safePage * pageSize, sorted.length)}
-                        </span>,
-                        <span key="total" className="font-medium text-foreground">
-                          {sorted.length}
-                        </span>,
-                      )}
-                    </p>
-                    <Pagination
-                      totalPages={totalPages}
-                      currentPage={safePage}
-                      onPageChange={setCurrentPage}
-                    />
-                  </div>
-                </div>
+                ) : (
+                  sorted.length > 0 && (
+                    <div className="flex flex-wrap-reverse items-center justify-end gap-3">
+                      <div className="flex items-center gap-2">
+                        <p className="text-label whitespace-nowrap text-muted-foreground">
+                          {t.client.hub.perPage}
+                        </p>
+                        <select
+                          value={pageSize}
+                          onChange={(e) => {
+                            setPageSize(Number(e.target.value));
+                            setCurrentPage(1);
+                          }}
+                          className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
+                        >
+                          {PAGE_SIZE_OPTIONS.map((n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <p className="text-label text-muted-foreground">
+                          {t.client.hub.showingClients(
+                            <span key="from" className="font-medium text-foreground">
+                              {(safePage - 1) * pageSize + 1}
+                            </span>,
+                            <span key="to" className="font-medium text-foreground">
+                              {Math.min(safePage * pageSize, sorted.length)}
+                            </span>,
+                            <span key="total" className="font-medium text-foreground">
+                              {sorted.length}
+                            </span>,
+                          )}
+                        </p>
+                        <Pagination
+                          totalPages={totalPages}
+                          currentPage={safePage}
+                          onPageChange={setCurrentPage}
+                        />
+                      </div>
+                    </div>
+                  )
                 )}
               </>
             ) : (
@@ -496,7 +493,7 @@ function ClientHubPageInner() {
 
       {/* Client Detail Drawer */}
       <DetailDrawer
-        className="overflow-hidden flex flex-col"
+        className="flex flex-col overflow-hidden"
         open={drawerOpen}
         onOpenChange={(open, details) => {
           if (open) return;
@@ -531,7 +528,7 @@ function ClientHubPageInner() {
 
       {/* Product Detail Drawer */}
       <DetailDrawer
-        className="overflow-hidden flex flex-col"
+        className="flex flex-col overflow-hidden"
         open={productDrawerOpen}
         onOpenChange={(open) => {
           setProductDrawerOpen(open);
@@ -549,16 +546,14 @@ function ClientHubPageInner() {
 
       {/* Nine Box Cell Drawer */}
       <DetailDrawer
-        className="overflow-hidden flex flex-col"
+        className="flex flex-col overflow-hidden"
         open={nineBoxDrawerOpen}
         onOpenChange={(open) => {
           setNineBoxDrawerOpen(open);
           if (!open) setNineBoxCell(null);
         }}
       >
-        {nineBoxCell && (
-          <NineBoxCellDrawer cell={nineBoxCell} onViewFullProfile={goToProfile} />
-        )}
+        {nineBoxCell && <NineBoxCellDrawer cell={nineBoxCell} onViewFullProfile={goToProfile} />}
       </DetailDrawer>
     </>
   );

@@ -14,20 +14,44 @@ import { useT } from "@/i18n/I18nProvider";
 function KpiBar() {
   const k = useT().research.aiInsights.kpi;
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+    <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
       {[
-        { label: k.highPriority,    tag: k.highPriorityTag,    tagV: "red"    as const, value: "3",       sub: k.highPrioritySub },
-        { label: k.revenueImpact,   tag: "+฿ 9.5M",            tagV: "green"  as const, value: "฿ 9.5M",  sub: k.revenueImpactSub(8) },
-        { label: k.riskAlerts,      tag: k.riskAlertsTag(2),   tagV: "red"    as const, value: "2",       sub: k.riskAlertsSub },
-        { label: k.engagementDrops, tag: k.engagementDropsTag, tagV: "yellow" as const, value: "1",       sub: k.engagementDropsSub(14) },
+        {
+          label: k.highPriority,
+          tag: k.highPriorityTag,
+          tagV: "red" as const,
+          value: "3",
+          sub: k.highPrioritySub,
+        },
+        {
+          label: k.revenueImpact,
+          tag: "+฿ 9.5M",
+          tagV: "green" as const,
+          value: "฿ 9.5M",
+          sub: k.revenueImpactSub(8),
+        },
+        {
+          label: k.riskAlerts,
+          tag: k.riskAlertsTag(2),
+          tagV: "red" as const,
+          value: "2",
+          sub: k.riskAlertsSub,
+        },
+        {
+          label: k.engagementDrops,
+          tag: k.engagementDropsTag,
+          tagV: "yellow" as const,
+          value: "1",
+          sub: k.engagementDropsSub(14),
+        },
       ].map((k) => (
         <Card key={k.label} variant="default" className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
             <p className="type-caption text-muted-foreground">{k.label}</p>
             <Tag text={k.tag} variant={k.tagV} size="small" />
           </div>
-          <div className="flex flex-col gap-1 mt-auto">
-            <p className="type-h3 text-foreground leading-none">{k.value}</p>
+          <div className="mt-auto flex flex-col gap-1">
+            <p className="type-h3 leading-none text-foreground">{k.value}</p>
             <p className="type-caption text-[var(--text-default-disabled)]">{k.sub}</p>
           </div>
         </Card>
@@ -44,19 +68,20 @@ function AiSummaryCard() {
         <SparkleIcon size={16} weight="duotone" className="text-foreground" />
         <p className="type-subtitle-1 text-foreground">{s.title}</p>
       </div>
-      <p className="text-label text-muted-foreground leading-relaxed">
+      <p className="text-label leading-relaxed text-muted-foreground">
         8 active insights across your book. Focus on{" "}
         <span className="font-semibold text-foreground">Somchai</span> and{" "}
-        <span className="font-semibold text-foreground">Nattaporn</span> — highest revenue potential at ฿ 5.6M combined.
+        <span className="font-semibold text-foreground">Nattaporn</span> — highest revenue potential
+        at ฿ 5.6M combined.
       </p>
-      <div className="flex flex-col gap-2 pt-1 border-t border-border">
+      <div className="flex flex-col gap-2 border-t border-border pt-1">
         <div className="flex items-center justify-between">
           <span className="text-meta text-muted-foreground">{s.modelUpdated}</span>
           <span className="text-meta font-medium text-foreground">{s.todayAt("08:30")}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-meta text-muted-foreground">{s.avgConfidence}</span>
-          <span className="text-meta font-semibold text-success">83%</span>
+          <span className="text-success text-meta font-semibold">83%</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-meta text-muted-foreground">{s.clientsAnalyzed}</span>
@@ -85,8 +110,8 @@ function AiModelStats() {
       <div className="flex flex-col gap-2">
         {stats.map((s) => (
           <div key={s.label} className="flex items-center gap-2.5">
-            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-            <span className="text-label text-muted-foreground flex-1">{s.label}</span>
+            <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+            <span className="flex-1 text-label text-muted-foreground">{s.label}</span>
             <span className="text-label font-semibold text-foreground tabular-nums">{s.count}</span>
           </div>
         ))}
@@ -147,9 +172,9 @@ export default function AiInsightsPage() {
         <KpiBar />
 
         {/* Body: 2-col */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           {/* Main feed */}
-          <div className="w-full lg:flex-1 min-w-0 flex flex-col gap-4">
+          <div className="flex w-full min-w-0 flex-col gap-4 lg:flex-1">
             <div className="scrollable-tabs transparent-tabs">
               <TabGroup
                 items={tabItems}
@@ -183,7 +208,7 @@ export default function AiInsightsPage() {
             </div>
 
             {/* Insight feed */}
-            <div className="rounded-2xl border border-border bg-card overflow-hidden w-full max-w-full">
+            <div className="w-full max-w-full overflow-hidden rounded-2xl border border-border bg-card">
               {sortedInsights.length === 0 ? (
                 <div className="flex items-center justify-center py-16">
                   <p className="type-body-2 text-muted-foreground">{ai.empty}</p>
@@ -203,7 +228,7 @@ export default function AiInsightsPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-72 lg:shrink-0 flex flex-col gap-4">
+          <div className="flex w-full flex-col gap-4 lg:w-72 lg:shrink-0">
             <AiSummaryCard />
             <AiModelStats />
             <LogicRulesSidebar />

@@ -70,7 +70,7 @@ export function ChipScroller({
     <div className="relative" style={style}>
       <div
         ref={scrollRef}
-        className="overflow-x-auto hide-scrollbar"
+        className="hide-scrollbar overflow-x-auto"
         style={{ scrollbarWidth: "none" }}
       >
         <div ref={contentRef} className={`flex items-center gap-2 ${rowClassName}`}>
@@ -85,30 +85,24 @@ export function ChipScroller({
   );
 }
 
-function ChipScrollButton({
-  side,
-  onClick,
-}: {
-  side: "left" | "right";
-  onClick: () => void;
-}) {
+function ChipScrollButton({ side, onClick }: { side: "left" | "right"; onClick: () => void }) {
   const t = useT();
   const isLeft = side === "left";
   return (
     // The wrapper is click-through so it only fades the chips sliding under it;
     // the button itself takes pointer events back.
     <div
-      className={`pointer-events-none absolute inset-y-0 hidden lg:flex items-center ${
+      className={`pointer-events-none absolute inset-y-0 hidden items-center lg:flex ${
         isLeft
-          ? "left-0 pl-1.5 pr-6 bg-gradient-to-r from-white via-white to-transparent"
-          : "right-0 pr-1.5 pl-6 bg-gradient-to-l from-white via-white to-transparent"
+          ? "left-0 bg-gradient-to-r from-white via-white to-transparent pr-6 pl-1.5"
+          : "right-0 bg-gradient-to-l from-white via-white to-transparent pr-1.5 pl-6"
       }`}
     >
       <button
         type="button"
         onClick={onClick}
         aria-label={isLeft ? t.shell.chipScroller.scrollLeft : t.shell.chipScroller.scrollRight}
-        className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white shadow-sm transition-colors cursor-pointer hover:bg-muted active:bg-[var(--fill-gray-200)]"
+        className="pointer-events-auto flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-black/10 bg-white shadow-sm transition-colors hover:bg-muted active:bg-[var(--fill-gray-200)]"
       >
         {isLeft ? <CaretLeftIcon size={14} /> : <CaretRightIcon size={14} />}
       </button>

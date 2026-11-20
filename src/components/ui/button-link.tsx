@@ -38,8 +38,7 @@ const VARIANT = {
     "bg-background text-primary-action border border-border hover:bg-hover-bg active:bg-disabled-bg",
   plain:
     "bg-transparent text-primary-action border border-transparent hover:bg-hover-bg active:bg-disabled-bg",
-  "outline-black":
-    "bg-background text-foreground border border-border hover:bg-hover-bg",
+  "outline-black": "bg-background text-foreground border border-border hover:bg-hover-bg",
 } as const;
 
 export function ButtonLink({
@@ -61,11 +60,7 @@ export function ButtonLink({
   children: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Link>, "href" | "className" | "children">) {
   return (
-    <Link
-      href={href}
-      className={cn(BASE, SIZE[size], VARIANT[variant], className)}
-      {...props}
-    >
+    <Link href={href} className={cn(BASE, SIZE[size], VARIANT[variant], className)} {...props}>
       {leftIcon}
       {children}
       {rightIcon}

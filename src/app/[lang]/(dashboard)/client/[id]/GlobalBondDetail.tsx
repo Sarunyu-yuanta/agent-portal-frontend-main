@@ -59,10 +59,7 @@ export function GlobalBondDetail({
    * list to sell from, but the orders already placed on it are still this
    * issuer's and still the IC's to read.
    */
-  const bookIds = useMemo(
-    () => issuer.bonds.map((row) => globalBondBookableId(row)),
-    [issuer],
-  );
+  const bookIds = useMemo(() => issuer.bonds.map((row) => globalBondBookableId(row)), [issuer]);
   const filteredBonds = useMemo(
     () => filterGlobalBonds(openBonds, yieldFilter, maturityFilter),
     [openBonds, yieldFilter, maturityFilter],
@@ -94,13 +91,11 @@ export function GlobalBondDetail({
         }
       : undefined;
 
-  const updatedAtMobile = issuer.updatedAt
-    .replace("September", "Sep")
-    .replace("August", "Aug");
+  const updatedAtMobile = issuer.updatedAt.replace("September", "Sep").replace("August", "Aug");
 
   return (
-    <div className="flex flex-col items-stretch w-full pt-4 pb-10 px-4 md:pt-6 md:pb-20 md:px-8 lg:px-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] mx-auto">
+    <div className="flex w-full flex-col items-stretch bg-gradient-to-b from-white from-[43.451%] to-transparent px-4 pt-4 pb-10 md:px-8 md:pt-6 md:pb-20 lg:px-20">
+      <div className="mx-auto flex h-[46px] w-full max-w-[1280px] items-center gap-2 py-2">
         <Button
           variant="plain"
           size="icon-sm"
@@ -110,12 +105,12 @@ export function GlobalBondDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-base lg:text-lg font-bold leading-[28px] lg:leading-[30px] text-[#101828] text-left truncate">
+        <h1 className="min-w-0 flex-1 truncate text-left text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[30px]">
           {issuer.title}
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 md:gap-8 lg:gap-8 w-full max-w-[1280px] mx-auto">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 md:gap-8 lg:gap-8">
         <GlobalBondDetailHero
           issuer={issuer}
           yieldFilter={yieldFilter}
@@ -126,7 +121,7 @@ export function GlobalBondDetail({
           showFilters={tab === "detail"}
         />
 
-        <div className="flex flex-col gap-4 lg:gap-12 w-full">
+        <div className="flex w-full flex-col gap-4 lg:gap-12">
           {/* The same two views the rest of the catalogue's product pages
               carry. This one is an *issuer*, not a single bond, so Order is
               scoped to all of its bonds — the chips and the table are Order
@@ -146,12 +141,12 @@ export function GlobalBondDetail({
             <QuotaBooksPanel desk="Global Bond" productIds={bookIds} />
           ) : (
             <>
-              <div className="flex flex-col gap-4 w-full">
-                <div className="flex items-center justify-between w-full gap-3">
-                  <p className="text-sm font-bold leading-[24px] text-[#101828] md:text-base md:leading-[28px]">
+              <div className="flex w-full flex-col gap-4">
+                <div className="flex w-full items-center justify-between gap-3">
+                  <p className="text-sm leading-[24px] font-bold text-[#101828] md:text-base md:leading-[28px]">
                     {t.products.common.itemCount(filteredBonds.length)}
                   </p>
-                  <span className="text-xs leading-[20px] text-[#6a7282] md:text-sm md:leading-[24px] whitespace-nowrap shrink-0">
+                  <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-[#6a7282] md:text-sm md:leading-[24px]">
                     <span className="md:hidden">
                       {t.products.common.updatedAt(updatedAtMobile)}
                     </span>
@@ -166,20 +161,20 @@ export function GlobalBondDetail({
                   <GlobalBondProposalContext.Provider
                     value={ORDER_BOOKING_ENABLED ? proposal.send : null}
                   >
-                  <div className="lg:hidden">
-                    <GlobalBondDetailAccordion bonds={filteredBonds} onClearFilters={clearFilters} />
-                  </div>
-                  <div className="hidden lg:block">
-                    <GlobalBondDetailTable bonds={filteredBonds} onClearFilters={clearFilters} />
-                  </div>
+                    <div className="lg:hidden">
+                      <GlobalBondDetailAccordion
+                        bonds={filteredBonds}
+                        onClearFilters={clearFilters}
+                      />
+                    </div>
+                    <div className="hidden lg:block">
+                      <GlobalBondDetailTable bonds={filteredBonds} onClearFilters={clearFilters} />
+                    </div>
                   </GlobalBondProposalContext.Provider>
                 </GlobalBondBookingContext.Provider>
               </div>
 
-              <GlobalBondDetailRecommended
-                issuerId={issuerId}
-                onIssuerSelect={onIssuerSelect}
-              />
+              <GlobalBondDetailRecommended issuerId={issuerId} onIssuerSelect={onIssuerSelect} />
             </>
           )}
           {booking.ui}

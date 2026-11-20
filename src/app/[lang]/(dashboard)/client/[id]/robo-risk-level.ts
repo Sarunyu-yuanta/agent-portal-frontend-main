@@ -4,10 +4,7 @@ export type RoboRiskTier = "low" | "low-medium" | "medium" | "high" | "super-hig
 export const ROBO_RISK_TRACK_COLOR = "#d9d9d9";
 export const ROBO_RISK_EMPTY_SEGMENT_COLOR = "#f9fafb";
 
-export const ROBO_RISK_CONFIG: Record<
-  RoboRiskTier,
-  { filledSegments: number; color: string }
-> = {
+export const ROBO_RISK_CONFIG: Record<RoboRiskTier, { filledSegments: number; color: string }> = {
   low: { filledSegments: 1, color: "#00c951" },
   "low-medium": { filledSegments: 2, color: "#f0b100" },
   medium: { filledSegments: 3, color: "#ff6900" },

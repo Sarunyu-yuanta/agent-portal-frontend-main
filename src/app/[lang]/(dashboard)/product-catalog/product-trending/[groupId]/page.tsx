@@ -39,8 +39,7 @@ export default function ProductTrendingGroupPage({
   const select = useTrendingSelect({
     onMutualFundSelect: (fundId) =>
       router.push(`/product-catalog/mutual-fund/${encodeURIComponent(fundId)}`),
-    onFixedIncomeBondSelect: (bond) =>
-      router.push(`/product-catalog/fixed-income/bond/${bond.id}`),
+    onFixedIncomeBondSelect: (bond) => router.push(`/product-catalog/fixed-income/bond/${bond.id}`),
     onThaiProductSelect: (p) =>
       router.push(`/product-catalog/thai-structured/${encodeURIComponent(p.theme)}`),
     onProductSelect: (p) => router.push(`/product-catalog/product/${p.id}`),

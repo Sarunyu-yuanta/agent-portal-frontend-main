@@ -101,8 +101,10 @@ export function paymentStatus(booking: Booking, book: OrderBook, t: Dictionary):
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = submissionFor(booking, book);
   if (submission?.status === "completed") return { text: t.orders.payment.paid, variant: "green" };
-  if (submission?.status === "processing") return { text: t.orders.payment.awaiting, variant: "yellow" };
-  if (submission?.status === "rejected") return { text: t.orders.payment.notRequired, variant: "gray" };
+  if (submission?.status === "processing")
+    return { text: t.orders.payment.awaiting, variant: "yellow" };
+  if (submission?.status === "rejected")
+    return { text: t.orders.payment.notRequired, variant: "gray" };
   return { text: t.orders.payment.reserved, variant: "lime" };
 }
 
@@ -115,7 +117,8 @@ export function paymentStatus(booking: Booking, book: OrderBook, t: Dictionary):
 export function emailStatus(booking: Booking, book: OrderBook, t: Dictionary): BookingStatusTag {
   if (booking.status === "cancelled") return { text: "—", variant: "gray" };
   const submission = submissionFor(booking, book);
-  if (submission?.status === "completed") return { text: t.orders.email.confirmed, variant: "green" };
+  if (submission?.status === "completed")
+    return { text: t.orders.email.confirmed, variant: "green" };
   if (submission?.status === "rejected") return { text: t.orders.email.cancelled, variant: "gray" };
   return { text: t.orders.email.sent, variant: "blue" };
 }

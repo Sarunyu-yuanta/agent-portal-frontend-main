@@ -68,13 +68,9 @@ const LAYERS: { key: CalendarLayerKey }[] = [
 
 /** Does this row survive the filter? Applied before the grid so a hidden row
  *  isn't counted by a cell's "+N more" either. */
-export function itemVisible(
-  item: DayItem,
-  filter: CalendarFilterState,
-): boolean {
+export function itemVisible(item: DayItem, filter: CalendarFilterState): boolean {
   if (filter.hiddenLayers.has(item.source)) return false;
-  if (item.source === "corporate-action")
-    return !filter.hiddenKinds.has(item.kind);
+  if (item.source === "corporate-action") return !filter.hiddenKinds.has(item.kind);
   if (item.source === "event") return !filter.hiddenCategories.has(item.kind);
   return true;
 }
@@ -89,17 +85,12 @@ export function holidaysVisible(filter: CalendarFilterState): boolean {
  *  arithmetic. */
 export function hiddenCount(filter: CalendarFilterState): number {
   let n = filter.hiddenLayers.size;
-  if (!filter.hiddenLayers.has("corporate-action"))
-    n += filter.hiddenKinds.size;
+  if (!filter.hiddenLayers.has("corporate-action")) n += filter.hiddenKinds.size;
   if (!filter.hiddenLayers.has("event")) n += filter.hiddenCategories.size;
   return n;
 }
 
-function toggle(
-  set: ReadonlySet<string>,
-  key: string,
-  hidden: boolean,
-): Set<string> {
+function toggle(set: ReadonlySet<string>, key: string, hidden: boolean): Set<string> {
   const next = new Set(set);
   if (hidden) next.add(key);
   else next.delete(key);
@@ -136,14 +127,9 @@ function ChildRow({
         // line, and a row that wrapped would break the even rhythm the eye
         // scans down. If a feed ever sends something longer, it truncates —
         // the panel does not widen and never scrolls sideways.
-        <span
-          className="flex min-w-0 items-center gap-1.5 whitespace-nowrap"
-          title={fullName}
-        >
+        <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap" title={fullName}>
           <KeyPill swatch={tag} swatchStyle={tagStyle} />
-          <span className="min-w-0 truncate type-body-2 text-muted-foreground">
-            {name}
-          </span>
+          <span className="type-body-2 min-w-0 truncate text-muted-foreground">{name}</span>
         </span>
       }
     />
@@ -188,9 +174,7 @@ export function CalendarFilterMenu({
   const t = useT();
   const hidden = hiddenCount(state);
   /** Which layers are showing their codes. Starts empty — see the note above. */
-  const [expanded, setExpanded] = useState<ReadonlySet<string>>(
-    () => new Set(),
-  );
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
 
   const sortedKinds = [...kinds].sort(
     (a, b) => actionKindRank(a) - actionKindRank(b) || a.localeCompare(b),
@@ -248,9 +232,7 @@ export function CalendarFilterMenu({
         const layerLabel = t.planner.calendar.filter.layers[layer.key];
         const layerShown = !state.hiddenLayers.has(layer.key);
         const child = childrenOf(layer.key);
-        const hiddenHere = child
-          ? child.all.filter((c) => child.hiddenSet.has(c)).length
-          : 0;
+        const hiddenHere = child ? child.all.filter((c) => child.hiddenSet.has(c)).length : 0;
         const isOpen = expanded.has(layer.key);
 
         return (
@@ -265,18 +247,10 @@ export function CalendarFilterMenu({
                   // with some of its codes off — a plain tick would claim the
                   // grid is showing every company event when it is showing
                   // eight of eleven.
-                  checked={
-                    layerShown
-                      ? hiddenHere > 0
-                        ? "indeterminate"
-                        : true
-                      : false
-                  }
+                  checked={layerShown ? (hiddenHere > 0 ? "indeterminate" : true) : false}
                   onChange={(next) => setLayer(layer.key, next)}
                   label={
-                    <span className="type-body-2 font-medium text-foreground">
-                      {layerLabel}
-                    </span>
+                    <span className="type-body-2 font-medium text-foreground">{layerLabel}</span>
                   }
                 />
               </div>
@@ -297,8 +271,12 @@ export function CalendarFilterMenu({
                     })
                   }
                   aria-expanded={isOpen}
-                  aria-label={t.planner.calendar.filter.toggleTypes(isOpen, child.all.length, layerLabel)}
-                  className="flex shrink-0 items-center gap-1 rounded-lg px-1.5 py-1 type-caption font-medium text-muted-foreground transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
+                  aria-label={t.planner.calendar.filter.toggleTypes(
+                    isOpen,
+                    child.all.length,
+                    layerLabel,
+                  )}
+                  className="type-caption flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 font-medium text-muted-foreground transition-colors hover:bg-[var(--bg-default-secondary)]! hover:text-foreground"
                 >
                   <span className="tabular-nums">
                     {hiddenHere > 0
@@ -343,11 +321,7 @@ export function CalendarFilterMenu({
                           onChange={(next) =>
                             onChange({
                               ...state,
-                              hiddenKinds: toggle(
-                                state.hiddenKinds,
-                                kind,
-                                !next,
-                              ),
+                              hiddenKinds: toggle(state.hiddenKinds, kind, !next),
                             })
                           }
                         />
@@ -359,9 +333,7 @@ export function CalendarFilterMenu({
                         <ChildRow
                           key={category}
                           tag={
-                            <span className="flex items-center [&>svg]:size-3">
-                              {meta.icon}
-                            </span>
+                            <span className="flex items-center [&>svg]:size-3">{meta.icon}</span>
                           }
                           tagStyle={{
                             backgroundColor: meta.tint,
@@ -373,11 +345,7 @@ export function CalendarFilterMenu({
                           onChange={(next) =>
                             onChange({
                               ...state,
-                              hiddenCategories: toggle(
-                                state.hiddenCategories,
-                                category,
-                                !next,
-                              ),
+                              hiddenCategories: toggle(state.hiddenCategories, category, !next),
                             })
                           }
                         />
@@ -395,7 +363,7 @@ export function CalendarFilterMenu({
         <button
           type="button"
           onClick={() => onChange(SHOW_EVERYTHING)}
-          className="shrink-0 border-t border-border/60 px-3 py-2 text-left type-body-2 font-medium text-primary-action transition-colors cursor-pointer hover:bg-[var(--bg-default-secondary)]!"
+          className="type-body-2 text-primary-action shrink-0 cursor-pointer border-t border-border/60 px-3 py-2 text-left font-medium transition-colors hover:bg-[var(--bg-default-secondary)]!"
         >
           {t.planner.calendar.filter.showEverything}
         </button>
@@ -404,7 +372,7 @@ export function CalendarFilterMenu({
   );
 
   return (
-    <Popover align="end" className="p-0 overflow-hidden" content={content}>
+    <Popover align="end" className="overflow-hidden p-0" content={content}>
       {/* Two buttons rather than one with a hidden label, for the reason
           `CalendarView`'s "New reminder" pair documents: `Button` trims the
           padding on whichever side carries an icon, which leaves a lone glyph
@@ -419,12 +387,18 @@ export function CalendarFilterMenu({
           leftIcon={<FunnelSimpleIcon size={15} />}
           rightIcon={<CaretDownIcon size={12} weight="bold" />}
         >
-          {hidden > 0 ? t.planner.calendar.filter.filterCount(hidden) : t.planner.calendar.filter.filter}
+          {hidden > 0
+            ? t.planner.calendar.filter.filterCount(hidden)
+            : t.planner.calendar.filter.filter}
         </Button>
         <Button
           variant="outline"
           size="icon-md"
-          aria-label={hidden > 0 ? t.planner.calendar.filter.filterHidden(hidden) : t.planner.calendar.filter.filter}
+          aria-label={
+            hidden > 0
+              ? t.planner.calendar.filter.filterHidden(hidden)
+              : t.planner.calendar.filter.filter
+          }
           className="sm:hidden!"
         >
           <FunnelSimpleIcon size={16} />

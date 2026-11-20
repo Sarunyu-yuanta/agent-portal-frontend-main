@@ -38,7 +38,6 @@ import { RoboRiskLevel } from "./RoboRiskLevel";
 import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
 import { useT } from "@/i18n/I18nProvider";
 
-
 /** Hidden pending sign-off on the filter behavior — flip to true to re-enable. */
 const SHOW_ROBO_FILTER_BUTTON = false;
 
@@ -47,10 +46,16 @@ function DesktopBackHeader({ onBack }: { onBack: () => void }) {
   const t = useT();
   return (
     <div className="flex w-full items-center gap-3 rounded-lg p-2">
-      <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="size-[34px] shrink-0 p-2">
+      <Button
+        variant="plain"
+        size="icon-sm"
+        onClick={onBack}
+        aria-label={t.products.common.back}
+        className="size-[34px] shrink-0 p-2"
+      >
         <ArrowLeftIcon size={18} />
       </Button>
-      <h1 className="shrink-0 text-lg font-bold leading-[28px] text-black">Robo Advisory</h1>
+      <h1 className="shrink-0 text-lg leading-[28px] font-bold text-black">Robo Advisory</h1>
     </div>
   );
 }
@@ -78,10 +83,14 @@ function StatItem({
         style={labelWidth != null ? { width: labelWidth } : undefined}
       >
         <div className="text-center leading-none">
-          <p className="mb-0 text-xs font-bold leading-[20px] text-[#101828]">{labelLines[0]}</p>
-          <p className="text-xs font-bold leading-[20px] text-[#101828]">{labelLines[1]}</p>
+          <p className="mb-0 text-xs leading-[20px] font-bold text-[#101828]">{labelLines[0]}</p>
+          <p className="text-xs leading-[20px] font-bold text-[#101828]">{labelLines[1]}</p>
         </div>
-        <p className={`whitespace-nowrap text-xs leading-[20px] ${valueClassName ?? "text-[#4a5565]"}`}>{value}</p>
+        <p
+          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-[#4a5565]"}`}
+        >
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -125,7 +134,7 @@ function RoboPlanCard({
           <div className="flex w-full flex-col gap-1">
             <div className="flex flex-col gap-1 pt-1">
               <p className="text-micro leading-[18px] text-[#4a5565]">{plan.provider}</p>
-              <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg font-bold leading-[28px] text-transparent">
+              <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg leading-[28px] font-bold text-transparent">
                 {plan.name}
               </p>
             </div>
@@ -135,16 +144,24 @@ function RoboPlanCard({
             <RoboRiskLevel tier={plan.riskTier} />
             <PlanSuitabilityBadge suitability={planSuitability(client, plan.riskTier)} />
             <div className="flex min-w-0 flex-[1_0_0] items-center justify-end gap-1 whitespace-nowrap">
-              <p className="text-xs font-bold leading-[20px] text-[#101828]">Available Room</p>
+              <p className="text-xs leading-[20px] font-bold text-[#101828]">Available Room</p>
               <p className="text-xs leading-[20px] text-[#4a5565]">{plan.availableRoom}</p>
             </div>
           </div>
         </div>
 
         <div className="flex w-full items-end">
-          <StatItem iconSrc={ROBO_ASSETS.iconMoney} labelLines={stats.minInvestmentLines} value={plan.minInvestment} />
+          <StatItem
+            iconSrc={ROBO_ASSETS.iconMoney}
+            labelLines={stats.minInvestmentLines}
+            value={plan.minInvestment}
+          />
           <div className="h-[58px] w-px shrink-0 bg-black/10" />
-          <StatItem iconSrc={ROBO_ASSETS.iconClock} labelLines={stats.holdingPeriodLines} value={plan.holdingPeriod} />
+          <StatItem
+            iconSrc={ROBO_ASSETS.iconClock}
+            labelLines={stats.holdingPeriodLines}
+            value={plan.holdingPeriod}
+          />
           <div className="h-[58px] w-px shrink-0 bg-black/10" />
           <StatItem
             iconSrc={ROBO_ASSETS.iconHandCoins}
@@ -167,9 +184,15 @@ function RoboPlanCard({
           variant="plain"
           size="lg"
           onClick={onDetailsClick}
-          className="gap-1 pl-3.5 pr-2.5"
+          className="gap-1 pr-2.5 pl-3.5"
           rightIcon={
-            <Image src={ROBO_ASSETS.iconCaretDown} alt="" width={20} height={20} className="size-5 shrink-0" />
+            <Image
+              src={ROBO_ASSETS.iconCaretDown}
+              alt=""
+              width={20}
+              height={20}
+              className="size-5 shrink-0"
+            />
           }
         >
           {t.products.common.details}
@@ -195,9 +218,7 @@ function RoboAdvisoryChartOverlay({ layout }: { layout: "mobile" | "tablet" }) {
         priority
         sizes="100vw"
         className={
-          layout === "tablet"
-            ? "object-cover object-right-top"
-            : "object-cover object-[32%_top]"
+          layout === "tablet" ? "object-cover object-right-top" : "object-cover object-[32%_top]"
         }
       />
     </div>
@@ -227,7 +248,7 @@ function RoboAdvisoryHeroMobile({
     <div className="relative flex w-full flex-1 flex-col items-center overflow-x-clip bg-gradient-to-t from-white to-[#063f84] pb-20">
       <RoboAdvisoryChartOverlay layout="mobile" />
 
-      <div className="relative z-10 flex h-[170px] w-full shrink-0 items-center gap-2 py-4 pl-5 pr-4">
+      <div className="relative z-10 flex h-[170px] w-full shrink-0 items-center gap-2 py-4 pr-4 pl-5">
         <div className="relative h-[138px] w-[98px] shrink-0">
           <Image
             src={ROBO_ASSETS.roboIllustration}
@@ -239,10 +260,13 @@ function RoboAdvisoryHeroMobile({
           />
         </div>
         <div className="flex min-w-0 flex-[1_0_0] flex-col gap-2 text-white">
-          <p className="whitespace-nowrap text-2xl font-bold leading-9">Robo Advisory</p>
+          <p className="text-2xl leading-9 font-bold whitespace-nowrap">Robo Advisory</p>
           <div className="w-full text-sm leading-[24px]">
             {ROBO_DETAIL_MOBILE_HERO_LINES.map((line, index) => (
-              <p key={line} className={index < ROBO_DETAIL_MOBILE_HERO_LINES.length - 1 ? "mb-0" : undefined}>
+              <p
+                key={line}
+                className={index < ROBO_DETAIL_MOBILE_HERO_LINES.length - 1 ? "mb-0" : undefined}
+              >
                 {line}
               </p>
             ))}
@@ -255,22 +279,31 @@ function RoboAdvisoryHeroMobile({
           <AdvisoryClientBar state={advisory} />
         </div>
         <div className="flex w-full items-center justify-between px-4">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
+          <p className="text-base leading-[28px] font-bold text-white">
+            {t.products.advisory.allPlans(plans.length)}
+          </p>
           {SHOW_ROBO_FILTER_BUTTON ? (
-            <Button variant="outline-black" size="icon-sm" aria-label={t.products.common.filter} onClick={onFilterClick}>
+            <Button
+              variant="outline-black"
+              size="icon-sm"
+              aria-label={t.products.common.filter}
+              onClick={onFilterClick}
+            >
               <FunnelSimpleIcon size={18} />
             </Button>
           ) : null}
         </div>
         <div className="flex w-[343px] max-w-[calc(100%-32px)] flex-col gap-3">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <RoboPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          {plans.length === 0
+            ? empty
+            : plans.map((plan) => (
+                <RoboPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  client={client}
+                  onDetailsClick={() => onPlanDetails(plan)}
+                />
+              ))}
         </div>
       </div>
     </div>
@@ -311,7 +344,7 @@ function RoboAdvisoryHeroTablet({
           />
         </div>
         <div className="flex min-w-0 flex-[1_0_0] flex-col gap-2 text-white">
-          <p className="text-2xl font-bold leading-9">Robo Advisory</p>
+          <p className="text-2xl leading-9 font-bold">Robo Advisory</p>
           <p className="text-base leading-[24px]">{t.products.advisory.robo.tagline.full}</p>
         </div>
       </div>
@@ -319,22 +352,31 @@ function RoboAdvisoryHeroTablet({
       <div className="relative z-10 flex w-full flex-col gap-4 px-8">
         <AdvisoryClientBar state={advisory} />
         <div className="flex w-full items-center justify-between">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
+          <p className="text-base leading-[28px] font-bold text-white">
+            {t.products.advisory.allPlans(plans.length)}
+          </p>
           {SHOW_ROBO_FILTER_BUTTON ? (
-            <Button variant="outline-black" size="icon-sm" aria-label={t.products.common.filter} onClick={onFilterClick}>
+            <Button
+              variant="outline-black"
+              size="icon-sm"
+              aria-label={t.products.common.filter}
+              onClick={onFilterClick}
+            >
               <FunnelSimpleIcon size={18} />
             </Button>
           ) : null}
         </div>
         <div className="flex w-full flex-col gap-4">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <RoboPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          {plans.length === 0
+            ? empty
+            : plans.map((plan) => (
+                <RoboPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  client={client}
+                  onDetailsClick={() => onPlanDetails(plan)}
+                />
+              ))}
         </div>
       </div>
     </div>
@@ -362,10 +404,16 @@ function RoboAdvisoryHeroDesktop({
   return (
     <div className="relative flex w-full flex-col items-center bg-gradient-to-t from-white to-[#063f84] px-14 pb-12">
       <div
-        className="pointer-events-none absolute left-[214px] top-0 h-[347px] w-[768px] overflow-hidden"
+        className="pointer-events-none absolute top-0 left-[214px] h-[347px] w-[768px] overflow-hidden"
         aria-hidden
       >
-        <Image src={ROBO_ASSETS.detailChartBg} alt="" fill className="object-cover object-left-top" sizes="768px" />
+        <Image
+          src={ROBO_ASSETS.detailChartBg}
+          alt=""
+          fill
+          className="object-cover object-left-top"
+          sizes="768px"
+        />
       </div>
 
       <div className="relative z-10 flex w-full items-center gap-6 px-10 py-8">
@@ -379,33 +427,40 @@ function RoboAdvisoryHeroDesktop({
           />
         </div>
         <div className="flex min-w-0 flex-[1_0_0] flex-col gap-2 text-white">
-          <p className="text-2xl font-bold leading-9">Robo Advisory</p>
-          <p className="text-base leading-[24px]">
-            {t.products.advisory.robo.tagline.full}
-          </p>
+          <p className="text-2xl leading-9 font-bold">Robo Advisory</p>
+          <p className="text-base leading-[24px]">{t.products.advisory.robo.tagline.full}</p>
         </div>
       </div>
 
       <div className="relative z-10 flex w-full flex-col gap-4">
         <AdvisoryClientBar state={advisory} />
         <div className="flex w-full items-center justify-between">
-          <p className="text-base font-bold leading-[28px] text-white">{t.products.advisory.allPlans(plans.length)}</p>
+          <p className="text-base leading-[28px] font-bold text-white">
+            {t.products.advisory.allPlans(plans.length)}
+          </p>
           {SHOW_ROBO_FILTER_BUTTON ? (
-            <Button variant="outline-black" size="icon-sm" aria-label={t.products.common.filter} onClick={onFilterClick}>
+            <Button
+              variant="outline-black"
+              size="icon-sm"
+              aria-label={t.products.common.filter}
+              onClick={onFilterClick}
+            >
               <FunnelSimpleIcon size={18} />
             </Button>
           ) : null}
         </div>
 
         <div className="flex w-full items-stretch gap-3">
-          {plans.length === 0 ? empty : plans.map((plan) => (
-            <RoboPlanCard
-              key={plan.id}
-              plan={plan}
-              client={client}
-              onDetailsClick={() => onPlanDetails(plan)}
-            />
-          ))}
+          {plans.length === 0
+            ? empty
+            : plans.map((plan) => (
+                <RoboPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  client={client}
+                  onDetailsClick={() => onPlanDetails(plan)}
+                />
+              ))}
         </div>
       </div>
     </div>
@@ -425,9 +480,7 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
   // Every plan filtered away reads differently from there being none.
   const plansEmpty = (
     <AdvisoryPlansEmpty
-      onClearFilters={
-        plans.length > 0 ? () => setFilters(EMPTY_ROBO_ADVISORY_FILTERS) : undefined
-      }
+      onClearFilters={plans.length > 0 ? () => setFilters(EMPTY_ROBO_ADVISORY_FILTERS) : undefined}
     />
   );
 
@@ -454,7 +507,7 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pb-20 lg:pt-2">
+    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20">
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
         <RoboAdvisoryMobileBreadcrumb />
         {client ? (
@@ -487,7 +540,10 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
         {onBack ? <DesktopBackHeader onBack={onBack} /> : null}
 
         {client ? (
-          <div className="w-full overflow-clip rounded-xl bg-white" style={{ boxShadow: SECTION_SHADOW }}>
+          <div
+            className="w-full overflow-clip rounded-xl bg-white"
+            style={{ boxShadow: SECTION_SHADOW }}
+          >
             <RoboAdvisoryHeroDesktop
               plans={filteredPlans}
               advisory={advisory}
@@ -517,7 +573,9 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
         open={detailPlan != null}
         onClose={() => setDetailPlan(null)}
         cta={client ? advisoryCta(client, "robo") : undefined}
-        suitability={client && detailPlan ? planSuitability(client, detailPlan.riskTier) : undefined}
+        suitability={
+          client && detailPlan ? planSuitability(client, detailPlan.riskTier) : undefined
+        }
       />
     </div>
   );

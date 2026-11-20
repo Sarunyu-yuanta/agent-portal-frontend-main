@@ -525,7 +525,11 @@
         { "bookCloseDate": "02 Jan 2025", "paymentDate": "14 Jan 2025", "amountPerUnit": "0.2000" }
       ],
       "topHoldings": [
-        { "label": "PIMCO GIS Income Fund 'I' (USD) ACC -PIMINIA", "percent": 99.36, "color": "#074EA4" },
+        {
+          "label": "PIMCO GIS Income Fund 'I' (USD) ACC -PIMINIA",
+          "percent": 99.36,
+          "color": "#074EA4"
+        },
         { "label": "KASIKORNBANK PUBLIC COMPANY LIMITED", "percent": 2.65, "color": "#51A2FF" },
         { "label": "OPERATING ACCOUNT", "percent": 0.1, "color": "#A3B3FF" }
       ],

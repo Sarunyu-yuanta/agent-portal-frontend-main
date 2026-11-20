@@ -32,12 +32,18 @@ export function TopIdeaAllPage({
   if (isLoading) return <TopIdeaAllPageSkeleton />;
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full pt-6 pb-20 bg-gradient-to-b from-white from-[43.451%] to-transparent">
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+    <div className="flex w-full flex-col items-center gap-8 bg-gradient-to-b from-white from-[43.451%] to-transparent pt-6 pb-20">
+      <div className="flex h-[46px] w-full max-w-[1280px] items-center gap-2 px-4 py-2 md:px-8 lg:px-20">
+        <Button
+          variant="plain"
+          size="icon-sm"
+          onClick={onBack}
+          aria-label={t.products.common.back}
+          className="shrink-0"
+        >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
           Top idea
         </h1>
       </div>
@@ -47,16 +53,16 @@ export function TopIdeaAllPage({
           <CatalogSectionEmpty title={t.products.states.noTopIdeas} />
         </div>
       ) : (
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-[1280px] px-4 md:px-8 lg:px-20">
-        {topIdeas.map((item, i) => (
-          <TopIdeaCard
-            key={`${item.sector}-${i}`}
-            sector={item.sector}
-            fullWidth
-            onClick={() => onSelect(item.sector)}
-          />
-        ))}
-      </div>
+        <div className="grid w-full max-w-[1280px] grid-cols-2 gap-4 px-4 md:px-8 lg:grid-cols-3 lg:px-20">
+          {topIdeas.map((item, i) => (
+            <TopIdeaCard
+              key={`${item.sector}-${i}`}
+              sector={item.sector}
+              fullWidth
+              onClick={() => onSelect(item.sector)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

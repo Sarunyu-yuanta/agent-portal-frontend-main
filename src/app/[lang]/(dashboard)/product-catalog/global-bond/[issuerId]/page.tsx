@@ -38,9 +38,7 @@ export default function GlobalBondDetailPage({
     <GlobalBondDetail
       issuer={issuer}
       onBack={goBack}
-      onIssuerSelect={(id: GlobalBondIssuerId) =>
-        router.push(`/product-catalog/global-bond/${id}`)
-      }
+      onIssuerSelect={(id: GlobalBondIssuerId) => router.push(`/product-catalog/global-bond/${id}`)}
     />
   );
 }

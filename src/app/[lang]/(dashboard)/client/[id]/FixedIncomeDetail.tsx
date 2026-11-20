@@ -44,24 +44,24 @@ function DetailTable({ bond }: { bond: FixedIncomeBond }) {
 
   return (
     <div
-      className="flex flex-col w-full rounded-md overflow-hidden"
+      className="flex w-full flex-col overflow-hidden rounded-md"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       {rows.map((row, i) => (
         <div
           key={row.label}
-          className={`flex gap-3 items-start px-4 py-2 w-full text-base leading-[24px] ${
+          className={`flex w-full items-start gap-3 px-4 py-2 text-base leading-[24px] ${
             i % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
           }`}
         >
-          <span className="flex-1 min-w-0 text-[#4a5565]">{row.label}</span>
+          <span className="min-w-0 flex-1 text-[#4a5565]">{row.label}</span>
           {row.documents ? (
-            <div className="flex flex-1 min-w-0 flex-col gap-4 items-start">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
               {row.documents.map((doc) => (
                 <button
                   key={doc.label}
                   type="button"
-                  className="inline-flex items-center gap-0.5 text-[#2b7fff] underline border-none bg-transparent p-0 cursor-pointer text-base leading-[24px]"
+                  className="inline-flex cursor-pointer items-center gap-0.5 border-none bg-transparent p-0 text-base leading-[24px] text-[#2b7fff] underline"
                 >
                   {doc.label}
                   <FileTextIcon size={14} className="shrink-0" />
@@ -71,12 +71,12 @@ function DetailTable({ bond }: { bond: FixedIncomeBond }) {
           ) : row.link ? (
             <button
               type="button"
-              className="flex-1 min-w-0 text-left text-[#0a6ee7] underline border-none bg-transparent p-0 cursor-pointer text-base leading-[24px]"
+              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-[#0a6ee7] underline"
             >
               {row.value}
             </button>
           ) : (
-            <span className="flex-1 min-w-0 text-[#101828]">{row.value}</span>
+            <span className="min-w-0 flex-1 text-[#101828]">{row.value}</span>
           )}
         </div>
       ))}
@@ -127,48 +127,62 @@ export function FixedIncomeDetail({
 
   return (
     <div
-      className="flex flex-col items-center w-full pt-6 pb-20 px-4 md:px-8 lg:px-[221px]"
+      className="flex w-full flex-col items-center px-4 pt-6 pb-20 md:px-8 lg:px-[221px]"
       style={{ backgroundColor: "#f9fafb" }}
     >
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+      <div className="flex h-[46px] w-full max-w-[998px] items-center gap-2 py-2">
+        <Button
+          variant="plain"
+          size="icon-sm"
+          onClick={onBack}
+          aria-label={t.products.common.back}
+          className="shrink-0"
+        >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
           Fixed Income
         </h1>
       </div>
 
       <div
-        className="flex flex-col gap-14 items-center w-full max-w-[998px] px-6 py-8 md:px-10 lg:px-14 rounded-xl bg-white"
+        className="flex w-full max-w-[998px] flex-col items-center gap-14 rounded-xl bg-white px-6 py-8 md:px-10 lg:px-14"
         style={{ boxShadow: "0px 0px 4px rgba(0,0,0,0.02)" }}
       >
-        <div className="flex flex-col gap-6 w-full">
+        <div className="flex w-full flex-col gap-6">
           <button
             type="button"
             onClick={() => onCompanySelect?.(bond.companyName)}
-            className="flex gap-1 items-center w-full pb-2 border-b border-black/10 border-solid border-t-0 border-x-0 bg-transparent p-0 cursor-pointer text-left"
+            className="flex w-full cursor-pointer items-center gap-1 border-x-0 border-t-0 border-b border-solid border-black/10 bg-transparent p-0 pb-2 text-left"
           >
-            <span className="flex-1 min-w-0 text-base leading-[24px] text-[#4a5565] truncate">
+            <span className="min-w-0 flex-1 truncate text-base leading-[24px] text-[#4a5565]">
               {bond.fullCompanyName}
             </span>
             <CaretDoubleRightIcon size={20} className="shrink-0 text-[#101828]" />
           </button>
 
-          <div className="flex flex-col gap-4 w-full">
-            <div className="flex gap-3 items-center w-full">
-              <BondLogo src={BOND_LOGOS[bond.logoIdx]} logoCrop={bond.logoCrop} className="size-12 rounded-md" />
-              <div className="flex flex-1 min-w-0 flex-col gap-1">
-                <p className="text-lg font-bold leading-[28px] text-[#101828] truncate w-full">{bond.symbol}</p>
-                <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full items-center gap-3">
+              <BondLogo
+                src={BOND_LOGOS[bond.logoIdx]}
+                logoCrop={bond.logoCrop}
+                className="size-12 rounded-md"
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <p className="w-full truncate text-lg leading-[28px] font-bold text-[#101828]">
+                  {bond.symbol}
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
                   <StatusTag status={bond.status} label={bond.statusLabel} />
-                  <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#f3f4f6] text-xs leading-[20px] text-[#4a5565] whitespace-nowrap">
+                  <span className="inline-flex items-center justify-center rounded bg-[#f3f4f6] px-2 py-1 text-xs leading-[20px] whitespace-nowrap text-[#4a5565]">
                     {t.products.fixedIncome.category[bond.category]}
                   </span>
                 </div>
               </div>
-              <div className="flex flex-col gap-1 items-end shrink-0">
-                <p className="text-lg font-bold leading-[28px] text-[#008236] whitespace-nowrap">{bond.ytm}</p>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <p className="text-lg leading-[28px] font-bold whitespace-nowrap text-[#008236]">
+                  {bond.ytm}
+                </p>
                 <p className="text-sm leading-[24px] text-[#4a5565]">YTM</p>
               </div>
             </div>
@@ -189,10 +203,10 @@ export function FixedIncomeDetail({
             )}
 
             {tab === "detail" ? (
-              <div className="flex flex-col gap-3 items-center w-full">
+              <div className="flex w-full flex-col items-center gap-3">
                 <DetailTable bond={bond} />
                 <DealProgress productId={adapted.id} />
-                <p className="text-sm leading-[24px] text-[#6a7282] text-center whitespace-nowrap">
+                <p className="text-center text-sm leading-[24px] whitespace-nowrap text-[#6a7282]">
                   {t.products.common.updatedAt(bond.updatedAt)}
                 </p>
               </div>
@@ -211,7 +225,7 @@ export function FixedIncomeDetail({
         {/* Under Detail only — the Order tab carries its own ส่งคำสั่งซื้อ, and
             two primaries for the same action read as two different ones. */}
         {tab === "detail" && (
-          <div className="flex flex-col gap-3 items-center w-full">
+          <div className="flex w-full flex-col items-center gap-3">
             {/* The offer, above the order it is trying to produce. A bond's
                 documents are the rows in its own table above (`bond.documents`),
                 so this carries no download menu — sending is all of it. */}

@@ -2,15 +2,43 @@
   {
     "label": "Today",
     "items": [
-      { "id": "n1", "title": "NBA Action — Somchai Rattanakul", "description": "AI draft ready: Structured Note pitch",  "time": "09:15", "unread": true,  "type": "icon" },
-      { "id": "n2", "title": "Compliance Alert",                "description": "Sanctions match pending review",         "time": "08:30", "unread": true,  "type": "icon" }
+      {
+        "id": "n1",
+        "title": "NBA Action — Somchai Rattanakul",
+        "description": "AI draft ready: Structured Note pitch",
+        "time": "09:15",
+        "unread": true,
+        "type": "icon"
+      },
+      {
+        "id": "n2",
+        "title": "Compliance Alert",
+        "description": "Sanctions match pending review",
+        "time": "08:30",
+        "unread": true,
+        "type": "icon"
+      }
     ]
   },
   {
     "label": "Yesterday",
     "items": [
-      { "id": "n3", "title": "KYC Expiry Warning",  "description": "Malee Pongpipat — 14 days remaining",                   "time": "16:00", "unread": false, "type": "icon" },
-      { "id": "n4", "title": "Deal Stage Update",   "description": "Thanawat Boonmee — Bond Portfolio moved to Closed Won",  "time": "14:30", "unread": false, "type": "icon" }
+      {
+        "id": "n3",
+        "title": "KYC Expiry Warning",
+        "description": "Malee Pongpipat — 14 days remaining",
+        "time": "16:00",
+        "unread": false,
+        "type": "icon"
+      },
+      {
+        "id": "n4",
+        "title": "Deal Stage Update",
+        "description": "Thanawat Boonmee — Bond Portfolio moved to Closed Won",
+        "time": "14:30",
+        "unread": false,
+        "type": "icon"
+      }
     ]
   }
 ]

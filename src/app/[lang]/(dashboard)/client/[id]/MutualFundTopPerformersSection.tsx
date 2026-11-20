@@ -42,7 +42,9 @@ export function MutualFundTopPerformersSection({
             height={16}
             className="h-[15.625px] w-[17.5px] shrink-0 object-contain"
           />
-          <h2 className="flex-1 text-lg font-bold leading-[32px] text-[#101828]">{t.fund.topPerformers.title}</h2>
+          <h2 className="flex-1 text-lg leading-[32px] font-bold text-[#101828]">
+            {t.fund.topPerformers.title}
+          </h2>
         </div>
 
         <div className="-mx-4 md:-mx-8 lg:mx-0">
@@ -64,7 +66,7 @@ export function MutualFundTopPerformersSection({
 
       <div className="flex flex-col gap-2 rounded-xl bg-[#f3f4f6] p-2">
         <div className="flex h-8 items-center justify-end px-3">
-          <span className="text-xs font-semibold leading-[20px] text-[#101828]">
+          <span className="text-xs leading-[20px] font-semibold text-[#101828]">
             {t.fund.topPerformers.oneYearPerformance}
           </span>
         </div>
@@ -85,7 +87,12 @@ export function MutualFundTopPerformersSection({
                     : undefined
                 }
               >
-                <Button variant="plain" size="xl" rightIcon={<MutualFundSeeMoreIcon />} className="w-fit shrink-0">
+                <Button
+                  variant="plain"
+                  size="xl"
+                  rightIcon={<MutualFundSeeMoreIcon />}
+                  className="w-fit shrink-0"
+                >
                   {t.fund.list.seeMore}
                 </Button>
               </Link>

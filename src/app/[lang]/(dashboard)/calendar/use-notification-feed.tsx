@@ -3,11 +3,7 @@ import type { Note } from "@/types/domain";
 import { dayFromKey, dayOffset, relativeDayLabel, todayDateKey } from "./calendar-grid";
 import { concernsSomeone, groupDayItems, type DayItem } from "./day-items";
 import { itemBadge } from "./source-badge";
-import {
-  isDue,
-  zoneForDays,
-  type ZonedNotification,
-} from "../notification-zones";
+import { isDue, zoneForDays, type ZonedNotification } from "../notification-zones";
 import { useT } from "@/i18n/I18nProvider";
 
 /**
@@ -63,9 +59,7 @@ export function useNotificationFeed(notes: Note[], clients: { id: string; name: 
         const badge = itemBadge(item, t);
         // A note's reminder has a time of day; a corporate action or desk
         // event only has its date, so it is stamped by day alone.
-        const reminderAt = item.noteId
-          ? notes.find((n) => n.id === item.noteId)?.reminderAt
-          : null;
+        const reminderAt = item.noteId ? notes.find((n) => n.id === item.noteId)?.reminderAt : null;
         const at = reminderAt ? new Date(reminderAt) : undefined;
         rows.push({
           zone,

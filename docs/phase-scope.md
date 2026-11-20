@@ -12,18 +12,18 @@ Phase 1 switched off Notes, Calendar, Reminders and Call log. **Phase 2 turned
 all four back on.** The only things held back now are four sidebar entries in
 the Growth section.
 
-| Flag                    | Feature                  | State   | Gates |
-| ----------------------- | ------------------------ | ------- | ----- |
-| `ORDER_BOOKING_ENABLED` | Order booking            | `true`  | whole feature |
-| `KYC_ALERTS_ENABLED`    | KYC rows in the bell     | `true`  | whole feature |
-| `NOTES_ENABLED`         | Notes                    | `true`  | whole feature |
-| `CALENDAR_ENABLED`      | Calendar + Reminders page| `true`  | whole feature |
-| `REMINDERS_ENABLED`     | Reminder surfaces        | `true`  | whole feature |
-| `CALL_LOG_ENABLED`      | Call log                 | `true`  | whole feature |
-| `PROMOTIONS_ENABLED`    | Promotion / Events       | `false` | sidebar link only |
-| `PERFORMANCE_ENABLED`   | Performance              | `false` | sidebar link only |
-| `IC_LEARNING_ENABLED`   | IC Learning              | `false` | sidebar link only |
-| `YAA_TEAM_HEAD_ENABLED` | YAA / Team Head          | `false` | sidebar link only |
+| Flag                    | Feature                   | State   | Gates             |
+| ----------------------- | ------------------------- | ------- | ----------------- |
+| `ORDER_BOOKING_ENABLED` | Order booking             | `true`  | whole feature     |
+| `KYC_ALERTS_ENABLED`    | KYC rows in the bell      | `true`  | whole feature     |
+| `NOTES_ENABLED`         | Notes                     | `true`  | whole feature     |
+| `CALENDAR_ENABLED`      | Calendar + Reminders page | `true`  | whole feature     |
+| `REMINDERS_ENABLED`     | Reminder surfaces         | `true`  | whole feature     |
+| `CALL_LOG_ENABLED`      | Call log                  | `true`  | whole feature     |
+| `PROMOTIONS_ENABLED`    | Promotion / Events        | `false` | sidebar link only |
+| `PERFORMANCE_ENABLED`   | Performance               | `false` | sidebar link only |
+| `IC_LEARNING_ENABLED`   | IC Learning               | `false` | sidebar link only |
+| `YAA_TEAM_HEAD_ENABLED` | YAA / Team Head           | `false` | sidebar link only |
 
 ## Two kinds of gate
 
@@ -74,7 +74,7 @@ Growth entries off, the Growth heading in the sidebar stops rendering too.
 ## Dependencies
 
 `CALL_LOG_ENABLED` stands on its own. The other three are one body of work:
-a reminder *is* a date attached to a note, and the Calendar and Reminders pages
+a reminder _is_ a date attached to a note, and the Calendar and Reminders pages
 are those reminders laid out by day or by list. If they are switched off again,
 switch them off together — the partial combinations aren't shapes the design
 accounts for. The flag file spells out the details.
@@ -91,7 +91,7 @@ accounts for. The flag file spells out the details.
   would be unverifiable.
 - **The `comingSoon` flag** on the side panel's shortcut tiles. That's a
   different mechanism from a phase gate: `comingSoon` shows a disabled tile with
-  a badge, for a feature the user is *meant* to know is on the way. A
+  a badge, for a feature the user is _meant_ to know is on the way. A
   phase-gated feature isn't advertised at all.
 - **The flag file itself**, even with every whole-feature gate on. It is how a
   finished feature gets held back from a release without being deleted, and the

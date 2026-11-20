@@ -15,12 +15,7 @@ import type { NotificationItem } from "@sarunyu/system-one";
  * expiring today and a dividend due today land in the same group, under one
  * Thai heading, sorted by urgency rather than by which hook produced them.
  */
-export type NotificationZone =
-  | "overdue"
-  | "today"
-  | "tomorrow"
-  | "thisWeek"
-  | "next2Weeks";
+export type NotificationZone = "overdue" | "today" | "tomorrow" | "thisWeek" | "next2Weeks";
 
 /** Urgency order — the order the groups are rendered in. */
 export const ZONE_ORDER: NotificationZone[] = [
@@ -30,7 +25,6 @@ export const ZONE_ORDER: NotificationZone[] = [
   "thisWeek",
   "next2Weeks",
 ];
-
 
 /**
  * Which zone a due-date falls in, or `null` past 15 days — the point nothing
@@ -85,7 +79,6 @@ export type ZonedNotification = {
  * `daysAgo` is `-daysLeft`, so 0 is today and 1 is yesterday.
  */
 
-
 /** Bucket ids in panel order, newest first. Headings: `t.buckets.past[id]`. */
 export const PAST_BUCKETS = ["today", "yesterday", "week", "earlier"] as const;
 export type PastBucket = (typeof PAST_BUCKETS)[number];
@@ -104,7 +97,6 @@ export function pastBucket(daysAgo: number): PastBucket {
   if (daysAgo <= 7) return "week";
   return "earlier";
 }
-
 
 /**
  * The small stamp beside a bell row's title, sized to its bucket:

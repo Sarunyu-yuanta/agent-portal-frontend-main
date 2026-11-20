@@ -84,7 +84,7 @@ export function ResponsiveBottomSheetModal({
       }}
     >
       <div
-        className={`bg-white border border-[rgba(0,0,0,0.1)] ${desktopRoundedClassName} w-full ${desktopMaxWidth} max-h-[calc(var(--vh)*85)] flex flex-col overflow-hidden shadow-lg`}
+        className={`border border-[rgba(0,0,0,0.1)] bg-white ${desktopRoundedClassName} w-full ${desktopMaxWidth} flex max-h-[calc(var(--vh)*85)] flex-col overflow-hidden shadow-lg`}
         role="dialog"
         aria-modal
         aria-labelledby={titleId}
@@ -92,18 +92,18 @@ export function ResponsiveBottomSheetModal({
         {/* `pt-2` when the heading is hidden: the row is then just the ✕, and
             the full `pt-4` left it floating in a band of its own. */}
         <div
-          className={`flex gap-4 items-center px-4 pb-0 shrink-0 ${
+          className={`flex shrink-0 items-center gap-4 px-4 pb-0 ${
             desktopTitleHidden ? "pt-2" : "pt-4"
           }`}
         >
-          <div className="flex flex-1 gap-2 items-center min-w-0">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
             {!desktopTitleHidden && desktopTitleIcon}
             <p
               id={titleId}
               className={
                 desktopTitleHidden
                   ? "sr-only"
-                  : `type-h6 font-bold text-[var(--text-default-primary)] ${desktopTitleClassName} flex-1 min-w-0`
+                  : `type-h6 font-bold text-[var(--text-default-primary)] ${desktopTitleClassName} min-w-0 flex-1`
               }
             >
               {title}
@@ -113,7 +113,7 @@ export function ResponsiveBottomSheetModal({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 p-0.5 text-[var(--text-default-tertiary)] hover:text-[var(--text-default-primary)] cursor-pointer"
+            className="shrink-0 cursor-pointer p-0.5 text-[var(--text-default-tertiary)] hover:text-[var(--text-default-primary)]"
             aria-label={t.common.close}
           >
             <XIcon size={20} />

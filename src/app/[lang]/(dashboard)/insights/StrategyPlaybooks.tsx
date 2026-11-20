@@ -2,7 +2,13 @@
 
 import { useState, Fragment } from "react";
 import { Chip, Button, BottomSheet, Modal } from "@sarunyu/system-one";
-import { ArrowRightIcon, FilePdfIcon, FileTextIcon, FunnelSimpleIcon, XIcon } from "@phosphor-icons/react";
+import {
+  ArrowRightIcon,
+  FilePdfIcon,
+  FileTextIcon,
+  FunnelSimpleIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import { mockHouseViewStrategies } from "@/lib/mock-data";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { FadeIn } from "@/components/ui/fade-in";
@@ -24,17 +30,18 @@ export type AssetClassFilter =
   | "Market outlook";
 
 const ASSET_FILTERS: AssetClassFilter[] = [
-  "All", "Hot issue", "Buy list", "Asset performance",
-  "Market calendar", "Asset class outlook", "Market outlook",
+  "All",
+  "Hot issue",
+  "Buy list",
+  "Asset performance",
+  "Market calendar",
+  "Asset class outlook",
+  "Market outlook",
 ];
 
 /** Coerces a URL `?filter=` value to a real chip, falling back to "All". */
-export function normalizeAssetFilter(
-  value: string | null | undefined,
-): AssetClassFilter {
-  return ASSET_FILTERS.includes(value as AssetClassFilter)
-    ? (value as AssetClassFilter)
-    : "All";
+export function normalizeAssetFilter(value: string | null | undefined): AssetClassFilter {
+  return ASSET_FILTERS.includes(value as AssetClassFilter) ? (value as AssetClassFilter) : "All";
 }
 
 const GRID_LIMIT = 4;
@@ -71,7 +78,9 @@ function periodBadgeLabel(period: string) {
 }
 
 function periodName(t: Dictionary, period: string) {
-  return period === "monthly" ? t.research.houseView.period.monthly : t.research.houseView.period.weekly;
+  return period === "monthly"
+    ? t.research.houseView.period.monthly
+    : t.research.houseView.period.weekly;
 }
 
 function modalTitle(t: Dictionary, group: PeriodGroup) {
@@ -129,13 +138,19 @@ export function StrategyPlaybooks({
   const groups = groupByPeriodLabel(filtered);
 
   return (
-    <div className="flex flex-col gap-8 w-full">
+    <div className="flex w-full flex-col gap-8">
       {/* Filter chips */}
-      <div className="-mx-4 xl:-mx-6 overflow-x-auto hide-scrollbar">
-        <div className="flex items-center gap-2 flex-nowrap md:flex-wrap px-4 xl:px-6">
+      <div className="hide-scrollbar -mx-4 overflow-x-auto xl:-mx-6">
+        <div className="flex flex-nowrap items-center gap-2 px-4 md:flex-wrap xl:px-6">
           {ASSET_FILTERS.map((f) => (
             <span key={f} className="shrink-0">
-              <Chip label={hv.category[f] ?? f} type="single" size="small" selected={filter === f} onClick={() => onFilterChange(f)} />
+              <Chip
+                label={hv.category[f] ?? f}
+                type="single"
+                size="small"
+                selected={filter === f}
+                onClick={() => onFilterChange(f)}
+              />
             </span>
           ))}
         </div>
@@ -147,7 +162,9 @@ export function StrategyPlaybooks({
           (isFiltered && all.length > 0 ? (
             <EmptyState
               size="compact"
-              icon={<FunnelSimpleIcon size={32} className="text-[var(--text-default-placeholder)]" />}
+              icon={
+                <FunnelSimpleIcon size={32} className="text-[var(--text-default-placeholder)]" />
+              }
               title={t.states.noFilterResultTitle}
               body={t.states.noFilterResultBody}
               action={{ label: t.states.clearFilters, onClick: () => onFilterChange("All") }}
@@ -167,17 +184,17 @@ export function StrategyPlaybooks({
 
           return (
             <Fragment key={`${group.period}-${group.periodLabel}`}>
-              {idx > 0 && <div className="border-t border-border my-4" />}
+              {idx > 0 && <div className="my-4 border-t border-border" />}
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="px-2.5 py-1 rounded bg-primary-action-light text-primary-action text-meta font-bold">
+                    <span className="bg-primary-action-light text-primary-action rounded px-2.5 py-1 text-meta font-bold">
                       {periodName(t, group.period)}
                     </span>
                     <p className="type-subtitle-1 font-bold text-foreground">{group.periodLabel}</p>
                     <FullReportButton group={group} />
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 items-center gap-2">
                     {(hasMore && !isFirstMonthly) || isFirstMonthly ? (
                       <Button
                         size="sm"
@@ -195,12 +212,12 @@ export function StrategyPlaybooks({
                 {isFirstMonthly ? (
                   <>
                     {/* Desktop: combined card */}
-                    <div className="hidden lg:flex rounded-2xl border border-border bg-card overflow-hidden flex-col lg:flex-row">
-                      <div className="flex-1 min-w-0">
+                    <div className="hidden flex-col overflow-hidden rounded-2xl border border-border bg-card lg:flex lg:flex-row">
+                      <div className="min-w-0 flex-1">
                         <PlaybookCard strategy={featured} noBorder />
                       </div>
                       {rest.length > 0 && (
-                        <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-border lg:w-[45%] shrink-0 overflow-y-auto max-h-[306px] visible-scrollbar">
+                        <div className="visible-scrollbar flex max-h-[306px] shrink-0 flex-col overflow-y-auto border-t border-border lg:w-[45%] lg:border-t-0 lg:border-l">
                           <div className="flex flex-col divide-y divide-border">
                             {rest.map((s) => (
                               <PlaybookCardCompact key={s.id} strategy={s} noBorder />
@@ -213,7 +230,7 @@ export function StrategyPlaybooks({
                     {/* Mobile: separate cards + view all */}
                     <div className="flex flex-col gap-3 lg:hidden">
                       <PlaybookCard strategy={featured} />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {rest.slice(0, 3).map((s) => (
                           <PlaybookCardCompact key={s.id} strategy={s} />
                         ))}
@@ -221,7 +238,7 @@ export function StrategyPlaybooks({
                     </div>
                   </>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {gridItems.slice(0, GRID_LIMIT).map((s) => (
                       <PlaybookCardCompact key={s.id} strategy={s} />
                     ))}
@@ -236,13 +253,17 @@ export function StrategyPlaybooks({
       {/* Mobile: BottomSheet */}
       <BottomSheet
         open={!!modalGroup && isMobile}
-        onOpenChange={(o) => { if (!o) setModalGroup(null); }}
+        onOpenChange={(o) => {
+          if (!o) setModalGroup(null);
+        }}
         title={modalGroup ? modalTitle(t, modalGroup) : ""}
         showHandle
         showHeader
         rightSide="action"
         actionLabel={hv.downloadPdf}
-        onActionClick={() => { if (modalGroup) downloadFullReport(modalGroup); }}
+        onActionClick={() => {
+          if (modalGroup) downloadFullReport(modalGroup);
+        }}
         contentClassName="overflow-y-auto"
       >
         <div className="flex flex-col gap-3 pb-8">
@@ -273,15 +294,15 @@ export function StrategyPlaybooks({
                     so the header is rebuilt here to seat the PDF button beside
                     the title. `-mt-4` collapses the now-empty native header. */}
                 <div className="-mt-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <p className="text-title leading-[32px] font-bold text-foreground truncate">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <p className="truncate text-title leading-[32px] font-bold text-foreground">
                       {modalTitle(t, modalGroup)}
                     </p>
                     <FullReportButton group={modalGroup} />
                   </div>
                   <Button
                     aria-label={hv.closeDialog}
-                    className="h-5 w-5 shrink-0 rounded-none text-subtle-text"
+                    className="text-subtle-text h-5 w-5 shrink-0 rounded-none"
                     onClick={() => setModalGroup(null)}
                     size="icon-xs"
                     variant="plain-black"
@@ -289,7 +310,7 @@ export function StrategyPlaybooks({
                     <XIcon size={20} />
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(var(--vh)*60)] overflow-y-auto hide-scrollbar py-1">
+                <div className="hide-scrollbar grid max-h-[calc(var(--vh)*60)] grid-cols-1 gap-4 overflow-y-auto py-1 sm:grid-cols-2">
                   {modalGroup.items.map((s) => (
                     <PlaybookCardCompact key={s.id} strategy={s} />
                   ))}

@@ -162,15 +162,13 @@ export function ReminderDayStrip({
         // No vertical padding of its own: the cells carry it, so the week's
         // band reaches the strip's top and bottom edges instead of floating
         // inside them. Height is unchanged — the 12px moved into each cell.
-        className="flex overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex [scrollbar-width:none] overflow-x-auto px-3 [&::-webkit-scrollbar]:hidden"
       >
         {cells.map((cell) => {
           const isActive = cell.key === activeKey;
           return (
             <Fragment key={cell.key}>
-              {cell.month && (
-                <MonthDivider label={cell.month} inWeek={cell.inWeek} />
-              )}
+              {cell.month && <MonthDivider label={cell.month} inWeek={cell.inWeek} />}
               <button
                 ref={isActive ? activeRef : undefined}
                 type="button"
@@ -207,7 +205,7 @@ export function ReminderDayStrip({
                 <span
                   className={`flex size-9 items-center justify-center rounded-full text-body tabular-nums transition-colors ${
                     cell.isToday
-                      ? "bg-primary-action font-bold text-on-primary-action"
+                      ? "bg-primary-action text-on-primary-action font-bold"
                       : isActive
                         ? "bg-[var(--fill-p1-200)] font-semibold text-[var(--fill-p1-700)]"
                         : cell.has
@@ -262,7 +260,7 @@ function MonthDivider({ label, inWeek }: { label: string; inWeek: boolean }) {
         inWeek ? "bg-[var(--fill-p1-100)]" : ""
       }`}
     >
-      <span className="rotate-180 text-meta font-bold uppercase tracking-widest text-primary-action [writing-mode:vertical-rl]">
+      <span className="text-primary-action rotate-180 text-meta font-bold tracking-widest uppercase [writing-mode:vertical-rl]">
         {label}
       </span>
     </span>
@@ -279,9 +277,7 @@ function MonthDivider({ label, inWeek }: { label: string; inWeek: boolean }) {
 function buildCells(days: ReminderDay[], today: Date, locale: Locale): Cell[] {
   if (days.length === 0) return [];
 
-  const withRows = new Set(
-    days.filter((d) => d.items.length > 0).map((d) => d.key),
-  );
+  const withRows = new Set(days.filter((d) => d.items.length > 0).map((d) => d.key));
   const reachable = new Set(days.map((d) => d.key));
   const todayKey = dayKey(today);
 
@@ -293,11 +289,7 @@ function buildCells(days: ReminderDay[], today: Date, locale: Locale): Cell[] {
 
   const cells: Cell[] = [];
   const last = days[days.length - 1].day;
-  for (
-    let day = days[0].day;
-    day.getTime() <= last.getTime();
-    day = addDays(day, 1)
-  ) {
+  for (let day = days[0].day; day.getTime() <= last.getTime(); day = addDays(day, 1)) {
     const key = dayKey(day);
     cells.push({
       key,
@@ -336,13 +328,7 @@ function buildCells(days: ReminderDay[], today: Date, locale: Locale): Cell[] {
  * day half under the blur is still a day, and the arrow is the only thing here
  * meant to be pressed.
  */
-function StripEdge({
-  side,
-  onPage,
-}: {
-  side: "left" | "right";
-  onPage: () => void;
-}) {
+function StripEdge({ side, onPage }: { side: "left" | "right"; onPage: () => void }) {
   const t = useT();
   const isLeft = side === "left";
   return (

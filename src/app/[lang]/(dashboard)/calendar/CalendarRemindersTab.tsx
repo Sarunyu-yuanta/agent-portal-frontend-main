@@ -191,8 +191,7 @@ function byDay(rows: ReminderRow[], today: Date): ReminderDay[] {
   // put them in — exchange facts, then desk events, then the user's own notes.
   // `SOURCE_RANK` only has to lift KYC above all three.
   const sorted = [...rows].sort(
-    (a, b) =>
-      a.day.getTime() - b.day.getTime() || SOURCE_RANK[a.source] - SOURCE_RANK[b.source],
+    (a, b) => a.day.getTime() - b.day.getTime() || SOURCE_RANK[a.source] - SOURCE_RANK[b.source],
   );
 
   const days: ReminderDay[] = [];
@@ -254,14 +253,14 @@ function ReminderDayHeading({ day, daysUntil }: { day: Date; daysUntil: number }
       <p
         className={
           isToday
-            ? "type-body-2 font-bold text-primary-action"
+            ? "type-body-2 text-primary-action font-bold"
             : "type-caption font-semibold text-muted-foreground"
         }
       >
         {dayHeading(day, locale)}
       </p>
       {isToday ? (
-        <span className="rounded-md bg-primary-action px-1.5 py-0.5 text-meta font-semibold leading-[20px] text-on-primary-action">
+        <span className="bg-primary-action text-on-primary-action rounded-md px-1.5 py-0.5 text-meta leading-[20px] font-semibold">
           {t.dates.today}
         </span>
       ) : (
@@ -438,7 +437,13 @@ export function CalendarRemindersTab({
     return (
       <div className="flex min-h-[320px] items-center justify-center">
         <EmptyState
-          icon={<BellIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+          icon={
+            <BellIcon
+              size={40}
+              weight="duotone"
+              className="text-[var(--text-default-placeholder)]"
+            />
+          }
           title={t.planner.reminders.emptyTitle}
           body={t.planner.reminders.emptyBody}
         />
@@ -461,7 +466,10 @@ export function CalendarRemindersTab({
           it scrolls; anchored to the outer box instead, `top-3` measured from
           the top of the day strip and put the button on top of the dates. */}
       <div className="relative flex min-h-0 flex-1 flex-col">
-        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 py-4 lg:px-10!">
+        <div
+          ref={scrollRef}
+          className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 py-4 lg:px-10!"
+        >
           {days.map((d) => {
             const isToday = d.daysUntil === 0;
             return (
@@ -491,7 +499,9 @@ export function CalendarRemindersTab({
                   }`}
                 >
                   {d.items.length === 0 ? (
-                    <p className="type-caption p-3 text-muted-foreground">{t.planner.reminders.noneToday}</p>
+                    <p className="type-caption p-3 text-muted-foreground">
+                      {t.planner.reminders.noneToday}
+                    </p>
                   ) : (
                     d.items.map((row) => (
                       <ReminderPreviewRow
@@ -544,7 +554,7 @@ export function CalendarRemindersTab({
             onClick={jumpToToday}
             className={`absolute left-1/2 z-10 -translate-x-1/2 ${
               jump === "up" ? "top-3" : "bottom-3"
-            } inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary-action px-3 py-1.5 text-label font-semibold text-on-primary-action shadow-[0px_4px_12px_rgba(0,0,0,0.18)] transition-colors hover:bg-primary-action-hover`}
+            } bg-primary-action text-on-primary-action hover:bg-primary-action-hover inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-label font-semibold shadow-[0px_4px_12px_rgba(0,0,0,0.18)] transition-colors`}
           >
             {jump === "up" ? (
               <ArrowUpIcon size={14} weight="bold" />

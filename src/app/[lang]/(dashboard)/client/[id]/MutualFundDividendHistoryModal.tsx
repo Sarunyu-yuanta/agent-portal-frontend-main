@@ -17,7 +17,11 @@ function DividendHistoryTable({ rows }: { rows: MutualFundDividend[] }) {
           <div
             key={col.label}
             className={`flex flex-1 items-center px-4 py-3 ${
-              col.align === "center" ? "justify-center text-center" : col.align === "right" ? "justify-end text-right" : ""
+              col.align === "center"
+                ? "justify-center text-center"
+                : col.align === "right"
+                  ? "justify-end text-right"
+                  : ""
             }`}
           >
             <span className="text-xs leading-[20px] text-[#6a7282]">{col.label}</span>
@@ -95,7 +99,7 @@ export function MutualFundDividendHistoryModal({
           showClose
           onClose={onClose}
           actionLayout="none"
-          className="!max-w-[552px] w-[calc(var(--vw)*100-3rem)]"
+          className="w-[calc(var(--vw)*100-3rem)] !max-w-[552px]"
         >
           <div className="max-h-[min(460px,calc(var(--dvh)*100-8rem))] overflow-y-auto">
             <DividendHistoryTable rows={rows} />
@@ -128,7 +132,11 @@ export function DividendHistoryPreview({
           <div
             key={col.label}
             className={`flex flex-1 items-center px-4 py-3 ${
-              col.align === "center" ? "justify-center text-center" : col.align === "right" ? "justify-end text-right" : ""
+              col.align === "center"
+                ? "justify-center text-center"
+                : col.align === "right"
+                  ? "justify-end text-right"
+                  : ""
             }`}
           >
             <span className="text-xs leading-[20px] text-[#6a7282]">{col.label}</span>
@@ -157,7 +165,7 @@ export function DividendHistoryPreview({
         <button
           type="button"
           onClick={onViewAll}
-          className="flex h-[38px] w-full items-center justify-center border-none bg-white px-4 py-3.5 text-sm leading-[24px] text-[#0a6ee7] cursor-pointer"
+          className="flex h-[38px] w-full cursor-pointer items-center justify-center border-none bg-white px-4 py-3.5 text-sm leading-[24px] text-[#0a6ee7]"
         >
           {t.fund.list.viewAll}
         </button>

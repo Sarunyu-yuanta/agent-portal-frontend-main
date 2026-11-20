@@ -451,21 +451,19 @@ const ASSET_PRODUCT_DETAILS: Record<string, AssetAccountDetail> = {
 // put Thai stocks and funds under any account — someone else's positions, as
 // far as the IC could tell.
 export function getAssetAccountDetail(accountNo: string): AssetAccountDetail {
-  const detail =
-    ASSET_ACCOUNT_DETAILS[accountNo] ?? {
-      viewByLabel: "view by Asset Class",
-      sections: [],
-    };
+  const detail = ASSET_ACCOUNT_DETAILS[accountNo] ?? {
+    viewByLabel: "view by Asset Class",
+    sections: [],
+  };
 
   return enrichDetailWithPositions(detail);
 }
 
 export function getAssetProductDetail(productName: string): AssetAccountDetail {
-  const detail =
-    ASSET_PRODUCT_DETAILS[productName] ?? {
-      viewByLabel: `view by Asset Class - ${productName}`,
-      sections: [],
-    };
+  const detail = ASSET_PRODUCT_DETAILS[productName] ?? {
+    viewByLabel: `view by Asset Class - ${productName}`,
+    sections: [],
+  };
 
   return enrichDetailWithPositions(detail);
 }

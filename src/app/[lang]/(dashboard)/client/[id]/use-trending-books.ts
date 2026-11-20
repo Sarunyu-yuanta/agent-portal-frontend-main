@@ -41,10 +41,7 @@ export function useTrendingBooks(): Map<string, OrderBook> {
 }
 
 /** One trending row's book, or `null` where the product has none. */
-export function bookForItem(
-  item: TrendingItem,
-  books: Map<string, OrderBook>,
-): OrderBook | null {
+export function bookForItem(item: TrendingItem, books: Map<string, OrderBook>): OrderBook | null {
   return (item.bookableId && books.get(item.bookableId)) || null;
 }
 

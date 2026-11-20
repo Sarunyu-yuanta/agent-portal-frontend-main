@@ -100,13 +100,7 @@ function dayFromOffset(offset: number | undefined): string | null {
 /** An offset in days turned into a timestamp, for the seeded audit rows. */
 function timestampFromOffset(offset: number): string {
   const now = new Date();
-  return new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + offset,
-    10,
-    30,
-  ).toISOString();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 10, 30).toISOString();
 }
 
 function materialsOf(raw: RawCampaign): CampaignMaterial[] {
@@ -188,16 +182,12 @@ export function segmentsOfClient(client: {
  */
 function seedRowsFor(raw: RawCampaign): CampaignClient[] {
   const campaignSegments = raw.segments as ClientSegment[];
-  const authored = new Map<string, RawClientRow>(
-    raw.clients.map((row) => [row.clientId, row]),
-  );
+  const authored = new Map<string, RawClientRow>(raw.clients.map((row) => [row.clientId, row]));
 
   return mockClients
     .map((client): CampaignClient | null => {
       const row = authored.get(client.id);
-      const matches = segmentsOfClient(client).some((s) =>
-        campaignSegments.includes(s),
-      );
+      const matches = segmentsOfClient(client).some((s) => campaignSegments.includes(s));
       // Neither authored nor a segment match — the campaign simply isn't about
       // this client, so they get no row at all rather than an ineligible one.
       if (!row && !matches) return null;
@@ -207,12 +197,8 @@ function seedRowsFor(raw: RawCampaign): CampaignClient[] {
         campaignId: raw.id,
         clientId: client.id,
         eligible: overridden ?? matches,
-        ineligibleReason:
-          row && "ineligibleReason" in row ? row.ineligibleReason : undefined,
-        status:
-          row && "status" in row
-            ? (row.status as CampaignClientStatus)
-            : "not-sent",
+        ineligibleReason: row && "ineligibleReason" in row ? row.ineligibleReason : undefined,
+        status: row && "status" in row ? (row.status as CampaignClientStatus) : "not-sent",
         // Dated a few days back so the column isn't a wall of identical
         // timestamps; the exact day carries no meaning.
         updatedAt: timestampFromOffset(-3),

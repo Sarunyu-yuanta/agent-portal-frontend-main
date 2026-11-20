@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, TabGroup, Toaster, type ToastStatus } from "@sarunyu/system-one";
-import {
-  ArrowLeftIcon,
-  ArrowSquareOutIcon,
-  UserPlusIcon,
-} from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowSquareOutIcon, UserPlusIcon } from "@phosphor-icons/react";
 import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
 import { useToasts } from "@/hooks/use-toasts";
 import { OrderBookingModal } from "@/app/[lang]/(dashboard)/orders/OrderBookingModal";
@@ -29,13 +25,13 @@ const INVEST_URL = "https://placeholder.example.com/create-order";
 function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
   return (
     <div
-      className="flex flex-col w-full rounded-md overflow-hidden"
+      className="flex w-full flex-col overflow-hidden rounded-md"
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       {rows.map((row, i) => (
         <div
           key={row.label}
-          className="flex gap-3 items-center px-4 py-2 w-full text-sm leading-[24px]"
+          className="flex w-full items-center gap-3 px-4 py-2 text-sm leading-[24px]"
           style={{ backgroundColor: i % 2 === 0 ? "#f9fafb" : "white" }}
         >
           <span className="flex-1 text-[#4a5565]">{row.label}</span>
@@ -47,7 +43,9 @@ function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
 }
 
 /** The theme's terms as the Detail tab lists them — shared with Order Management's modal. */
-export function thaiProductRows(product: ThaiStructuredProduct): { label: string; value: string }[] {
+export function thaiProductRows(
+  product: ThaiStructuredProduct,
+): { label: string; value: string }[] {
   return [
     { label: "Investment Theme", value: product.theme },
     { label: "Product", value: product.product },
@@ -101,27 +99,32 @@ export function ThaiStructuredProductDetail({
   const { data: book } = useOrderBook(adapted.id);
   const canBook = !book || isBookingOpen(book);
 
-
   const rows = thaiProductRows(product);
 
   return (
     <div
-      className="flex flex-col items-center w-full pt-6 pb-20 px-4 md:px-8 lg:px-[221px]"
+      className="flex w-full flex-col items-center px-4 pt-6 pb-20 md:px-8 lg:px-[221px]"
       style={{ backgroundColor: "#f9fafb" }}
     >
       {/* Header */}
-      <div className="flex gap-2 items-center h-[46px] py-2 w-full max-w-[998px]">
-        <Button variant="plain" size="icon-sm" onClick={onBack} aria-label={t.products.common.back} className="shrink-0">
+      <div className="flex h-[46px] w-full max-w-[998px] items-center gap-2 py-2">
+        <Button
+          variant="plain"
+          size="icon-sm"
+          onClick={onBack}
+          aria-label={t.products.common.back}
+          className="shrink-0"
+        >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="flex-1 min-w-0 text-lg font-bold leading-[30px] text-[#101828] truncate">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
           {underlying}
         </h1>
       </div>
 
       {/* Card */}
       <div
-        className="flex flex-col gap-14 w-full max-w-[998px] px-6 py-8 md:px-10 lg:px-14 rounded-xl bg-white"
+        className="flex w-full max-w-[998px] flex-col gap-14 rounded-xl bg-white px-6 py-8 md:px-10 lg:px-14"
         style={{ boxShadow: "0px 0px 4px rgba(0,0,0,0.02)" }}
       >
         {/* Summary */}
@@ -131,11 +134,11 @@ export function ThaiStructuredProductDetail({
           {ORDER_BOOKING_ENABLED && <ProductOrderNotice book={book} />}
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-0.5">
-              <p className="text-base font-bold leading-[28px] text-[#101828]">{underlying}</p>
+              <p className="text-base leading-[28px] font-bold text-[#101828]">{underlying}</p>
               <p className="text-xs leading-[20px] text-[#4a5565]">Underlying</p>
             </div>
-            <div className="flex flex-col gap-0.5 items-end shrink-0">
-              <p className="text-2xl font-bold leading-8 text-[#0a6ee7] whitespace-nowrap">
+            <div className="flex shrink-0 flex-col items-end gap-0.5">
+              <p className="text-2xl leading-8 font-bold whitespace-nowrap text-[#0a6ee7]">
                 {product.couponPa}
               </p>
               <p className="text-xs leading-[20px] font-medium text-[#4a5565]">Coupon p.a.</p>
@@ -172,52 +175,59 @@ export function ThaiStructuredProductDetail({
 
         {/* CTA — only under Detail; the Order tab carries its own จองซื้อ. */}
         {tab === "detail" && (
-        <div className="flex flex-col gap-3 items-center w-full">
-          <div className="flex w-full max-w-[343px] flex-col gap-1.5">
-            <ProductDocumentActions
-              onSendProposal={() => proposal.send(adapted)}
-              onPresentation={() => setFcnModalOpen(true)}
-              onPackage={() => setPackageModalOpen(true)}
-            />
-            {/* How the offers on this product have gone. See the component —
+          <div className="flex w-full flex-col items-center gap-3">
+            <div className="flex w-full max-w-[343px] flex-col gap-1.5">
+              <ProductDocumentActions
+                onSendProposal={() => proposal.send(adapted)}
+                onPresentation={() => setFcnModalOpen(true)}
+                onPackage={() => setPackageModalOpen(true)}
+              />
+              {/* How the offers on this product have gone. See the component —
                 the report proper is Performance's job. */}
-            <ProposalTallyLine productId={adapted.id} />
-          </div>
+              <ProposalTallyLine productId={adapted.id} />
+            </div>
 
-          {/* Same swap as the global desk's detail page: booking replaces the
+            {/* Same swap as the global desk's detail page: booking replaces the
               external hand-off, and the flag puts the old link back. */}
-          {ORDER_BOOKING_ENABLED ? (
-            // Gone once the order is sent — the notice above the tabs says why.
-            canBook ? (
-              <button
-                type="button"
-                onClick={() => setBookingOpen(true)}
-                className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border bg-transparent"
+            {ORDER_BOOKING_ENABLED ? (
+              // Gone once the order is sent — the notice above the tabs says why.
+              canBook ? (
+                <button
+                  type="button"
+                  onClick={() => setBookingOpen(true)}
+                  className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border bg-transparent px-4 text-sm font-medium transition-opacity hover:opacity-90"
+                  style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
+                >
+                  <UserPlusIcon size={16} />
+                  <span>{t.products.common.bookForClient}</span>
+                </button>
+              ) : null
+            ) : (
+              <a
+                href={INVEST_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-opacity hover:opacity-90"
                 style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
               >
-                <UserPlusIcon size={16} />
-                <span>{t.products.common.bookForClient}</span>
-              </button>
-            ) : null
-          ) : (
-            <a
-              href={INVEST_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full max-w-[343px] items-center justify-center gap-2 h-12 px-4 font-medium text-sm rounded-xl cursor-pointer transition-opacity hover:opacity-90 border"
-              style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}
-            >
-              <span>{t.products.common.createOrder}</span>
-              <ArrowSquareOutIcon size={16} />
-            </a>
-          )}
-
-        </div>
+                <span>{t.products.common.createOrder}</span>
+                <ArrowSquareOutIcon size={16} />
+              </a>
+            )}
+          </div>
         )}
       </div>
 
-      <FCNPresentationModal product={adapted} open={fcnModalOpen} onClose={() => setFcnModalOpen(false)} />
-      <PackageFilesModal product={adapted} open={packageModalOpen} onClose={() => setPackageModalOpen(false)} />
+      <FCNPresentationModal
+        product={adapted}
+        open={fcnModalOpen}
+        onClose={() => setFcnModalOpen(false)}
+      />
+      <PackageFilesModal
+        product={adapted}
+        open={packageModalOpen}
+        onClose={() => setPackageModalOpen(false)}
+      />
       {ORDER_BOOKING_ENABLED && (
         <OrderBookingModal
           open={bookingOpen}

@@ -41,10 +41,7 @@ export type { AssetListViewMode } from "@/components/AssetAccountCard";
 /** Option order; labels come from `t.client.assets` at render. */
 const ASSET_LIST_VIEW_OPTIONS: AssetListViewMode[] = ["product", "account"];
 
-function buildProductItems(
-  netValue: string,
-  slices: AssetAllocationSlice[],
-): AssetAccountItem[] {
+function buildProductItems(netValue: string, slices: AssetAllocationSlice[]): AssetAccountItem[] {
   const total = parseAmount(netValue);
 
   return slices
@@ -72,20 +69,17 @@ function AssetListHeader({
   const viewLabel = (mode: AssetListViewMode) =>
     mode === "account" ? t.client.assets.byAccount : t.client.assets.byProduct;
   const selected =
-    ASSET_LIST_VIEW_OPTIONS.find((option) => option === viewMode) ??
-    ASSET_LIST_VIEW_OPTIONS[0];
+    ASSET_LIST_VIEW_OPTIONS.find((option) => option === viewMode) ?? ASSET_LIST_VIEW_OPTIONS[0];
 
   return (
-    <div className="flex items-center justify-between px-4 w-full">
-      <p className="type-subtitle-1 font-bold text-[var(--text-default-primary)] whitespace-nowrap leading-6">
+    <div className="flex w-full items-center justify-between px-4">
+      <p className="type-subtitle-1 leading-6 font-bold whitespace-nowrap text-[var(--text-default-primary)]">
         {t.client.assets.assetList}
       </p>
       <div className="relative">
         <select
           value={viewMode}
-          onChange={(event) =>
-            onViewModeChange(event.target.value as AssetListViewMode)
-          }
+          onChange={(event) => onViewModeChange(event.target.value as AssetListViewMode)}
           aria-label={t.client.assets.filterAria}
           className="absolute inset-0 z-[1] h-full w-full cursor-pointer opacity-0"
         >
@@ -95,11 +89,11 @@ function AssetListHeader({
             </option>
           ))}
         </select>
-        <div className="bg-white border border-[rgba(0,0,0,0.1)] rounded-md flex gap-0.5 items-center pl-2 pr-1.5 py-1 pointer-events-none">
-          <span className="type-button text-[var(--text-default-primary)] leading-5">
+        <div className="pointer-events-none flex items-center gap-0.5 rounded-md border border-[rgba(0,0,0,0.1)] bg-white py-1 pr-1.5 pl-2">
+          <span className="type-button leading-5 text-[var(--text-default-primary)]">
             {viewLabel(selected)}
           </span>
-          <CaretDownIcon size={18} className="text-[var(--text-default-tertiary)] shrink-0" />
+          <CaretDownIcon size={18} className="shrink-0 text-[var(--text-default-tertiary)]" />
         </div>
       </div>
     </div>
@@ -137,22 +131,15 @@ export function ClientAssetSidebarContent({
   const detail = mockClientDetails[clientId];
   const summary = heroSummary ?? detail?.assetSummary ?? buildHeroSummaryFromClient(client, locale);
 
-  const liabilitiesAmount =
-    liabilities ?? formatLiabilitiesStr(client.aum);
+  const liabilitiesAmount = liabilities ?? formatLiabilitiesStr(client.aum);
 
-  const slices =
-    detail?.assetSummary?.allocationSlices ?? allocationSlices;
+  const slices = detail?.assetSummary?.allocationSlices ?? allocationSlices;
 
   const lastUpdatedLabel = `${summary.lastUpdatedDate} - ${summary.lastUpdatedTime}`;
-  const liabilitiesDetail = getLiabilitiesDetail(
-    liabilitiesAmount,
-    lastUpdatedLabel,
-  );
+  const liabilitiesDetail = getLiabilitiesDetail(liabilitiesAmount, lastUpdatedLabel);
 
   const listItems =
-    viewMode === "account"
-      ? assetAccounts
-      : buildProductItems(summary.netValue, slices);
+    viewMode === "account" ? assetAccounts : buildProductItems(summary.netValue, slices);
 
   const cardKeys = listItems.map((item) => `${viewMode}-${item.accountNo}-${item.name}`);
   const allExpanded = cardKeys.length > 0 && cardKeys.every((k) => expandedCards.has(k));
@@ -160,7 +147,8 @@ export function ClientAssetSidebarContent({
   const toggleCard = (key: string) =>
     setExpandedCards((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) next.delete(key); else next.add(key);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
 
@@ -173,7 +161,9 @@ export function ClientAssetSidebarContent({
   const emptyList = (
     <EmptyState
       size="compact"
-      icon={<WalletIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      icon={
+        <WalletIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />
+      }
       title={t.client.assets.noAssets}
     />
   );
@@ -190,7 +180,7 @@ export function ClientAssetSidebarContent({
     return (
       <div className="w-full">
         {/* Mobile / tablet — stacked, tap-to-expand-inline (no room for a side panel) */}
-        <div className="lg:hidden flex flex-col gap-6">
+        <div className="flex flex-col gap-6 lg:hidden">
           <div className="flex flex-col gap-2">
             <HeroCard summary={summary} />
             <LiabilitiesBar
@@ -200,37 +190,42 @@ export function ClientAssetSidebarContent({
             <LastUpdated summary={summary} />
           </div>
 
-          <div className="flex flex-col gap-4 bg-white rounded-2xl border border-border p-3 md:p-4">
+          <div className="flex flex-col gap-4 rounded-2xl border border-border bg-white p-3 md:p-4">
             <AssetListHeader
               viewMode={viewMode}
-              onViewModeChange={(mode) => { setViewMode(mode); setExpandedCards(new Set()); }}
+              onViewModeChange={(mode) => {
+                setViewMode(mode);
+                setExpandedCards(new Set());
+              }}
             />
             <div className="flex flex-col gap-4">
               <AllocationBreakdownSidebar slices={slices} />
-              {listEmpty ? emptyList : (
-              <>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleExpandCollapseAll}
-                  className="type-caption text-primary-action font-medium hover:underline cursor-pointer"
-                >
-                  {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
-                </button>
-              </div>
-              <div className="flex flex-col gap-3">
-                {listItems.map((item, i) => (
-                  <AssetAccountCard
-                    key={cardKeys[i]}
-                    account={item}
-                    viewMode={viewMode}
-                    accordion
-                    open={expandedCards.has(cardKeys[i])}
-                    onToggle={() => toggleCard(cardKeys[i])}
-                  />
-                ))}
-              </div>
-              </>
+              {listEmpty ? (
+                emptyList
+              ) : (
+                <>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleExpandCollapseAll}
+                      className="type-caption text-primary-action cursor-pointer font-medium hover:underline"
+                    >
+                      {allExpanded ? t.client.assets.collapseAll : t.client.assets.expandAll}
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {listItems.map((item, i) => (
+                      <AssetAccountCard
+                        key={cardKeys[i]}
+                        account={item}
+                        viewMode={viewMode}
+                        accordion
+                        open={expandedCards.has(cardKeys[i])}
+                        onToggle={() => toggleCard(cardKeys[i])}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -239,26 +234,31 @@ export function ClientAssetSidebarContent({
         {/* Desktop — list on the left (60%), summary sticky on the right (40%).
             Clicking a row opens its detail in a drawer sliding in from the
             right, so the net-value card up top is never covered. */}
-        <div className="hidden lg:grid grid-cols-[3fr_2fr] gap-6 items-start">
-          <div className="flex flex-col gap-4 bg-white rounded-2xl border border-border p-4">
+        <div className="hidden grid-cols-[3fr_2fr] items-start gap-6 lg:grid">
+          <div className="flex flex-col gap-4 rounded-2xl border border-border bg-white p-4">
             <AssetListHeader
               viewMode={viewMode}
-              onViewModeChange={(mode) => { setViewMode(mode); setSelectedKey(null); }}
+              onViewModeChange={(mode) => {
+                setViewMode(mode);
+                setSelectedKey(null);
+              }}
             />
             <div className="flex flex-col gap-4">
               <AllocationBreakdownSidebar slices={slices} />
-              {listEmpty ? emptyList : (
-              <div className="flex flex-col gap-3">
-                {listItems.map((item, i) => (
-                  <AssetAccountCard
-                    key={cardKeys[i]}
-                    account={item}
-                    viewMode={viewMode}
-                    selected={selectedKey === cardKeys[i]}
-                    onClick={() => setSelectedKey(cardKeys[i])}
-                  />
-                ))}
-              </div>
+              {listEmpty ? (
+                emptyList
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {listItems.map((item, i) => (
+                    <AssetAccountCard
+                      key={cardKeys[i]}
+                      account={item}
+                      viewMode={viewMode}
+                      selected={selectedKey === cardKeys[i]}
+                      onClick={() => setSelectedKey(cardKeys[i])}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -273,7 +273,7 @@ export function ClientAssetSidebarContent({
             {selectedItem && selectedDetail && (
               <div
                 key={selectedKey}
-                className="animate-in fade-in slide-in-from-top-2 duration-200 mt-4 bg-white border border-[rgba(0,0,0,0.1)] rounded-lg overflow-hidden"
+                className="mt-4 animate-in overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white duration-200 fade-in slide-in-from-top-2"
               >
                 <AssetDetailDrawerHeader item={selectedItem} onClose={() => setSelectedKey(null)} />
                 <div>
@@ -288,9 +288,9 @@ export function ClientAssetSidebarContent({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex w-full flex-col gap-4">
       <div className="bg-gradient-to-b from-white to-[#f3f4f6]">
-        <div className="flex flex-col gap-2 items-center p-4 w-full">
+        <div className="flex w-full flex-col items-center gap-2 p-4">
           <HeroCard summary={summary} />
           <LiabilitiesBar
             amount={liabilitiesAmount}
@@ -300,14 +300,17 @@ export function ClientAssetSidebarContent({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 items-center py-4 bg-white rounded-t-2xl">
+      <div className="flex flex-col items-center gap-4 rounded-t-2xl bg-white py-4">
         <AssetListHeader
           viewMode={viewMode}
-          onViewModeChange={(mode) => { setViewMode(mode); setExpandedCards(new Set()); }}
+          onViewModeChange={(mode) => {
+            setViewMode(mode);
+            setExpandedCards(new Set());
+          }}
         />
-        <div className="flex flex-col gap-4 items-start px-4 w-full">
+        <div className="flex w-full flex-col items-start gap-4 px-4">
           <AllocationBreakdownSidebar slices={slices} />
-          <div className="flex flex-col gap-4 w-full">
+          <div className="flex w-full flex-col gap-4">
             {listEmpty && emptyList}
             {listItems.map((item, i) => (
               <AssetAccountCard

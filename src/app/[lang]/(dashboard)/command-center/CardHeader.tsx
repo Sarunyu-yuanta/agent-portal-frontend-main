@@ -80,7 +80,7 @@ export function CardHeader({
  */
 export function CardCount({ value }: { value: number }) {
   return (
-    <span className="shrink-0 rounded-md bg-[var(--fill-p1-100)] px-1.5 py-0.5 text-label font-semibold tabular-nums text-primary-action">
+    <span className="text-primary-action shrink-0 rounded-md bg-[var(--fill-p1-100)] px-1.5 py-0.5 text-label font-semibold tabular-nums">
       {value}
     </span>
   );

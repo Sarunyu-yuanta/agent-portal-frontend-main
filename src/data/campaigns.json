@@ -12,15 +12,8 @@
     ],
     "cover": "/campaigns/global-rewards.webp",
     "featured": true,
-    "products": [
-      "global",
-      "bond"
-    ],
-    "segments": [
-      "aggressive",
-      "moderate",
-      "idle-cash"
-    ],
+    "products": ["global", "bond"],
+    "segments": ["aggressive", "moderate", "idle-cash"],
     "startOffset": -80,
     "endOffset": 12,
     "conditions": [
@@ -99,15 +92,8 @@
     ],
     "cover": "/campaigns/dr-qqqm19.webp",
     "featured": true,
-    "products": [
-      "global",
-      "stock"
-    ],
-    "segments": [
-      "aggressive",
-      "moderate",
-      "idle-cash"
-    ],
+    "products": ["global", "stock"],
+    "segments": ["aggressive", "moderate", "idle-cash"],
     "startOffset": -4,
     "endOffset": 122,
     "conditions": [
@@ -194,15 +180,8 @@
     ],
     "cover": "/campaigns/openacc-400.webp",
     "featured": false,
-    "products": [
-      "stock",
-      "global"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "conservative"
-    ],
+    "products": ["stock", "global"],
+    "segments": ["hnw", "moderate", "conservative"],
     "startOffset": -45,
     "endOffset": 108,
     "conditions": [
@@ -279,16 +258,8 @@
     ],
     "cover": "/campaigns/vietnam-x2.webp",
     "featured": false,
-    "products": [
-      "global",
-      "mutual-fund",
-      "stock"
-    ],
-    "segments": [
-      "aggressive",
-      "moderate",
-      "idle-cash"
-    ],
+    "products": ["global", "mutual-fund", "stock"],
+    "segments": ["aggressive", "moderate", "idle-cash"],
     "startOffset": -84,
     "endOffset": 6,
     "conditions": [
@@ -366,13 +337,8 @@
     ],
     "cover": "/campaigns/voice-survey.webp",
     "featured": false,
-    "products": [
-      "stock"
-    ],
-    "segments": [
-      "hnw",
-      "uhnw"
-    ],
+    "products": ["stock"],
+    "segments": ["hnw", "uhnw"],
     "startOffset": -14,
     "endOffset": 2,
     "conditions": [
@@ -432,16 +398,8 @@
     ],
     "cover": "/campaigns/aomwise-fgf.webp",
     "featured": false,
-    "products": [
-      "stock",
-      "mutual-fund",
-      "global"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "conservative"
-    ],
+    "products": ["stock", "mutual-fund", "global"],
+    "segments": ["hnw", "moderate", "conservative"],
     "conditions": [
       "เพื่อนที่ถูกชวนต้องเปิดบัญชีสำเร็จ และใส่โค้ดแนะนำของผู้ชวนขณะเปิดบัญชี",
       "การเลือกโบรกเกอร์จะจับคู่กับโบรกเกอร์ของผู้ชวนโดยอัตโนมัติ",
@@ -503,14 +461,8 @@
     ],
     "cover": "/campaigns/global-cost.webp",
     "featured": false,
-    "products": [
-      "global"
-    ],
-    "segments": [
-      "uhnw",
-      "aggressive",
-      "moderate"
-    ],
+    "products": ["global"],
+    "segments": ["uhnw", "aggressive", "moderate"],
     "conditions": [
       "ต้องมีบัญชี Yuanta Global Trading เพื่อซื้อขายหลักทรัพย์ต่างประเทศ",
       "อัตราค่าธรรมเนียมที่แสดงอาจเปลี่ยนแปลงได้ตามที่บริษัทกำหนด",
@@ -585,15 +537,8 @@
     ],
     "cover": "/campaigns/aomwise-dual.webp",
     "featured": false,
-    "products": [
-      "stock",
-      "global"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "conservative"
-    ],
+    "products": ["stock", "global"],
+    "segments": ["hnw", "moderate", "conservative"],
     "startOffset": 9,
     "endOffset": 110,
     "conditions": [
@@ -659,15 +604,8 @@
     ],
     "cover": "/campaigns/ytreward-2026.webp",
     "featured": false,
-    "products": [
-      "stock",
-      "global"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "aggressive"
-    ],
+    "products": ["stock", "global"],
+    "segments": ["hnw", "moderate", "aggressive"],
     "startOffset": -200,
     "endOffset": -19,
     "conditions": [
@@ -725,14 +663,8 @@
     ],
     "cover": "/campaigns/stock-transfer.webp",
     "featured": false,
-    "products": [
-      "stock"
-    ],
-    "segments": [
-      "uhnw",
-      "hnw",
-      "aggressive"
-    ],
+    "products": ["stock"],
+    "segments": ["uhnw", "hnw", "aggressive"],
     "startOffset": -70,
     "endOffset": -9,
     "conditions": [
@@ -798,15 +730,8 @@
     ],
     "cover": "/campaigns/global-outlook.svg",
     "featured": true,
-    "products": [
-      "stock",
-      "mutual-fund",
-      "global"
-    ],
-    "segments": [
-      "uhnw",
-      "hnw"
-    ],
+    "products": ["stock", "mutual-fund", "global"],
+    "segments": ["uhnw", "hnw"],
     "startOffset": -14,
     "endOffset": 9,
     "eventOffset": 12,
@@ -917,14 +842,8 @@
     ],
     "cover": "/campaigns/fund-webinar.svg",
     "featured": false,
-    "products": [
-      "mutual-fund"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "aggressive"
-    ],
+    "products": ["mutual-fund"],
+    "segments": ["hnw", "moderate", "aggressive"],
     "startOffset": -5,
     "endOffset": 2,
     "eventOffset": 3,
@@ -958,10 +877,7 @@
       "เปิดให้ลูกค้าทุกระดับที่มีบัญชีกองทุนกับ Yuanta เข้าร่วม",
       "ลงทะเบียนล่วงหน้าเพื่อรับลิงก์เข้าร่วมทางอีเมล"
     ],
-    "terms": [
-      "ลิงก์เข้าร่วมเป็นสิทธิ์เฉพาะบุคคล ไม่ควรส่งต่อให้ผู้อื่น",
-      "มีการบันทึกวิดีโอและส่งให้ผู้ลงทะเบียนภายหลังงาน"
-    ],
+    "terms": ["ลิงก์เข้าร่วมเป็นสิทธิ์เฉพาะบุคคล ไม่ควรส่งต่อให้ผู้อื่น", "มีการบันทึกวิดีโอและส่งให้ผู้ลงทะเบียนภายหลังงาน"],
     "disclaimer": "เนื้อหาในงานสัมมนาจัดทำขึ้นเพื่อให้ข้อมูลเท่านั้น ผู้ลงทุนควรศึกษาข้อมูลในหนังสือชี้ชวนก่อนตัดสินใจลงทุน",
     "materials": [
       {
@@ -1009,13 +925,8 @@
     ],
     "cover": "/campaigns/elite-dinner.svg",
     "featured": false,
-    "products": [
-      "global",
-      "fcn"
-    ],
-    "segments": [
-      "uhnw"
-    ],
+    "products": ["global", "fcn"],
+    "segments": ["uhnw"],
     "startOffset": -8,
     "endOffset": 4,
     "eventOffset": 6,
@@ -1044,9 +955,7 @@
         "title": "Head of Investment Strategy, Yuanta Securities"
       }
     ],
-    "conditions": [
-      "สงวนสิทธิ์เฉพาะลูกค้าระดับ UHNW ที่ได้รับเชิญ จำกัด 1 ที่นั่งต่อหนึ่งบัญชี"
-    ],
+    "conditions": ["สงวนสิทธิ์เฉพาะลูกค้าระดับ UHNW ที่ได้รับเชิญ จำกัด 1 ที่นั่งต่อหนึ่งบัญชี"],
     "terms": [
       "การเข้าร่วมเป็นไปตามคำเชิญเฉพาะบุคคล ไม่สามารถโอนสิทธิ์ให้ผู้อื่นได้",
       "กรุณาแจ้งข้อจำกัดด้านอาหารล่วงหน้าอย่างน้อย 3 วันทำการ"
@@ -1090,14 +999,8 @@
     ],
     "cover": "/campaigns/tax-planning.svg",
     "featured": false,
-    "products": [
-      "mutual-fund"
-    ],
-    "segments": [
-      "hnw",
-      "moderate",
-      "conservative"
-    ],
+    "products": ["mutual-fund"],
+    "segments": ["hnw", "moderate", "conservative"],
     "startOffset": -30,
     "endOffset": -12,
     "eventOffset": -8,
@@ -1127,12 +1030,8 @@
         "title": "Wealth Planning Specialist, Yuanta Securities"
       }
     ],
-    "conditions": [
-      "เปิดให้ลูกค้าทุกระดับที่มีบัญชีกองทุนกับ Yuanta เข้าร่วม"
-    ],
-    "terms": [
-      "มีการบันทึกวิดีโอและส่งให้ผู้ลงทะเบียนภายหลังงาน"
-    ],
+    "conditions": ["เปิดให้ลูกค้าทุกระดับที่มีบัญชีกองทุนกับ Yuanta เข้าร่วม"],
+    "terms": ["มีการบันทึกวิดีโอและส่งให้ผู้ลงทะเบียนภายหลังงาน"],
     "disclaimer": "เนื้อหาในงานสัมมนาจัดทำขึ้นเพื่อให้ข้อมูลเท่านั้น ผู้ลงทุนควรศึกษาข้อมูลในหนังสือชี้ชวนก่อนตัดสินใจลงทุน",
     "materials": [
       {
@@ -1176,16 +1075,8 @@
     ],
     "cover": "/campaigns/wealth-clinic.svg",
     "featured": false,
-    "products": [
-      "stock",
-      "mutual-fund",
-      "bond"
-    ],
-    "segments": [
-      "hnw",
-      "uhnw",
-      "conservative"
-    ],
+    "products": ["stock", "mutual-fund", "bond"],
+    "segments": ["hnw", "uhnw", "conservative"],
     "startOffset": -3,
     "endOffset": 20,
     "eventOffset": 24,
@@ -1205,10 +1096,7 @@
         "title": "Wealth Planning Specialist, Yuanta Securities"
       }
     ],
-    "conditions": [
-      "สงวนสิทธิ์สำหรับลูกค้าระดับ HNW ขึ้นไป",
-      "หนึ่งบัญชีต่อหนึ่งรอบนัดหมาย"
-    ],
+    "conditions": ["สงวนสิทธิ์สำหรับลูกค้าระดับ HNW ขึ้นไป", "หนึ่งบัญชีต่อหนึ่งรอบนัดหมาย"],
     "terms": [
       "กรุณายืนยันรอบนัดหมายล่วงหน้าอย่างน้อย 2 วันทำการ",
       "หากต้องการเลื่อนนัด กรุณาแจ้งผ่านผู้แนะนำการลงทุนของท่าน"

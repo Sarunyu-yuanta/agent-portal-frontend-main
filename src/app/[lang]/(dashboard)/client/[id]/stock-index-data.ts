@@ -28,7 +28,10 @@ const INDEX_SLUG_PREFIX = "index-";
 /** "S&P 500" → "s-p-500". Codes carry spaces and `&`, neither of which belongs
  *  in a path segment, and the display code is recovered from the catalog. */
 const slugOf = (code: string) =>
-  code.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  code
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
 export function marketIndexHref(code: string, market: MarketId = "th"): string {
   return `/product-catalog/stock/${INDEX_SLUG_PREFIX}${market}-${slugOf(code)}`;
@@ -39,13 +42,18 @@ export function marketIndexHref(code: string, market: MarketId = "th"): string {
  *  on a code without clashing. */
 const INDEX_DESCRIPTIONS: Record<string, string> = {
   set: "The SET Index tracks every common stock listed on the Stock Exchange of Thailand, weighted by market capitalisation — the broadest read on the Thai market.",
-  set50: "The SET50 Index follows the 50 largest and most liquid names on the SET, the universe most Thai index funds and futures are built on.",
-  set100: "The SET100 Index widens SET50 to the 100 leading listed companies, adding mid-caps while staying inside the liquid end of the market.",
+  set50:
+    "The SET50 Index follows the 50 largest and most liquid names on the SET, the universe most Thai index funds and futures are built on.",
+  set100:
+    "The SET100 Index widens SET50 to the 100 leading listed companies, adding mid-caps while staying inside the liquid end of the market.",
   sset: "The sSET Index covers listed companies outside SET100 that still meet the exchange's liquidity and free-float rules — the small-cap end of the SET.",
   mai: "The MAI Index tracks the Market for Alternative Investment, where smaller and faster-growing Thai companies list ahead of a move to the SET.",
-  "dow-jones": "The Dow Jones Industrial Average is a price-weighted average of 30 prominent US companies, the oldest widely followed gauge of the US market.",
-  "s-p-500": "The S&P 500 tracks 500 leading US companies by market capitalisation and is the standard benchmark for US large-cap equity.",
-  "nasdaq-100": "The Nasdaq 100 covers the largest non-financial companies listed on Nasdaq, weighted toward technology and growth.",
+  "dow-jones":
+    "The Dow Jones Industrial Average is a price-weighted average of 30 prominent US companies, the oldest widely followed gauge of the US market.",
+  "s-p-500":
+    "The S&P 500 tracks 500 leading US companies by market capitalisation and is the standard benchmark for US large-cap equity.",
+  "nasdaq-100":
+    "The Nasdaq 100 covers the largest non-financial companies listed on Nasdaq, weighted toward technology and growth.",
   hsi: "The Hang Seng Index tracks the largest companies listed in Hong Kong and is the primary benchmark for that market.",
   hose: "The HOSE Index covers companies listed on the Ho Chi Minh City Stock Exchange, Vietnam's main trading venue.",
   tsx: "The S&P/TSX Composite tracks the largest companies on the Toronto Stock Exchange, the headline benchmark for Canadian equity.",

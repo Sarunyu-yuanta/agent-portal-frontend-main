@@ -13,12 +13,12 @@ npm run dev
 
 เปิด http://localhost:3000 — **ไม่ต้องตั้งค่า `.env` หรืออะไรเพิ่ม**
 
-| คำสั่ง | |
-| --- | --- |
-| `npm run dev` | dev server |
-| `npm run build` | build production |
-| `npm run lint` | ESLint |
-| `npx tsc --noEmit` | ตรวจ TypeScript |
+| คำสั่ง               |                  |
+| ------------------ | ---------------- |
+| `npm run dev`      | dev server       |
+| `npm run build`    | build production |
+| `npm run lint`     | ESLint           |
+| `npx tsc --noEmit` | ตรวจ TypeScript  |
 
 ## สถานะ
 
@@ -30,11 +30,11 @@ npm run dev
 
 ## 📄 อ่านก่อนเริ่มงาน
 
-| เอกสาร | |
-| --- | --- |
-| **[docs/handover.md](docs/handover.md)** | **เริ่มที่นี่** — สถานะ, วิธีต่อ API, ข้อควรระวัง |
-| [docs/mock-data-inventory.md](docs/mock-data-inventory.md) | รายการข้อมูลทุกชุด — ใช้อ้างอิงตอนออกแบบ API |
-| [docs/phase-scope.md](docs/phase-scope.md) | ขอบเขตแต่ละเฟส และของที่ถูกซ่อนไว้ (**อย่าลบ**) |
+| เอกสาร                                                     |                                          |
+| ---------------------------------------------------------- | ---------------------------------------- |
+| **[docs/handover.md](docs/handover.md)**                   | **เริ่มที่นี่** — สถานะ, วิธีต่อ API, ข้อควรระวัง   |
+| [docs/mock-data-inventory.md](docs/mock-data-inventory.md) | รายการข้อมูลทุกชุด — ใช้อ้างอิงตอนออกแบบ API    |
+| [docs/phase-scope.md](docs/phase-scope.md)                 | ขอบเขตแต่ละเฟส และของที่ถูกซ่อนไว้ (**อย่าลบ**) |
 
 > ⚠️ มีโค้ดบางส่วนที่ไม่มีใครเรียกแต่ **ห้ามลบ** — ถูกซ่อนไว้เพราะไม่อยู่ในเฟสนี้
 > รายละเอียดใน `docs/phase-scope.md`

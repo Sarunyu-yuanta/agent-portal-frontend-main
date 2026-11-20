@@ -36,47 +36,84 @@ export function InsightRow({
     >
       {/* ── Mobile layout ── */}
       <div className="flex flex-col gap-2 px-4 py-4 lg:hidden">
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: bg }}>
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+            style={{ backgroundColor: bg }}
+          >
             <Icon size={13} weight="duotone" style={{ color }} />
           </div>
           <Tag text={tagText} variant={tagVariant} size="small" />
           <span className="text-meta font-medium text-muted-foreground">{insight.tier}</span>
         </div>
-        <p className="text-body font-semibold text-foreground leading-snug">{maskedName}</p>
-        <p className="type-body-2 text-muted-foreground leading-snug">{insight.insight}</p>
+        <p className="text-body leading-snug font-semibold text-foreground">{maskedName}</p>
+        <p className="type-body-2 leading-snug text-muted-foreground">{insight.insight}</p>
         <div className="flex items-center gap-3">
-          <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{ai.row.confidence(insight.confidence)}</span>
-          {!isRisk && <span className="text-meta font-medium text-success">{ai.row.potential(insight.revenueImpact)}</span>}
-          {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>{ai.row.riskReduction}</span>}
+          <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>
+            {ai.row.confidence(insight.confidence)}
+          </span>
+          {!isRisk && (
+            <span className="text-success text-meta font-medium">
+              {ai.row.potential(insight.revenueImpact)}
+            </span>
+          )}
+          {isRisk && (
+            <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>
+              {ai.row.riskReduction}
+            </span>
+          )}
         </div>
         <div className="flex items-center justify-end gap-2">
-          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>{ai.row.snooze}</Button>
-          <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>{primaryAction}</Button>
+          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>
+            {ai.row.snooze}
+          </Button>
+          <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+            {primaryAction}
+          </Button>
         </div>
       </div>
 
       {/* ── Desktop layout (original) ── */}
-      <div className="hidden lg:flex items-start gap-4 px-5 py-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: bg }}>
+      <div className="hidden items-start gap-4 px-5 py-4 lg:flex">
+        <div
+          className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+          style={{ backgroundColor: bg }}
+        >
           <Icon size={18} weight="duotone" style={{ color }} />
         </div>
-        <div className="flex-1 min-w-0 flex flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
             <Tag text={tagText} variant={tagVariant} size="small" />
             <span className="text-meta font-medium text-muted-foreground">{insight.tier}</span>
           </div>
-          <p className="text-body font-semibold text-foreground leading-snug">{maskedName}</p>
-          <p className="type-body-2 text-muted-foreground leading-snug">{insight.insight}</p>
-          <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>{ai.row.confidence(insight.confidence)}</span>
-            {!isRisk && <span className="text-meta font-medium text-success">{ai.row.potential(insight.revenueImpact)}</span>}
-            {isRisk && <span className="text-meta font-medium" style={{ color: "var(--text-danger-primary)" }}>{ai.row.riskReduction}</span>}
+          <p className="text-body leading-snug font-semibold text-foreground">{maskedName}</p>
+          <p className="type-body-2 leading-snug text-muted-foreground">{insight.insight}</p>
+          <div className="mt-0.5 flex items-center gap-3">
+            <span className="text-meta font-semibold tabular-nums" style={{ color: confColor }}>
+              {ai.row.confidence(insight.confidence)}
+            </span>
+            {!isRisk && (
+              <span className="text-success text-meta font-medium">
+                {ai.row.potential(insight.revenueImpact)}
+              </span>
+            )}
+            {isRisk && (
+              <span
+                className="text-meta font-medium"
+                style={{ color: "var(--text-danger-primary)" }}
+              >
+                {ai.row.riskReduction}
+              </span>
+            )}
           </div>
         </div>
-        <div className="flex flex-col gap-1.5 shrink-0 items-end">
-          <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>{primaryAction}</Button>
-          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>{ai.row.snooze}</Button>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+            {primaryAction}
+          </Button>
+          <Button variant="plain" size="sm" onClick={(e) => e.stopPropagation()}>
+            {ai.row.snooze}
+          </Button>
         </div>
       </div>
     </div>

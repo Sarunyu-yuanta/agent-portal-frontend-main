@@ -40,7 +40,9 @@ function readStoredIncomeState(): StoredIncomeState {
   try {
     const parsed: unknown = JSON.parse(raw);
     const incomeInput =
-      typeof parsed === "object" && parsed !== null && typeof (parsed as { incomeInput?: unknown }).incomeInput === "string"
+      typeof parsed === "object" &&
+      parsed !== null &&
+      typeof (parsed as { incomeInput?: unknown }).incomeInput === "string"
         ? (parsed as { incomeInput: string }).incomeInput
         : "";
     const calculatedIncomeRaw = (parsed as { calculatedIncome?: unknown } | null)?.calculatedIncome;
@@ -61,9 +63,15 @@ function TaxCardViewTag() {
     <span className="inline-flex shrink-0 items-center gap-0.5 overflow-hidden rounded bg-[#f6f3ef] px-1 py-0.5">
       <span className="relative size-3.5 shrink-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MF_ASSETS.performersTagView} alt="" className="absolute inset-0 block size-full max-w-none" />
+        <img
+          src={MF_ASSETS.performersTagView}
+          alt=""
+          className="absolute inset-0 block size-full max-w-none"
+        />
       </span>
-      <span className="text-micro leading-[18px] font-normal whitespace-nowrap text-[#935737]">{t.fund.tags.view}</span>
+      <span className="text-micro leading-[18px] font-normal whitespace-nowrap text-[#935737]">
+        {t.fund.tags.view}
+      </span>
     </span>
   );
 }
@@ -74,7 +82,11 @@ function TaxCardHighlightTag() {
     <span className="inline-flex shrink-0 items-center gap-0.5 overflow-hidden rounded bg-[#eff6ff] px-1 py-0.5">
       <span className="relative size-3.5 shrink-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MF_ASSETS.performersTagHighlight} alt="" className="absolute inset-0 block size-full max-w-none" />
+        <img
+          src={MF_ASSETS.performersTagHighlight}
+          alt=""
+          className="absolute inset-0 block size-full max-w-none"
+        />
       </span>
       <span className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-micro leading-[18px] font-normal whitespace-nowrap text-transparent">
         {t.fund.tags.highlight}
@@ -121,7 +133,9 @@ function TaxFundPreviewCard({
     >
       <TaxCardTags variant={tagVariantForIndex(index, total)} />
       <div className="flex w-full cursor-pointer flex-col gap-2 rounded-lg bg-white p-2 transition-colors hover:bg-black/[0.03]!">
-        <span className="truncate text-sm font-bold leading-[24px] text-[#101828]">{fund.symbol}</span>
+        <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+          {fund.symbol}
+        </span>
         <div className="flex items-center gap-1">
           <span className="text-xs leading-[20px] text-[#4a5565]">{fund.price}</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -139,7 +153,7 @@ function TaxFundPreviewCard({
     return (
       <Link
         href={href}
-        className="no-underline text-inherit"
+        className="text-inherit no-underline"
         onClick={(e) => {
           e.preventDefault();
           onSelect(fund.id);
@@ -150,7 +164,7 @@ function TaxFundPreviewCard({
     );
   }
   return (
-    <Link href={href} className="no-underline text-inherit">
+    <Link href={href} className="text-inherit no-underline">
       {inner}
     </Link>
   );
@@ -174,12 +188,18 @@ function TaxSavingFundCard({
     <div className="flex w-full flex-col overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full items-center justify-between gap-2 p-4">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.fundType}</span>
-          <span className="text-base font-bold leading-[28px] text-[#101828]">{fundType}</span>
+          <span className="text-xs leading-[20px] text-[#6a7282]">
+            {t.fund.taxPlanning.fundType}
+          </span>
+          <span className="text-base leading-[28px] font-bold text-[#101828]">{fundType}</span>
         </div>
         <div className="flex flex-col items-end gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.maxInvestment}</span>
-          <span className="text-base font-bold leading-[28px] text-[#101828]">{formatThb(maxInvestment, t.fund.taxPlanning.unitThb)}</span>
+          <span className="text-xs leading-[20px] text-[#6a7282]">
+            {t.fund.taxPlanning.maxInvestment}
+          </span>
+          <span className="text-base leading-[28px] font-bold text-[#101828]">
+            {formatThb(maxInvestment, t.fund.taxPlanning.unitThb)}
+          </span>
         </div>
       </div>
 
@@ -187,33 +207,35 @@ function TaxSavingFundCard({
 
       <div className="flex w-full flex-col gap-2 bg-[#f9fafb] p-4">
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="text-sm leading-[24px] text-[#6a7282]">{t.fund.list.recommendedFunds}</span>
+          <span className="text-sm leading-[24px] text-[#6a7282]">
+            {t.fund.list.recommendedFunds}
+          </span>
           {funds.length > 0 && (
-          <Button
-            variant="plain"
-            size="xs"
-            rightIcon={<ArrowRightIcon size={14} />}
-            className="shrink-0 !px-0"
-            onClick={() => router.push(taxPlanningResultsHref(fundType))}
-          >
-            {t.fund.list.viewAll}
-          </Button>
+            <Button
+              variant="plain"
+              size="xs"
+              rightIcon={<ArrowRightIcon size={14} />}
+              className="shrink-0 !px-0"
+              onClick={() => router.push(taxPlanningResultsHref(fundType))}
+            >
+              {t.fund.list.viewAll}
+            </Button>
           )}
         </div>
         {funds.length === 0 ? (
           <MutualFundSectionEmpty title={t.fund.empty.recommendedFunds} />
         ) : (
-        <div className="flex w-full gap-2 overflow-x-auto pb-1">
-          {funds.map((fund, index) => (
-            <TaxFundPreviewCard
-              key={`${fund.id}-${index}`}
-              fund={fund}
-              index={index}
-              total={funds.length}
-              onSelect={onFundSelect}
-            />
-          ))}
-        </div>
+          <div className="flex w-full gap-2 overflow-x-auto pb-1">
+            {funds.map((fund, index) => (
+              <TaxFundPreviewCard
+                key={`${fund.id}-${index}`}
+                fund={fund}
+                index={index}
+                total={funds.length}
+                onSelect={onFundSelect}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -277,7 +299,7 @@ export function MutualFundTaxPlanningPage({
 
   return (
     <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">
-      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pb-2 pt-4 md:px-8 lg:px-0 lg:pt-8">
+      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-4 pb-2 md:px-8 lg:px-0 lg:pt-8">
         <Button
           variant="plain"
           size="icon-sm"
@@ -287,7 +309,9 @@ export function MutualFundTaxPlanningPage({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[32px] text-[#101828]">{t.fund.taxPlanning.title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+          {t.fund.taxPlanning.title}
+        </h1>
       </div>
 
       <div className="mx-auto w-full max-w-[996px] px-4 py-4 md:px-8 lg:px-0">
@@ -300,8 +324,12 @@ export function MutualFundTaxPlanningPage({
         >
           <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-[#f9fafb] p-4">
             <div className="flex flex-col gap-0.5">
-              <p className="text-sm font-bold leading-[24px] text-[#101828]">{t.fund.taxPlanning.incomeTitle}</p>
-              <p className="text-xs leading-[20px] text-[#6a7282]">{t.fund.taxPlanning.incomeHint}</p>
+              <p className="text-sm leading-[24px] font-bold text-[#101828]">
+                {t.fund.taxPlanning.incomeTitle}
+              </p>
+              <p className="text-xs leading-[20px] text-[#6a7282]">
+                {t.fund.taxPlanning.incomeHint}
+              </p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
               <div className="min-w-0 flex-1">
@@ -338,7 +366,9 @@ export function MutualFundTaxPlanningPage({
 
           {calculatedIncome !== null ? (
             <div className="flex w-full flex-col gap-3">
-              <p className="text-base font-bold leading-[28px] text-[#101828]">{t.fund.taxPlanning.title}</p>
+              <p className="text-base leading-[28px] font-bold text-[#101828]">
+                {t.fund.taxPlanning.title}
+              </p>
               {TAX_SAVING_FUND_TYPES.map((fundType) => (
                 <TaxSavingFundCard
                   key={fundType}

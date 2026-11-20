@@ -30,7 +30,7 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">
-      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pb-2 pt-8 md:px-8 lg:px-0">
+      <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-8 pb-2 md:px-8 lg:px-0">
         <Button
           variant="plain"
           size="icon-sm"
@@ -40,7 +40,7 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg font-bold leading-[30px] text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
           {t.insights.allResearch}
         </h1>
       </div>
@@ -51,11 +51,11 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
           {items.length === 0 ? (
             <MutualFundSectionEmpty title={t.fund.empty.insights} />
           ) : (
-          <div className="mx-auto grid w-full max-w-[884px] grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-6">
-            {items.map((item) => (
-              <MutualFundInsightCard key={item.id} item={item} elevated list />
-            ))}
-          </div>
+            <div className="mx-auto grid w-full max-w-[884px] grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-6">
+              {items.map((item) => (
+                <MutualFundInsightCard key={item.id} item={item} elevated list />
+              ))}
+            </div>
           )}
 
           {totalPages > 1 ? (

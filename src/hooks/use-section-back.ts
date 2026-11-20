@@ -2,11 +2,7 @@
 
 import { useCallback } from "react";
 import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
-import {
-  catalogListUrl,
-  crossSectionReferrer,
-  parentTrailUrl,
-} from "@/lib/nav-memory";
+import { catalogListUrl, crossSectionReferrer, parentTrailUrl } from "@/lib/nav-memory";
 import {
   catalogCategoryForPath,
   catalogListHref,

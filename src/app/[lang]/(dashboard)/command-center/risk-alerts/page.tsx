@@ -12,18 +12,10 @@ import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { useSectionBack } from "@/hooks/use-section-back";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import type { RiskSeverity } from "@/types/domain";
-import {
-  RiskAlertRowItem,
-  RiskCategoryTabs,
-  RiskSeverityStrip,
-} from "../RiskAlertsPanel";
+import { RiskAlertRowItem, RiskCategoryTabs, RiskSeverityStrip } from "../RiskAlertsPanel";
 import { RiskAlertDetail } from "../RiskAlertDetail";
 import { parseRiskCategory, SEVERITY_ORDER } from "../risk-config";
-import {
-  countRiskByCategory,
-  countRiskBySeverity,
-  type RiskAlertRow,
-} from "../risk-feed";
+import { countRiskByCategory, countRiskBySeverity, type RiskAlertRow } from "../risk-feed";
 import { useRiskAlertRows } from "../use-risk-alert-rows";
 import { useRiskCta } from "../use-risk-cta";
 import { ErrorState } from "@/components/ui/empty-state";
@@ -74,9 +66,7 @@ function RiskAlertsPageInner() {
 
   const category = parseRiskCategory(searchParams.get("category"));
   const severityParam = searchParams.get("severity");
-  const severity: RiskSeverity | null = SEVERITY_ORDER.includes(
-    severityParam as RiskSeverity,
-  )
+  const severity: RiskSeverity | null = SEVERITY_ORDER.includes(severityParam as RiskSeverity)
     ? (severityParam as RiskSeverity)
     : null;
 
@@ -108,9 +98,7 @@ function RiskAlertsPageInner() {
   const severityCounts = useMemo(
     () =>
       countRiskBySeverity(
-        category === "all"
-          ? pool
-          : pool.filter((row) => row.alert.category === category),
+        category === "all" ? pool : pool.filter((row) => row.alert.category === category),
       ),
     [pool, category],
   );
@@ -191,14 +179,10 @@ function RiskAlertsPageInner() {
               />
             }
             title={
-              filtered
-                ? t.commandCenter.risk.noFilterResultTitle
-                : t.commandCenter.risk.emptyTitle
+              filtered ? t.commandCenter.risk.noFilterResultTitle : t.commandCenter.risk.emptyTitle
             }
             body={
-              filtered
-                ? t.commandCenter.risk.noFilterResultBody
-                : t.commandCenter.risk.emptyBody
+              filtered ? t.commandCenter.risk.noFilterResultBody : t.commandCenter.risk.emptyBody
             }
             action={
               filtered
@@ -214,7 +198,7 @@ function RiskAlertsPageInner() {
             {/* Keyed on the filters, so switching either replays the fade — the
                 rows change completely in both cases. Same as `orders`. */}
             <FadeIn key={`${category}|${severity}`}>
-              <div className="overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)] divide-y divide-black/[0.05]">
+              <div className="divide-y divide-black/[0.05] overflow-hidden rounded-2xl bg-[var(--bg-default-secondary)]">
                 {visible.map((row) => (
                   <RiskAlertRowItem
                     key={row.alert.id}

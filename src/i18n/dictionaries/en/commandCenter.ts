@@ -58,10 +58,12 @@ const commandCenter = {
     comingSoon: "Coming Soon",
     comingSoonMessage: {
       book: "Every morning, AI will tell you which client to look after first today, about what, and why.",
-      client: "AI will suggest what to discuss with this client next and why, with a drafted message.",
+      client:
+        "AI will suggest what to discuss with this client next and why, with a drafted message.",
     },
     emptyTitle: "No open suggestions",
-    emptyBody: "AI will suggest a new action when it picks up a signal from a portfolio or a client's behaviour.",
+    emptyBody:
+      "AI will suggest a new action when it picks up a signal from a portfolio or a client's behaviour.",
     category: {
       revenue: "Revenue opportunity",
       compliance: "Compliance risk",
@@ -105,7 +107,8 @@ const commandCenter = {
     title: "Proactive Compliance Alerts",
     loadError: "Couldn't load risk alerts",
     emptyTitle: "No open risk alerts",
-    emptyBody: "You'll be alerted as soon as a margin, suitability or trading-conduct risk is found.",
+    emptyBody:
+      "You'll be alerted as soon as a margin, suitability or trading-conduct risk is found.",
     emptySeverity: "Nothing at this level",
     emptyCategory: "Nothing in this category",
     emptyFilteredBody: "Choose “All” to see other risk alerts.",

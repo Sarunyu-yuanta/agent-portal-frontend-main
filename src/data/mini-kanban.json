@@ -1,6 +1,24 @@
 [
-  { "id": "k1", "clientId": "110001", "dealName": "Structured Note",  "dealSize": "฿ 50",  "stage": "Pitch"        },
-  { "id": "k2", "clientId": "110004", "dealName": "Equity Fund",      "dealSize": "฿ 120", "stage": "Client Review"},
-  { "id": "k3", "clientId": "110007", "dealName": "Bond Portfolio",   "dealSize": "฿ 200", "stage": "Executed"     },
-  { "id": "k4", "clientId": "110008", "dealName": "DCA Fund",         "dealSize": "฿ 30",  "stage": "Idea"         }
+  {
+    "id": "k1",
+    "clientId": "110001",
+    "dealName": "Structured Note",
+    "dealSize": "฿ 50",
+    "stage": "Pitch"
+  },
+  {
+    "id": "k2",
+    "clientId": "110004",
+    "dealName": "Equity Fund",
+    "dealSize": "฿ 120",
+    "stage": "Client Review"
+  },
+  {
+    "id": "k3",
+    "clientId": "110007",
+    "dealName": "Bond Portfolio",
+    "dealSize": "฿ 200",
+    "stage": "Executed"
+  },
+  { "id": "k4", "clientId": "110008", "dealName": "DCA Fund", "dealSize": "฿ 30", "stage": "Idea" }
 ]

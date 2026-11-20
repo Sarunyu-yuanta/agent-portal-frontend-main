@@ -253,12 +253,13 @@ function NavSection({
   // `text-[length:Npx]` because a plain `text-[11px]` is enlarged globally by
   // `app/typography.css`. Same in `SidebarUserMenu`.
   return (
-    <div className="flex flex-col gap-0.5 mt-2">
+    <div className="mt-2 flex flex-col gap-0.5">
       {/* Section label fades out when collapsed */}
-      <div className="h-7 flex items-end px-4 pb-1 overflow-hidden">
+      <div className="flex h-7 items-end overflow-hidden px-4 pb-1">
         <p
-          className={`text-[length:11px] font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap transition-all duration-300 ease-in-out ${collapsed ? "opacity-0 -translate-x-1" : "opacity-100 translate-x-0"
-            }`}
+          className={`text-[length:11px] font-semibold tracking-widest whitespace-nowrap text-slate-500 uppercase transition-all duration-300 ease-in-out ${
+            collapsed ? "-translate-x-1 opacity-0" : "translate-x-0 opacity-100"
+          }`}
         >
           {label}
         </p>
@@ -274,13 +275,14 @@ function NavSection({
           <Link
             key={item.href}
             href={item.href}
-            className="no-underline block px-2"
+            className="block px-2 no-underline"
             onClick={handleNavigate(item)}
             title={label}
           >
             <div
-              className={`flex items-center gap-3 py-2.5 rounded-lg transition-colors overflow-hidden ${isActive ? "bg-slate-700/60" : "hover:bg-slate-800"
-                }`}
+              className={`flex items-center gap-3 overflow-hidden rounded-lg py-2.5 transition-colors ${
+                isActive ? "bg-slate-700/60" : "hover:bg-slate-800"
+              }`}
             >
               {/* Icon zone — fixed width, never moves */}
               <div className={ICON_ZONE}>
@@ -294,18 +296,18 @@ function NavSection({
               {/* Text fades + collapses. max-width (not width:auto) so the collapse
                   itself can be transitioned — CSS can't interpolate to/from "auto". */}
               <span
-                className={`text-[length:13.5px] leading-[18px] whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden ${collapsed ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
-                  } ${isActive ? "text-white" : "text-slate-300"} font-medium`}
+                className={`overflow-hidden text-[length:13.5px] leading-[18px] whitespace-nowrap transition-all duration-300 ease-in-out ${
+                  collapsed ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
+                } ${isActive ? "text-white" : "text-slate-300"} font-medium`}
               >
                 {label}
               </span>
 
               {item.badge != null && (
                 <span
-                  className={`bg-slate-700 text-slate-300 text-[length:11px] font-semibold py-0.5 rounded-full tabular-nums whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${collapsed
-                    ? "max-w-0 opacity-0 p-0"
-                    : "max-w-[48px] opacity-100 px-2"
-                    }`}
+                  className={`overflow-hidden rounded-full bg-slate-700 py-0.5 text-[length:11px] font-semibold whitespace-nowrap text-slate-300 tabular-nums transition-all duration-300 ease-in-out ${
+                    collapsed ? "max-w-0 p-0 opacity-0" : "max-w-[48px] px-2 opacity-100"
+                  }`}
                 >
                   {item.badge}
                 </span>
@@ -330,16 +332,16 @@ export function AppSidebar({
   const { isPrivate, toggle } = usePrivacy();
   const t = useT();
   return (
-    <div className="flex flex-col h-full w-full overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       {/* Toggle button — icon zone keeps it still */}
       {onToggleCollapse && (
-        <div className="flex shrink-0 pt-5 pb-1 px-2">
+        <div className="flex shrink-0 px-2 pt-5 pb-1">
           <div className={ICON_ZONE}>
             <button
               type="button"
               onClick={onToggleCollapse}
               title={collapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
-              className="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              className="cursor-pointer text-slate-400 transition-colors hover:text-slate-200"
             >
               <SidebarSimpleIcon size={18} />
             </button>
@@ -354,21 +356,22 @@ export function AppSidebar({
           mark clipped off, so only the "Yuanta Securities / IC PORTAL" text
           fades in and out. Cross-fading two copies of the mark instead dims it
           mid-transition, which reads as a flicker. */}
-      <div className="relative flex items-center py-4 shrink-0 px-2 h-[62px]">
+      <div className="relative flex h-[62px] shrink-0 items-center px-2 py-4">
         <div className={ICON_ZONE}>
           {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size icon, no responsive sizes needed */}
-          <img src="/brand/yuanta-icon-logo.svg" alt="Yuanta" className="w-auto h-8" />
+          <img src="/brand/yuanta-icon-logo.svg" alt="Yuanta" className="h-8 w-auto" />
         </div>
         <div
           aria-hidden={collapsed}
-          className={`absolute left-[9px] top-1/2 -translate-y-1/2 transition-opacity duration-300 ease-in-out ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
+          className={`absolute top-1/2 left-[9px] -translate-y-1/2 transition-opacity duration-300 ease-in-out ${
+            collapsed ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- small fixed-size wordmark, no responsive sizes needed */}
           <img
             src="/brand/logo-ic-portal-white.svg"
             alt="Yuanta IC Portal"
-            className="w-auto h-8 max-w-none [clip-path:inset(0_0_0_34px)]"
+            className="h-8 w-auto max-w-none [clip-path:inset(0_0_0_34px)]"
           />
         </div>
       </div>
@@ -407,28 +410,41 @@ export function AppSidebar({
 
       {/* Privacy mode toggle */}
       <div
-        className="shrink-0 mx-2 mb-2 rounded-lg transition-colors duration-200"
-        style={{ backgroundColor: isPrivate ? "color-mix(in srgb, var(--primary-action) 25%, transparent)" : "color-mix(in srgb, var(--fill-gray-700) 30%, transparent)" }}
+        className="mx-2 mb-2 shrink-0 rounded-lg transition-colors duration-200"
+        style={{
+          backgroundColor: isPrivate
+            ? "color-mix(in srgb, var(--primary-action) 25%, transparent)"
+            : "color-mix(in srgb, var(--fill-gray-700) 30%, transparent)",
+        }}
       >
         <button
           type="button"
           onClick={toggle}
           title={isPrivate ? t.nav.showClientNames : t.nav.hideClientNames}
-          className={`w-full flex items-center gap-1.5 py-2.5 pr-2 rounded-lg transition-colors cursor-pointer ${isPrivate ? "hover:bg-primary-action/20" : "hover:bg-slate-700/50"}`}
+          className={`flex w-full cursor-pointer items-center gap-1.5 rounded-lg py-2.5 pr-2 transition-colors ${isPrivate ? "hover:bg-primary-action/20" : "hover:bg-slate-700/50"}`}
         >
           <div className={ICON_ZONE}>
-            {isPrivate
-              ? <EyeSlashIcon size={16} className="text-primary-action shrink-0" />
-              : <EyeIcon size={16} className="text-slate-400 shrink-0" />
-            }
+            {isPrivate ? (
+              <EyeSlashIcon size={16} className="text-primary-action shrink-0" />
+            ) : (
+              <EyeIcon size={16} className="shrink-0 text-slate-400" />
+            )}
           </div>
-          <span className={`text-[length:13px] leading-normal whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"} ${isPrivate ? "text-primary-action font-medium" : "text-slate-300"}`}>
+          <span
+            className={`overflow-hidden text-[length:13px] leading-normal whitespace-nowrap transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"} ${isPrivate ? "text-primary-action font-medium" : "text-slate-300"}`}
+          >
             {t.nav.hideClientNames}
           </span>
           {/* Switch indicator */}
-          <div className={`ml-auto shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[40px] opacity-100"}`}>
-            <div className={`relative w-8 h-4.5 rounded-full transition-colors duration-200 ${isPrivate ? "bg-primary-action" : "bg-slate-600"}`}>
-              <div className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? "translate-x-[14px]" : "translate-x-0.5"}`} />
+          <div
+            className={`ml-auto shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[40px] opacity-100"}`}
+          >
+            <div
+              className={`relative h-4.5 w-8 rounded-full transition-colors duration-200 ${isPrivate ? "bg-primary-action" : "bg-slate-600"}`}
+            >
+              <div
+                className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? "translate-x-[14px]" : "translate-x-0.5"}`}
+              />
             </div>
           </div>
         </button>
@@ -439,12 +455,7 @@ export function AppSidebar({
           edge to edge, from the divider down to the foot of the rail. Any
           padding here would show up as a dead margin around the highlight. */}
       <div className="shrink-0 border-t border-slate-700/60">
-        <SidebarUserMenu
-          name={NOTE_AUTHOR}
-          role={IC_ROLE}
-          initials="JD"
-          collapsed={collapsed}
-        />
+        <SidebarUserMenu name={NOTE_AUTHOR} role={IC_ROLE} initials="JD" collapsed={collapsed} />
       </div>
     </div>
   );

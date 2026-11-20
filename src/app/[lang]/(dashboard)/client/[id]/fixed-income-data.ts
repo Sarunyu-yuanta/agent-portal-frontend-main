@@ -59,7 +59,9 @@ const withCategory =
   (category: FixedIncomeBondCategory) =>
   (bond: RawFixedIncomeBond): FixedIncomeBond => ({ ...bond, category });
 
-export const FIXED_INCOME_BONDS = (fixedIncomeRaw.bonds as RawFixedIncomeBond[]).map(withCategory("primary"));
+export const FIXED_INCOME_BONDS = (fixedIncomeRaw.bonds as RawFixedIncomeBond[]).map(
+  withCategory("primary"),
+);
 
 const COMPANY_ONLY_BONDS = (fixedIncomeRaw.secondaryMarketBonds as RawFixedIncomeBond[]).map(
   withCategory("secondary"),
@@ -96,15 +98,11 @@ export function resolveFixedIncomeCompany(companyId: string): FixedIncomeCompany
 }
 
 export function getCompanyPrimaryBonds(companyId: string): FixedIncomeBond[] {
-  return allBonds().filter(
-    (b) => b.companyName === companyId && b.category === "primary",
-  );
+  return allBonds().filter((b) => b.companyName === companyId && b.category === "primary");
 }
 
 export function getCompanySecondaryBonds(companyId: string): FixedIncomeBond[] {
-  return allBonds().filter(
-    (b) => b.companyName === companyId && b.category === "secondary",
-  );
+  return allBonds().filter((b) => b.companyName === companyId && b.category === "secondary");
 }
 
 export function getFixedIncomeBond(id: string): FixedIncomeBond | undefined {
@@ -173,7 +171,9 @@ export function fixedIncomeToBookableProduct(bond: FixedIncomeBond): StructuredP
 
 export function getBookingLabel(bond: FixedIncomeBond, t: Dictionary): string {
   const labels = t.products.fixedIncome.booking;
-  return bond.status === "open" ? labels.open(bond.subscriptionPeriod) : labels.expected(bond.subscriptionPeriod);
+  return bond.status === "open"
+    ? labels.open(bond.subscriptionPeriod)
+    : labels.expected(bond.subscriptionPeriod);
 }
 
 export function getRiskNumber(risk: string): string {
@@ -236,7 +236,10 @@ function getRiskChipLabel(id: FixedIncomeRiskFilter, t: Dictionary): string {
   return label ? t.products.fixedIncome.filter.riskChip(label) : id;
 }
 
-export function getFixedIncomeFilterChips(filters: FixedIncomeFilters, t: Dictionary): FixedIncomeFilterChip[] {
+export function getFixedIncomeFilterChips(
+  filters: FixedIncomeFilters,
+  t: Dictionary,
+): FixedIncomeFilterChip[] {
   const chips: FixedIncomeFilterChip[] = [];
 
   for (const companyId of filters.companies) {
@@ -380,10 +383,16 @@ export function filterFixedIncomeBonds(
     if (filters.companies.length > 0 && !filters.companies.includes(bond.companyName)) {
       return false;
     }
-    if (filters.coupons.length > 0 && !filters.coupons.some((c) => matchesCouponFilter(bond.couponRate, c))) {
+    if (
+      filters.coupons.length > 0 &&
+      !filters.coupons.some((c) => matchesCouponFilter(bond.couponRate, c))
+    ) {
       return false;
     }
-    if (filters.offerTypes.length > 0 && !filters.offerTypes.some((o) => matchesOfferFilter(bond.offerType, o))) {
+    if (
+      filters.offerTypes.length > 0 &&
+      !filters.offerTypes.some((o) => matchesOfferFilter(bond.offerType, o))
+    ) {
       return false;
     }
     if (

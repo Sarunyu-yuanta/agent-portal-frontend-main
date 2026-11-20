@@ -1,13 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import {
-  NO_IDS,
-  preferenceKey,
-  readIds,
-  subscribeIds,
-  writeIds,
-} from "@/lib/preferences";
+import { NO_IDS, preferenceKey, readIds, subscribeIds, writeIds } from "@/lib/preferences";
 
 /**
  * A set of ids kept as a lasting user preference — see {@link @/lib/preferences}
@@ -23,10 +17,7 @@ export function useStoredIds<T extends string>(
 ): [Set<T>, (next: Set<T>) => void] {
   const key = preferenceKey(name);
 
-  const subscribe = useCallback(
-    (onChange: () => void) => subscribeIds(key, onChange),
-    [key],
-  );
+  const subscribe = useCallback((onChange: () => void) => subscribeIds(key, onChange), [key]);
   const getSnapshot = useCallback(() => readIds(key), [key]);
   // The server has no localStorage, so it renders the default; React swaps in
   // the stored value after hydration instead of mismatching the markup.
@@ -36,15 +27,9 @@ export function useStoredIds<T extends string>(
 
   // Kept stable so callers can memoize off it — `ids` only changes identity
   // when the stored value actually does.
-  const known = useMemo(
-    () => new Set(ids.filter(isKnown) as T[]),
-    [ids, isKnown],
-  );
+  const known = useMemo(() => new Set(ids.filter(isKnown) as T[]), [ids, isKnown]);
 
-  const set = useCallback(
-    (next: Set<T>) => writeIds(key, next),
-    [key],
-  );
+  const set = useCallback((next: Set<T>) => writeIds(key, next), [key]);
 
   return [known, set];
 }

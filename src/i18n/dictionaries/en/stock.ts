@@ -268,8 +268,10 @@ const stock = {
       chg: "• Chg (Change):",
       chgBody: "Change from Prior Settlement Price",
       oi: "• OI (Open Interest):",
-      oiDay: "- During Day Session, Open Interest is the value as of the Night Session of previous day.",
-      oiNight: "- During Night Session, Open Interest is the value as of the Afternoon Session of current day.",
+      oiDay:
+        "- During Day Session, Open Interest is the value as of the Night Session of previous day.",
+      oiNight:
+        "- During Night Session, Open Interest is the value as of the Afternoon Session of current day.",
       im: "• IM:",
       imBody: "Initial Margin",
     },

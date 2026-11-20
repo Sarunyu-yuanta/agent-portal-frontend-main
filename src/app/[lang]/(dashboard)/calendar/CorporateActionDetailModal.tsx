@@ -95,7 +95,7 @@ export function CorporateActionDetailModal({
         <div className="flex min-h-0 w-full flex-col gap-4 overflow-y-auto rounded-2xl border border-[rgba(0,0,0,0.1)] p-3">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className="rounded px-2 py-0.5 text-sm font-semibold leading-[1.5]"
+              className="rounded px-2 py-0.5 text-sm leading-[1.5] font-semibold"
               style={{ backgroundColor: tag.bg, color: tag.text }}
               title={actionKindName(kind, t)}
             >
@@ -105,7 +105,7 @@ export function CorporateActionDetailModal({
                 legal name only confirms it, so they belong on the same baseline.
                 It wraps rather than truncating — a half-shown company name on a
                 record sheet is the kind of thing people screenshot. */}
-            <p className="min-w-0 text-sm font-bold leading-[24px] text-[rgba(0,0,0,0.85)]">
+            <p className="min-w-0 text-sm leading-[24px] font-bold text-[rgba(0,0,0,0.85)]">
               {symbol} : {companyName}
             </p>
           </div>
@@ -114,7 +114,13 @@ export function CorporateActionDetailModal({
             {rows.length === 0 && (
               <EmptyState
                 size="compact"
-                icon={<FileTextIcon size={32} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+                icon={
+                  <FileTextIcon
+                    size={32}
+                    weight="duotone"
+                    className="text-[var(--text-default-placeholder)]"
+                  />
+                }
                 title={t.planner.calendar.alert.noDetails}
               />
             )}
@@ -132,7 +138,7 @@ export function CorporateActionDetailModal({
                     <span className="min-w-0 flex-1 text-sm leading-[1.5] text-[rgba(0,0,0,0.75)]">
                       {row.label}
                     </span>
-                    <span className="shrink-0 text-right text-sm font-semibold leading-[1.5] text-[rgba(0,0,0,0.85)]">
+                    <span className="shrink-0 text-right text-sm leading-[1.5] font-semibold text-[rgba(0,0,0,0.85)]">
                       {row.value}
                     </span>
                   </div>

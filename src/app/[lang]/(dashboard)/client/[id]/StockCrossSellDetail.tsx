@@ -83,21 +83,29 @@ function StockCrossSellDetailBody({
         <div className={`relative flex items-center gap-6 py-10 ${NARROW}`}>
           <div
             className="flex shrink-0 items-center justify-center rounded-full p-2"
-            style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)" }}
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)",
+            }}
           >
             <ChartLineUpIcon size={48} weight="regular" className="text-white" />
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <p className="text-2xl font-bold leading-9 text-white [text-shadow:0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.1)]">
+            <p className="text-2xl leading-9 font-bold text-white [text-shadow:0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.1)]">
               {copy.title}
             </p>
-            <p className="whitespace-pre-line text-base leading-[24px] text-white">{copy.description}</p>
+            <p className="text-base leading-[24px] whitespace-pre-line text-white">
+              {copy.description}
+            </p>
           </div>
           <div
-            className="pointer-events-none absolute right-0 top-[18px] hidden size-[237px] rounded-full bg-white/20 md:block"
+            className="pointer-events-none absolute top-[18px] right-0 hidden size-[237px] rounded-full bg-white/20 md:block"
             aria-hidden
           />
-          <div className="pointer-events-none absolute right-[34px] top-[34px] hidden h-[132px] w-[169px] md:block" aria-hidden>
+          <div
+            className="pointer-events-none absolute top-[34px] right-[34px] hidden h-[132px] w-[169px] md:block"
+            aria-hidden
+          >
             <Image
               src={config.heroImage}
               alt=""
@@ -132,7 +140,7 @@ function StockCrossSellDetailBody({
                 {t.stock.crossSell.filter}
               </span>
               {filterCount > 0 && (
-                <span className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-[#0a6ee7] text-meta font-medium text-white">
+                <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-[#0a6ee7] text-meta font-medium text-white">
                   {filterCount}
                 </span>
               )}
@@ -144,21 +152,21 @@ function StockCrossSellDetailBody({
           {rows.length === 0 ? (
             <StockSectionEmpty title={t.stock.empty.crossSell} />
           ) : (
-          <div className="grid w-full grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-            {[...rows, ...rows].map((row, i) => (
-              <StockLargeAssetCard
-                key={`${row.symbol}-${i}`}
-                symbol={row.symbol}
-                subtitle={row.subtitle}
-                price={row.price}
-                currency={row.currency}
-                changeAmount={row.changeAmount}
-                changePercent={row.changePercent}
-                trend={row.trend}
-                series={row.series}
-              />
-            ))}
-          </div>
+            <div className="grid w-full grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+              {[...rows, ...rows].map((row, i) => (
+                <StockLargeAssetCard
+                  key={`${row.symbol}-${i}`}
+                  symbol={row.symbol}
+                  subtitle={row.subtitle}
+                  price={row.price}
+                  currency={row.currency}
+                  changeAmount={row.changeAmount}
+                  changePercent={row.changePercent}
+                  trend={row.trend}
+                  series={row.series}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

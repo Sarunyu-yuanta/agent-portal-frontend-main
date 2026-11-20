@@ -27,8 +27,16 @@ export const CARD_SHADOW =
 /** Note: `SetIndustrySectorDetail.tsx` deliberately keeps its own copy with a
  *  lighter `flat` (#6a7282) — Figma's hero band uses a different neutral, so
  *  these are NOT interchangeable. Only `TREND_PILL_BG` is shared with it. */
-export const TREND_TEXT: Record<Trend, string> = { up: "#008236", down: "#c10007", flat: "#4a5565" };
-export const TREND_PILL_BG: Record<Trend, string> = { up: "#dbfce7", down: "#fef2f2", flat: "#f3f4f6" };
+export const TREND_TEXT: Record<Trend, string> = {
+  up: "#008236",
+  down: "#c10007",
+  flat: "#4a5565",
+};
+export const TREND_PILL_BG: Record<Trend, string> = {
+  up: "#dbfce7",
+  down: "#fef2f2",
+  flat: "#f3f4f6",
+};
 
 /** Figma "Percent Change" pill — success/danger/neutral tri-state badge used
  *  throughout the Stock tab (market boards, stock rows, sector list). Figma
@@ -97,7 +105,9 @@ export function StockSectionEmpty({ title }: { title: string }) {
   return (
     <EmptyState
       size="compact"
-      icon={<TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />}
+      icon={
+        <TrayIcon size={40} weight="duotone" className="text-[var(--text-default-placeholder)]" />
+      }
       title={title}
     />
   );

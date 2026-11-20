@@ -261,7 +261,8 @@ export const MOBILE_FUND_GROUPS: MobileFundGroup[] = [
 /** Funds for a mobile tab — pools every underlying category, deduped by fund id. */
 export function getMobileGroupFunds(groupId: MobileFundGroupId): MutualFund[] {
   const group = MOBILE_FUND_GROUPS.find((g) => g.id === groupId);
-  const categoryIds = groupId === "all" ? MUTUAL_FUND_CATEGORIES.map((c) => c.id) : (group?.categoryIds ?? []);
+  const categoryIds =
+    groupId === "all" ? MUTUAL_FUND_CATEGORIES.map((c) => c.id) : (group?.categoryIds ?? []);
 
   const byId = new Map<string, MutualFund>();
   for (const categoryId of categoryIds) {
@@ -323,7 +324,10 @@ export const MUTUAL_FUND_INSIGHTS_PAGE_SIZE = 8;
 /** Figma pagination mock — 10 pages × 8 cards. */
 export const MUTUAL_FUND_INSIGHTS_MOCK_TOTAL = 80;
 
-function cycleInsightsToCount(items: MutualFundInsight[], targetCount: number): MutualFundInsight[] {
+function cycleInsightsToCount(
+  items: MutualFundInsight[],
+  targetCount: number,
+): MutualFundInsight[] {
   if (items.length === 0) return [];
   const out: MutualFundInsight[] = [];
   for (let i = 0; i < targetCount; i += 1) {
@@ -392,7 +396,9 @@ export function getTopPerformersList(categoryId: MutualFundCategoryId): MutualFu
 }
 
 /** Figma 39839:525396 — theme detail page ("ดูเพิ่มเติม" destination) tabs, in card order. */
-export const MUTUAL_FUND_THEME_IDS: MutualFundThemeId[] = MUTUAL_FUND_CATALOG.themes.map((t) => t.id);
+export const MUTUAL_FUND_THEME_IDS: MutualFundThemeId[] = MUTUAL_FUND_CATALOG.themes.map(
+  (t) => t.id,
+);
 
 export function getMutualFundTheme(themeId: MutualFundThemeId): MutualFundTheme {
   return MUTUAL_FUND_CATALOG.themes.find((t) => t.id === themeId) ?? MUTUAL_FUND_CATALOG.themes[0];
@@ -400,7 +406,9 @@ export function getMutualFundTheme(themeId: MutualFundThemeId): MutualFundTheme 
 
 /** The theme a route param names, or `null` — a detail route must not stand in another theme for an unknown id. */
 export function findMutualFundThemeId(value: string): MutualFundThemeId | null {
-  return MUTUAL_FUND_CATALOG.themes.some((t) => t.id === value) ? (value as MutualFundThemeId) : null;
+  return MUTUAL_FUND_CATALOG.themes.some((t) => t.id === value)
+    ? (value as MutualFundThemeId)
+    : null;
 }
 
 export function normalizeMutualFundThemeId(value: string): MutualFundThemeId {
@@ -414,7 +422,11 @@ export function mutualFundThemeHref(themeId: MutualFundThemeId): string {
 }
 
 /** Same density cycling as getTopPerformersGridFunds, for a theme's fund pool. */
-export function getThemeGridFunds(themeId: MutualFundThemeId, pickOnly: boolean, targetCount = 16): MutualFund[] {
+export function getThemeGridFunds(
+  themeId: MutualFundThemeId,
+  pickOnly: boolean,
+  targetCount = 16,
+): MutualFund[] {
   const base = getMutualFundTheme(themeId).funds;
   return cycleToCount(pickOnly ? base.filter((f) => f.isPick) : base, targetCount);
 }
@@ -451,12 +463,12 @@ export function getThemeDescription(themeId: MutualFundThemeId): string {
  * "tax-saving" matches any fund with a tax-saving type, "others" funds outside the catalog.
  */
 export type FilterCategoryOption = { id: MobileFundGroupId; categoryIds?: string[] };
-export const FILTER_CATEGORY_OPTIONS: FilterCategoryOption[] = MOBILE_FUND_GROUPS.filter((g) => g.id !== "all").map(
-  (g) => ({
-    id: g.id,
-    categoryIds: g.id === "others" ? ["others"] : g.categoryIds,
-  }),
-);
+export const FILTER_CATEGORY_OPTIONS: FilterCategoryOption[] = MOBILE_FUND_GROUPS.filter(
+  (g) => g.id !== "all",
+).map((g) => ({
+  id: g.id,
+  categoryIds: g.id === "others" ? ["others"] : g.categoryIds,
+}));
 
 export const TAX_SAVING_FUND_TYPES = ["RMF", "TESG", "TESGX"] as const;
 export type TaxSavingFundType = (typeof TAX_SAVING_FUND_TYPES)[number];
@@ -464,7 +476,9 @@ export type TaxSavingFundType = (typeof TAX_SAVING_FUND_TYPES)[number];
 /** The tax-saving fund type a route param names, or `null` when it names none. */
 export function findTaxSavingFundType(value: string): TaxSavingFundType | null {
   const upper = value.toUpperCase();
-  return (TAX_SAVING_FUND_TYPES as readonly string[]).includes(upper) ? (upper as TaxSavingFundType) : null;
+  return (TAX_SAVING_FUND_TYPES as readonly string[]).includes(upper)
+    ? (upper as TaxSavingFundType)
+    : null;
 }
 
 export function normalizeTaxSavingFundType(value: string): TaxSavingFundType {
@@ -542,14 +556,21 @@ export function fundHasHighlightTag(fund: MutualFund): boolean {
 export function searchFunds(funds: MutualFund[], query: string): MutualFund[] {
   const term = query.trim().toLowerCase();
   if (!term) return funds;
-  return funds.filter((fund) => fund.symbol.toLowerCase().includes(term) || fund.name.toLowerCase().includes(term));
+  return funds.filter(
+    (fund) => fund.symbol.toLowerCase().includes(term) || fund.name.toLowerCase().includes(term),
+  );
 }
 
 /** The View/Highlight toggles: neither on → every fund; otherwise funds carrying any active tag. */
-export function filterFundsByTag(funds: MutualFund[], viewActive: boolean, highlightActive: boolean): MutualFund[] {
+export function filterFundsByTag(
+  funds: MutualFund[],
+  viewActive: boolean,
+  highlightActive: boolean,
+): MutualFund[] {
   if (!viewActive && !highlightActive) return funds;
   return funds.filter(
-    (fund) => (viewActive && fundHasViewTag(fund)) || (highlightActive && fundHasHighlightTag(fund)),
+    (fund) =>
+      (viewActive && fundHasViewTag(fund)) || (highlightActive && fundHasHighlightTag(fund)),
   );
 }
 
@@ -704,10 +725,39 @@ const MOCK_POLICY: Record<MockFundGroup, string> = {
 };
 
 /** The fund-info row's value — mock record text, like the rest of `fundInfo`. */
-const MOCK_DIVIDEND_POLICY_TEXT: Record<DividendPolicyId, string> = { pay: "จ่าย", "no-pay": "ไม่จ่าย" };
+const MOCK_DIVIDEND_POLICY_TEXT: Record<DividendPolicyId, string> = {
+  pay: "จ่าย",
+  "no-pay": "ไม่จ่าย",
+};
 
-const MOCK_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const MOCK_THAI_MONTHS = ["ม.ค", "ก.พ", "มี.ค", "เม.ย", "พ.ค", "มิ.ย", "ก.ค", "ส.ค", "ก.ย", "ต.ค", "พ.ย", "ธ.ค"];
+const MOCK_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const MOCK_THAI_MONTHS = [
+  "ม.ค",
+  "ก.พ",
+  "มี.ค",
+  "เม.ย",
+  "พ.ค",
+  "มิ.ย",
+  "ก.ค",
+  "ส.ค",
+  "ก.ย",
+  "ต.ค",
+  "พ.ย",
+  "ธ.ค",
+];
 
 function formatEnDate(date: Date): string {
   return `${String(date.getUTCDate()).padStart(2, "0")} ${MOCK_MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
@@ -733,7 +783,11 @@ function mockDividendHistory(rnd: () => number): MutualFundDividend[] {
   return rows;
 }
 
-function mockAllocation(rnd: () => number, labels: string[], first: [number, number]): MutualFundAllocationItem[] {
+function mockAllocation(
+  rnd: () => number,
+  labels: string[],
+  first: [number, number],
+): MutualFundAllocationItem[] {
   const colors = ["#074EA4", "#51A2FF", "#A3B3FF"];
   const a = Number(between(rnd, first[0], first[1]).toFixed(2));
   const b = Number(((100 - a) * between(rnd, 0.45, 0.8)).toFixed(2));
@@ -778,8 +832,18 @@ function defaultDetailFields(fund: MutualFund): MutualFundDetailFields {
       volatility: r.period === "1Y" ? formatPct(volatility1y) : "-",
       maxDrawdown: r.period === "1Y" ? formatPct(drawdown1y) : "-",
     })),
-    { period: "3Y", return: formatPct(between(rnd, -2, 12)), volatility: formatPct(volatility1y * 1.1), maxDrawdown: formatPct(drawdown1y * 1.6) },
-    { period: "5Y", return: formatPct(between(rnd, -1, 10)), volatility: formatPct(volatility1y * 1.2), maxDrawdown: formatPct(drawdown1y * 2) },
+    {
+      period: "3Y",
+      return: formatPct(between(rnd, -2, 12)),
+      volatility: formatPct(volatility1y * 1.1),
+      maxDrawdown: formatPct(drawdown1y * 1.6),
+    },
+    {
+      period: "5Y",
+      return: formatPct(between(rnd, -1, 10)),
+      volatility: formatPct(volatility1y * 1.2),
+      maxDrawdown: formatPct(drawdown1y * 2),
+    },
     { period: "SI", return: formatPct(between(rnd, 0, 8)), volatility: "-", maxDrawdown: "-" },
   ];
 
@@ -789,10 +853,18 @@ function defaultDetailFields(fund: MutualFund): MutualFundDetailFields {
   const dividendHistory = dividendPolicy === "pay" ? mockDividendHistory(rnd) : [];
 
   const holdingPool = [...MOCK_HOLDINGS[group]].sort(() => rnd() - 0.5);
-  const topHoldings = mockAllocation(rnd, holdingPool.slice(0, 3), foreign ? [85, 97] : [8, 14]).map(
-    (item, i) => (foreign ? item : { ...item, percent: Number(between(rnd, 9 - i * 2, 12 - i * 2).toFixed(2)) }),
+  const topHoldings = mockAllocation(
+    rnd,
+    holdingPool.slice(0, 3),
+    foreign ? [85, 97] : [8, 14],
+  ).map((item, i) =>
+    foreign ? item : { ...item, percent: Number(between(rnd, 9 - i * 2, 12 - i * 2).toFixed(2)) },
   );
-  const assetAllocation = mockAllocation(rnd, MOCK_ALLOCATION_LABELS[group], group === "thai-bond" ? [50, 70] : [85, 97]);
+  const assetAllocation = mockAllocation(
+    rnd,
+    MOCK_ALLOCATION_LABELS[group],
+    group === "thai-bond" ? [50, 70] : [85, 97],
+  );
 
   const regYear = 60 + Math.floor(rnd() * 8);
   const nav = between(rnd, 500_000_000, 40_000_000_000);
@@ -825,7 +897,11 @@ function defaultDetailFields(fund: MutualFund): MutualFundDetailFields {
       { label: "ค่าธรรมเนียมการสับเปลี่ยนเข้า", actual: frontEnd.replace(".00", ""), maximum: "2%" },
       { label: "ค่าธรรมเนียมการสับเปลี่ยนออก", actual: backEnd.replace(".00", ""), maximum: "1%" },
       { label: "ค่าธรรมเนียมการจัดการ", actual: `${managementFee}%`, maximum: "2.14%" },
-      { label: "ค่าใช้จ่ายรวมทั้งหมด", actual: `${(Number(managementFee) + 0.1).toFixed(2)}%`, maximum: "5.35%" },
+      {
+        label: "ค่าใช้จ่ายรวมทั้งหมด",
+        actual: `${(Number(managementFee) + 0.1).toFixed(2)}%`,
+        maximum: "5.35%",
+      },
     ],
     fundInfo: {
       prospectusUrl: "#",
@@ -860,13 +936,21 @@ function mockNavHistory(fund: MutualFundDetail): NavHistory {
   const latestNav = Number(fund.nav) || 10;
   const latest = Date.parse(`${MOCK_LATEST_NAV_DATE}T00:00:00Z`);
   const ytdDays = Math.round((latest - Date.UTC(new Date(latest).getUTCFullYear(), 0, 1)) / DAY_MS);
-  const windowDays: Record<string, number> = { "1W": 7, "1M": 30, "3M": 91, "6M": 182, YTD: ytdDays, "1Y": 365 };
+  const windowDays: Record<string, number> = {
+    "1W": 7,
+    "1M": 30,
+    "3M": 91,
+    "6M": 182,
+    YTD: ytdDays,
+    "1Y": 365,
+  };
 
   const anchors: [number, number][] = [[0, latestNav]];
   for (const r of fund.historicalReturns) {
     const days = windowDays[r.period];
     const pct = parseFloat(r.value);
-    if (days !== undefined && Number.isFinite(pct)) anchors.push([days, latestNav / (1 + pct / 100)]);
+    if (days !== undefined && Number.isFinite(pct))
+      anchors.push([days, latestNav / (1 + pct / 100)]);
   }
   const navAt1y = anchors.find(([d]) => d === 365)?.[1] ?? latestNav;
   anchors.push([1826, navAt1y / (1 + between(rnd, -0.1, 0.35))]);
@@ -882,7 +966,8 @@ function mockNavHistory(fund: MutualFundDetail): NavHistory {
     const base = Math.exp(Math.log(v0) + (Math.log(v1) - Math.log(v0)) * t);
     // Gentle drift that fades to zero at both anchors: a slow swing plus a
     // little day-to-day noise, so the line reads like a fund, not a seismograph.
-    const wobble = Math.sin(Math.PI * t) * (Math.sin(day * 0.09 + phase) * 0.006 + (rnd() - 0.5) * 0.003);
+    const wobble =
+      Math.sin(Math.PI * t) * (Math.sin(day * 0.09 + phase) * 0.006 + (rnd() - 0.5) * 0.003);
     return base * (1 + wobble);
   };
 
@@ -927,10 +1012,8 @@ export type NavHistory = {
  * back really is 2.82% below the latest one, and so on down the list, so the
  * chart and the returns under it can never tell different stories.
  */
-const NAV_HISTORY: Record<
-  string,
-  { currency: string; points: (string | number)[][] } | undefined
-> = navHistoryRaw;
+const NAV_HISTORY: Record<string, { currency: string; points: (string | number)[][] } | undefined> =
+  navHistoryRaw;
 
 const NAV_HISTORY_CACHE = new Map<string, NavHistory | undefined>();
 

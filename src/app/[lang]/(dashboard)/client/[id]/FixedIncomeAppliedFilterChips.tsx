@@ -4,17 +4,13 @@ import { XIcon } from "@phosphor-icons/react";
 import type { FixedIncomeFilterChip } from "./fixed-income-data";
 import { useT } from "@/i18n/I18nProvider";
 
-function AppliedFilterChip({
-  label,
-  onRemove,
-}: {
-  label: string;
-  onRemove: () => void;
-}) {
+function AppliedFilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   const t = useT();
   return (
-    <div className="inline-flex h-8 shrink-0 items-center gap-1 overflow-hidden rounded-full border border-primary-action bg-primary-action pl-3 pr-1.5">
-      <span className="whitespace-nowrap text-sm leading-[24px] text-on-primary-action">{label}</span>
+    <div className="border-primary-action bg-primary-action inline-flex h-8 shrink-0 items-center gap-1 overflow-hidden rounded-full border pr-1.5 pl-3">
+      <span className="text-on-primary-action text-sm leading-[24px] whitespace-nowrap">
+        {label}
+      </span>
       <button
         type="button"
         aria-label={t.products.common.removeFilter(label)}
@@ -47,11 +43,7 @@ export function FixedIncomeAppliedFilterChips({
   if (chips.length === 0) return null;
 
   const chipElements = chips.map((chip) => (
-    <AppliedFilterChip
-      key={chip.id}
-      label={chip.label}
-      onRemove={() => onRemoveChip(chip)}
-    />
+    <AppliedFilterChip key={chip.id} label={chip.label} onRemove={() => onRemoveChip(chip)} />
   ));
 
   if (wrap) {
@@ -66,7 +58,7 @@ export function FixedIncomeAppliedFilterChips({
 
   return (
     <div
-      className={`overflow-x-auto hide-scrollbar ${className ?? "w-full"}`}
+      className={`hide-scrollbar overflow-x-auto ${className ?? "w-full"}`}
       style={{ scrollbarWidth: "none", ...style }}
     >
       <div className={`flex w-max flex-nowrap items-center gap-2 ${innerClassName ?? ""}`}>

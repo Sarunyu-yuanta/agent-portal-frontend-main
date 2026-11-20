@@ -22,13 +22,7 @@ import { localizePath } from "@/i18n/locale-path";
  *    the text rather than dropping rungs, and the section, the path and the
  *    current page all stay on screen.
  */
-export function ResponsiveBreadcrumb({
-  items,
-  className,
-}: {
-  items: Crumb[];
-  className?: string;
-}) {
+export function ResponsiveBreadcrumb({ items, className }: { items: Crumb[]; className?: string }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const probeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [level, setLevel] = useState(0);
@@ -78,7 +72,7 @@ export function ResponsiveBreadcrumb({
           them out of layout; they are never announced or focusable. */}
       <div
         aria-hidden
-        className="absolute top-0 left-0 h-0 overflow-hidden invisible pointer-events-none"
+        className="pointer-events-none invisible absolute top-0 left-0 h-0 overflow-hidden"
       >
         {variants.map((variant, i) => (
           <div
@@ -92,10 +86,7 @@ export function ResponsiveBreadcrumb({
         ))}
       </div>
 
-      <Breadcrumb
-        items={variants[level] ?? items}
-        className="w-full min-w-0 breadcrumb-fit"
-      />
+      <Breadcrumb items={variants[level] ?? items} className="breadcrumb-fit w-full min-w-0" />
     </div>
   );
 }

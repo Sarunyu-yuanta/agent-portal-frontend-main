@@ -33,11 +33,78 @@
       "moodys": "Aaa",
       "fitch": "AAA",
       "bonds": [
-        { "id": "a1", "name": "Apple Inc 1.37% 2026", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.375%", "price": "98.45", "yieldPct": "2.05%", "yieldValue": 2.05, "maturity": "05/05/2026", "duration": "1.7", "durationYears": 1.7, "topPick": true },
-        { "id": "a2", "name": "Apple Inc 1.65% 2027", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833DG77", "currency": "USD", "couponRate": "1.65%", "price": "96.20", "yieldPct": "2.40%", "yieldValue": 2.4, "maturity": "15/08/2027", "duration": "2.6", "durationYears": 2.6 },
-        { "id": "a3", "name": "Apple Inc 3.05% 2032", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833DU16", "currency": "USD", "couponRate": "3.05%", "price": "93.60", "yieldPct": "3.45%", "yieldValue": 3.45, "maturity": "05/06/2032", "duration": "6.1", "durationYears": 6.1, "topPick": true },
-        { "id": "a4", "name": "Apple Inc 4.45% 2035", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833DV98", "currency": "USD", "couponRate": "4.45%", "price": "101.20", "yieldPct": "4.35%", "yieldValue": 4.35, "maturity": "01/02/2035", "duration": "8.7", "durationYears": 8.7 },
-        { "id": "a5", "name": "Apple Inc 4.65% 2041", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833DW70", "currency": "USD", "couponRate": "4.65%", "price": "99.10", "yieldPct": "4.70%", "yieldValue": 4.7, "maturity": "15/12/2041", "duration": "12.5", "durationYears": 12.5 }
+        {
+          "id": "a1",
+          "name": "Apple Inc 1.37% 2026",
+          "logo": "/bond-logos/gb-apple.jpg",
+          "isin": "US037833CF61",
+          "currency": "USD",
+          "couponRate": "1.375%",
+          "price": "98.45",
+          "yieldPct": "2.05%",
+          "yieldValue": 2.05,
+          "maturity": "05/05/2026",
+          "duration": "1.7",
+          "durationYears": 1.7,
+          "topPick": true
+        },
+        {
+          "id": "a2",
+          "name": "Apple Inc 1.65% 2027",
+          "logo": "/bond-logos/gb-apple.jpg",
+          "isin": "US037833DG77",
+          "currency": "USD",
+          "couponRate": "1.65%",
+          "price": "96.20",
+          "yieldPct": "2.40%",
+          "yieldValue": 2.4,
+          "maturity": "15/08/2027",
+          "duration": "2.6",
+          "durationYears": 2.6
+        },
+        {
+          "id": "a3",
+          "name": "Apple Inc 3.05% 2032",
+          "logo": "/bond-logos/gb-apple.jpg",
+          "isin": "US037833DU16",
+          "currency": "USD",
+          "couponRate": "3.05%",
+          "price": "93.60",
+          "yieldPct": "3.45%",
+          "yieldValue": 3.45,
+          "maturity": "05/06/2032",
+          "duration": "6.1",
+          "durationYears": 6.1,
+          "topPick": true
+        },
+        {
+          "id": "a4",
+          "name": "Apple Inc 4.45% 2035",
+          "logo": "/bond-logos/gb-apple.jpg",
+          "isin": "US037833DV98",
+          "currency": "USD",
+          "couponRate": "4.45%",
+          "price": "101.20",
+          "yieldPct": "4.35%",
+          "yieldValue": 4.35,
+          "maturity": "01/02/2035",
+          "duration": "8.7",
+          "durationYears": 8.7
+        },
+        {
+          "id": "a5",
+          "name": "Apple Inc 4.65% 2041",
+          "logo": "/bond-logos/gb-apple.jpg",
+          "isin": "US037833DW70",
+          "currency": "USD",
+          "couponRate": "4.65%",
+          "price": "99.10",
+          "yieldPct": "4.70%",
+          "yieldValue": 4.7,
+          "maturity": "15/12/2041",
+          "duration": "12.5",
+          "durationYears": 12.5
+        }
       ]
     },
     {
@@ -57,9 +124,49 @@
       "moodys": "Aaa",
       "fitch": "AA+",
       "bonds": [
-        { "id": "m1", "name": "Microsoft Corp 2.1% 2026", "logo": "/bond-logos/gb-microsoft.jpg", "isin": "US594918CB67", "currency": "USD", "couponRate": "2.1%", "price": "99.10", "yieldPct": "2.25%", "yieldValue": 2.25, "maturity": "01/06/2026", "duration": "1.2", "durationYears": 1.2, "topPick": true },
-        { "id": "m2", "name": "Microsoft Corp 3.5% 2030", "logo": "/bond-logos/gb-microsoft.jpg", "isin": "US594918CC50", "currency": "USD", "couponRate": "3.5%", "price": "97.80", "yieldPct": "3.70%", "yieldValue": 3.7, "maturity": "15/03/2030", "duration": "4.5", "durationYears": 4.5 },
-        { "id": "m3", "name": "Microsoft Corp 4.2% 2035", "logo": "/bond-logos/gb-microsoft.jpg", "isin": "US594918CD34", "currency": "USD", "couponRate": "4.2%", "price": "100.50", "yieldPct": "4.15%", "yieldValue": 4.15, "maturity": "10/11/2035", "duration": "8.2", "durationYears": 8.2 }
+        {
+          "id": "m1",
+          "name": "Microsoft Corp 2.1% 2026",
+          "logo": "/bond-logos/gb-microsoft.jpg",
+          "isin": "US594918CB67",
+          "currency": "USD",
+          "couponRate": "2.1%",
+          "price": "99.10",
+          "yieldPct": "2.25%",
+          "yieldValue": 2.25,
+          "maturity": "01/06/2026",
+          "duration": "1.2",
+          "durationYears": 1.2,
+          "topPick": true
+        },
+        {
+          "id": "m2",
+          "name": "Microsoft Corp 3.5% 2030",
+          "logo": "/bond-logos/gb-microsoft.jpg",
+          "isin": "US594918CC50",
+          "currency": "USD",
+          "couponRate": "3.5%",
+          "price": "97.80",
+          "yieldPct": "3.70%",
+          "yieldValue": 3.7,
+          "maturity": "15/03/2030",
+          "duration": "4.5",
+          "durationYears": 4.5
+        },
+        {
+          "id": "m3",
+          "name": "Microsoft Corp 4.2% 2035",
+          "logo": "/bond-logos/gb-microsoft.jpg",
+          "isin": "US594918CD34",
+          "currency": "USD",
+          "couponRate": "4.2%",
+          "price": "100.50",
+          "yieldPct": "4.15%",
+          "yieldValue": 4.15,
+          "maturity": "10/11/2035",
+          "duration": "8.2",
+          "durationYears": 8.2
+        }
       ]
     },
     {
@@ -79,8 +186,35 @@
       "moodys": "A2",
       "fitch": "AA-",
       "bonds": [
-        { "id": "me1", "name": "Meta Platforms 2.2% 2027", "logo": "/bond-logos/gb-meta.jpg", "isin": "US30303M1027", "currency": "USD", "couponRate": "2.2%", "price": "98.00", "yieldPct": "2.80%", "yieldValue": 2.8, "maturity": "15/08/2027", "duration": "2.1", "durationYears": 2.1, "topPick": true },
-        { "id": "me2", "name": "Meta Platforms 3.8% 2032", "logo": "/bond-logos/gb-meta.jpg", "isin": "US30303M1035", "currency": "USD", "couponRate": "3.8%", "price": "96.50", "yieldPct": "4.00%", "yieldValue": 4.0, "maturity": "01/04/2032", "duration": "6.0", "durationYears": 6.0 }
+        {
+          "id": "me1",
+          "name": "Meta Platforms 2.2% 2027",
+          "logo": "/bond-logos/gb-meta.jpg",
+          "isin": "US30303M1027",
+          "currency": "USD",
+          "couponRate": "2.2%",
+          "price": "98.00",
+          "yieldPct": "2.80%",
+          "yieldValue": 2.8,
+          "maturity": "15/08/2027",
+          "duration": "2.1",
+          "durationYears": 2.1,
+          "topPick": true
+        },
+        {
+          "id": "me2",
+          "name": "Meta Platforms 3.8% 2032",
+          "logo": "/bond-logos/gb-meta.jpg",
+          "isin": "US30303M1035",
+          "currency": "USD",
+          "couponRate": "3.8%",
+          "price": "96.50",
+          "yieldPct": "4.00%",
+          "yieldValue": 4.0,
+          "maturity": "01/04/2032",
+          "duration": "6.0",
+          "durationYears": 6.0
+        }
       ]
     },
     {
@@ -100,8 +234,35 @@
       "moodys": "A1",
       "fitch": "AA-",
       "bonds": [
-        { "id": "am1", "name": "Amazon.com 3.5% 2028", "logo": "/bond-logos/gb-amazon.jpg", "isin": "US0231351067", "currency": "USD", "couponRate": "3.5%", "price": "97.20", "yieldPct": "3.80%", "yieldValue": 3.8, "maturity": "20/05/2028", "duration": "3.2", "durationYears": 3.2, "topPick": true },
-        { "id": "am2", "name": "Amazon.com 4.8% 2033", "logo": "/bond-logos/gb-amazon.jpg", "isin": "US0231351075", "currency": "USD", "couponRate": "4.8%", "price": "99.80", "yieldPct": "4.85%", "yieldValue": 4.85, "maturity": "10/12/2033", "duration": "7.5", "durationYears": 7.5 }
+        {
+          "id": "am1",
+          "name": "Amazon.com 3.5% 2028",
+          "logo": "/bond-logos/gb-amazon.jpg",
+          "isin": "US0231351067",
+          "currency": "USD",
+          "couponRate": "3.5%",
+          "price": "97.20",
+          "yieldPct": "3.80%",
+          "yieldValue": 3.8,
+          "maturity": "20/05/2028",
+          "duration": "3.2",
+          "durationYears": 3.2,
+          "topPick": true
+        },
+        {
+          "id": "am2",
+          "name": "Amazon.com 4.8% 2033",
+          "logo": "/bond-logos/gb-amazon.jpg",
+          "isin": "US0231351075",
+          "currency": "USD",
+          "couponRate": "4.8%",
+          "price": "99.80",
+          "yieldPct": "4.85%",
+          "yieldValue": 4.85,
+          "maturity": "10/12/2033",
+          "duration": "7.5",
+          "durationYears": 7.5
+        }
       ]
     },
     {
@@ -121,7 +282,21 @@
       "moodys": "A1",
       "fitch": "A+",
       "bonds": [
-        { "id": "c1", "name": "COCA-COLA CO/THE 5.18% 2045", "logo": "/bond-logos/gb-coke.jpg", "isin": "US1912161007", "currency": "USD", "couponRate": "5.18%", "price": "102.30", "yieldPct": "5.05%", "yieldValue": 5.05, "maturity": "01/11/2045", "duration": "15.2", "durationYears": 15.2, "topPick": true }
+        {
+          "id": "c1",
+          "name": "COCA-COLA CO/THE 5.18% 2045",
+          "logo": "/bond-logos/gb-coke.jpg",
+          "isin": "US1912161007",
+          "currency": "USD",
+          "couponRate": "5.18%",
+          "price": "102.30",
+          "yieldPct": "5.05%",
+          "yieldValue": 5.05,
+          "maturity": "01/11/2045",
+          "duration": "15.2",
+          "durationYears": 15.2,
+          "topPick": true
+        }
       ]
     },
     {
@@ -141,7 +316,21 @@
       "moodys": "A2",
       "fitch": "A",
       "bonds": [
-        { "id": "ax1", "name": "AMERICAN EXPRESS 1.37% 2026", "logo": "/bond-logos/gb-amex.jpg", "isin": "US0258161092", "currency": "USD", "couponRate": "1.37%", "price": "99.50", "yieldPct": "1.50%", "yieldValue": 1.5, "maturity": "15/08/2026", "duration": "1.0", "durationYears": 1.0, "topPick": true }
+        {
+          "id": "ax1",
+          "name": "AMERICAN EXPRESS 1.37% 2026",
+          "logo": "/bond-logos/gb-amex.jpg",
+          "isin": "US0258161092",
+          "currency": "USD",
+          "couponRate": "1.37%",
+          "price": "99.50",
+          "yieldPct": "1.50%",
+          "yieldValue": 1.5,
+          "maturity": "15/08/2026",
+          "duration": "1.0",
+          "durationYears": 1.0,
+          "topPick": true
+        }
       ]
     },
     {
@@ -161,7 +350,21 @@
       "moodys": "A1",
       "fitch": "AA-",
       "bonds": [
-        { "id": "n1", "name": "NVIDIA CORP 4.75% 2060", "logo": "/bond-logos/gb-nvidia.jpg", "isin": "US67066G1040", "currency": "USD", "couponRate": "4.75%", "price": "93.60", "yieldPct": "3.45%", "yieldValue": 3.45, "maturity": "05/06/2032", "duration": "6.1", "durationYears": 6.1, "topPick": true }
+        {
+          "id": "n1",
+          "name": "NVIDIA CORP 4.75% 2060",
+          "logo": "/bond-logos/gb-nvidia.jpg",
+          "isin": "US67066G1040",
+          "currency": "USD",
+          "couponRate": "4.75%",
+          "price": "93.60",
+          "yieldPct": "3.45%",
+          "yieldValue": 3.45,
+          "maturity": "05/06/2032",
+          "duration": "6.1",
+          "durationYears": 6.1,
+          "topPick": true
+        }
       ]
     },
     {
@@ -181,18 +384,108 @@
       "moodys": "Aa2",
       "fitch": "AA",
       "bonds": [
-        { "id": "w1", "name": "WALMART INC 2.9% 2030", "logo": "/bond-logos/gb-walmart.jpg", "isin": "US9311421039", "currency": "USD", "couponRate": "2.9%", "price": "98.80", "yieldPct": "3.10%", "yieldValue": 3.1, "maturity": "15/04/2030", "duration": "4.0", "durationYears": 4.0, "topPick": true }
+        {
+          "id": "w1",
+          "name": "WALMART INC 2.9% 2030",
+          "logo": "/bond-logos/gb-walmart.jpg",
+          "isin": "US9311421039",
+          "currency": "USD",
+          "couponRate": "2.9%",
+          "price": "98.80",
+          "yieldPct": "3.10%",
+          "yieldValue": 3.1,
+          "maturity": "15/04/2030",
+          "duration": "4.0",
+          "durationYears": 4.0,
+          "topPick": true
+        }
       ]
     }
   ],
   "topPickRows": [
-    { "id": "tp1", "name": "Apple Inc 4.45% 2035", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.375%", "price": "98.45", "yieldPct": "2.05%", "yieldValue": 2.05, "maturity": "05/05/2026", "duration": "1.7", "durationYears": 1.7, "topPick": true },
-    { "id": "tp2", "name": "COCA-COLA CO/THE 5.18% 2045", "logo": "/bond-logos/gb-coke.jpg", "isin": "US037833DG77", "currency": "USD", "couponRate": "1.65%", "price": "96.20", "yieldPct": "2.40%", "yieldValue": 2.4, "maturity": "15/08/2027", "duration": "2.6", "durationYears": 2.6 },
-    { "id": "tp3", "name": "NVIDIA CORP 4.75% 2060", "logo": "/bond-logos/gb-nvidia.jpg", "isin": "US037833DU16", "currency": "USD", "couponRate": "3.05%", "price": "93.60", "yieldPct": "3.45%", "yieldValue": 3.45, "maturity": "05/06/2032", "duration": "6.1", "durationYears": 6.1, "topPick": true },
-    { "id": "tp4", "name": "Apple Inc 4.45% 2035", "logo": "/bond-logos/gb-apple.jpg", "isin": "US037833DV98", "currency": "USD", "couponRate": "4.45%", "price": "101.20", "yieldPct": "4.35%", "yieldValue": 4.35, "maturity": "01/02/2035", "duration": "8.7", "durationYears": 8.7 },
-    { "id": "tp5", "name": "AMERICAN EXPRESS 1.37% 2026", "logo": "/bond-logos/gb-amex.jpg", "isin": "US037833DW70", "currency": "USD", "couponRate": "4.65%", "price": "99.10", "yieldPct": "4.70%", "yieldValue": 4.7, "maturity": "15/12/2041", "duration": "12.5", "durationYears": 12.5 }
+    {
+      "id": "tp1",
+      "name": "Apple Inc 4.45% 2035",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.375%",
+      "price": "98.45",
+      "yieldPct": "2.05%",
+      "yieldValue": 2.05,
+      "maturity": "05/05/2026",
+      "duration": "1.7",
+      "durationYears": 1.7,
+      "topPick": true
+    },
+    {
+      "id": "tp2",
+      "name": "COCA-COLA CO/THE 5.18% 2045",
+      "logo": "/bond-logos/gb-coke.jpg",
+      "isin": "US037833DG77",
+      "currency": "USD",
+      "couponRate": "1.65%",
+      "price": "96.20",
+      "yieldPct": "2.40%",
+      "yieldValue": 2.4,
+      "maturity": "15/08/2027",
+      "duration": "2.6",
+      "durationYears": 2.6
+    },
+    {
+      "id": "tp3",
+      "name": "NVIDIA CORP 4.75% 2060",
+      "logo": "/bond-logos/gb-nvidia.jpg",
+      "isin": "US037833DU16",
+      "currency": "USD",
+      "couponRate": "3.05%",
+      "price": "93.60",
+      "yieldPct": "3.45%",
+      "yieldValue": 3.45,
+      "maturity": "05/06/2032",
+      "duration": "6.1",
+      "durationYears": 6.1,
+      "topPick": true
+    },
+    {
+      "id": "tp4",
+      "name": "Apple Inc 4.45% 2035",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "isin": "US037833DV98",
+      "currency": "USD",
+      "couponRate": "4.45%",
+      "price": "101.20",
+      "yieldPct": "4.35%",
+      "yieldValue": 4.35,
+      "maturity": "01/02/2035",
+      "duration": "8.7",
+      "durationYears": 8.7
+    },
+    {
+      "id": "tp5",
+      "name": "AMERICAN EXPRESS 1.37% 2026",
+      "logo": "/bond-logos/gb-amex.jpg",
+      "isin": "US037833DW70",
+      "currency": "USD",
+      "couponRate": "4.65%",
+      "price": "99.10",
+      "yieldPct": "4.70%",
+      "yieldValue": 4.7,
+      "maturity": "15/12/2041",
+      "duration": "12.5",
+      "durationYears": 12.5
+    }
   ],
-  "recommendedIssuers": ["apple", "microsoft", "meta", "amazon", "coke", "amex", "nvidia", "walmart"],
+  "recommendedIssuers": [
+    "apple",
+    "microsoft",
+    "meta",
+    "amazon",
+    "coke",
+    "amex",
+    "nvidia",
+    "walmart"
+  ],
   "detailRecommendedCards": [
     {
       "id": "meta",
@@ -223,20 +516,233 @@
     }
   ],
   "allOverseasBondsSeed": [
-    { "name": "Microsoft Corp 3.05% 2032", "logo": "/bond-logos/gb-microsoft.jpg", "ticker": "MSFT", "isin": "US037833CF61", "currency": "USD", "couponRate": "3.05%", "couponValue": 3.05, "price": "93.60", "yieldPct": "3.45%", "yieldValue": 3.45, "maturity": "05/06/2032", "duration": "6.1", "durationYears": 6.1, "topPick": true },
-    { "name": "Meta Platforms Inc 1.37% 2026", "logo": "/bond-logos/gb-meta.jpg", "ticker": "META", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.37%", "couponValue": 1.37, "price": "98.45", "yieldPct": "2.05%", "yieldValue": 2.05, "maturity": "05/05/2026", "duration": "1.7", "durationYears": 1.7 },
-    { "name": "Apple Inc 1.37% 2026", "logo": "/bond-logos/gb-apple.jpg", "ticker": "AAPL", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.375%", "couponValue": 1.375, "price": "98.45", "yieldPct": "2.05%", "yieldValue": 2.05, "maturity": "05/05/2026", "duration": "1.7", "durationYears": 1.7 },
-    { "name": "Apple Inc 4.45% 2035", "logo": "/bond-logos/gb-apple.jpg", "ticker": "AAPL", "isin": "US037833CF61", "currency": "USD", "couponRate": "4.45%", "couponValue": 4.45, "price": "101.20", "yieldPct": "4.35%", "yieldValue": 4.35, "maturity": "01/02/2035", "duration": "8.7", "durationYears": 8.7, "topPick": true },
-    { "name": "Microsoft Corp 1.37% 2026", "logo": "/bond-logos/gb-microsoft.jpg", "ticker": "MSFT", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.37%", "couponValue": 1.37, "price": "99.10", "yieldPct": "2.25%", "yieldValue": 2.25, "maturity": "01/06/2026", "duration": "1.2", "durationYears": 1.2 },
-    { "name": "Meta Platforms Inc 3.05% 2032", "logo": "/bond-logos/gb-meta.jpg", "ticker": "META", "isin": "US037833CF61", "currency": "USD", "couponRate": "3.05%", "couponValue": 3.05, "price": "96.50", "yieldPct": "4.00%", "yieldValue": 4.0, "maturity": "01/04/2032", "duration": "6.0", "durationYears": 6.0 },
-    { "name": "Apple Inc 3.05% 2032", "logo": "/bond-logos/gb-apple.jpg", "ticker": "AAPL", "isin": "US037833CF61", "currency": "USD", "couponRate": "3.05%", "couponValue": 3.05, "price": "93.60", "yieldPct": "3.45%", "yieldValue": 3.45, "maturity": "05/06/2032", "duration": "6.1", "durationYears": 6.1 },
-    { "name": "Apple Inc 1.65% 2027", "logo": "/bond-logos/gb-apple.jpg", "ticker": "AAPL", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.65%", "couponValue": 1.65, "price": "96.20", "yieldPct": "2.40%", "yieldValue": 2.4, "maturity": "15/08/2027", "duration": "2.6", "durationYears": 2.6 },
-    { "name": "Microsoft Corp 1.65% 2027", "logo": "/bond-logos/gb-microsoft.jpg", "ticker": "MSFT", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.65%", "couponValue": 1.65, "price": "97.80", "yieldPct": "3.70%", "yieldValue": 3.7, "maturity": "15/03/2030", "duration": "4.5", "durationYears": 4.5 },
-    { "name": "Apple Inc 4.65% 2041", "logo": "/bond-logos/gb-apple.jpg", "ticker": "AAPL", "isin": "US037833CF61", "currency": "USD", "couponRate": "4.65%", "couponValue": 4.65, "price": "99.10", "yieldPct": "4.70%", "yieldValue": 4.7, "maturity": "15/12/2041", "duration": "12.5", "durationYears": 12.5 },
-    { "name": "Amazon.com Inc 3.05% 2032", "logo": "/bond-logos/gb-amazon.jpg", "ticker": "AMZN", "isin": "US037833CF61", "currency": "USD", "couponRate": "3.05%", "couponValue": 3.05, "price": "97.20", "yieldPct": "3.80%", "yieldValue": 3.8, "maturity": "20/05/2028", "duration": "3.2", "durationYears": 3.2 },
-    { "name": "Amazon.com Inc 1.37% 2026", "logo": "/bond-logos/gb-amazon.jpg", "ticker": "AMZN", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.37%", "couponValue": 1.37, "price": "99.80", "yieldPct": "4.85%", "yieldValue": 4.85, "maturity": "10/12/2033", "duration": "7.5", "durationYears": 7.5, "topPick": true },
-    { "name": "Meta Platforms Inc 1.65% 2027", "logo": "/bond-logos/gb-meta.jpg", "ticker": "META", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.65%", "couponValue": 1.65, "price": "98.00", "yieldPct": "2.80%", "yieldValue": 2.8, "maturity": "15/08/2027", "duration": "2.1", "durationYears": 2.1 },
-    { "name": "Amazon.com Inc 1.65% 2027", "logo": "/bond-logos/gb-amazon.jpg", "ticker": "AMZN", "isin": "US037833CF61", "currency": "USD", "couponRate": "1.65%", "couponValue": 1.65, "price": "97.20", "yieldPct": "3.80%", "yieldValue": 3.8, "maturity": "20/05/2028", "duration": "3.2", "durationYears": 3.2 },
-    { "name": "Meta Platforms Inc 4.45% 2035", "logo": "/bond-logos/gb-meta.jpg", "ticker": "META", "isin": "US037833CF61", "currency": "USD", "couponRate": "4.45%", "couponValue": 4.45, "price": "96.50", "yieldPct": "4.00%", "yieldValue": 4.0, "maturity": "01/04/2032", "duration": "6.0", "durationYears": 6.0 }
+    {
+      "name": "Microsoft Corp 3.05% 2032",
+      "logo": "/bond-logos/gb-microsoft.jpg",
+      "ticker": "MSFT",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "3.05%",
+      "couponValue": 3.05,
+      "price": "93.60",
+      "yieldPct": "3.45%",
+      "yieldValue": 3.45,
+      "maturity": "05/06/2032",
+      "duration": "6.1",
+      "durationYears": 6.1,
+      "topPick": true
+    },
+    {
+      "name": "Meta Platforms Inc 1.37% 2026",
+      "logo": "/bond-logos/gb-meta.jpg",
+      "ticker": "META",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.37%",
+      "couponValue": 1.37,
+      "price": "98.45",
+      "yieldPct": "2.05%",
+      "yieldValue": 2.05,
+      "maturity": "05/05/2026",
+      "duration": "1.7",
+      "durationYears": 1.7
+    },
+    {
+      "name": "Apple Inc 1.37% 2026",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "ticker": "AAPL",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.375%",
+      "couponValue": 1.375,
+      "price": "98.45",
+      "yieldPct": "2.05%",
+      "yieldValue": 2.05,
+      "maturity": "05/05/2026",
+      "duration": "1.7",
+      "durationYears": 1.7
+    },
+    {
+      "name": "Apple Inc 4.45% 2035",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "ticker": "AAPL",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "4.45%",
+      "couponValue": 4.45,
+      "price": "101.20",
+      "yieldPct": "4.35%",
+      "yieldValue": 4.35,
+      "maturity": "01/02/2035",
+      "duration": "8.7",
+      "durationYears": 8.7,
+      "topPick": true
+    },
+    {
+      "name": "Microsoft Corp 1.37% 2026",
+      "logo": "/bond-logos/gb-microsoft.jpg",
+      "ticker": "MSFT",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.37%",
+      "couponValue": 1.37,
+      "price": "99.10",
+      "yieldPct": "2.25%",
+      "yieldValue": 2.25,
+      "maturity": "01/06/2026",
+      "duration": "1.2",
+      "durationYears": 1.2
+    },
+    {
+      "name": "Meta Platforms Inc 3.05% 2032",
+      "logo": "/bond-logos/gb-meta.jpg",
+      "ticker": "META",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "3.05%",
+      "couponValue": 3.05,
+      "price": "96.50",
+      "yieldPct": "4.00%",
+      "yieldValue": 4.0,
+      "maturity": "01/04/2032",
+      "duration": "6.0",
+      "durationYears": 6.0
+    },
+    {
+      "name": "Apple Inc 3.05% 2032",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "ticker": "AAPL",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "3.05%",
+      "couponValue": 3.05,
+      "price": "93.60",
+      "yieldPct": "3.45%",
+      "yieldValue": 3.45,
+      "maturity": "05/06/2032",
+      "duration": "6.1",
+      "durationYears": 6.1
+    },
+    {
+      "name": "Apple Inc 1.65% 2027",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "ticker": "AAPL",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.65%",
+      "couponValue": 1.65,
+      "price": "96.20",
+      "yieldPct": "2.40%",
+      "yieldValue": 2.4,
+      "maturity": "15/08/2027",
+      "duration": "2.6",
+      "durationYears": 2.6
+    },
+    {
+      "name": "Microsoft Corp 1.65% 2027",
+      "logo": "/bond-logos/gb-microsoft.jpg",
+      "ticker": "MSFT",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.65%",
+      "couponValue": 1.65,
+      "price": "97.80",
+      "yieldPct": "3.70%",
+      "yieldValue": 3.7,
+      "maturity": "15/03/2030",
+      "duration": "4.5",
+      "durationYears": 4.5
+    },
+    {
+      "name": "Apple Inc 4.65% 2041",
+      "logo": "/bond-logos/gb-apple.jpg",
+      "ticker": "AAPL",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "4.65%",
+      "couponValue": 4.65,
+      "price": "99.10",
+      "yieldPct": "4.70%",
+      "yieldValue": 4.7,
+      "maturity": "15/12/2041",
+      "duration": "12.5",
+      "durationYears": 12.5
+    },
+    {
+      "name": "Amazon.com Inc 3.05% 2032",
+      "logo": "/bond-logos/gb-amazon.jpg",
+      "ticker": "AMZN",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "3.05%",
+      "couponValue": 3.05,
+      "price": "97.20",
+      "yieldPct": "3.80%",
+      "yieldValue": 3.8,
+      "maturity": "20/05/2028",
+      "duration": "3.2",
+      "durationYears": 3.2
+    },
+    {
+      "name": "Amazon.com Inc 1.37% 2026",
+      "logo": "/bond-logos/gb-amazon.jpg",
+      "ticker": "AMZN",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.37%",
+      "couponValue": 1.37,
+      "price": "99.80",
+      "yieldPct": "4.85%",
+      "yieldValue": 4.85,
+      "maturity": "10/12/2033",
+      "duration": "7.5",
+      "durationYears": 7.5,
+      "topPick": true
+    },
+    {
+      "name": "Meta Platforms Inc 1.65% 2027",
+      "logo": "/bond-logos/gb-meta.jpg",
+      "ticker": "META",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.65%",
+      "couponValue": 1.65,
+      "price": "98.00",
+      "yieldPct": "2.80%",
+      "yieldValue": 2.8,
+      "maturity": "15/08/2027",
+      "duration": "2.1",
+      "durationYears": 2.1
+    },
+    {
+      "name": "Amazon.com Inc 1.65% 2027",
+      "logo": "/bond-logos/gb-amazon.jpg",
+      "ticker": "AMZN",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "1.65%",
+      "couponValue": 1.65,
+      "price": "97.20",
+      "yieldPct": "3.80%",
+      "yieldValue": 3.8,
+      "maturity": "20/05/2028",
+      "duration": "3.2",
+      "durationYears": 3.2
+    },
+    {
+      "name": "Meta Platforms Inc 4.45% 2035",
+      "logo": "/bond-logos/gb-meta.jpg",
+      "ticker": "META",
+      "isin": "US037833CF61",
+      "currency": "USD",
+      "couponRate": "4.45%",
+      "couponValue": 4.45,
+      "price": "96.50",
+      "yieldPct": "4.00%",
+      "yieldValue": 4.0,
+      "maturity": "01/04/2032",
+      "duration": "6.0",
+      "durationYears": 6.0
+    }
   ]
 }

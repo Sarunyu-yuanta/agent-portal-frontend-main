@@ -4,12 +4,7 @@ import { useCallback, useMemo } from "react";
 import { useNBAActions } from "@/hooks/use-api";
 import { usePrivacy } from "@/contexts/privacy-context";
 import { useStoredIds } from "@/hooks/use-stored-ids";
-import {
-  buildNbaRows,
-  isNbaId,
-  HIDDEN_NBA_IDS_PREF,
-  type NbaRow,
-} from "./dashboard-data";
+import { buildNbaRows, isNbaId, HIDDEN_NBA_IDS_PREF, type NbaRow } from "./dashboard-data";
 
 /**
  * The AI's suggested next moves, ranked, with the dismissed ones gone.
@@ -34,10 +29,7 @@ export function useNbaRows(clientId?: string): {
 } {
   const { data: actions, isLoading, error, retry } = useNBAActions();
   const { isPrivate } = usePrivacy();
-  const [dismissed, setDismissed] = useStoredIds<string>(
-    HIDDEN_NBA_IDS_PREF,
-    isNbaId,
-  );
+  const [dismissed, setDismissed] = useStoredIds<string>(HIDDEN_NBA_IDS_PREF, isNbaId);
 
   const rows = useMemo(
     () =>

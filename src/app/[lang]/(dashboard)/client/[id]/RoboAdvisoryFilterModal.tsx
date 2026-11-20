@@ -33,7 +33,12 @@ type FilterContentProps = {
   onToggleRebalance: (rebalance: RoboRebalanceFilter) => void;
 };
 
-function FilterContent({ draft, onToggleProvider, onToggleRisk, onToggleRebalance }: FilterContentProps) {
+function FilterContent({
+  draft,
+  onToggleProvider,
+  onToggleRisk,
+  onToggleRebalance,
+}: FilterContentProps) {
   const t = useT();
   return (
     <div className="flex w-full flex-col gap-4">
@@ -86,10 +91,20 @@ function FilterFooter({ onClear, onApply }: { onClear: () => void; onApply: () =
   const t = useT();
   return (
     <div className="flex w-full items-start gap-4">
-      <Button variant="outline-black" size="xl" className="min-w-0 flex-1 max-w-[343px] text-[#0a6ee7]" onClick={onClear}>
+      <Button
+        variant="outline-black"
+        size="xl"
+        className="max-w-[343px] min-w-0 flex-1 text-[#0a6ee7]"
+        onClick={onClear}
+      >
         {t.products.common.clearSelection}
       </Button>
-      <Button variant="primary" size="xl" className="min-w-0 flex-1 max-w-[343px]" onClick={onApply}>
+      <Button
+        variant="primary"
+        size="xl"
+        className="max-w-[343px] min-w-0 flex-1"
+        onClick={onApply}
+      >
         {t.products.common.showResults}
       </Button>
     </div>
@@ -104,7 +119,12 @@ type RoboAdvisoryFilterModalProps = {
 };
 
 /** Figma 33787:152139 — Robo Advisory filter modal (Model type / ความเสี่ยง / Rebalance Timing). */
-export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: RoboAdvisoryFilterModalProps) {
+export function RoboAdvisoryFilterModal({
+  open,
+  filters,
+  onClose,
+  onApply,
+}: RoboAdvisoryFilterModalProps) {
   const t = useT();
   const isMobile = useIsMobile();
   const [draft, setDraft] = useState<RoboAdvisoryFilters>(filters);
@@ -138,7 +158,9 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
   const toggleRisk = (risk: RoboRiskTier) => {
     setDraft((prev) => ({
       ...prev,
-      risks: prev.risks.includes(risk) ? prev.risks.filter((r) => r !== risk) : [...prev.risks, risk],
+      risks: prev.risks.includes(risk)
+        ? prev.risks.filter((r) => r !== risk)
+        : [...prev.risks, risk],
     }));
   };
 
@@ -198,7 +220,10 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
         aria-labelledby="robo-advisory-filter-title"
       >
         <div className="flex w-full items-center gap-4 px-4 pt-4">
-          <p id="robo-advisory-filter-title" className="min-w-0 flex-1 text-lg font-bold leading-[28px] text-[#101828]">
+          <p
+            id="robo-advisory-filter-title"
+            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-[#101828]"
+          >
             {title}
           </p>
           <button
@@ -211,7 +236,7 @@ export function RoboAdvisoryFilterModal({ open, filters, onClose, onApply }: Rob
           </button>
         </div>
 
-        <div className="flex w-full flex-col items-center px-4 pb-6 pt-4">
+        <div className="flex w-full flex-col items-center px-4 pt-4 pb-6">
           <FilterContent {...filterContentProps} />
         </div>
 

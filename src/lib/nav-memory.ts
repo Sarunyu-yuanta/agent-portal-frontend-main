@@ -158,8 +158,7 @@ export function sectionTrail(pathname: string, url: string): string[] {
 }
 
 /** Everything above the last path segment — two paths sharing it are siblings. */
-const parentPath = (pathname: string) =>
-  pathname.slice(0, pathname.lastIndexOf("/"));
+const parentPath = (pathname: string) => pathname.slice(0, pathname.lastIndexOf("/"));
 
 /** Records a navigation: section memory, breadcrumb trail and previous URL. */
 export function recordVisit(pathname: string, url: string) {
