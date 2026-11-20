@@ -63,7 +63,7 @@ app (routes)  →  features  →  components / hooks / lib / config / types / i1
 | `no-console` — ใช้ `reportError()` (`src/lib/report-error.ts`)            | ต่อ Sentry/monitoring ที่เดียว                            |
 
 ไฟล์ `lib/` ที่ยังอ่าน mock ตรง ๆ มีรายชื่อชัดเจนใน `LEGACY_MOCK_READERS` (`eslint.config.mjs`)
-**ห้ามเพิ่มรายชื่อ** — ย้ายการอ่านของไฟล์นั้นไปหลัง endpoint แล้วลบออกจากลิสต์ (ดู §7)
+**ห้ามเพิ่มรายชื่อ** — ย้ายการอ่านของไฟล์นั้นไปหลัง endpoint แล้วลบออกจากลิสต์ (ดู §8)
 
 ## 3. ข้อมูลไหลอย่างไร
 
@@ -172,25 +172,48 @@ hook (`useClients`) และทุกหน้าจอที่ใช้ไม
 - ตัวเลขเงิน: `formatInteger` / `formatDecimal` (`src/lib/format/number.ts`),
   วันที่และตัวเลขในประโยค: `useFormat()` (`src/i18n/I18nProvider`)
 
-## 7. งานที่ยังค้าง (tech debt ที่รู้แล้ว)
+## 7. Security — ข้อมูลที่ไปถึง browser
 
-| เรื่อง                                                  | ที่อยู่                                                             | ทำอย่างไร                                                          |
-| ----------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| ไฟล์ `lib/` ที่ยังอ่าน mock ตรง ๆ (15 ไฟล์)                 | `LEGACY_MOCK_READERS` ใน `eslint.config.mjs`                    | ย้ายการอ่านไปหลัง endpoint ทีละไฟล์ แล้วลบออกจากลิสต์                     |
-| Breadcrumb หาชื่อ entity แบบ sync จาก mock              | `src/features/shell/lib/page-breadcrumbs.ts`                    | ให้หน้า detail ส่งชื่อผ่าน `header-slot-context` หรืออ่านจาก query cache  |
-| ข้อมูลที่ generate ไม่ใช่ data model                        | ดู handover.md "ต้องรู้ก่อนออกแบบ API"                               | model ใหม่ก่อนทำ endpoint                                           |
-| timer จำลองระบบภายนอก 3 ตัว                            | `src/features/orders/store/orders-context.tsx`                  | ลบเมื่อมี push / polling จริง                                         |
-| store ยังเป็น React state ล้วน                           | `features/*/store/`                                             | โหลดผ่าน endpoint + mutation + invalidate                          |
-| className แบบ template literal (~585 จุด)              | ทั่วโปรเจกต์                                                       | เปลี่ยนเป็น `cn()` เมื่อแก้ไฟล์นั้น (ระวัง tailwind-merge ตัด class ที่ชนกัน)   |
-| hex ที่ไม่อยู่ใน palette (~150 จุด) และ inline `style={{}}` | ทั่วโปรเจกต์                                                       | ขอ token จาก design system แล้วแทน                                 |
-| system-one CSS ไม่อยู่ใน `@layer`                        | `src/app/[lang]/layout.tsx`                                     | ย้ายเข้า layer แล้วลบ `!important` ใน `globals.css` (ต้องทดสอบทั้งแอป)  |
-| ฟอร์มยัง validate ด้วยมือ                                 | `features/auth/views/*`, `features/orders/components/booking/*` | ติดตั้ง `react-hook-form` + `zod` ไว้แล้ว — ใช้กับฟอร์มใหม่และตอนแก้ฟอร์มเดิม |
-| ปุ่ม CTA ของ Risk alert ยังเป็น "Lorem ipsum"             | `src/features/command-center/lib/risk-config.ts`                | รอ product กำหนด                                                  |
-| URL ระบบส่งคำสั่งซื้อยังเป็น placeholder                     | `src/config/external-links.ts`                                  | ใส่ URL จริง / ย้ายไป env                                            |
-| ข้อความใน design system ยังเป็นไทย                       | [system-one-i18n-spec.md](system-one-i18n-spec.md)              | รอ system-one เวอร์ชันใหม่                                           |
-| dark mode — token และ class `dark:` มีอยู่แต่ยังไม่เปิดใช้    | `globals.css`, greeting card                                    | ตัดสินใจว่าจะทำหรือลบ                                                 |
+**กฎข้อแรก: ทุกอย่างที่ส่งไปถึง browser คนที่กด Inspect / DevTools เห็นได้ทั้งหมด**
+ได้แก่ JS bundle (แท็บ Sources), response ของ API (แท็บ Network), React Query cache
+และ props (React DevTools), localStorage, cookie ที่ไม่ใช่ httpOnly และ console
 
-## 8. คำสั่ง
+| เรื่อง               | กติกา                                                                                                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ข้อมูลจาก API        | ให้ backend ส่งเฉพาะ field ที่หน้านั้นใช้จริง การซ่อน field ใน UI ไม่ได้ทำให้มันหายไปจาก response                                                                                                                         |
+| Privacy mode / สิทธิ์ | `maskName()` แค่ซ่อนบนจอ ข้อมูลดิบยังอยู่ใน cache ถ้าต้องปิดจริง (เช่นตามสิทธิ์ผู้ใช้) backend ต้อง mask มาให้                                                                                                                   |
+| env                | `NEXT_PUBLIC_*` ถูกฝังเข้า bundle ห้ามใส่ secret เด็ดขาด ค่าลับใช้ได้เฉพาะโค้ดฝั่ง server และไฟล์นั้นต้อง `import "server-only"`                                                                                             |
+| Auth               | session/token เก็บใน cookie แบบ `HttpOnly; Secure; SameSite=Lax` ที่ BFF ตั้งให้ ห้ามเก็บ token ใน localStorage/sessionStorage `setAuthHeaderProvider` (`src/lib/api/http.ts`) ใช้เฉพาะเมื่อ backend บังคับ header จริง ๆ |
+| Web storage        | localStorage/sessionStorage เก็บได้แค่ค่าที่ไม่ลับ (preference, id ที่กดรับทราบ) ห้ามเก็บข้อมูลลูกค้า                                                                                                                        |
+| Console            | log error ผ่าน `reportError()` เท่านั้น production log แค่ context กับชนิด error ไม่ log payload (มี test กำกับ)                                                                                                      |
+| Mock data          | ต้องเป็นข้อมูลสมมติล้วน อีเมลใช้ `@example.com` เบอร์ใช้ `+66 00 000 xxxx` ห้ามใช้ชื่อ/อีเมล/เบอร์ของคนจริง                                                                                                                  |
+| Source map         | ปิดใน production (`productionBrowserSourceMaps: false` ใน `next.config.ts`)                                                                                                                                  |
+| Response headers   | ตั้งใน `next.config.ts`: CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS และปิด `X-Powered-By` ถ้าเพิ่มโดเมนภายนอก (รูป, analytics) ต้องเพิ่มใน CSP ด้วย                              |
+
+**ก่อน release:** `npm run build && npm run check:bundle` สคริปต์นี้สแกน `.next/static` หา
+string ที่ดูเป็น secret (fail เสมอ) และข้อมูล mock (fail เมื่อ build ด้วย `NEXT_PUBLIC_API_MODE=http`)
+
+## 8. งานที่ยังค้าง (tech debt ที่รู้แล้ว)
+
+| เรื่อง                                                  | ที่อยู่                                                             | ทำอย่างไร                                                                                                                                  |
+| ----------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ไฟล์ `lib/` ที่ยังอ่าน mock ตรง ๆ (15 ไฟล์)                 | `LEGACY_MOCK_READERS` ใน `eslint.config.mjs`                    | ย้ายการอ่านไปหลัง endpoint ทีละไฟล์ แล้วลบออกจากลิสต์                                                                                             |
+| Breadcrumb หาชื่อ entity แบบ sync จาก mock              | `src/features/shell/lib/page-breadcrumbs.ts`                    | ให้หน้า detail ส่งชื่อผ่าน `header-slot-context` หรืออ่านจาก query cache                                                                          |
+| ข้อมูลที่ generate ไม่ใช่ data model                        | ดู handover.md "ต้องรู้ก่อนออกแบบ API"                               | model ใหม่ก่อนทำ endpoint                                                                                                                   |
+| timer จำลองระบบภายนอก 3 ตัว                            | `src/features/orders/store/orders-context.tsx`                  | ลบเมื่อมี push / polling จริง                                                                                                                 |
+| store ยังเป็น React state ล้วน                           | `features/*/store/`                                             | โหลดผ่าน endpoint + mutation + invalidate                                                                                                  |
+| className แบบ template literal (~585 จุด)              | ทั่วโปรเจกต์                                                       | เปลี่ยนเป็น `cn()` เมื่อแก้ไฟล์นั้น (ระวัง tailwind-merge ตัด class ที่ชนกัน)                                                                           |
+| hex ที่ไม่อยู่ใน palette (~150 จุด) และ inline `style={{}}` | ทั่วโปรเจกต์                                                       | ขอ token จาก design system แล้วแทน                                                                                                         |
+| system-one CSS ไม่อยู่ใน `@layer`                        | `src/app/[lang]/layout.tsx`                                     | ย้ายเข้า layer แล้วลบ `!important` ใน `globals.css` (ต้องทดสอบทั้งแอป)                                                                          |
+| ฟอร์มยัง validate ด้วยมือ                                 | `features/auth/views/*`, `features/orders/components/booking/*` | ติดตั้ง `react-hook-form` + `zod` ไว้แล้ว — ใช้กับฟอร์มใหม่และตอนแก้ฟอร์มเดิม                                                                         |
+| ปุ่ม CTA ของ Risk alert ยังเป็น "Lorem ipsum"             | `src/features/command-center/lib/risk-config.ts`                | รอ product กำหนด                                                                                                                          |
+| URL ระบบส่งคำสั่งซื้อยังเป็น placeholder                     | `src/config/external-links.ts`                                  | ใส่ URL จริง / ย้ายไป env                                                                                                                    |
+| ข้อความใน design system ยังเป็นไทย                       | [system-one-i18n-spec.md](system-one-i18n-spec.md)              | รอ system-one เวอร์ชันใหม่                                                                                                                   |
+| dark mode — token และ class `dark:` มีอยู่แต่ยังไม่เปิดใช้    | `globals.css`, greeting card                                    | ตัดสินใจว่าจะทำหรือลบ                                                                                                                         |
+| ข้อมูล mock ทั้งชุดอยู่ใน JS bundle                          | `src/mocks/*`, `defineEndpoint` import แบบ static               | เมื่อทุก endpoint มี `http` แล้ว ให้ build โหมด http ไม่รวม `src/mocks` (เช่น alias ไป stub ใน `next.config.ts`) แล้วให้ `npm run check:bundle` ผ่าน |
+| CSP ยังใช้ `'unsafe-inline'`                            | `next.config.ts`                                                | เปลี่ยนเป็น CSP แบบ nonce ตาม `node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md` (ทุกหน้าจะเป็น dynamic)                 |
+
+## 9. คำสั่ง
 
 | คำสั่ง                                  |                                                              |
 | ------------------------------------- | ------------------------------------------------------------ |
@@ -199,3 +222,4 @@ hook (`useClients`) และทุกหน้าจอที่ใช้ไม
 | `npm run typecheck` / `lint` / `test` | แยกทีละตัว                                                     |
 | `npm run format`                      | Prettier ทั้ง repo (pre-commit hook ทำให้เฉพาะไฟล์ที่ stage อยู่แล้ว) |
 | `npm run build`                       | build production                                             |
+| `npm run check:bundle`                | หลัง build: สแกน bundle หา secret และ mock data (ดู §7)        |

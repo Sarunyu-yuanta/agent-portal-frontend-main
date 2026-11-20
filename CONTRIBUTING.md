@@ -39,3 +39,4 @@
 - [ ] หน้าใหม่ / ข้อมูลใหม่มี loading, error, empty state
 - [ ] ทดสอบทั้ง desktop และ mobile, ทั้ง `/th` และ `/en`
 - [ ] ถ้าเปลี่ยนสิ่งที่ backend ต้องรู้ อัปเดต `docs/api-by-page.md` / `docs/mock-data-inventory.md`
+- [ ] ไม่มีข้อมูลลับหรือข้อมูลลูกค้าจริงใน `NEXT_PUBLIC_*`, mock, localStorage หรือ console (ดู `docs/architecture.md` §7)
