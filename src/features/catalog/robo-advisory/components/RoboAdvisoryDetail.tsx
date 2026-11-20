@@ -147,7 +147,9 @@ function RoboPlanCard({
             <RoboRiskLevel tier={plan.riskTier} />
             <PlanSuitabilityBadge suitability={planSuitability(client, plan.riskTier)} />
             <div className="flex min-w-0 flex-[1_0_0] items-center justify-end gap-1 whitespace-nowrap">
-              <p className="text-xs leading-[20px] font-bold text-neutral-900">Available Room</p>
+              <p className="text-xs leading-[20px] font-bold text-neutral-900">
+                {t.products.advisory.planLabels.availableRoom}
+              </p>
               <p className="text-xs leading-[20px] text-neutral-600">{plan.availableRoom}</p>
             </div>
           </div>

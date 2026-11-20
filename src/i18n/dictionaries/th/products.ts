@@ -317,6 +317,16 @@ const products = {
         ] as string[],
       },
     },
+    /** Plan labels. Kept in English in both languages, as designed. */
+    planLabels: {
+      availableRoom: "Available Room",
+      modelType: "Model type",
+      rebalanceTiming: "Rebalance Timing",
+      tradingStyle: "Trading style:",
+      marketTiming: "Market Timing",
+      timing: "Timing",
+      knowledgeStyle: "Knowledge style:",
+    },
     allPlans: (n: number) => `แผนลงทุนทั้งหมด (${n})`,
     /** A plan card's stats — two-line labels for the narrow columns, one line where there is room. */
     stats: {

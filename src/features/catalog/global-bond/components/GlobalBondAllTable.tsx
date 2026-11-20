@@ -16,9 +16,9 @@ import { useSyncedTableScroll } from "@/features/catalog/hooks/use-synced-table-
 import { GlobalBondListCta } from "./GlobalBondDetailBondList";
 import { CatalogSectionEmpty } from "@/features/catalog/components/ProductCatalogEmpty";
 import { useT } from "@/i18n/I18nProvider";
+import { ORDER_ENTRY_URL } from "@/config/external-links";
 
 const BONDS_COL_MIN_CLS = "min-w-[400px]";
-const INVEST_URL = "https://placeholder.example.com/create-order";
 
 function IssuerLogo({ src }: { src: string }) {
   return (
@@ -200,7 +200,7 @@ export function GlobalBondAllTable({
                   className="flex h-[65px] w-[138px] shrink-0 items-center justify-center px-4 py-3"
                   style={border}
                 >
-                  <GlobalBondListCta row={row} href={INVEST_URL} />
+                  <GlobalBondListCta row={row} href={ORDER_ENTRY_URL} />
                 </div>
               </div>
             );

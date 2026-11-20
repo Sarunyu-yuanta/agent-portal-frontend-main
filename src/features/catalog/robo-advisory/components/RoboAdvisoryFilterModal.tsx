@@ -42,7 +42,7 @@ function FilterContent({
   const t = useT();
   return (
     <div className="flex w-full flex-col gap-4">
-      <FilterSection title="Model type">
+      <FilterSection title={t.products.advisory.planLabels.modelType}>
         <div className="flex w-full flex-wrap items-center gap-2">
           {ROBO_PROVIDER_FILTERS.map((option) => (
             <Chip
@@ -70,7 +70,7 @@ function FilterContent({
         </div>
       </FilterSection>
 
-      <FilterSection title="Rebalance Timing">
+      <FilterSection title={t.products.advisory.planLabels.rebalanceTiming}>
         <div className="flex w-full flex-wrap items-center gap-2">
           {ROBO_REBALANCE_FILTERS.map((option) => (
             <Chip

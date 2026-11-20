@@ -21,9 +21,9 @@ import { ProductDocumentActions } from "@/features/catalog/components/ProductDoc
 import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "@/features/catalog/components/PackageFilesModal";
 import { useT } from "@/i18n/I18nProvider";
+import { ORDER_ENTRY_URL } from "@/config/external-links";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
-const INVEST_URL = "https://placeholder.example.com/create-order";
 
 function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
   return (
@@ -207,7 +207,7 @@ export function ThaiStructuredProductDetail({
               ) : null
             ) : (
               <a
-                href={INVEST_URL}
+                href={ORDER_ENTRY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-opacity hover:opacity-90"

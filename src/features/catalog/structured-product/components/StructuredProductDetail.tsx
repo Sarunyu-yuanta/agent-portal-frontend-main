@@ -28,6 +28,7 @@ import { PackageFilesModal } from "@/features/catalog/components/PackageFilesMod
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatInteger } from "@/lib/format/number";
+import { ORDER_ENTRY_URL } from "@/config/external-links";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 
@@ -343,7 +344,7 @@ export function StructuredProductDetail({
               ) : null
             ) : (
               <a
-                href="https://placeholder.example.com/create-order"
+                href={ORDER_ENTRY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-opacity hover:opacity-90"

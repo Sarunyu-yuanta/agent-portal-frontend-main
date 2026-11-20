@@ -319,6 +319,16 @@ const products = {
         ] as string[],
       },
     },
+    /** Plan labels. Kept in English in both languages, as designed. */
+    planLabels: {
+      availableRoom: "Available Room",
+      modelType: "Model type",
+      rebalanceTiming: "Rebalance Timing",
+      tradingStyle: "Trading style:",
+      marketTiming: "Market Timing",
+      timing: "Timing",
+      knowledgeStyle: "Knowledge style:",
+    },
     allPlans: (n: number) => `All plans (${n})`,
     stats: {
       minInvestmentLines: ["Minimum", "initial (THB)"] as [string, string],

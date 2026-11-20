@@ -152,7 +152,9 @@ function PlanDetailContent({
           <RoboRiskLevel tier={plan.riskTier} />
           {suitability ? <PlanSuitabilityBadge suitability={suitability} /> : null}
           <div className="flex min-w-0 flex-[1_0_0] items-center justify-end gap-1 whitespace-nowrap">
-            <p className="text-xs leading-[20px] font-bold text-black/75">Available Room</p>
+            <p className="text-xs leading-[20px] font-bold text-black/75">
+              {t.products.advisory.planLabels.availableRoom}
+            </p>
             <p className="text-xs leading-[20px] text-black/60">{plan.availableRoom}</p>
           </div>
         </div>
@@ -191,21 +193,33 @@ function PlanDetailContent({
       </div>
 
       <div className="flex w-full flex-col gap-2">
-        <DetailRow iconSrc={ROBO_ASSETS.modalIconHeadCircuit} title="Trading style:">
+        <DetailRow
+          iconSrc={ROBO_ASSETS.modalIconHeadCircuit}
+          title={t.products.advisory.planLabels.tradingStyle}
+        >
           <p className="text-sm leading-[24px] text-neutral-600">{detail.tradingStyle}</p>
         </DetailRow>
         {presentation.showMarketTiming ? (
-          <DetailRow iconSrc={ROBO_ASSETS.modalIconClockAfternoon} title="Market Timing">
+          <DetailRow
+            iconSrc={ROBO_ASSETS.modalIconClockAfternoon}
+            title={t.products.advisory.planLabels.marketTiming}
+          >
             <p className="text-sm leading-[24px] text-neutral-600">{detail.marketTiming}</p>
           </DetailRow>
         ) : null}
-        <DetailRow iconSrc={ROBO_ASSETS.modalIconTimer} title="Timing">
+        <DetailRow
+          iconSrc={ROBO_ASSETS.modalIconTimer}
+          title={t.products.advisory.planLabels.timing}
+        >
           <p className="text-sm leading-[24px] text-neutral-600">{detail.timing}</p>
         </DetailRow>
         <DetailRow iconSrc={ROBO_ASSETS.modalIconMoneyWavy} title={labels.topUpMin}>
           <p className="text-sm leading-[24px] text-neutral-600">{detail.topUpMin}</p>
         </DetailRow>
-        <DetailRow iconSrc={ROBO_ASSETS.modalIconBrain} title="Knowledge style:">
+        <DetailRow
+          iconSrc={ROBO_ASSETS.modalIconBrain}
+          title={t.products.advisory.planLabels.knowledgeStyle}
+        >
           <ul className="list-disc pl-5 text-sm leading-[24px] text-neutral-600">
             {detail.knowledgeStyles.map((item) => (
               <li key={item}>{item}</li>
