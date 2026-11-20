@@ -162,13 +162,13 @@ export function MutualFundThemesSection({
   onThemeSeeAll?: (themeId: MutualFundTheme["id"]) => void;
 }) {
   const t = useT();
-  const drag = useDragScroll();
+  const { ref: scrollRef, ...dragHandlers } = useDragScroll();
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
-    const el = drag.ref.current;
+    const el = scrollRef.current;
     if (!el) return;
     const update = () => {
       setCanScrollLeft(el.scrollLeft > 1);
@@ -183,10 +183,10 @@ export function MutualFundThemesSection({
       el.removeEventListener("scroll", update);
       observer.disconnect();
     };
-  }, [drag.ref, themes.length]);
+  }, [scrollRef, themes.length]);
 
   const scrollBy = (dir: -1 | 1) => {
-    const el = drag.ref.current;
+    const el = scrollRef.current;
     if (!el) return;
     scrollThemeToPage(el, dir === -1 ? 0 : 1);
   };
@@ -230,13 +230,10 @@ export function MutualFundThemesSection({
         )}
 
         <div
-          ref={drag.ref}
+          ref={scrollRef}
           className="overflow-x-auto hide-scrollbar"
           style={{ scrollbarWidth: "none", cursor: "grab" }}
-          onMouseDown={drag.onMouseDown}
-          onMouseMove={drag.onMouseMove}
-          onMouseUp={drag.onMouseUp}
-          onMouseLeave={drag.onMouseLeave}
+          {...dragHandlers}
         >
           <div className="flex min-w-max gap-2.5">
             {themes.map((theme) => (
@@ -251,7 +248,7 @@ export function MutualFundThemesSection({
         activeIndex={activeIndex}
         className="w-full justify-center"
         onIndexChange={(index) => {
-          const el = drag.ref.current;
+          const el = scrollRef.current;
           if (el) scrollThemeToPage(el, index);
         }}
       />

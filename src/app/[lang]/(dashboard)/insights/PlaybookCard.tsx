@@ -2,7 +2,7 @@
 
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { Tag } from "@sarunyu/system-one";
-import { mockHouseViewStrategies } from "@/lib/mock-data";
+import { type mockHouseViewStrategies } from "@/lib/mock-data";
 import { CATEGORY_TAG_VARIANT, CATEGORY_ACCENT_COLOR, STRATEGY_DETAIL, getCategory } from "./house-view-data";
 import { useT } from "@/i18n/I18nProvider";
 

@@ -1,0 +1,7 @@
+.next
+node_modules
+public
+coverage
+package-lock.json
+docs/mock-json
+*.tsbuildinfo

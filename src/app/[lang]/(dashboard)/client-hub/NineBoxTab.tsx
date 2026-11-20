@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AvatarStack } from "@sarunyu/system-one";
 import { getInitial } from "@/lib/client-utils";
-import { mockClients } from "@/lib/mock-data";
+import { type mockClients } from "@/lib/mock-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 

@@ -22,7 +22,7 @@ import {
   WarningIcon,
   AlarmIcon,
 } from "@phosphor-icons/react";
-import { getClientProfile } from "@/data/client-profiles";
+import { type getClientProfile } from "@/data/client-profiles";
 import { IMPORTANT_FORMS, formatKycDate, kycExpiry } from "./client-detail-data";
 import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";

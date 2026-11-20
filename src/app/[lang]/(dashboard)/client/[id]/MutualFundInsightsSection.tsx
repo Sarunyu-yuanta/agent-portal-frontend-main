@@ -154,13 +154,13 @@ export function MutualFundInsightsSection({
   const t = useT();
   const seeAllHref = mutualFundInsightsHref();
   const isEmpty = insights.length === 0;
-  const drag = useDragScroll();
+  const { ref: scrollRef, ...dragHandlers } = useDragScroll();
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
-    const el = drag.ref.current;
+    const el = scrollRef.current;
     if (!el) return;
     const update = () => {
       setActiveIndex(getInsightActiveIndex(el, insights.length));
@@ -175,10 +175,10 @@ export function MutualFundInsightsSection({
       el.removeEventListener("scroll", update);
       observer.disconnect();
     };
-  }, [drag.ref, insights.length]);
+  }, [scrollRef, insights.length]);
 
   const scrollByCard = (dir: -1 | 1) => {
-    const el = drag.ref.current;
+    const el = scrollRef.current;
     if (!el) return;
     const nextIndex = Math.min(Math.max(activeIndex + dir, 0), insights.length - 1);
     scrollInsightToIndex(el, nextIndex);
@@ -246,13 +246,10 @@ export function MutualFundInsightsSection({
         <>
         <div className="relative z-10 flex flex-col gap-4 lg:gap-6">
           <div
-            ref={drag.ref}
+            ref={scrollRef}
             className="overflow-x-auto hide-scrollbar"
             style={{ scrollbarWidth: "none", cursor: "grab" }}
-            onMouseDown={drag.onMouseDown}
-            onMouseMove={drag.onMouseMove}
-            onMouseUp={drag.onMouseUp}
-            onMouseLeave={drag.onMouseLeave}
+            {...dragHandlers}
           >
             <div className="flex w-max gap-2.5">
               {insights.map((item) => (
@@ -266,7 +263,7 @@ export function MutualFundInsightsSection({
               activeIndex={activeIndex}
               className="w-fit"
               onIndexChange={(index) => {
-                const el = drag.ref.current;
+                const el = scrollRef.current;
                 if (el) scrollInsightToIndex(el, index);
               }}
             />

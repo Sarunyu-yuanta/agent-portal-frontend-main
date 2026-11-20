@@ -7,7 +7,7 @@
  * timestamps in `AlertCards` are hard-coded and should come from the API.
  */
 
-import { mockKYCData } from "@/lib/mock-data";
+import { type mockKYCData } from "@/lib/mock-data";
 
 export type KycRow = (typeof mockKYCData)[number];
 

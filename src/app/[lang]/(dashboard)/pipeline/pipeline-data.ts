@@ -8,7 +8,7 @@
  * backend or a rules service owns.
  */
 
-import { mockPipelineDeals } from "@/lib/mock-data";
+import { type mockPipelineDeals } from "@/lib/mock-data";
 
 export const STAGES = [
   "Qualified",

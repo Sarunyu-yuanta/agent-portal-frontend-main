@@ -860,17 +860,13 @@ export function StockProductDetail({
         : STOCK_DETAIL_TABS.filter((tab) => tab !== "Related Product"),
     [related],
   );
+  // The URL is the source of truth; `setQueryState` keeps `useSearchParams` in sync.
   const requestedTab = tabFromQuery(searchParams.get("tab"));
-  const [activeTab, setActiveTab] = useState<StockDetailTab>("Market Info");
+  const activeTab: StockDetailTab = tabs.includes(requestedTab) ? requestedTab : "Market Info";
 
   useCatalogDetailScrollTop([symbol]);
 
-  useEffect(() => {
-    setActiveTab(tabs.includes(requestedTab) ? requestedTab : "Market Info");
-  }, [requestedTab, tabs]);
-
   function selectTab(tab: StockDetailTab) {
-    setActiveTab(tab);
     setQueryState(
       withQuery(pathname, searchParams, {
         tab: tabQueryValue(tab),

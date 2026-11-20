@@ -25,7 +25,7 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
  * pointing those at real endpoints lights this page up with them.
  */
 
-import { mockHouseViewStrategies, mockNBAActions } from "@/lib/mock-data";
+import { mockHouseViewStrategies, type mockNBAActions } from "@/lib/mock-data";
 import { maskName } from "@/lib/mask-name";
 import type { Client, Note } from "@/types/domain";
 import {

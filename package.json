@@ -2,20 +2,32 @@
   "name": "yuanta-agent-portal",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit --incremental false",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "prepare": "husky",
     "logos": "node scripts/generate-underlying-logos.mjs",
     "covers": "node scripts/generate-campaign-covers.mjs",
     "covers:fetch": "node scripts/fetch-campaign-covers.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@hookform/resolvers": "^7.0.7",
     "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-icons": "^1.3.2",
     "@sarunyu/system-one": "^4.10.2",
+    "@tanstack/react-query": "^5.108.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "html-to-image": "^1.11.13",
@@ -24,20 +36,31 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-hook-form": "^7.92.0",
     "recharts": "^3.8.1",
-    "shadcn": "^4.8.2",
     "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^8.0.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
+    "lint-staged": "^17.6.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "shadcn": "^4.8.2",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "sharp": "^0.34.5"
+    "vitest": "^5.1.1"
   }
 }
