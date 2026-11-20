@@ -464,4 +464,45 @@ body > .bg-popover.overflow-clip.p-\[8px\] {
   }
 }
 
+/* Dashboard greeting card — a sky that follows the clock.
 
+   `GreetingCard` computes the colours for the current minute (see
+   `time-of-day-sky.ts`) and sets them as custom properties on a wrapper:
+   `--g-*` for the light theme, `--gd-*` for dark. The card inherits them here,
+   painting the sky gradient (`--g-sky`, already a complete `linear-gradient`)
+   with the sun/moon glow over it. Between two periods that gradient is both
+   skies side by side, sliding — not a blend of the two.
+   Without them (server render, first paint) it keeps its plain brand tint.
+
+   Deliberately outside every @layer, and `!important` on the background, for
+   the reason the table rule above documents: `system-one`'s stylesheet loads
+   after this file and would otherwise win the tie against its own Card. */
+.greeting-card__mark {
+  background-color: var(--g-accent, var(--primary-action));  opacity: var(--g-mark, 0.08);
+}
+.greeting-card--live {
+  background:
+    radial-gradient(circle at var(--g-x) var(--g-y), var(--g-glow), transparent 55%),
+    var(--g-sky) !important;
+}
+.greeting-card--live .greeting-card__title {
+  color: var(--g-title);
+}
+.greeting-card--live .greeting-card__date {
+  color: var(--g-date);
+}
+.dark .greeting-card__mark {
+  background-color: var(--gd-accent, var(--primary-action));
+  opacity: var(--gd-mark, 0.08);
+}
+.dark .greeting-card--live {
+  background:
+    radial-gradient(circle at var(--gd-x) var(--gd-y), var(--gd-glow), transparent 55%),
+    var(--gd-sky) !important;
+}
+.dark .greeting-card--live .greeting-card__title {
+  color: var(--gd-title);
+}
+.dark .greeting-card--live .greeting-card__date {
+  color: var(--gd-date);
+}

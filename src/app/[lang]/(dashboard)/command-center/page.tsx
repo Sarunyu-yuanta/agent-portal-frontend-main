@@ -1,7 +1,5 @@
 "use client";
 
-import { formatDate } from "@/i18n/format";
-
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@sarunyu/system-one";
@@ -49,6 +47,8 @@ import {
 import { useNbaRows } from "./use-nba-rows";
 import { useRiskAlertRows } from "./use-risk-alert-rows";
 import { useLocale, useT } from "@/i18n/I18nProvider";
+import { GreetingCard } from "./GreetingCard";
+import { parseTimePreview } from "./time-of-day-sky";
 
 /**
  * The page an IC opens first.
@@ -163,6 +163,11 @@ function DashboardPageInner() {
     () => parseRiskCategory(searchParams.get("riskCat")),
     [searchParams],
   );
+
+  /** `?tod=` pins the greeting card's time of day, for previewing it outside
+   *  its hours: `morning|day|evening|night`, or a time like `?tod=17:20`.
+   *  Absent, it follows the clock. */
+  const todayPreview = parseTimePreview(searchParams.get("tod"));
 
   const monthOffset = Number(searchParams.get("month")) || 0;
   const viewDate = useMemo(() => addMonths(today, monthOffset), [today, monthOffset]);
@@ -289,45 +294,11 @@ function DashboardPageInner() {
                 wins over responsive `grid-cols-*` and keeps this row stacked. */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch xl:gap-5">
               <div className="flex min-h-[96px] min-w-0 flex-[8] flex-col">
-                <Card
-                  variant="default"
-                  className="relative isolate flex h-full min-h-0 flex-1 flex-col justify-center gap-1 overflow-hidden bg-primary-action-light border-border"
-                >
-                {/* The Yuanta mark as a watermark: far larger than the card and
-                    pushed off its right edge, so only part of it shows and it
-                    reads as texture rather than a logo. Sized to roughly one and a
-                    half times the card's height: bigger than that and the card would only show
-                    an unrecognisable band through the middle of the mark. Painted as a mask over
-                    `bg-primary-action` instead of an <img>, so it takes the theme
-                    colour rather than the SVG's own blue, and the gradient mask on
-                    the wrapper fades it out toward the greeting so text never sits
-                    on the mark's busiest part. Decorative — hidden from AT and
-                    inert to the pointer. */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-2/3 [mask-image:linear-gradient(to_right,transparent,black_55%)]"
-                >
-                  <div
-                    className="absolute -right-4 top-1/2 size-32 -translate-y-1/2 rotate-[-12deg] bg-primary-action opacity-[0.08] sm:-right-6 sm:size-36 xl:-right-8 xl:size-40"
-                    style={{
-                      maskImage: "url(/brand/logo-yuanta.svg)",
-                      WebkitMaskImage: "url(/brand/logo-yuanta.svg)",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskSize: "contain",
-                      WebkitMaskSize: "contain",
-                      maskPosition: "center",
-                      WebkitMaskPosition: "center",
-                    }}
-                  />
-                </div>
-                <h2 className="type-h5 font-bold text-primary-action">
-                  {t.commandCenter.greeting(NOTE_AUTHOR.split(" ")[0])}
-                </h2>
-                <p className="truncate text-label text-primary-action/70" title={formatDate(locale, today, "weekdayLong")}>
-                  {formatDate(locale, today, "weekdayLongMonthShort")}
-                </p>
-                </Card>
+                <GreetingCard
+                  name={NOTE_AUTHOR.split(" ")[0]}
+                  today={today}
+                  minutes={todayPreview}
+                />
               </div>
 
               <div className="flex min-h-[96px] min-w-0 flex-[17] flex-col">
