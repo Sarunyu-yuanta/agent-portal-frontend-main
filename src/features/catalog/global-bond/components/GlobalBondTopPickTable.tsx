@@ -69,7 +69,7 @@ export function GlobalBondTopPickTable({
                 {...rowCellProps(i, isLastRow(i))}
               >
                 <BondLogo src={row.logo} className="size-8 rounded" />
-                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#101828]">
+                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-neutral-900">
                   {row.name}
                 </span>
               </div>
@@ -102,7 +102,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.isin}</span>
               </div>
             ))}
           </div>
@@ -117,7 +117,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.currency}</span>
               </div>
             ))}
           </div>
@@ -132,7 +132,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.couponRate}</span>
               </div>
             ))}
           </div>
@@ -147,7 +147,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.price}</span>
               </div>
             ))}
           </div>
@@ -162,7 +162,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.yieldPct}</span>
               </div>
             ))}
           </div>
@@ -177,7 +177,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.maturity}</span>
               </div>
             ))}
           </div>
@@ -192,7 +192,7 @@ export function GlobalBondTopPickTable({
                 className={`flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5 ${ROW_CELL_CLS}`}
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.duration}</span>
               </div>
             ))}
           </div>

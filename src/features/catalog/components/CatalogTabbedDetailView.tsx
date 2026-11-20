@@ -39,9 +39,9 @@ export function CatalogDetailThemeHero({
               {title}
             </p>
           </div>
-          <p className="text-sm leading-[24px] font-normal text-[#4a5565]">{description}</p>
+          <p className="text-sm leading-[24px] font-normal text-neutral-600">{description}</p>
           {meta ? (
-            <p className="text-micro leading-[18px] font-normal text-[#6a7282]">{meta}</p>
+            <p className="text-micro leading-[18px] font-normal text-neutral-500">{meta}</p>
           ) : null}
         </div>
         {trailing}
@@ -99,7 +99,7 @@ export function CatalogTabbedDetailView<T extends string>({
           <div className={`flex flex-col gap-6 ${CATALOG_DETAIL_WIDTH.narrow}`}>
             {listControls ? <div className="flex w-full flex-col gap-3">{listControls}</div> : null}
             {countLabel ? (
-              <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
+              <p className="w-full px-3 text-sm leading-[24px] font-normal text-neutral-900">
                 {countLabel}
               </p>
             ) : null}

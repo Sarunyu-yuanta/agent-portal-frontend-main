@@ -49,7 +49,7 @@ function scrollInsightToIndex(container: HTMLElement, index: number) {
 const INSIGHT_CARD_SHADOW = CARD_SHADOW;
 
 const INSIGHT_LIST_CARD_INTERACTIVE =
-  "cursor-pointer no-underline text-inherit transition-[box-shadow,background-color,border-color] hover:border-[#0a6ee7]/25 hover:bg-[#f9fafb] hover:shadow-[0px_0px_4px_0px_rgba(102,102,102,0.18),0px_6px_12px_0px_rgba(102,102,102,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2";
+  "cursor-pointer no-underline text-inherit transition-[box-shadow,background-color,border-color] hover:border-brand-600/25 hover:bg-neutral-50 hover:shadow-[0px_0px_4px_0px_rgba(102,102,102,0.18),0px_6px_12px_0px_rgba(102,102,102,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2";
 
 function isHoldListInsight(title: string) {
   return title.startsWith("Hold List");

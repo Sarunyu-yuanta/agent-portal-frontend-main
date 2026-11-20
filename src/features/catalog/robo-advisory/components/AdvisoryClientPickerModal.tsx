@@ -39,7 +39,7 @@ function AccountFilterSegments({
 }) {
   const t = useT();
   return (
-    <div role="tablist" className="flex w-full shrink-0 gap-1 rounded-lg bg-[#f3f4f6] p-1">
+    <div role="tablist" className="flex w-full shrink-0 gap-1 rounded-lg bg-neutral-100 p-1">
       {ACCOUNT_FILTERS.map((id) => {
         const label = t.products.advisory.picker.accountFilter[id];
         const active = value === id;
@@ -50,10 +50,10 @@ function AccountFilterSegments({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(id)}
-            className={`min-w-0 flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-xs leading-[20px] font-bold transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none ${
+            className={`min-w-0 flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-xs leading-[20px] font-bold transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none ${
               active
-                ? "bg-white text-[#0a6ee7] shadow-sm"
-                : "text-[#4a5565] hover:bg-white/60 hover:text-[#101828]"
+                ? "bg-white text-brand-600 shadow-sm"
+                : "text-neutral-600 hover:bg-white/60 hover:text-neutral-900"
             }`}
           >
             {t.products.advisory.picker.segment(label, counts[id])}
@@ -86,20 +86,20 @@ function ClientRow({
       aria-pressed={selected}
       className={`group flex w-full cursor-pointer items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
         selected
-          ? "border-[#0a6ee7] bg-[#eff6ff]"
-          : "border-black/10 bg-white hover:border-black/20 hover:bg-[#f9fafb]"
-      } focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none`}
+          ? "border-brand-600 bg-[#eff6ff]"
+          : "border-black/10 bg-white hover:border-black/20 hover:bg-neutral-50"
+      } focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none`}
     >
       <Avatar type="text" initials={getInitial(displayName)} size="m" />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="truncate text-sm leading-[24px] font-bold text-[#101828]">{displayName}</p>
-        <p className="truncate text-xs leading-[20px] text-[#4a5565]">
+        <p className="truncate text-sm leading-[24px] font-bold text-neutral-900">{displayName}</p>
+        <p className="truncate text-xs leading-[20px] text-neutral-600">
           {client.tier} · {riskProfileLabel(client, t)}
         </p>
       </div>
       <AdvisoryAccountTag status={advisoryAccountStatus(client, service)} />
       {selected ? (
-        <CheckCircleIcon size={20} weight="fill" className="shrink-0 text-[#0a6ee7]" />
+        <CheckCircleIcon size={20} weight="fill" className="shrink-0 text-brand-600" />
       ) : (
         <CircleIcon
           size={20}
@@ -186,7 +186,7 @@ function PickerBody({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4">
-      <p className="shrink-0 text-sm leading-[24px] text-[#4a5565]">
+      <p className="shrink-0 text-sm leading-[24px] text-neutral-600">
         {labels.intro(SERVICE_TITLE[service])}
       </p>
 

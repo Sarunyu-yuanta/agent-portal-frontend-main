@@ -61,10 +61,10 @@ export function StockLargeAssetCard({
     <div className="flex w-full min-w-[343px] items-center gap-6 rounded-lg border-b border-black/10 bg-white p-6 transition-[background-color,box-shadow] group-hover:bg-[#fafafa]! group-hover:shadow-[0px_2px_8px_rgba(0,0,0,0.06)]">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="max-w-[119px] truncate text-sm leading-[24px] font-bold text-[#101828]">
+          <p className="max-w-[119px] truncate text-sm leading-[24px] font-bold text-neutral-900">
             {symbol}
           </p>
-          <p className="truncate text-sm leading-[24px] text-[#6a7282]">{subtitle}</p>
+          <p className="truncate text-sm leading-[24px] text-neutral-500">{subtitle}</p>
         </div>
         <StockMiniChart
           series={series}
@@ -74,12 +74,12 @@ export function StockLargeAssetCard({
           className="h-[42px] w-24 shrink-0"
         />
         <div className="flex w-[120px] max-w-[170px] shrink-0 flex-col items-end gap-0.5">
-          <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-[#101828]">
+          <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-neutral-900">
             <span>{price}</span>
             <span>{currency}</span>
           </div>
           {trend === "flat" ? (
-            <span className="text-sm leading-[24px] text-[#6a7282]">{changeAmount}</span>
+            <span className="text-sm leading-[24px] text-neutral-500">{changeAmount}</span>
           ) : (
             <div className="flex items-center gap-1.5">
               <span className="truncate text-sm leading-[24px]" style={{ color: amountColor }}>

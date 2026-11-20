@@ -20,7 +20,7 @@ import { useT } from "@/i18n/I18nProvider";
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex w-full flex-col gap-2">
-      <p className="text-base leading-[24px] text-[#4a5565]">{title}</p>
+      <p className="text-base leading-[24px] text-neutral-600">{title}</p>
       {children}
     </div>
   );
@@ -94,7 +94,7 @@ function FilterFooter({ onClear, onApply }: { onClear: () => void; onApply: () =
       <Button
         variant="outline-black"
         size="xl"
-        className="max-w-[343px] min-w-0 flex-1 text-[#0a6ee7]"
+        className="max-w-[343px] min-w-0 flex-1 text-brand-600"
         onClick={onClear}
       >
         {t.products.common.clearSelection}
@@ -222,7 +222,7 @@ export function RoboAdvisoryFilterModal({
         <div className="flex w-full items-center gap-4 px-4 pt-4">
           <p
             id="robo-advisory-filter-title"
-            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-[#101828]"
+            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-neutral-900"
           >
             {title}
           </p>
@@ -232,7 +232,7 @@ export function RoboAdvisoryFilterModal({
             aria-label={t.common.close}
             className="flex size-5 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0"
           >
-            <XIcon size={20} className="text-[#101828]" />
+            <XIcon size={20} className="text-neutral-900" />
           </button>
         </div>
 

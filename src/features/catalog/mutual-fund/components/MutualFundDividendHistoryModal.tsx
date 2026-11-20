@@ -24,7 +24,7 @@ function DividendHistoryTable({ rows }: { rows: MutualFundDividend[] }) {
                   : ""
             }`}
           >
-            <span className="text-xs leading-[20px] text-[#6a7282]">{col.label}</span>
+            <span className="text-xs leading-[20px] text-neutral-500">{col.label}</span>
           </div>
         ))}
       </div>
@@ -38,10 +38,10 @@ function DividendHistoryTable({ rows }: { rows: MutualFundDividend[] }) {
             <div
               key={cell.id}
               className={`flex h-[38px] flex-1 items-center border-b border-black/10 px-4 py-3.5 last:border-b-0 ${
-                index % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
+                index % 2 === 0 ? "bg-neutral-50" : "bg-white"
               } ${cell.align === "center" ? "justify-center text-center" : cell.align === "right" ? "justify-end text-right" : ""}`}
             >
-              <span className="text-sm leading-[24px] text-[#101828]">{cell.value}</span>
+              <span className="text-sm leading-[24px] text-neutral-900">{cell.value}</span>
             </div>
           ))}
         </div>
@@ -139,7 +139,7 @@ export function DividendHistoryPreview({
                   : ""
             }`}
           >
-            <span className="text-xs leading-[20px] text-[#6a7282]">{col.label}</span>
+            <span className="text-xs leading-[20px] text-neutral-500">{col.label}</span>
           </div>
         ))}
       </div>
@@ -153,10 +153,10 @@ export function DividendHistoryPreview({
             <div
               key={cell.id}
               className={`flex h-[38px] flex-1 items-center border-b border-black/10 px-4 py-3.5 ${
-                index % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
+                index % 2 === 0 ? "bg-neutral-50" : "bg-white"
               } ${cell.align === "center" ? "justify-center text-center" : cell.align === "right" ? "justify-end text-right" : ""}`}
             >
-              <span className="text-sm leading-[24px] text-[#101828]">{cell.value}</span>
+              <span className="text-sm leading-[24px] text-neutral-900">{cell.value}</span>
             </div>
           ))}
         </div>
@@ -165,7 +165,7 @@ export function DividendHistoryPreview({
         <button
           type="button"
           onClick={onViewAll}
-          className="flex h-[38px] w-full cursor-pointer items-center justify-center border-none bg-white px-4 py-3.5 text-sm leading-[24px] text-[#0a6ee7]"
+          className="flex h-[38px] w-full cursor-pointer items-center justify-center border-none bg-white px-4 py-3.5 text-sm leading-[24px] text-brand-600"
         >
           {t.fund.list.viewAll}
         </button>

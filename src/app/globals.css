@@ -257,6 +257,32 @@
 
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
+  /* Design-system palette (@sarunyu/system-one). Use these, never raw hex:
+     `text-neutral-900`, `bg-neutral-50`, `border-brand-600`.
+     Named `neutral`, not `gray`: system-one ships unlayered `.text-gray-900`,
+     `.bg-gray-100`, … that would beat every Tailwind variant (`lg:`, `hover:`). */
+  --color-neutral-50: var(--fill-gray-50);
+  --color-neutral-100: var(--fill-gray-100);
+  --color-neutral-200: var(--fill-gray-200);
+  --color-neutral-300: var(--fill-gray-300);
+  --color-neutral-400: var(--fill-gray-400);
+  --color-neutral-500: var(--fill-gray-500);
+  --color-neutral-600: var(--fill-gray-600);
+  --color-neutral-700: var(--fill-gray-700);
+  --color-neutral-800: var(--fill-gray-800);
+  --color-neutral-900: var(--fill-gray-900);
+  --color-neutral-950: var(--fill-gray-950);
+  --color-brand-100: var(--fill-p1-100);
+  --color-brand-200: var(--fill-p1-200);
+  --color-brand-300: var(--fill-p1-300);
+  --color-brand-400: var(--fill-p1-400);
+  --color-brand-500: var(--fill-p1-500);
+  --color-brand-600: var(--fill-p1-600);
+  --color-brand-700: var(--fill-p1-700);
+  --color-brand-800: var(--fill-p1-800);
+  --color-brand-900: var(--fill-p1-900);
+  --color-brand-950: var(--fill-p1-950);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -455,8 +481,9 @@ body > .bg-popover.overflow-clip.p-\[8px\] {
    wins over the responsive column width and the rail stays at its content
    minimum. */
 @media (min-width: 80rem) {
+  /* Work column 70%, rail 30%. */
   .dashboard-split {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
   }
   .dashboard-rail {
     width: auto !important;

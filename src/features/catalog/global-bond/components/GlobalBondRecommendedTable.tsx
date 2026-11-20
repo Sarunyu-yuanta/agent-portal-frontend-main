@@ -58,7 +58,7 @@ export function GlobalBondRecommendedTable({
                 {...rowCellProps(i, isLastRow(i))}
               >
                 <BondLogo src={row.logo} className="size-8 rounded" />
-                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] font-bold text-[#101828]">
+                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] font-bold text-neutral-900">
                   {row.issuer}
                 </span>
               </div>
@@ -75,7 +75,7 @@ export function GlobalBondRecommendedTable({
                 className="flex min-h-[52px] flex-1 cursor-pointer items-center justify-center px-4 py-3.5 transition-colors"
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-center text-sm leading-[24px] text-[#101828]">
+                <span className="text-center text-sm leading-[24px] text-neutral-900">
                   {row.couponRate}
                 </span>
               </div>
@@ -92,7 +92,7 @@ export function GlobalBondRecommendedTable({
                 className="flex min-h-[52px] flex-1 cursor-pointer items-center justify-center px-4 py-3.5 transition-colors"
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-center text-sm leading-[24px] text-[#101828]">
+                <span className="text-center text-sm leading-[24px] text-neutral-900">
                   {row.maturity}
                 </span>
               </div>
@@ -132,17 +132,17 @@ export function GlobalBondRecommendedTable({
                 {...rowCellProps(i, isLastRow(i))}
               >
                 <div className="flex flex-1 items-center justify-center px-4 py-3.5">
-                  <span className="text-center text-sm leading-[24px] text-[#101828]">
+                  <span className="text-center text-sm leading-[24px] text-neutral-900">
                     {row.sp}
                   </span>
                 </div>
                 <div className="flex flex-1 items-center justify-center px-4 py-3.5">
-                  <span className="text-center text-sm leading-[24px] text-[#101828]">
+                  <span className="text-center text-sm leading-[24px] text-neutral-900">
                     {row.moodys}
                   </span>
                 </div>
                 <div className="flex flex-1 items-center justify-center px-4 py-3.5">
-                  <span className="text-center text-sm leading-[24px] text-[#101828]">
+                  <span className="text-center text-sm leading-[24px] text-neutral-900">
                     {row.fitch}
                   </span>
                 </div>
@@ -163,7 +163,7 @@ export function GlobalBondRecommendedTable({
                 className="flex min-h-[52px] flex-1 cursor-pointer items-center justify-end px-4 py-3.5 transition-colors"
                 {...rowCellProps(i, isLastRow(i))}
               >
-                <span className="text-center text-sm leading-[24px] text-[#101828]">
+                <span className="text-center text-sm leading-[24px] text-neutral-900">
                   {row.estimatedYield}
                 </span>
               </div>

@@ -18,7 +18,7 @@ const ADVISORY_CARD_CLASS = [
   "shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]",
   "hover:-translate-y-0.5 hover:shadow-[0px_2px_4px_rgba(102,102,102,0.14),0px_8px_20px_rgba(102,102,102,0.18)]",
   "active:translate-y-0 active:shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
   "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
 ].join(" ");
 
@@ -77,7 +77,7 @@ function RoboAdvisoryDescription() {
   // Figma 33787:150673 — desktop 500×40 (2×20px lines, body-1 16px).
   const ROBO_DESKTOP_DESCRIPTION_LINES = t.products.advisory.robo.tagline.cardDesktop;
   return (
-    <div className="w-full min-w-0 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px] lg:text-black/60">
+    <div className="w-full min-w-0 text-sm leading-[24px] text-neutral-600 lg:text-base lg:leading-[24px] lg:text-black/60">
       <div className="max-lg:w-full max-lg:max-w-[311px] lg:hidden">
         {ROBO_COMPACT_DESCRIPTION_LINES.map((line, index) => (
           <p
@@ -122,7 +122,7 @@ function RoboAdvisoryCard({ onSelect }: { onSelect?: () => void }) {
       <div className="relative z-[1] flex w-full min-w-0 flex-1 flex-col gap-2 lg:gap-[7.864px]">
         <div className="flex w-full min-w-0 items-start justify-between">
           <p
-            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629] lg:text-black/75 lg:group-hover:text-black/85`}
+            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-neutral-900 transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629] lg:text-black/75 lg:group-hover:text-black/85`}
           >
             Robo Advisory
           </p>
@@ -165,13 +165,13 @@ function DefinitCard({ onSelect }: { onSelect?: () => void }) {
       <div className="relative z-[1] flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex w-full min-w-0 items-start justify-between gap-2">
           <p
-            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-[#101828] transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629]`}
+            className={`min-w-0 flex-1 text-base leading-[28px] font-bold text-neutral-900 transition-colors ${HOVER_TRANSITION} group-hover:text-[#0a1629]`}
           >
             Definit by finnomena.
           </p>
           <ArrowRightIcon />
         </div>
-        <div className="w-full min-w-0 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
+        <div className="w-full min-w-0 text-sm leading-[24px] text-neutral-600 lg:text-base lg:leading-[24px]">
           <div className="max-lg:max-w-[311px] lg:hidden">
             {DEFINIT_COMPACT_DESCRIPTION_LINES.map((line, index) => (
               <p
@@ -266,7 +266,7 @@ export function RoboAdvisoryTab({
   const { isLoading: clientsLoading } = useClientsResource();
 
   return (
-    <div className="w-full bg-white px-4 py-3 md:px-8 md:pt-3 md:pb-10 lg:bg-[#f9fafb] lg:py-10">
+    <div className="w-full bg-white px-4 py-3 md:px-8 md:pt-3 md:pb-10 lg:bg-neutral-50 lg:py-10">
       <div className="mx-auto w-full max-w-[1280px] lg:px-6">
         <div className="flex flex-col gap-3 md:gap-6 lg:rounded-xl lg:bg-white lg:px-14 lg:py-8 lg:shadow-[0px_0px_2px_rgba(102,102,102,0.16),0px_4px_8px_rgba(102,102,102,0.12)]">
           {/* The cards' copy is static, but both open a client picker — so

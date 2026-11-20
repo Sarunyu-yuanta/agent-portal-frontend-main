@@ -48,7 +48,7 @@ function CategoryTabs({
               type="button"
               onClick={() => onSelect(group.id)}
               className={`flex min-w-[80px] flex-1 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap ${
-                active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
+                active ? "border-brand-600 text-brand-600" : "border-black/10 text-neutral-500"
               }`}
             >
               {t.fund.groups[group.id]}
@@ -80,7 +80,7 @@ function PerformancePeriodTabs({
               className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-semibold ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
-                  : "text-[#4a5565]"
+                  : "text-neutral-600"
               }`}
             >
               {period}
@@ -157,7 +157,7 @@ export function MutualFundTopPerformersPage({
             >
               <ArrowLeftIcon size={20} />
             </Button>
-            <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+            <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-neutral-900">
               {t.fund.topPerformers.title}
             </h1>
           </div>
@@ -171,17 +171,17 @@ export function MutualFundTopPerformersPage({
           </div>
         </div>
 
-        <div className="relative w-full overflow-hidden bg-[#f9fafb]">
+        <div className="relative w-full overflow-hidden bg-neutral-50">
           {isLoading ? (
             <MutualFundTabbedListHeroSkeleton />
           ) : (
             <div className="relative mx-auto flex h-[126px] w-full max-w-[996px] shrink-0 items-center gap-1.5 overflow-visible px-4 pt-2.5 pb-2.5 md:px-8 lg:px-0">
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <p className="text-xl leading-[34px] font-bold text-[#074ea4]">{heroTitle}</p>
-                <p className="text-sm leading-[24px] font-normal text-[#4a5565]">
+                <p className="text-xl leading-[34px] font-bold text-brand-800">{heroTitle}</p>
+                <p className="text-sm leading-[24px] font-normal text-neutral-600">
                   {t.fund.topPerformers.heroSubtitle}
                 </p>
-                <p className="text-micro leading-[18px] font-normal text-[#6a7282]">
+                <p className="text-micro leading-[18px] font-normal text-neutral-500">
                   {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function MutualFundTopPerformersPage({
                         </div>
                       }
                     />
-                    <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
+                    <p className="w-full px-3 text-sm leading-[24px] font-normal text-neutral-900">
                       {listCountLabel}
                     </p>
                     <PerformancePeriodTabs active={period} onChange={setPeriod} />
@@ -243,7 +243,7 @@ export function MutualFundTopPerformersPage({
                   </div>
 
                   {tagFunds.length === 0 ? (
-                    <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
+                    <p className="px-3 text-center text-sm font-normal text-neutral-500">
                       {query.trim()
                         ? t.fund.list.noMatchForQuery(query.trim())
                         : t.fund.list.noFundsInCategory}

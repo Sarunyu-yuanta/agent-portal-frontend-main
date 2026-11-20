@@ -55,7 +55,7 @@ function SectorListRow({ sector, onNavigate }: { sector: SectorRow; onNavigate?:
           <PercentPill trend={sector.trend} value={sector.changePercent} />
         </div>
       )}
-      <CaretRightIcon size={24} className="shrink-0 text-[#4a5565]" />
+      <CaretRightIcon size={24} className="shrink-0 text-neutral-600" />
     </>
   );
   // Figma's "Sector_list" carries the divider on every row, last one included.
@@ -128,7 +128,7 @@ function HeatmapTile({
   style?: CSSProperties;
 }) {
   if (!sector) {
-    return <div aria-hidden className="min-w-0 flex-1 rounded-md bg-[#f3f4f6]" style={style} />;
+    return <div aria-hidden className="min-w-0 flex-1 rounded-md bg-neutral-100" style={style} />;
   }
   const trend = sector.heatmapTrend ?? sector.trend;
   const changeAmount = sector.heatmapChangeAmount ?? sector.changeAmount;

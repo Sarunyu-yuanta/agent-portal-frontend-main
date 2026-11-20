@@ -54,7 +54,7 @@ export function NineBoxCellDrawer({
               <button
                 key={c.id}
                 type="button"
-                className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-black/10 bg-white p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                 onClick={() => push.open(c)}
               >
                 <Avatar type="text" initials={getInitials(c.name)} size="s" />

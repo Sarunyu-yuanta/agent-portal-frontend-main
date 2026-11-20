@@ -115,13 +115,13 @@ function TableRow({
       style={border}
     >
       <span
-        className={`text-sm ${col.sticky || col.accent ? "font-bold" : ""}leading-[24px] ${col.accent ? "text-[#0a6ee7]" : "text-[#101828]"} whitespace-nowrap`}
+        className={`text-sm ${col.sticky || col.accent ? "font-bold" : ""}leading-[24px] ${col.accent ? "text-brand-600" : "text-neutral-900"} whitespace-nowrap`}
       >
         {row[col.key]}
         {/* Same tag the global desk's cards carry — under the theme, the one
             column always on screen. */}
         {col.key === "theme" && processing && (
-          <span className="mt-0.5 flex w-fit items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5 text-micro leading-[18px] font-normal text-[#101828]">
+          <span className="mt-0.5 flex w-fit items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5 text-micro leading-[18px] font-normal text-neutral-900">
             <HourglassMediumIcon size={12} weight="fill" color="#2b7fff" />
             {t.products.common.processingOrder}
           </span>

@@ -43,7 +43,7 @@ export function TopIdeaAllPage({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           Top idea
         </h1>
       </div>

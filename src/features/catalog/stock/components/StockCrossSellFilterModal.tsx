@@ -27,11 +27,11 @@ function FilterChip({
       aria-pressed={selected}
       className={`flex w-full cursor-pointer items-center gap-2 rounded-full border py-2 pr-3 pl-2 text-sm transition-colors ${
         selected
-          ? "border-[#0a6ee7] bg-[#f3f8fe] text-[#0a6ee7] hover:bg-[#e4eefb]!"
-          : "border-black/10 bg-white text-[#4a5565] hover:border-[#0a6ee7]/40! hover:bg-[#f9fafb]!"
+          ? "border-brand-600 bg-brand-100 text-brand-600 hover:bg-[#e4eefb]!"
+          : "border-black/10 bg-white text-neutral-600 hover:border-brand-600/40! hover:bg-neutral-50!"
       }`}
     >
-      <span className="relative size-6 shrink-0 overflow-hidden rounded-full bg-[#f3f4f6]">
+      <span className="relative size-6 shrink-0 overflow-hidden rounded-full bg-neutral-100">
         <Image src={option.icon} alt="" fill sizes="24px" className="object-cover" />
       </span>
       <span className="truncate">{option.label}</span>

@@ -102,8 +102,8 @@ function SortDropdown({ value, onChange }: { value: SortId; onChange: (id: SortI
                   active ? "bg-[#eff6ff]" : "hover:bg-black/[0.02]"
                 }`}
               >
-                <Icon size={24} className="shrink-0 text-[#4a5565]" />
-                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#101828]">
+                <Icon size={24} className="shrink-0 text-neutral-600" />
+                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-neutral-900">
                   {t.stock.detailList.sort[id]}
                 </span>
               </button>
@@ -117,13 +117,13 @@ function SortDropdown({ value, onChange }: { value: SortId; onChange: (id: SortI
         aria-label={t.stock.detailList.sortAria(selectedLabel)}
         className="flex w-[136px] shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-black/10 bg-white p-2 transition-colors hover:bg-black/[0.02]"
       >
-        <SelectedIcon size={20} className="shrink-0 text-[#4a5565]" />
-        <span className="min-w-0 flex-1 truncate text-left text-sm leading-[24px] font-semibold text-[#4a5565]">
+        <SelectedIcon size={20} className="shrink-0 text-neutral-600" />
+        <span className="min-w-0 flex-1 truncate text-left text-sm leading-[24px] font-semibold text-neutral-600">
           {selectedLabel}
         </span>
         <CaretDownIcon
           size={16}
-          className={`shrink-0 text-[#4a5565] transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-neutral-600 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
     </Popover>
@@ -278,12 +278,12 @@ export function StockDetailList({
       <div className={`flex flex-col gap-6 pt-4 ${NARROW}`}>
         <div className="flex w-full flex-col gap-3">
           <div className="flex w-full items-center gap-2 border-b border-black/10 px-3 py-3">
-            <p className="min-w-0 flex-1 text-base leading-[24px] text-[#4a5565]">
+            <p className="min-w-0 flex-1 text-base leading-[24px] text-neutral-600">
               {t.stock.detailList.count(isEmpty ? 0 : totalCount)}
             </p>
             <SortDropdown value={sort} onChange={setSort} />
           </div>
-          <p className="w-full px-3 text-xs leading-[20px] text-[#6a7282]">{updatedAt}</p>
+          <p className="w-full px-3 text-xs leading-[20px] text-neutral-500">{updatedAt}</p>
         </div>
         {isEmpty ? (
           // Nothing to page in either — no sentinel, or it would "load more" forever.
@@ -309,8 +309,8 @@ export function StockDetailList({
             </div>
             {isLoadingMore ? (
               <div className="flex w-full items-center justify-center gap-1 px-3 py-2.5">
-                <CircleNotchIcon size={20} className="animate-spin text-[#6a7282]" />
-                <span className="text-sm leading-[24px] font-bold text-[#6a7282]">
+                <CircleNotchIcon size={20} className="animate-spin text-neutral-500" />
+                <span className="text-sm leading-[24px] font-bold text-neutral-500">
                   {t.stock.detailList.loadingMore}
                 </span>
               </div>

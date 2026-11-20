@@ -79,11 +79,11 @@ function QuickActionCard({
   const body = (
     <div
       className={`relative flex flex-col gap-1 overflow-clip rounded bg-gradient-to-b to-white px-3 py-2 ${
-        variant === "search" ? "from-[#f3f8fe]" : "from-[#fafafa]"
+        variant === "search" ? "from-brand-100" : "from-[#fafafa]"
       }`}
     >
       <QuickActionArt variant={variant} />
-      <p className="relative text-sm leading-[24px] font-bold text-[#101828]">
+      <p className="relative text-sm leading-[24px] font-bold text-neutral-900">
         {title[0]}
         <br />
         {title[1]}
@@ -104,7 +104,7 @@ function QuickActionCard({
     "shadow-[0px_0px_1px_rgba(102,102,102,0.16),0px_4px_4px_rgba(102,102,102,0.12)] " +
     "transition-[transform,box-shadow] duration-200 ease-out " +
     "hover:-translate-y-0.5! hover:shadow-[0px_0px_2px_rgba(102,102,102,0.2),0px_8px_16px_rgba(102,102,102,0.18)]! " +
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] " +
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 " +
     "motion-reduce:transition-none motion-reduce:hover:translate-y-0!";
 
   if (href) {

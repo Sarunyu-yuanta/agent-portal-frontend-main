@@ -42,12 +42,12 @@ export function DealProgress({ productId }: { productId: string }) {
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-white px-4 py-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-xs leading-[20px] tracking-wide text-[#6a7282] uppercase">
+        <span className="text-xs leading-[20px] tracking-wide text-neutral-500 uppercase">
           {label}
         </span>
-        <span className="text-lg leading-[28px] font-bold text-[#101828] tabular-nums">
+        <span className="text-lg leading-[28px] font-bold text-neutral-900 tabular-nums">
           {formatInteger(used)} / {formatInteger(target)}{" "}
-          <span className="text-sm font-normal text-[#6a7282]">{book.currency}</span>
+          <span className="text-sm font-normal text-neutral-500">{book.currency}</span>
         </span>
       </div>
       <div
@@ -65,7 +65,7 @@ export function DealProgress({ productId }: { productId: string }) {
         <div className="bg-primary-action h-full" style={{ width: pct(mine) }} />
         <div className="h-full bg-[var(--fill-emerald-400)]" style={{ width: pct(others) }} />
       </div>
-      <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs leading-[20px] text-[#6a7282]">
+      <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs leading-[20px] text-neutral-500">
         <Legend
           swatch="bg-primary-action"
           label={t.orders.progress.mine}
@@ -91,7 +91,7 @@ function Legend({ swatch, label, value }: { swatch: string; label: string; value
     <span className="flex items-center gap-1.5">
       <span className={`size-2.5 rounded-sm ${swatch}`} />
       {label}
-      <span className="font-semibold text-[#101828] tabular-nums">{value}</span>
+      <span className="font-semibold text-neutral-900 tabular-nums">{value}</span>
     </span>
   );
 }

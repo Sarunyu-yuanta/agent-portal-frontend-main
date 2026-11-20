@@ -224,23 +224,23 @@ export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListPro
                 <IssuerLogo src={row.logo} />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="truncate text-sm leading-[26px] font-semibold text-[#101828]">
+                <span className="truncate text-sm leading-[26px] font-semibold text-neutral-900">
                   {row.name}
                 </span>
-                <span className="text-xs leading-[22px] text-[#4a5565]">{row.isin}</span>
+                <span className="text-xs leading-[22px] text-neutral-600">{row.isin}</span>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                <span className="text-sm leading-[26px] text-[#101828]">{row.yieldPct}</span>
+                <span className="text-sm leading-[26px] text-neutral-900">{row.yieldPct}</span>
                 {expanded ? (
-                  <CaretUpIcon size={22} className="text-[#101828]" />
+                  <CaretUpIcon size={22} className="text-neutral-900" />
                 ) : (
-                  <CaretDownIcon size={22} className="text-[#101828]" />
+                  <CaretDownIcon size={22} className="text-neutral-900" />
                 )}
               </div>
             </button>
             {expanded && (
               <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
-                <div className="flex w-full flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2">
+                <div className="flex w-full flex-col gap-1 rounded-md bg-neutral-50 px-3 py-2">
                   <DetailRow label={cols.currency} value={row.currency} />
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
                   <DetailRow label={cols.price} value={row.price} />
@@ -287,7 +287,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
                 <IssuerLogo src={row.logo} />
-                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#101828]">
+                <span className="min-w-0 flex-1 truncate text-sm leading-[24px] text-neutral-900">
                   {row.name}
                 </span>
               </div>
@@ -319,7 +319,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.isin}</span>
               </div>
             ))}
           </div>
@@ -333,7 +333,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.currency}</span>
               </div>
             ))}
           </div>
@@ -347,7 +347,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.couponRate}</span>
               </div>
             ))}
           </div>
@@ -361,7 +361,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.price}</span>
               </div>
             ))}
           </div>
@@ -375,7 +375,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.yieldPct}</span>
               </div>
             ))}
           </div>
@@ -389,7 +389,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-center px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.maturity}</span>
               </div>
             ))}
           </div>
@@ -403,7 +403,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-end px-4 py-3.5"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
+                <span className="text-sm leading-[24px] text-neutral-900">{row.duration}</span>
               </div>
             ))}
           </div>

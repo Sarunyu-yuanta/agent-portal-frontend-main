@@ -20,9 +20,9 @@ function LegendRow({
   description: string;
 }) {
   return (
-    <div className="flex w-full flex-col items-start gap-0.5 rounded-xl bg-[#f9fafb] py-2.5 pr-4 pl-3">
+    <div className="flex w-full flex-col items-start gap-0.5 rounded-xl bg-neutral-50 py-2.5 pr-4 pl-3">
       <div className="flex items-center gap-1.5">
-        <p className="text-sm leading-[24px] font-bold text-[#101828]">{label}</p>
+        <p className="text-sm leading-[24px] font-bold text-neutral-900">{label}</p>
         <div className={`flex items-center gap-0.5 rounded px-1 py-0.5 ${tagClassName}`}>
           <Image src={icon} alt="" width={14} height={14} className="size-3.5 shrink-0" />
           <span className={`text-micro leading-[18px] whitespace-nowrap ${tagTextClassName}`}>
@@ -30,7 +30,7 @@ function LegendRow({
           </span>
         </div>
       </div>
-      <p className="text-sm leading-[24px] font-normal text-[#6a7282]">{description}</p>
+      <p className="text-sm leading-[24px] font-normal text-neutral-500">{description}</p>
     </div>
   );
 }
@@ -50,7 +50,7 @@ function MutualFundLegendContent() {
         icon={MF_ASSETS.performersTagHighlight}
         label={t.fund.tags.highlight}
         tagClassName="bg-[#eff6ff]"
-        tagTextClassName="text-[#0a6ee7]"
+        tagTextClassName="text-brand-600"
         description={t.fund.legend.highlightDescription}
       />
     </div>

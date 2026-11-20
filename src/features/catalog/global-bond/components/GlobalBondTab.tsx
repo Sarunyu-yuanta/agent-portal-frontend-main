@@ -23,7 +23,7 @@ function TopPickHeading() {
   return (
     <div className="flex w-full items-center gap-1 rounded-lg bg-[#fdefe6] px-1 py-0.5">
       <FireIcon size={16} weight="fill" color="#f97316" className="shrink-0" />
-      <span className="text-sm leading-[24px] font-bold text-[#101828]">
+      <span className="text-sm leading-[24px] font-bold text-neutral-900">
         {t.products.globalBond.columns.topPick}
       </span>
     </div>
@@ -50,7 +50,9 @@ export function GlobalBondTab({
         {proposal.ui}
         {/* Tablet + mobile — accordion cards */}
         <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-6 px-4 pt-6 pb-10 md:px-8 lg:hidden">
-          <h2 className="w-full text-lg leading-[28px] font-bold text-[#101828]">{labels.title}</h2>
+          <h2 className="w-full text-lg leading-[28px] font-bold text-neutral-900">
+            {labels.title}
+          </h2>
           <div className="flex w-full flex-col gap-2">
             <TopPickHeading />
             {TOP_PICK_ROWS.length === 0 ? (
@@ -61,10 +63,10 @@ export function GlobalBondTab({
           </div>
           <div className="flex w-full flex-col gap-3">
             <div className="flex w-full items-center justify-between gap-3">
-              <h3 className="text-sm leading-[24px] font-bold text-[#101828]">
+              <h3 className="text-sm leading-[24px] font-bold text-neutral-900">
                 {labels.recommended}
               </h3>
-              <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-[#6a7282]">
+              <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-neutral-500">
                 {t.products.common.updatedAt("25 Aug 2026 - 09.00")}
               </span>
             </div>
@@ -87,7 +89,9 @@ export function GlobalBondTab({
 
         {/* Desktop — tables */}
         <div className="mx-auto hidden w-full max-w-[1280px] flex-col items-center gap-6 px-4 pt-6 pb-10 md:px-8 lg:flex lg:px-6">
-          <h2 className="w-full text-lg leading-[28px] font-bold text-[#101828]">{labels.title}</h2>
+          <h2 className="w-full text-lg leading-[28px] font-bold text-neutral-900">
+            {labels.title}
+          </h2>
           <div className="flex w-full flex-col gap-2">
             <TopPickHeading />
             {TOP_PICK_ROWS.length === 0 ? (
@@ -98,10 +102,10 @@ export function GlobalBondTab({
           </div>
           <div className="flex w-full flex-col gap-4">
             <div className="flex w-full items-end justify-between gap-3">
-              <h3 className="text-base leading-[28px] font-bold text-[#101828]">
+              <h3 className="text-base leading-[28px] font-bold text-neutral-900">
                 {labels.recommended}
               </h3>
-              <span className="shrink-0 text-sm leading-[24px] whitespace-nowrap text-[#6a7282]">
+              <span className="shrink-0 text-sm leading-[24px] whitespace-nowrap text-neutral-500">
                 {t.products.common.updatedAt("25 August 2026 - 09.00")}
               </span>
             </div>

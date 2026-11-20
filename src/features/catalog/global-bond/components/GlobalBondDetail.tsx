@@ -105,7 +105,7 @@ export function GlobalBondDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-left text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[30px]">
+        <h1 className="min-w-0 flex-1 truncate text-left text-base leading-[28px] font-bold text-neutral-900 lg:text-lg lg:leading-[30px]">
           {issuer.title}
         </h1>
       </div>
@@ -143,10 +143,10 @@ export function GlobalBondDetail({
             <>
               <div className="flex w-full flex-col gap-4">
                 <div className="flex w-full items-center justify-between gap-3">
-                  <p className="text-sm leading-[24px] font-bold text-[#101828] md:text-base md:leading-[28px]">
+                  <p className="text-sm leading-[24px] font-bold text-neutral-900 md:text-base md:leading-[28px]">
                     {t.products.common.itemCount(filteredBonds.length)}
                   </p>
-                  <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-[#6a7282] md:text-sm md:leading-[24px]">
+                  <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-neutral-500 md:text-sm md:leading-[24px]">
                     <span className="md:hidden">
                       {t.products.common.updatedAt(updatedAtMobile)}
                     </span>

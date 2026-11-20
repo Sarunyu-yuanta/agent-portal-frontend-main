@@ -96,7 +96,7 @@ export function ProductTermsModal({
               <p className="type-caption text-muted-foreground">{t.orders.terms.underlying}</p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
-              <p className="type-body-1 font-bold text-[#0a6ee7]">{product.coupon}</p>
+              <p className="type-body-1 font-bold text-brand-600">{product.coupon}</p>
               <p className="type-caption text-muted-foreground">{t.orders.terms.coupon}</p>
             </div>
           </div>

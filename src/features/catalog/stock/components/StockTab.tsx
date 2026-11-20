@@ -54,7 +54,7 @@ function TrendCaret({ trend, size = 16 }: { trend: Trend; size?: number }) {
       </span>
     );
   return (
-    <span className="text-[#99a1af]">
+    <span className="text-neutral-400">
       <MinusIcon size={size} weight="bold" />
     </span>
   );
@@ -154,7 +154,7 @@ function MarketBoardCard({
       // Same lift as `StockLargeAssetCard`, the Stock tab's other clickable
       // card. Trailing `!` on the paint properties because system-one ships its
       // base utilities unlayered, where they outrank a plain `hover:` variant.
-      className="flex min-w-[140px] flex-1 cursor-pointer flex-col gap-3 rounded-lg border border-black/10 bg-white p-3 text-left transition-[background-color,border-color,box-shadow] hover:border-[#0a6ee7]/25! hover:bg-[#fafafa]! hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="flex min-w-[140px] flex-1 cursor-pointer flex-col gap-3 rounded-lg border border-black/10 bg-white p-3 text-left transition-[background-color,border-color,box-shadow] hover:border-brand-600/25! hover:bg-[#fafafa]! hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)] focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <div className="flex w-full flex-col gap-2">
         <div className="flex items-center gap-2">

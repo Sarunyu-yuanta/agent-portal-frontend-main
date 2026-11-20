@@ -83,18 +83,6 @@ export function CommandCenterView() {
 
 const PATH = ROUTES.commandCenter;
 
-/** Column widths, inlined for the reason this page already had to learn once:
- *  `@sarunyu/system-one` ships a plain `.grid-cols-1` and loads after
- *  `globals.css`, so it takes the source-order tie against any responsive
- *  `grid-cols-*` on the same element and the utility never takes. `!important`
- *  on a named class is the only thing that reliably wins. */
-const DASHBOARD_RAIL_CSS = `
-@media (min-width: 80rem) {
-  .dashboard-split { grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important; }
-  .dashboard-rail { width: auto !important; min-width: 0 !important; max-width: none !important; }
-}
-`;
-
 function DashboardPageInner() {
   const currentIc = useCurrentIc();
   const locale = useLocale();
@@ -262,7 +250,6 @@ function DashboardPageInner() {
 
   return (
     <>
-      <style>{DASHBOARD_RAIL_CSS}</style>
       <div className="flex flex-col gap-4 xl:gap-5">
         {/* Main + right rail — greeting and stat tiles live in the work column
             only, so their width matches the NBA card below. The calendar sits

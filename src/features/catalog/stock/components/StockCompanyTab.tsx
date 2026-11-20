@@ -93,7 +93,7 @@ function ActionBadge({
 function CompanySubTabPlaceholder({ label }: { label: string }) {
   const t = useT();
   return (
-    <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+    <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-neutral-500">
       {t.stock.company.comingSoon(label)}
     </div>
   );
@@ -558,7 +558,7 @@ function CompanyEventsSection({
                       onChange={(next) => toggleKind(kind, next)}
                       label={
                         <span
-                          className={`text-sm leading-[24px] ${shown ? "text-[#0a6ee7]" : "text-[rgba(0,0,0,0.35)]"}`}
+                          className={`text-sm leading-[24px] ${shown ? "text-brand-600" : "text-[rgba(0,0,0,0.35)]"}`}
                         >
                           {kind}
                         </span>
@@ -652,7 +652,7 @@ export function StockCompanyTab({
   // Loaded with nothing: say so, rather than a skeleton that never resolves.
   if (!data) {
     return (
-      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-neutral-500">
         {t.stock.company.noData}
       </div>
     );

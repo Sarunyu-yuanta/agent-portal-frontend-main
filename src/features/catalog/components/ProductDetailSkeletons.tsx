@@ -127,7 +127,7 @@ export function FixedIncomeCompanyDetailSkeleton({
         <CompanyBondSectionSkeleton columns={12} />
 
         {hasSecondary && (
-          <div className="-mx-[9999px] bg-[#f9fafb] px-[9999px] py-8">
+          <div className="-mx-[9999px] bg-neutral-50 px-[9999px] py-8">
             <CompanyBondSectionSkeleton columns={11} />
           </div>
         )}
@@ -411,13 +411,13 @@ export function StructuredProductDetailSkeleton() {
             style={{ border: `1px solid ${BORDER_COLOR}` }}
           >
             <div
-              className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3"
+              className="flex flex-col items-center gap-1 bg-neutral-50 px-4 py-3"
               style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
             >
               <Skeleton className="h-3 w-32" />
               <Skeleton className="h-5 w-16" />
             </div>
-            <div className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3">
+            <div className="flex flex-col items-center gap-1 bg-neutral-50 px-4 py-3">
               <Skeleton className="h-3 w-32" />
               <Skeleton className="h-5 w-16" />
             </div>
@@ -464,7 +464,7 @@ export function ThaiStructuredProductDetailSkeleton() {
 /** Mirrors MutualFundDetail: header, NAV hero, tabs, chart, stat rows, CTA bar. */
 export function MutualFundDetailSkeleton() {
   return (
-    <div className="flex w-full flex-col pb-20 max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2">
+    <div className="flex w-full flex-col pb-20 max-lg:bg-white lg:bg-neutral-50 lg:pt-2">
       <div className="mx-auto flex w-full max-w-[996px] flex-col gap-2 px-4 md:px-8 lg:px-0">
         <div className="hidden py-2 lg:block lg:pr-2">
           <DetailHeaderSkeleton maxWidth="w-full" center={false} />

@@ -23,10 +23,7 @@ function IssuerLogo({ src }: { src: string }) {
 function BondCheckbox() {
   return (
     <div className="relative flex size-6 shrink-0 items-center justify-center">
-      <div
-        className="size-4 rounded-[2px] border-[1.5px] border-[rgba(0,0,0,0.1)] bg-white"
-        aria-hidden
-      />
+      <div className="size-4 rounded-[2px] border-[1.5px] border-black/10 bg-white" aria-hidden />
     </div>
   );
 }
@@ -94,29 +91,29 @@ export function GlobalBondAllAccordion({
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 <IssuerLogo src={row.logo} />
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate text-sm leading-[24px] font-bold text-[#4a5565]">
+                  <span className="truncate text-sm leading-[24px] font-bold text-neutral-600">
                     {row.name}
                   </span>
                   <div className="flex min-h-[18px] items-center gap-0.5">
-                    <span className="text-xs leading-[20px] text-[#4a5565]">{row.isin}</span>
+                    <span className="text-xs leading-[20px] text-neutral-600">{row.isin}</span>
                     {row.topPick && <TopPickTag small />}
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <span className="text-sm leading-[24px] font-normal text-[#4a5565]">
+                  <span className="text-sm leading-[24px] font-normal text-neutral-600">
                     {row.yieldPct}
                   </span>
                   {expanded ? (
-                    <CaretUpIcon size={22} className="text-[#4a5565]" />
+                    <CaretUpIcon size={22} className="text-neutral-600" />
                   ) : (
-                    <CaretDownIcon size={22} className="text-[#4a5565]" />
+                    <CaretDownIcon size={22} className="text-neutral-600" />
                   )}
                 </div>
               </div>
             </button>
             {expanded && (
               <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
-                <div className="flex w-full flex-col gap-1 rounded-md bg-[#f9fafb] px-3 py-2">
+                <div className="flex w-full flex-col gap-1 rounded-md bg-neutral-50 px-3 py-2">
                   <DetailRow label={cols.currency} value={row.currency} />
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
                   <DetailRow label={cols.price} value={row.price} />
@@ -124,7 +121,7 @@ export function GlobalBondAllAccordion({
                   <DetailRow label={cols.maturity} value={row.maturity} />
                   <DetailRow label={cols.durationYears} value={row.duration} />
                   <div className="flex w-full items-start gap-3 text-sm leading-[24px]">
-                    <span className="flex-1 text-[#4a5565]">
+                    <span className="flex-1 text-neutral-600">
                       {t.products.common.relatedDocuments}
                     </span>
                     <button

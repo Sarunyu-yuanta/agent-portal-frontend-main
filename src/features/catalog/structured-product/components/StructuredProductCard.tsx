@@ -59,7 +59,7 @@ function LogoRow({
             style={{ backgroundColor: "#fdefe6" }}
           >
             <FireIcon size={14} weight="fill" color="#f97316" />
-            <p className="text-micro leading-[18px] whitespace-nowrap text-[#101828]">
+            <p className="text-micro leading-[18px] whitespace-nowrap text-neutral-900">
               {t.products.structured.tags.almostFull}
             </p>
           </div>
@@ -70,7 +70,7 @@ function LogoRow({
             style={{ backgroundColor: "#eff6ff" }}
           >
             <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" />
-            <p className="text-micro leading-[18px] whitespace-nowrap text-[#101828]">
+            <p className="text-micro leading-[18px] whitespace-nowrap text-neutral-900">
               {t.products.structured.tags.principalProtected}
             </p>
           </div>
@@ -92,7 +92,7 @@ function LogoRow({
 function ProcessingBand() {
   const t = useT();
   return (
-    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label leading-[20px] font-medium text-[#0a6ee7]">
+    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label leading-[20px] font-medium text-brand-600">
       <HourglassMediumIcon size={14} weight="fill" />
       {t.products.common.processingOrder}
     </div>
@@ -103,14 +103,14 @@ function UnderlyingCouponRow({ underlying, coupon }: { underlying: string; coupo
   return (
     <div className="flex w-full shrink-0 items-center gap-2">
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+        <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
           {underlying}
         </p>
-        <p className="text-label leading-[20px] text-[#6a7282]">Underlying</p>
+        <p className="text-label leading-[20px] text-neutral-500">Underlying</p>
       </div>
       <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-        <p className="text-title-sm leading-[28px] font-bold text-[#101828]">{coupon}</p>
-        <p className="text-label leading-[20px] text-[#6a7282]">Coupon</p>
+        <p className="text-title-sm leading-[28px] font-bold text-neutral-900">{coupon}</p>
+        <p className="text-label leading-[20px] text-neutral-500">Coupon</p>
       </div>
     </div>
   );
@@ -127,7 +127,7 @@ function StatsGrid({
 }) {
   return (
     <div
-      className={`flex items-center justify-center rounded-lg bg-[#f9fafb] text-center ${className}`}
+      className={`flex items-center justify-center rounded-lg bg-neutral-50 text-center ${className}`}
     >
       {stats.map((s, i) => (
         <div
@@ -135,9 +135,9 @@ function StatsGrid({
           className="flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-0.5"
           style={i < stats.length - 1 ? { borderRight: "1px solid rgba(0,0,0,0.1)" } : {}}
         >
-          <p className="w-full text-micro leading-[18px] text-[#6a7282]">{s.label}</p>
+          <p className="w-full text-micro leading-[18px] text-neutral-500">{s.label}</p>
           <p
-            className={`w-full text-label leading-[20px] text-[#4a5565] ${
+            className={`w-full text-label leading-[20px] text-neutral-600 ${
               layout === "tablet"
                 ? s.label === "Tenor"
                   ? "font-bold"
@@ -153,7 +153,7 @@ function StatsGrid({
   );
 }
 
-const CARD_HOVER = "cursor-pointer transition-colors hover:bg-[#f9fafb]!";
+const CARD_HOVER = "cursor-pointer transition-colors hover:bg-neutral-50!";
 
 export function StructuredProductCard({
   underlying,

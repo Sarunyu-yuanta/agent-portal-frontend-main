@@ -127,7 +127,7 @@ export function ProductDetailDrawer({
               return (
                 <div
                   key={sub.id}
-                  className="overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white"
+                  className="overflow-hidden rounded-lg border border-black/10 bg-white"
                 >
                   {/* Card header — clickable */}
                   <button
@@ -241,7 +241,7 @@ export function ProductDetailDrawer({
               <button
                 key={holder.clientId}
                 type="button"
-                className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-black/10 bg-white p-3 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
                 onClick={() => openClient(holder.clientId)}
               >
                 <Avatar

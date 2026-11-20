@@ -46,7 +46,7 @@ const ASSETS = {
 } as const;
 
 const ROW_HOVER =
-  "cursor-pointer transition-colors hover:bg-[#f9fafb] focus-visible:outline-none focus-visible:bg-[#f9fafb]";
+  "cursor-pointer transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:bg-neutral-50";
 
 function MiniPercentPill({ value }: { value: string }) {
   const body = value.replace(/^[+-]/, "");
@@ -188,7 +188,7 @@ function FutureCard({ contract }: { contract: RelatedFutureContract }) {
           </div>
         </div>
       </div>
-      <CaretDownIcon size={20} className="shrink-0 text-[#4a5565]" aria-hidden />
+      <CaretDownIcon size={20} className="shrink-0 text-neutral-600" aria-hidden />
     </div>
   );
 }
@@ -281,9 +281,9 @@ function FuturesTable({
           {contracts.map((row) => (
             <tr
               key={row.symbol}
-              className="group/row cursor-pointer transition-colors hover:bg-[#f9fafb]"
+              className="group/row cursor-pointer transition-colors hover:bg-neutral-50"
             >
-              <td className="sticky left-0 z-[1] border-r border-b border-black/10 bg-white px-4 py-2.5 font-semibold whitespace-nowrap text-[#0a6ee7] group-hover/row:bg-[#f9fafb]">
+              <td className="sticky left-0 z-[1] border-r border-b border-black/10 bg-white px-4 py-2.5 font-semibold whitespace-nowrap text-brand-600 group-hover/row:bg-neutral-50">
                 {row.symbol}
               </td>
               {TABLE_COLS.map((col) => {
@@ -312,10 +312,10 @@ function FuturesTable({
             >
               {t.stock.related.totalFutures}
             </td>
-            <td className="border-b border-black/10 px-4 py-1 text-right font-semibold text-[#0a6ee7]">
+            <td className="border-b border-black/10 px-4 py-1 text-right font-semibold text-brand-600">
               {totals.volume}
             </td>
-            <td className="border-b border-black/10 px-4 py-1 text-right font-semibold text-[#0a6ee7]">
+            <td className="border-b border-black/10 px-4 py-1 text-right font-semibold text-brand-600">
               {totals.openInterest}
             </td>
             <td className="border-b border-black/10 px-4 py-1" />
@@ -360,7 +360,7 @@ function ViewModeMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-black/10 bg-white px-2 py-1 text-sm leading-[26px] font-semibold text-[#4a5565] transition-colors hover:bg-[#f9fafb]"
+        className="inline-flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-black/10 bg-white px-2 py-1 text-sm leading-[26px] font-semibold text-neutral-600 transition-colors hover:bg-neutral-50"
       >
         <TableIcon size={20} className="shrink-0" />
         {t.stock.related.viewMode}
@@ -392,13 +392,13 @@ function ViewModeMenu({
                 }}
                 className={`flex h-12 w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm leading-[24px] ${
                   selected
-                    ? "bg-[#eff6ff] text-[#101828]"
-                    : "bg-white text-[#101828] hover:bg-[#f9fafb]"
+                    ? "bg-[#eff6ff] text-neutral-900"
+                    : "bg-white text-neutral-900 hover:bg-neutral-50"
                 }`}
               >
                 <opt.Icon
                   size={24}
-                  className={`shrink-0 ${selected ? "text-[#0a6ee7]" : "text-[#4a5565]"}`}
+                  className={`shrink-0 ${selected ? "text-brand-600" : "text-neutral-600"}`}
                 />
                 <span className="min-w-0 flex-1">{opt.label}</span>
               </button>
@@ -502,7 +502,7 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center gap-1">
           <FireIcon size={24} weight="fill" color="#f97316" className="shrink-0" />
-          <p className="truncate text-xl leading-[34px] font-bold text-[#101828]">
+          <p className="truncate text-xl leading-[34px] font-bold text-neutral-900">
             {t.stock.related.topPick}
           </p>
         </div>
@@ -517,7 +517,7 @@ function RelatedThaiStructuredBody({ products }: { products: ThaiStructuredProdu
         </div>
       </div>
       <div className="flex w-full flex-col gap-4">
-        <p className="truncate text-xl leading-[34px] font-bold text-[#101828]">
+        <p className="truncate text-xl leading-[34px] font-bold text-neutral-900">
           {t.stock.related.allThaiFcn}
         </p>
         <ThaiStructuredProductTable products={products} getRowHref={thaiStructuredHref} />

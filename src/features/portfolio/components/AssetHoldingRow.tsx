@@ -22,7 +22,7 @@ function HoldingItemRow({
 
   return (
     <div
-      className={`overflow-hidden rounded-md border ${open ? "border-[rgba(0,0,0,0.1)] bg-[var(--bg-default-secondary)]" : "border-transparent"}`}
+      className={`overflow-hidden rounded-md border ${open ? "border-black/10 bg-[var(--bg-default-secondary)]" : "border-transparent"}`}
     >
       <button
         type="button"

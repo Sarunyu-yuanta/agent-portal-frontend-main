@@ -6,7 +6,7 @@ import { useT } from "@/i18n/I18nProvider";
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
 export const BORDER_COLOR = "rgba(0,0,0,0.1)";
-export const HEADER_TEXT_CLS = "text-sm leading-[24px] text-[#6a7282]";
+export const HEADER_TEXT_CLS = "text-sm leading-[24px] text-neutral-500";
 
 /**
  * The "rows per page" choices every paginated catalog table offers.
@@ -143,8 +143,8 @@ export function TopPickTag({ small }: { small?: boolean }) {
 export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex w-full items-start gap-3 text-sm leading-[24px]">
-      <span className="flex-1 text-[#4a5565]">{label}</span>
-      <span className="shrink-0 text-right whitespace-nowrap text-[#101828]">{value}</span>
+      <span className="flex-1 text-neutral-600">{label}</span>
+      <span className="shrink-0 text-right whitespace-nowrap text-neutral-900">{value}</span>
     </div>
   );
 }

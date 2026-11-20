@@ -281,7 +281,7 @@ function ChartRangeSelector({
             onClick={() => onChange(range)}
             className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-bold transition-colors ${
               selected
-                ? "bg-white text-[#101828] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
+                ? "bg-white text-neutral-900 shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
                 : "text-black/75"
             }`}
           >
@@ -347,7 +347,7 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
       <h2 className="text-lg leading-[28px] font-bold text-[rgba(0,0,0,0.85)]">{ob.title}</h2>
       <div className="flex w-full flex-col overflow-hidden rounded-xl border border-black/10">
         <div className="flex flex-col gap-2.5 p-4">
-          <div className="flex w-full items-center text-xs leading-[20px] text-[#6a7282]">
+          <div className="flex w-full items-center text-xs leading-[20px] text-neutral-500">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
               <span>{ob.volume}</span>
               <span>{ob.bestBid}</span>
@@ -359,7 +359,7 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
           </div>
           <div className="flex w-full items-center overflow-hidden rounded">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
-              <span className="w-[68px] text-sm leading-[24px] text-[#6a7282]">
+              <span className="w-[68px] text-sm leading-[24px] text-neutral-500">
                 {detail.bestBid.volume}
               </span>
               <span className="text-sm leading-[24px] font-bold text-[#2f952a]">
@@ -370,14 +370,14 @@ function OrderBook({ detail }: { detail: StockProductDetail }) {
               <span className="text-sm leading-[24px] font-bold text-[#f5212d]">
                 {detail.bestOffer.price}
               </span>
-              <span className="text-sm leading-[24px] text-[#6a7282]">
+              <span className="text-sm leading-[24px] text-neutral-500">
                 {detail.bestOffer.volume}
               </span>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-2.5 border-t border-black/10 p-4">
-          <div className="flex w-full items-center text-xs leading-[20px] text-[#6a7282]">
+          <div className="flex w-full items-center text-xs leading-[20px] text-neutral-500">
             <div className="flex min-w-0 flex-1 items-center justify-between px-2">
               <span>{ob.volume}</span>
               <span>{ob.bid}</span>
@@ -587,18 +587,18 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
         <div className="relative mt-1.5 min-h-[40px] min-w-0 flex-1">
           <div className="h-2 overflow-hidden rounded-lg bg-[#f3f3f3]">
             <div
-              className="h-full bg-[#0a6ee7]"
+              className="h-full bg-brand-600"
               style={{ marginLeft: `${left}%`, width: `${width}%` }}
             />
           </div>
           <span
-            className="absolute -top-3.5 text-micro leading-[18px] text-[#0a6ee7]"
+            className="absolute -top-3.5 text-micro leading-[18px] text-brand-600"
             style={{ left: `${right}%` }}
           >
             {data.dayMarkHigh}
           </span>
           <span
-            className="absolute top-3 text-micro leading-[18px] text-[#0a6ee7]"
+            className="absolute top-3 text-micro leading-[18px] text-brand-600"
             style={{ left: `${left}%` }}
           >
             {data.dayMarkLow}
@@ -610,11 +610,11 @@ function DaysRangeMeter({ data }: { data: StockAdvanceData }) {
             1D
           </span>
           <span
-            className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]"
+            className="absolute top-[-3px] h-5 w-px bg-brand-600"
             style={{ left: `${left}%` }}
           />
           <span
-            className="absolute top-[-3px] h-5 w-px bg-[#0a6ee7]"
+            className="absolute top-[-3px] h-5 w-px bg-brand-600"
             style={{ left: `${right}%` }}
           />
         </div>
@@ -759,7 +759,7 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
         aria-expanded={advanceOpen}
         aria-haspopup="dialog"
         onClick={() => setAdvanceOpen(true)}
-        className="inline-flex w-fit cursor-pointer items-center gap-4 rounded-2xl bg-[#f9f9f9] py-1.5 pr-2 pl-3 transition-colors hover:bg-[#ececec] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-offset-2 focus-visible:outline-none active:bg-[#e4e4e4] aria-expanded:bg-[#ececec]"
+        className="inline-flex w-fit cursor-pointer items-center gap-4 rounded-2xl bg-[#f9f9f9] py-1.5 pr-2 pl-3 transition-colors hover:bg-[#ececec] focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:outline-none active:bg-[#e4e4e4] aria-expanded:bg-[#ececec]"
       >
         <div className="flex items-center gap-[13px] text-sm leading-[24px]">
           <span className="flex items-center gap-1">
@@ -777,7 +777,7 @@ function QuoteBlock({ detail }: { detail: StockProductDetail }) {
         </div>
         <CaretDownIcon
           size={16}
-          className={`shrink-0 text-[#6a7282] transition-transform ${advanceOpen ? "rotate-180" : ""}`}
+          className={`shrink-0 text-neutral-500 transition-transform ${advanceOpen ? "rotate-180" : ""}`}
         />
       </button>
       {advanceOpen ? (
@@ -820,13 +820,13 @@ function NoticeTabBody({
   if (isLoading) return <StockTabBodySkeleton />;
   if (!notice) {
     return (
-      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+      <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-neutral-500">
         {t.stock.detail.noTabData}
       </div>
     );
   }
   return (
-    <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+    <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-neutral-500">
       {t.stock.detail.tabNotice(t.stock.detail.tabs[notice.tab] ?? notice.tab)}
     </div>
   );
@@ -900,7 +900,7 @@ export function StockProductDetail({
   }
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb] pt-4 pb-20 md:pt-6 lg:pt-8">
+    <div className="flex min-h-full w-full flex-1 flex-col bg-neutral-50 pt-4 pb-20 md:pt-6 lg:pt-8">
       <div className={`flex flex-col gap-2 ${CATALOG_DETAIL_WIDTH.narrow}`}>
         {!detail ? (
           <StockDetailHeaderSkeleton />
@@ -972,8 +972,8 @@ export function StockProductDetail({
                     // utilities unlayered, where they outrank a `hover:` variant.
                     className={`flex shrink-0 cursor-pointer items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap transition-colors lg:min-w-[80px] lg:flex-1 ${
                       active
-                        ? "border-[#0a6ee7] text-[#0a6ee7]"
-                        : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-[#101828]!"
+                        ? "border-brand-600 text-brand-600"
+                        : "border-black/10 text-black/60 hover:bg-black/[0.03]! hover:text-neutral-900!"
                     }`}
                   >
                     {t.stock.detail.tabs[tab] ?? tab}
@@ -999,7 +999,7 @@ export function StockProductDetail({
             ) : related ? (
               <StockRelatedProductTab related={related} />
             ) : (
-              <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-[#6a7282]">
+              <div className="flex min-h-[240px] items-center justify-center py-10 text-sm text-neutral-500">
                 {t.stock.detail.noRelated}
               </div>
             )

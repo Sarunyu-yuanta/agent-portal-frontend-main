@@ -40,14 +40,14 @@ const bondTableRowStyle = (showStatus: boolean) => ({
 });
 
 const STICKY_ACTION_HEADER_CLS =
-  "sticky right-0 z-20 w-[72px] shrink-0 bg-white border-l border-[rgba(0,0,0,0.1)]";
+  "sticky right-0 z-20 w-[72px] shrink-0 bg-white border-l border-black/10";
 
 const STICKY_ACTION_CELL_CLS =
-  "sticky right-0 z-10 w-[72px] shrink-0 bg-white group-hover:bg-[#f9fafb] border-l border-[rgba(0,0,0,0.1)] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]";
+  "sticky right-0 z-10 w-[72px] shrink-0 bg-white group-hover:bg-neutral-50 border-l border-black/10 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]";
 
 function CategoryTag({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center justify-center rounded bg-[#f3f4f6] px-2 py-1 text-xs leading-[20px] whitespace-nowrap text-[#4a5565]">
+    <span className="inline-flex items-center justify-center rounded bg-neutral-100 px-2 py-1 text-xs leading-[20px] whitespace-nowrap text-neutral-600">
       {label}
     </span>
   );
@@ -59,13 +59,13 @@ function GuaranteeCell({ value }: { value: string }) {
       <button
         type="button"
         onClick={(e) => e.stopPropagation()}
-        className="cursor-pointer border-none bg-transparent p-0 text-sm leading-[24px] whitespace-nowrap text-[#0a6ee7] underline"
+        className="cursor-pointer border-none bg-transparent p-0 text-sm leading-[24px] whitespace-nowrap text-brand-600 underline"
       >
         {value}
       </button>
     );
   }
-  return <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">{value}</span>;
+  return <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">{value}</span>;
 }
 
 function ViewInfoButton({ onClick }: { onClick: () => void }) {
@@ -77,7 +77,7 @@ function ViewInfoButton({ onClick }: { onClick: () => void }) {
         e.stopPropagation();
         onClick();
       }}
-      className="inline-flex cursor-pointer items-center justify-center rounded border-none bg-[#0a6ee7] px-1.5 py-1 text-xs leading-[22px] font-medium whitespace-nowrap text-white"
+      className="inline-flex cursor-pointer items-center justify-center rounded border-none bg-brand-600 px-1.5 py-1 text-xs leading-[22px] font-medium whitespace-nowrap text-white"
     >
       {t.products.common.viewInfo}
     </button>
@@ -198,7 +198,7 @@ function BondTableRow({
           onSelect(bond);
         }
       }}
-      className="group grid w-max min-w-full shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-[#f9fafb]"
+      className="group grid w-max min-w-full shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-neutral-50"
       style={bondTableRowStyle(showStatus)}
     >
       <div className={`${cell} gap-2`} style={border()}>
@@ -207,7 +207,7 @@ function BondTableRow({
           logoCrop={bond.logoCrop}
           className="size-8 rounded"
         />
-        <span className="min-w-0 flex-1 truncate text-sm leading-[24px] font-bold text-[#101828]">
+        <span className="min-w-0 flex-1 truncate text-sm leading-[24px] font-bold text-neutral-900">
           {bond.symbol}
         </span>
       </div>
@@ -220,49 +220,51 @@ function BondTableRow({
         <CategoryTag label={t.products.fixedIncome.category[bond.category]} />
       </div>
       <div className={`${cell} justify-end`} style={border()}>
-        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
           {bond.ytm}
         </span>
       </div>
       <div className={`${cell} justify-end`} style={border()}>
-        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
           {bond.couponRate}
         </span>
       </div>
       <div className={`${cell}`} style={border()}>
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.couponPeriod}
         </span>
       </div>
       <div className={`${cell}`} style={border()}>
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.tenor}
         </span>
       </div>
       <div className={`${cell}`} style={border()}>
-        <span className="text-sm leading-[24px] text-[#101828]">{bond.maturity}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{bond.maturity}</span>
       </div>
       <div className={`${cell} justify-center`} style={border()}>
-        <span className="text-center text-sm leading-[24px] text-[#101828]">
+        <span className="text-center text-sm leading-[24px] text-neutral-900">
           {bond.companyRating}
         </span>
       </div>
       <div className={`${cell} justify-center`} style={border()}>
-        <span className="text-center text-sm leading-[24px] text-[#101828]">{bond.bondRating}</span>
+        <span className="text-center text-sm leading-[24px] text-neutral-900">
+          {bond.bondRating}
+        </span>
       </div>
       <div className={`${cell}`} style={border()}>
-        <span className="text-sm leading-[24px] text-[#101828]">{bond.risk}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{bond.risk}</span>
       </div>
       <div className={`${cell}`} style={border()}>
         <GuaranteeCell value={bond.guarantee} />
       </div>
       <div className={`${cell}`} style={border()}>
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.offerType}
         </span>
       </div>
       <div className={`${cell} overflow-hidden`} style={border()}>
-        <span className="truncate text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="truncate text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.subscriptionPeriod}
         </span>
       </div>
@@ -318,7 +320,7 @@ const ASSET_TAG_ICONS = {
 
 function AssetTag({ iconSrc, label }: { iconSrc: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-0.5 rounded bg-[#f9fafb] px-2 py-1 text-sm leading-[24px] text-[#4a5565]">
+    <span className="inline-flex items-center gap-0.5 rounded bg-neutral-50 px-2 py-1 text-sm leading-[24px] text-neutral-600">
       {/* eslint-disable-next-line @next/next/no-img-element -- 14px SVG tag icon; the image optimizer rejects SVG */}
       <img alt="" src={iconSrc} className="size-3.5 shrink-0" />
       {label}
@@ -348,11 +350,11 @@ function BondSection({
     <div className="flex w-full flex-col gap-4">
       <div className="flex w-full flex-col gap-0.5">
         <h2
-          className={`text-2xl leading-9 font-bold ${titleGradient ? GRADIENT_TITLE : "text-[#101828]"}`}
+          className={`text-2xl leading-9 font-bold ${titleGradient ? GRADIENT_TITLE : "text-neutral-900"}`}
         >
           {title}
         </h2>
-        <div className="flex w-full items-center justify-between text-sm leading-[24px] text-[#6a7282]">
+        <div className="flex w-full items-center justify-between text-sm leading-[24px] text-neutral-500">
           <span>{t.products.common.itemCount(bonds.length)}</span>
           <span className="hidden sm:inline">{t.products.common.updatedAt(updatedAt)}</span>
         </div>
@@ -409,7 +411,7 @@ export function FixedIncomeCompanyDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           {company.fullName}
         </h1>
       </div>
@@ -487,7 +489,7 @@ export function FixedIncomeCompanyDetail({
         />
 
         {secondaryBonds.length > 0 && (
-          <div className="-mx-[9999px] bg-[#f9fafb] px-[9999px] py-8">
+          <div className="-mx-[9999px] bg-neutral-50 px-[9999px] py-8">
             <BondSection
               title={t.products.fixedIncome.category.secondary}
               bonds={secondaryBonds}

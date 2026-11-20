@@ -40,7 +40,7 @@ export function AssetAccountCard({
   return (
     <div
       className={`w-full overflow-hidden rounded-lg border bg-white transition-colors ${
-        selected ? "border-[color:var(--primary-action)]/50" : "border-[rgba(0,0,0,0.1)]"
+        selected ? "border-[color:var(--primary-action)]/50" : "border-black/10"
       }`}
     >
       <button

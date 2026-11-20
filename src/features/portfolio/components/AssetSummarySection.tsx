@@ -55,7 +55,7 @@ function AllocationBreakdownCard({
 }) {
   return (
     <div
-      className={`flex w-full flex-col items-start justify-center gap-3 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white p-4 ${className}`}
+      className={`flex w-full flex-col items-start justify-center gap-3 rounded-lg border border-black/10 bg-white p-4 ${className}`}
     >
       {children}
     </div>
@@ -135,7 +135,7 @@ export function LiabilitiesBar({ amount, onClick }: { amount: string; onClick?: 
   return (
     <button
       type="button"
-      className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-[rgba(0,0,0,0.1)] bg-white py-2 pr-4 pl-5 transition-colors hover:bg-[var(--bg-default-secondary)]"
+      className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-black/10 bg-white py-2 pr-4 pl-5 transition-colors hover:bg-[var(--bg-default-secondary)]"
       onClick={onClick}
     >
       <div className="flex min-w-0 flex-1 items-center gap-0.5">
@@ -158,7 +158,7 @@ export function HeroCard({ summary }: { summary: AssetHeroSummary }) {
 
   return (
     <>
-      <div className="w-full overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white">
+      <div className="w-full overflow-hidden rounded-lg border border-black/10 bg-white">
         <div className="flex w-full flex-col items-center py-3">
           <div className="flex w-full items-start justify-center">
             <div className="flex items-center justify-center gap-1">

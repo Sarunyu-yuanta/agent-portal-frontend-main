@@ -37,8 +37,8 @@ function DetailTable({ rows }: { rows: { label: string; value: string }[] }) {
           className="flex w-full items-center gap-3 px-4 py-2 text-sm leading-[24px]"
           style={{ backgroundColor: i % 2 === 0 ? "#f9fafb" : "white" }}
         >
-          <span className="flex-1 text-[#4a5565]">{row.label}</span>
-          <span className="flex-1 text-right font-medium text-[#101828]">{row.value}</span>
+          <span className="flex-1 text-neutral-600">{row.label}</span>
+          <span className="flex-1 text-right font-medium text-neutral-900">{row.value}</span>
         </div>
       ))}
     </div>
@@ -120,7 +120,7 @@ export function ThaiStructuredProductDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           {underlying}
         </h1>
       </div>
@@ -137,14 +137,14 @@ export function ThaiStructuredProductDetail({
           {ORDER_BOOKING_ENABLED && <ProductOrderNotice book={book} />}
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-0.5">
-              <p className="text-base leading-[28px] font-bold text-[#101828]">{underlying}</p>
-              <p className="text-xs leading-[20px] text-[#4a5565]">Underlying</p>
+              <p className="text-base leading-[28px] font-bold text-neutral-900">{underlying}</p>
+              <p className="text-xs leading-[20px] text-neutral-600">Underlying</p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-0.5">
-              <p className="text-2xl leading-8 font-bold whitespace-nowrap text-[#0a6ee7]">
+              <p className="text-2xl leading-8 font-bold whitespace-nowrap text-brand-600">
                 {product.couponPa}
               </p>
-              <p className="text-xs leading-[20px] font-medium text-[#4a5565]">Coupon p.a.</p>
+              <p className="text-xs leading-[20px] font-medium text-neutral-600">Coupon p.a.</p>
             </div>
           </div>
 

@@ -65,11 +65,11 @@ function FileList({ files, slug }: { files: PackageFile[]; slug: string }) {
   const t = useT();
   return (
     <div className="flex flex-col gap-0">
-      <p className="mb-3 text-xs text-[#6a7282]">
+      <p className="mb-3 text-xs text-neutral-500">
         {t.products.packageFiles.summary(
           files.length,
           (s) => (
-            <strong className="text-[#4a5565]">{s}</strong>
+            <strong className="text-neutral-600">{s}</strong>
           ),
           `${slug}_Package.zip`,
         )}
@@ -83,8 +83,8 @@ function FileList({ files, slug }: { files: PackageFile[]; slug: string }) {
           >
             <FileIcon type={file.type} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <p className="truncate text-sm font-medium text-[#101828]">{file.name}</p>
-              <p className="text-xs text-[#6a7282]">{file.description}</p>
+              <p className="truncate text-sm font-medium text-neutral-900">{file.name}</p>
+              <p className="text-xs text-neutral-500">{file.description}</p>
             </div>
             <span className="shrink-0 text-xs text-[#9ca3af]">{file.size}</span>
           </div>

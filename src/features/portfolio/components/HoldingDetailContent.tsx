@@ -134,7 +134,7 @@ function HoldingCard({
 
   if (!expanded) {
     return (
-      <div className="w-full overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white">
+      <div className="w-full overflow-hidden rounded-lg border border-black/10 bg-white">
         <button
           type="button"
           className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-[var(--bg-default-secondary)]"
@@ -148,7 +148,7 @@ function HoldingCard({
   }
 
   return (
-    <div className="flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white px-3 py-2">
+    <div className="flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-black/10 bg-white px-3 py-2">
       <button
         type="button"
         className="flex w-full cursor-pointer items-center gap-2 text-left transition-opacity hover:opacity-80"

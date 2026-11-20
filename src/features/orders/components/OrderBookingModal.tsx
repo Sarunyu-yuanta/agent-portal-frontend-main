@@ -834,7 +834,7 @@ function CustomerPicker({
              each one its own object and put eight pairs of rounded corners in
              the way of that. `overflow-hidden` lets the first and last row take
              the frame's corners. */
-          <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-[#f3f4f6]">
+          <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl bg-neutral-100">
             {results.map((client) => (
               <CustomerRow
                 key={client.id}
@@ -910,7 +910,7 @@ function CustomerRow({
         // `py-4`, where the single-line pair it was built for took `py-3`: a
         // chip sitting right on top of the line that explains it reads as one
         // stacked object, and the row needed the height for them to be two.
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--fill-gray-200)] focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset"
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--fill-neutral-200)] focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none focus-visible:ring-inset"
       >
         <Avatar type="text" initials={getInitial(displayName)} size="m" />
         {/* Still tight. A name and the tier under it are one label in two
@@ -1231,7 +1231,7 @@ export function FieldCard({
         // do, and with no panel to pad the padding only showed up as 36px of
         // dead space between two rows of plain text. The grid's own row gap is
         // the spacing now.
-        variant === "status" ? "rounded-xl bg-[#f3f4f6] px-4 py-3" : ""
+        variant === "status" ? "rounded-xl bg-neutral-100 px-4 py-3" : ""
       } ${className}`}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -1275,7 +1275,7 @@ function ActionLink({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="cursor-pointer text-xs leading-[20px] font-medium text-[#0a6ee7] hover:underline disabled:cursor-default disabled:text-muted-foreground/50 disabled:no-underline"
+      className="cursor-pointer text-xs leading-[20px] font-medium text-brand-600 hover:underline disabled:cursor-default disabled:text-muted-foreground/50 disabled:no-underline"
     >
       {label}
     </button>
@@ -1770,7 +1770,7 @@ function EvidenceSection({
                 type="button"
                 aria-pressed={on}
                 onClick={() => pickChannel(c)}
-                className={`flex h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-center transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none ${
+                className={`flex h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-center transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none ${
                   on
                     ? "border-primary-action bg-primary-action-light"
                     : "border-border bg-white hover:border-[var(--border-hover)] hover:bg-[var(--bg-default-secondary)]"

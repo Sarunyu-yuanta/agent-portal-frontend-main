@@ -60,7 +60,7 @@ function RelatedProductCardSkeleton() {
         </div>
         <Skeleton className="h-4 w-12 shrink-0" />
       </div>
-      <div className="flex gap-2 rounded-lg bg-[#f9fafb] p-2">
+      <div className="flex gap-2 rounded-lg bg-neutral-50 p-2">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1">
             <Skeleton className="h-2.5 w-10" />

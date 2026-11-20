@@ -67,7 +67,7 @@ export function StructuredProductAllPage({
           >
             <ArrowLeftIcon size={20} />
           </Button>
-          <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+          <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
             {labels.title}
           </h1>
         </div>
@@ -84,10 +84,10 @@ export function StructuredProductAllPage({
             src="/products/structured-product/structured-products-all-banner-bg.webp"
           />
           <div className="relative z-[1] flex max-w-[220px] flex-col gap-2 md:max-w-none">
-            <p className="text-2xl leading-9 font-bold text-[#101828] lg:text-[32px] lg:leading-[48px] lg:text-[rgba(0,0,0,0.85)]">
+            <p className="text-2xl leading-9 font-bold text-neutral-900 lg:text-[32px] lg:leading-[48px] lg:text-[rgba(0,0,0,0.85)]">
               {labels.title}
             </p>
-            <p className="text-sm leading-[24px] font-bold text-[#4a5565] lg:text-base lg:leading-[28px] lg:text-[rgba(0,0,0,0.75)]">
+            <p className="text-sm leading-[24px] font-bold text-neutral-600 lg:text-base lg:leading-[28px] lg:text-[rgba(0,0,0,0.75)]">
               {labels.subtitle}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function StructuredProductAllPage({
 
         {/* Product list — mobile/tablet: single-col vertical cards; desktop: 3-col grid */}
         <div className="flex w-full flex-col gap-3 lg:gap-4">
-          <div className="flex w-full items-center justify-between text-xs leading-[20px] text-[#6a7282] lg:text-sm lg:leading-[24px]">
+          <div className="flex w-full items-center justify-between text-xs leading-[20px] text-neutral-500 lg:text-sm lg:leading-[24px]">
             {/* The feed's total unfiltered; what the chip left once one is picked. */}
             <span>
               {t.products.common.itemCount(

@@ -117,8 +117,8 @@ export function ProductDocumentActions({
                 />
               </div>
               <div>
-                <p className="text-sm font-medium text-[#101828]">{labels.presentation}</p>
-                <p className="mt-0.5 text-xs text-[#6a7282]">{labels.presentationHint}</p>
+                <p className="text-sm font-medium text-neutral-900">{labels.presentation}</p>
+                <p className="mt-0.5 text-xs text-neutral-500">{labels.presentationHint}</p>
               </div>
             </button>
             <button
@@ -144,10 +144,10 @@ export function ProductDocumentActions({
                 />
               </div>
               <div>
-                <p className="text-sm font-medium text-[#101828]">
+                <p className="text-sm font-medium text-neutral-900">
                   {t.products.packageFiles.title}
                 </p>
-                <p className="mt-0.5 text-xs text-[#6a7282]">{labels.packageHint}</p>
+                <p className="mt-0.5 text-xs text-neutral-500">{labels.packageHint}</p>
               </div>
             </button>
           </div>

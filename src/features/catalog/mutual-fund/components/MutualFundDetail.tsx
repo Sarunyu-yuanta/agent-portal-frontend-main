@@ -50,7 +50,7 @@ function RiskTag({ risk }: { risk: number }) {
           />
         </span>
       </span>
-      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-[#4a5565]">
+      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-neutral-600">
         {t.fund.tags.risk(risk)}
       </span>
     </span>
@@ -61,7 +61,7 @@ function FxRiskTag({ label }: { label: string }) {
   return (
     <span className="inline-flex shrink-0 items-center gap-1 rounded-2xl border border-black/10 bg-white px-2 py-0.5">
       <Image src={MF_ASSETS.coinsIcon} alt="" width={20} height={20} className="size-5 shrink-0" />
-      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-[#4a5565]">
+      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-neutral-600">
         {label}
       </span>
     </span>
@@ -82,7 +82,7 @@ function CreditCardTag() {
           />
         </span>
       </span>
-      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-[#4a5565]">
+      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-neutral-600">
         {t.fund.tags.creditCard}
       </span>
     </span>
@@ -94,7 +94,7 @@ function ReturnCell({ period, value }: { period: string; value: string }) {
   const color = isPositive ? "#008236" : value.startsWith("-") ? "#fb2c36" : "#101828";
 
   return (
-    <div className="flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg bg-[#f9fafb] p-1.5">
+    <div className="flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg bg-neutral-50 p-1.5">
       <span className="text-sm leading-[24px] font-bold" style={{ color }}>
         {value}
       </span>
@@ -105,10 +105,10 @@ function ReturnCell({ period, value }: { period: string; value: string }) {
 
 function FeeCell({ label, sublabel, value }: { label: string; sublabel: string; value: string }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-md bg-[#f9fafb] p-1.5">
-      <span className="text-center text-sm leading-[24px] text-[#4a5565]">{label}</span>
-      <span className="text-center text-micro leading-[18px] text-[#4a5565]">{sublabel}</span>
-      <span className="text-sm leading-[24px] font-bold text-[#101828]">{value}</span>
+    <div className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-md bg-neutral-50 p-1.5">
+      <span className="text-center text-sm leading-[24px] text-neutral-600">{label}</span>
+      <span className="text-center text-micro leading-[18px] text-neutral-600">{sublabel}</span>
+      <span className="text-sm leading-[24px] font-bold text-neutral-900">{value}</span>
     </div>
   );
 }
@@ -117,13 +117,13 @@ function FundInfoRow({ label, value, link }: { label: string; value: ReactNode; 
   return (
     <div className="flex w-full border-b border-black/10 last:border-b-0">
       <div className="flex min-h-12 flex-1 items-center px-4 py-3.5">
-        <span className="text-sm leading-[24px] text-[#101828]">{label}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{label}</span>
       </div>
       <div className="flex min-h-12 flex-1 items-center px-4 py-3.5">
         {link ? (
-          <span className="text-sm leading-[24px] text-[#0a6ee7]">{value}</span>
+          <span className="text-sm leading-[24px] text-brand-600">{value}</span>
         ) : (
-          <span className="text-sm leading-[24px] text-[#4a5565]">{value}</span>
+          <span className="text-sm leading-[24px] text-neutral-600">{value}</span>
         )}
       </div>
     </div>
@@ -206,11 +206,11 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       </section>
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base leading-[28px] font-bold text-[#101828]">
+        <h2 className="text-base leading-[28px] font-bold text-neutral-900">
           {t.fund.detail.investmentPolicy}
         </h2>
         <div className="flex flex-col items-end gap-2.5 rounded-lg border border-black/10 p-3">
-          <p className="line-clamp-4 w-full text-sm leading-[24px] text-[#101828]">
+          <p className="line-clamp-4 w-full text-sm leading-[24px] text-neutral-900">
             {fund.investmentPolicy}
           </p>
           <button
@@ -230,7 +230,9 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       />
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base leading-[28px] font-bold text-[#101828]">{t.fund.detail.fees}</h2>
+        <h2 className="text-base leading-[28px] font-bold text-neutral-900">
+          {t.fund.detail.fees}
+        </h2>
         <div className="flex gap-2.5 rounded-lg border border-black/10 p-3">
           <FeeCell
             label={t.fund.detail.feeBuy}
@@ -252,32 +254,32 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
 
       {fund.dividend && (
         <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-          <h2 className="text-base leading-[28px] font-bold text-[#101828]">
+          <h2 className="text-base leading-[28px] font-bold text-neutral-900">
             {t.fund.detail.lastDividend}
           </h2>
           <div className="rounded-lg border border-black/10 p-3">
             <div className="flex gap-2.5">
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-center text-xs leading-[20px] text-[#4a5565]">
+                <span className="text-center text-xs leading-[20px] text-neutral-600">
                   {t.fund.dividend.bookCloseDate}
                 </span>
-                <span className="text-sm leading-[24px] font-bold text-[#101828]">
+                <span className="text-sm leading-[24px] font-bold text-neutral-900">
                   {fund.dividend.bookCloseDate}
                 </span>
               </div>
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-center text-xs leading-[20px] text-[#4a5565]">
+                <span className="text-center text-xs leading-[20px] text-neutral-600">
                   {t.fund.detail.lastDividendPaymentDate}
                 </span>
-                <span className="text-sm leading-[24px] font-bold text-[#101828]">
+                <span className="text-sm leading-[24px] font-bold text-neutral-900">
                   {fund.dividend.paymentDate}
                 </span>
               </div>
               <div className="flex flex-1 flex-col items-center gap-0.5 p-1.5">
-                <span className="text-center text-xs leading-[20px] text-[#4a5565]">
+                <span className="text-center text-xs leading-[20px] text-neutral-600">
                   {t.fund.dividend.perUnit}
                 </span>
-                <span className="text-sm leading-[24px] font-bold text-[#101828]">
+                <span className="text-sm leading-[24px] font-bold text-neutral-900">
                   {fund.dividend.amountPerUnit}
                 </span>
               </div>
@@ -287,7 +289,7 @@ function OverviewContent({ fund }: { fund: MutualFundDetailData }) {
       )}
 
       <section className="flex w-full flex-col gap-4 py-4 lg:px-0">
-        <h2 className="text-base leading-[28px] font-bold text-[#101828]">
+        <h2 className="text-base leading-[28px] font-bold text-neutral-900">
           {t.fund.detail.fundDetails}
         </h2>
         <div className="overflow-hidden rounded-lg border border-black/10">
@@ -361,7 +363,9 @@ function valueColor(value: string): string {
 
 function SectionTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <h2 className={`text-base leading-[28px] font-bold text-[#101828] ${className}`}>{children}</h2>
+    <h2 className={`text-base leading-[28px] font-bold text-neutral-900 ${className}`}>
+      {children}
+    </h2>
   );
 }
 
@@ -383,7 +387,7 @@ function DataTableHeader({
                 : ""
           }`}
         >
-          <span className="text-xs leading-[20px] text-[#6a7282]">{col.label}</span>
+          <span className="text-xs leading-[20px] text-neutral-500">{col.label}</span>
         </div>
       ))}
     </div>
@@ -402,7 +406,7 @@ function DataTableCell({
   return (
     <div
       className={`flex h-[38px] flex-1 items-center border-b border-black/10 px-4 py-3.5 last:border-b-0 ${
-        striped ? "bg-[#f9fafb]" : "bg-white"
+        striped ? "bg-neutral-50" : "bg-white"
       } ${align === "center" ? "justify-center text-center" : align === "right" ? "justify-end text-right" : ""}`}
     >
       <span className="text-sm leading-[24px]" style={{ color: valueColor(value) }}>
@@ -417,8 +421,8 @@ function KeyValueBox({ rows }: { rows: { label: string; value: string }[] }) {
     <div className="flex w-full flex-col gap-3 rounded-lg border border-black/10 p-3">
       {rows.map((row) => (
         <div key={row.label} className="flex w-full items-end gap-2">
-          <span className="flex-1 text-sm leading-[24px] text-[#4a5565]">{row.label}</span>
-          <span className="shrink-0 text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+          <span className="flex-1 text-sm leading-[24px] text-neutral-600">{row.label}</span>
+          <span className="shrink-0 text-sm leading-[24px] whitespace-nowrap text-neutral-900">
             {row.value}
           </span>
         </div>
@@ -434,24 +438,24 @@ function FeeDetailsTable({ rows }: { rows: { label: string; actual: string; maxi
     <div className="w-full overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full">
         <div className="flex h-12 min-w-0 flex-1 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">
+          <span className="text-sm leading-[24px] text-neutral-600">
             {t.fund.detail.feeTable.item}
           </span>
         </div>
         <div className="flex h-12 w-20 shrink-0 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">
+          <span className="text-sm leading-[24px] text-neutral-600">
             {t.fund.detail.feeTable.actual}
           </span>
         </div>
         <div className="flex h-12 w-[81px] shrink-0 items-center border-b border-black/10 bg-white px-4 py-3.5">
-          <span className="text-sm leading-[24px] text-[#4a5565]">
+          <span className="text-sm leading-[24px] text-neutral-600">
             {t.fund.detail.feeTable.maximum}
           </span>
         </div>
       </div>
       {rows.map((row, index) => {
         const striped = index % 2 === 0;
-        const bg = striped ? "bg-[#f9fafb]" : "bg-white";
+        const bg = striped ? "bg-neutral-50" : "bg-white";
         const isLast = index === rows.length - 1;
         const rowBorder = isLast ? "" : "border-b border-black/10";
 
@@ -460,17 +464,17 @@ function FeeDetailsTable({ rows }: { rows: { label: string; actual: string; maxi
             <div
               className={`flex min-h-12 min-w-0 flex-1 items-center px-4 py-3.5 ${rowBorder} ${bg}`}
             >
-              <span className="text-sm leading-[24px] text-[#101828]">{row.label}</span>
+              <span className="text-sm leading-[24px] text-neutral-900">{row.label}</span>
             </div>
             <div
               className={`flex min-h-12 w-20 shrink-0 items-center px-4 py-3.5 ${rowBorder} ${bg}`}
             >
-              <span className="text-sm leading-[24px] text-[#101828]">{row.actual}</span>
+              <span className="text-sm leading-[24px] text-neutral-900">{row.actual}</span>
             </div>
             <div
               className={`flex min-h-12 w-[81px] shrink-0 items-center px-4 py-3.5 ${rowBorder} ${bg}`}
             >
-              <span className="text-sm leading-[24px] text-[#101828]">{row.maximum}</span>
+              <span className="text-sm leading-[24px] text-neutral-900">{row.maximum}</span>
             </div>
           </div>
         );
@@ -491,7 +495,7 @@ function AllocationSection({
     return (
       <section className="flex w-full flex-col gap-3 bg-white py-4 lg:bg-transparent">
         <SectionTitle className="lg:px-0">{title}</SectionTitle>
-        <p className="text-sm leading-[24px] text-[#6a7282] lg:px-0">{t.common.noData}</p>
+        <p className="text-sm leading-[24px] text-neutral-500 lg:px-0">{t.common.noData}</p>
       </section>
     );
   }
@@ -511,8 +515,8 @@ function AllocationSection({
                     backgroundColor: item.color ?? ["#074EA4", "#51A2FF", "#A3B3FF"][index % 3],
                   }}
                 />
-                <span className="flex-1 text-sm leading-[24px] text-[#4a5565]">{item.label}</span>
-                <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+                <span className="flex-1 text-sm leading-[24px] text-neutral-600">{item.label}</span>
+                <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
                   {item.percent}%
                 </span>
               </div>
@@ -571,7 +575,7 @@ function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
         ) : (
           <div className="flex w-full items-center gap-[15px]">
             <NoDividendIllustration />
-            <p className="text-center text-sm leading-[24px] text-[#4a5565]">
+            <p className="text-center text-sm leading-[24px] text-neutral-600">
               {t.fund.dividend.none}
             </p>
           </div>
@@ -590,7 +594,7 @@ function PerformanceContent({ fund }: { fund: MutualFundDetailData }) {
 function AllocationContent({ fund }: { fund: MutualFundDetailData }) {
   const t = useT();
   return (
-    <div className="flex flex-col gap-2.5 bg-[#f9fafb] lg:bg-transparent">
+    <div className="flex flex-col gap-2.5 bg-neutral-50 lg:bg-transparent">
       <AllocationSection title={t.fund.detail.topHoldings} slices={fund.topHoldings} />
       <AllocationSection title={t.fund.detail.assetAllocation} slices={fund.assetAllocation} />
     </div>
@@ -743,7 +747,7 @@ export function MutualFundDetail({
   const isPositive = fund.changePct.startsWith("+");
 
   return (
-    <div className="flex w-full flex-col pb-20 max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2">
+    <div className="flex w-full flex-col pb-20 max-lg:bg-white lg:bg-neutral-50 lg:pt-2">
       <div className="mx-auto flex w-full max-w-[996px] flex-col gap-2 px-4 md:px-8 lg:px-0">
         {/* Desktop keeps its own bar above the card: there the card's title
             block is fully visible anyway, so a back arrow parked next to the
@@ -763,10 +767,10 @@ export function MutualFundDetail({
             <ArrowLeftIcon size={18} />
           </Button>
           <div className="flex min-w-0 flex-1 items-center gap-1">
-            <p className="shrink-0 text-base leading-[28px] font-bold text-[#101828]">
+            <p className="shrink-0 text-base leading-[28px] font-bold text-neutral-900">
               {fund.symbol}
             </p>
-            <p className="min-w-0 flex-1 truncate text-sm leading-[24px] text-[#4a5565]">
+            <p className="min-w-0 flex-1 truncate text-sm leading-[24px] text-neutral-600">
               {fund.name}
             </p>
           </div>
@@ -793,7 +797,7 @@ export function MutualFundDetail({
             </Button>
             {/* Figma 360:64854 — View / Highlight sit right after the symbol */}
             <div className="flex min-w-0 flex-1 items-center gap-1">
-              <h1 className="min-w-0 text-lg leading-[32px] font-bold text-[#101828]">
+              <h1 className="min-w-0 text-lg leading-[32px] font-bold text-neutral-900">
                 {fund.symbol}
               </h1>
               <FundTagBadges fund={fund} />
@@ -801,7 +805,7 @@ export function MutualFundDetail({
           </div>
           {/* `pl-9` keeps the name under the symbol rather than under the
               arrow — the 28px button plus the row's 8px gap. */}
-          <p className="pt-1.5 pb-3 pl-9 text-sm leading-[24px] text-[#4a5565] lg:pl-0">
+          <p className="pt-1.5 pb-3 pl-9 text-sm leading-[24px] text-neutral-600 lg:pl-0">
             {fund.name}
           </p>
 
@@ -814,10 +818,10 @@ export function MutualFundDetail({
                 height={20}
                 className="size-5 shrink-0"
               />
-              <span className="text-[32px] leading-[48px] font-bold text-[#101828]">
+              <span className="text-[32px] leading-[48px] font-bold text-neutral-900">
                 {fund.nav}
               </span>
-              <span className="text-sm leading-[24px] text-[#6a7282]">{fund.currency}</span>
+              <span className="text-sm leading-[24px] text-neutral-500">{fund.currency}</span>
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               <span
@@ -858,7 +862,7 @@ export function MutualFundDetail({
                   type="button"
                   onClick={() => selectTab(tab)}
                   className={`flex shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap md:min-w-[80px] md:flex-1 md:shrink lg:min-w-[80px] lg:flex-1 ${
-                    active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-black/60"
+                    active ? "border-brand-600 text-brand-600" : "border-black/10 text-black/60"
                   }`}
                 >
                   {t.catalog.fundDetailTabs[tab]}

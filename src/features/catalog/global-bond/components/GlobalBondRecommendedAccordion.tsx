@@ -54,27 +54,29 @@ export function GlobalBondRecommendedAccordion({
               <BondLogo src={row.logo} className="size-8 rounded" />
               <span
                 className={`min-w-0 flex-1 truncate text-sm leading-[24px] font-bold ${
-                  expanded ? "text-[#101828]" : "text-[#4a5565]"
+                  expanded ? "text-neutral-900" : "text-neutral-600"
                 }`}
               >
                 {row.issuer}
               </span>
               {expanded ? (
-                <CaretUpIcon size={22} className="shrink-0 text-[#101828]" />
+                <CaretUpIcon size={22} className="shrink-0 text-neutral-900" />
               ) : (
-                <CaretDownIcon size={22} className="shrink-0 text-[#101828]" />
+                <CaretDownIcon size={22} className="shrink-0 text-neutral-900" />
               )}
             </button>
             {expanded && (
               <div className="flex w-full flex-col items-center gap-3 px-3 pb-3">
-                <div className="flex w-full flex-col gap-1 rounded-lg bg-[#f3f4f6] px-3 py-2">
+                <div className="flex w-full flex-col gap-1 rounded-lg bg-neutral-100 px-3 py-2">
                   <DetailRow label={cols.couponRate} value={row.couponRate} />
                   <DetailRow label={cols.maturity} value={row.maturity} />
                   <hr
                     className="m-0 w-full border-0"
                     style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
                   />
-                  <span className="text-xs leading-[20px] text-[#6a7282]">{cols.creditRating}</span>
+                  <span className="text-xs leading-[20px] text-neutral-500">
+                    {cols.creditRating}
+                  </span>
                   <DetailRow label="S&P" value={row.sp} />
                   <DetailRow label="Moody's" value={row.moodys} />
                   <DetailRow label="Fitch" value={row.fitch} />

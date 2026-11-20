@@ -42,7 +42,7 @@ export function MutualFundTopPerformersSection({
             height={16}
             className="h-[15.625px] w-[17.5px] shrink-0 object-contain"
           />
-          <h2 className="flex-1 text-lg leading-[32px] font-bold text-[#101828]">
+          <h2 className="flex-1 text-lg leading-[32px] font-bold text-neutral-900">
             {t.fund.topPerformers.title}
           </h2>
         </div>
@@ -64,9 +64,9 @@ export function MutualFundTopPerformersSection({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 rounded-xl bg-[#f3f4f6] p-2">
+      <div className="flex flex-col gap-2 rounded-xl bg-neutral-100 p-2">
         <div className="flex h-8 items-center justify-end px-3">
-          <span className="text-xs leading-[20px] font-semibold text-[#101828]">
+          <span className="text-xs leading-[20px] font-semibold text-neutral-900">
             {t.fund.topPerformers.oneYearPerformance}
           </span>
         </div>

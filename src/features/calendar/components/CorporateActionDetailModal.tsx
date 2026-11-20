@@ -92,7 +92,7 @@ export function CorporateActionDetailModal({
           plus the chrome overruns a laptop viewport, and a dialog you cannot
           reach the Close button of is worse than one that scrolls. */}
       <div className="flex max-h-full w-full max-w-[704px] flex-col items-center gap-6 overflow-hidden rounded-3xl bg-card p-4">
-        <div className="flex min-h-0 w-full flex-col gap-4 overflow-y-auto rounded-2xl border border-[rgba(0,0,0,0.1)] p-3">
+        <div className="flex min-h-0 w-full flex-col gap-4 overflow-y-auto rounded-2xl border border-black/10 p-3">
           <div className="flex flex-wrap items-center gap-2">
             <span
               className="rounded px-2 py-0.5 text-sm leading-[1.5] font-semibold"
@@ -130,7 +130,7 @@ export function CorporateActionDetailModal({
                     the last row with nothing under it. */}
                 {groupIndex > 0 && (
                   <div className="py-1">
-                    <div className="h-px w-full bg-[rgba(0,0,0,0.1)]" />
+                    <div className="h-px w-full bg-black/10" />
                   </div>
                 )}
                 {group.map((row) => (

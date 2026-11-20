@@ -49,7 +49,7 @@ function PeriodTabs({
               className={`flex min-h-8 flex-1 shrink-0 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-xs leading-[20px] font-semibold whitespace-nowrap ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
-                  : "text-[#4a5565]"
+                  : "text-neutral-600"
               }`}
             >
               {period}
@@ -142,7 +142,7 @@ export function MutualFundFilterResultsPage({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-neutral-900">
           {title}
         </h1>
       </div>
@@ -185,7 +185,7 @@ export function MutualFundFilterResultsPage({
         </div>
       ) : (
         <div className="mx-auto flex w-full max-w-[996px] flex-col gap-3 px-4 pt-3 md:px-8 lg:px-0">
-          <p className="w-full px-3 text-sm leading-[24px] font-normal text-[#101828]">
+          <p className="w-full px-3 text-sm leading-[24px] font-normal text-neutral-900">
             {t.fund.list.count(tagFunds.length)}
           </p>
 
@@ -219,7 +219,7 @@ export function MutualFundFilterResultsPage({
           </div>
 
           {tagFunds.length === 0 ? (
-            <p className="px-3 text-center text-sm text-[#6a7282]">
+            <p className="px-3 text-center text-sm text-neutral-500">
               {searchTerm ? t.fund.list.noMatchForQuery(searchTerm) : t.fund.list.noFundsInCategory}
             </p>
           ) : null}

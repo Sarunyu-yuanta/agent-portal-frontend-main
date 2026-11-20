@@ -64,7 +64,7 @@ function FilterSection({
   return (
     <div className={`flex w-full flex-col ${mobile ? "gap-3" : "gap-4"}`}>
       <p
-        className={`w-full font-bold text-[#101828] ${
+        className={`w-full font-bold text-neutral-900 ${
           mobile ? "text-sm leading-[24px]" : "text-base leading-[28px]"
         }`}
       >
@@ -178,7 +178,7 @@ function FilterFooter({
       <Button
         variant="outline-black"
         size={mobile ? "lg" : "xl"}
-        className="max-w-[343px] min-w-0 flex-1 text-[#0a6ee7]"
+        className="max-w-[343px] min-w-0 flex-1 text-brand-600"
         onClick={onClear}
       >
         {t.products.common.clearSelection}
@@ -284,7 +284,7 @@ export function FixedIncomeFilterModal({
           if (!next) onClose();
         }}
         headerType="icon"
-        leftIcon={<FunnelSimpleIcon size={22} className="text-[#101828]" />}
+        leftIcon={<FunnelSimpleIcon size={22} className="text-neutral-900" />}
         title={title}
         rightSide="action"
         actionLabel={t.common.close}
@@ -325,10 +325,10 @@ export function FixedIncomeFilterModal({
         </button>
 
         <div className="flex w-full items-center gap-2 pr-8">
-          <FunnelSimpleIcon size={24} className="shrink-0 text-[#101828]" />
+          <FunnelSimpleIcon size={24} className="shrink-0 text-neutral-900" />
           <p
             id="fixed-income-filter-title"
-            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-[#101828]"
+            className="min-w-0 flex-1 text-lg leading-[28px] font-bold text-neutral-900"
           >
             {title}
           </p>

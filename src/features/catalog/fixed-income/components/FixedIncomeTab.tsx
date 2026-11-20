@@ -200,23 +200,23 @@ function FixedIncomeCard({
       <div className="flex w-full flex-col gap-2">
         <div className="flex w-full items-start gap-2">
           <StatusTag status={bond.status} label={bond.statusLabel} />
-          <span className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-[#101828]">
+          <span className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-neutral-900">
             {bond.symbol}
           </span>
           <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-            <span className="text-base leading-[28px] font-bold text-[#101828]">{bond.ytm}</span>
-            <span className="text-xs leading-[20px] text-[#6a7282]">YTM</span>
+            <span className="text-base leading-[28px] font-bold text-neutral-900">{bond.ytm}</span>
+            <span className="text-xs leading-[20px] text-neutral-500">YTM</span>
           </div>
         </div>
-        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-[#101828]">
+        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-neutral-900">
           <span className="min-w-0 flex-1">{bond.companyRating}</span>
           <span className="shrink-0 whitespace-nowrap">{bond.couponPeriod}</span>
         </div>
-        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-[#101828]">
+        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-neutral-900">
           <span className="min-w-0 flex-1">{t.products.fixedIncome.maturesOn(bond.maturity)}</span>
           <span className="shrink-0 whitespace-nowrap">{bond.tenor}</span>
         </div>
-        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-[#101828]">
+        <div className="flex w-full items-center gap-2 text-xs leading-[20px] text-neutral-900">
           <OfferTypeTag offerType={bond.offerType} />
           <span className="shrink-0 whitespace-nowrap">{getBookingLabel(bond, t)}</span>
         </div>
@@ -229,10 +229,10 @@ function FixedIncomeCard({
           className="size-8 rounded"
         />
         <div className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
-          <span className="shrink-0 truncate text-xs leading-[20px] font-bold text-[#101828]">
+          <span className="shrink-0 truncate text-xs leading-[20px] font-bold text-neutral-900">
             {bond.companyName}
           </span>
-          <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-[#4a5565]">
+          <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-neutral-600">
             {t.products.fixedIncome.ratingAndRisk(bond.bondRating, getRiskNumber(bond.risk))}
           </span>
         </div>
@@ -329,10 +329,10 @@ function BondTableRow({
           onSelect(bond);
         }
       }}
-      className="group flex min-w-[1440px] shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-[#f9fafb]"
+      className="group flex min-w-[1440px] shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-neutral-50"
     >
       <div
-        className="sticky left-0 z-[1] flex w-[160px] shrink-0 items-center gap-2 bg-white px-3 py-3.5 transition-colors group-hover:bg-[#f9fafb] group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]"
+        className="sticky left-0 z-[1] flex w-[160px] shrink-0 items-center gap-2 bg-white px-3 py-3.5 transition-colors group-hover:bg-neutral-50 group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]"
         style={border()}
       >
         <BondLogo
@@ -340,7 +340,7 @@ function BondTableRow({
           logoCrop={bond.logoCrop}
           className="size-8 rounded"
         />
-        <span className="min-w-0 flex-1 text-sm leading-[24px] font-bold text-[#101828]">
+        <span className="min-w-0 flex-1 text-sm leading-[24px] font-bold text-neutral-900">
           {bond.symbol}
         </span>
       </div>
@@ -353,39 +353,41 @@ function BondTableRow({
         />
       </div>
       <div className="flex w-[136px] items-center justify-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
           {bond.ytm}
         </span>
       </div>
       <div className="flex w-[120px] items-center justify-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.couponPeriod}
         </span>
       </div>
       <div className="flex w-32 items-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.tenor}
         </span>
       </div>
       <div className="flex w-[120px] items-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] text-[#101828]">{bond.maturity}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{bond.maturity}</span>
       </div>
       <div className="flex w-[106px] items-center justify-center px-3 py-3.5" style={border()}>
-        <span className="text-center text-sm leading-[24px] text-[#101828]">
+        <span className="text-center text-sm leading-[24px] text-neutral-900">
           {bond.companyRating}
         </span>
       </div>
       <div className="flex w-[106px] items-center justify-center px-3 py-3.5" style={border()}>
-        <span className="text-center text-sm leading-[24px] text-[#101828]">{bond.bondRating}</span>
+        <span className="text-center text-sm leading-[24px] text-neutral-900">
+          {bond.bondRating}
+        </span>
       </div>
       <div className="flex w-[112px] items-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] text-[#101828]">{bond.risk}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{bond.risk}</span>
       </div>
       <div className="flex w-[140px] items-center px-3 py-3.5" style={border()}>
         <OfferTypeTag offerType={bond.offerType} />
       </div>
       <div className="flex min-w-[140px] flex-1 items-center px-3 py-3.5" style={border()}>
-        <span className="text-sm leading-[24px] text-[#101828]">{bond.subscriptionPeriod}</span>
+        <span className="text-sm leading-[24px] text-neutral-900">{bond.subscriptionPeriod}</span>
       </div>
       <div className="flex w-[92px] items-center justify-center px-3 py-[11px]" style={border()}>
         <ActionButton bond={bond} onBook={onBook} />
@@ -510,13 +512,13 @@ export function FixedIncomeTab({
             )}
           </div>
         </div>
-        <div className="flex w-full items-center justify-end px-1 text-sm leading-[24px] whitespace-nowrap text-[#6a7282]">
+        <div className="flex w-full items-center justify-end px-1 text-sm leading-[24px] whitespace-nowrap text-neutral-500">
           <span>{t.products.common.updatedAt("25 August 2026 - 9:00")}</span>
         </div>
       </div>
 
       {/* ── Mobile/Tablet: count text ── */}
-      <div className="flex w-full items-center justify-between px-1 text-xs leading-[20px] whitespace-nowrap text-[#6a7282] lg:hidden">
+      <div className="flex w-full items-center justify-between px-1 text-xs leading-[20px] whitespace-nowrap text-neutral-500 lg:hidden">
         <span>{t.products.common.updatedAt("25 Aug 2026 - 9:00")}</span>
       </div>
 

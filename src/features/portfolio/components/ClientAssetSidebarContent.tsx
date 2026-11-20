@@ -91,7 +91,7 @@ function AssetListHeader({
             </option>
           ))}
         </select>
-        <div className="pointer-events-none flex items-center gap-0.5 rounded-md border border-[rgba(0,0,0,0.1)] bg-white py-1 pr-1.5 pl-2">
+        <div className="pointer-events-none flex items-center gap-0.5 rounded-md border border-black/10 bg-white py-1 pr-1.5 pl-2">
           <span className="type-button leading-5 text-[var(--text-default-primary)]">
             {viewLabel(selected)}
           </span>
@@ -270,7 +270,7 @@ export function ClientAssetSidebarContent({
             {selectedItem && selectedDetail && (
               <div
                 key={selectedKey}
-                className="mt-4 animate-in overflow-hidden rounded-lg border border-[rgba(0,0,0,0.1)] bg-white duration-200 fade-in slide-in-from-top-2"
+                className="mt-4 animate-in overflow-hidden rounded-lg border border-black/10 bg-white duration-200 fade-in slide-in-from-top-2"
               >
                 <AssetDetailDrawerHeader item={selectedItem} onClose={() => setSelectedKey(null)} />
                 <div>
@@ -286,7 +286,7 @@ export function ClientAssetSidebarContent({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="bg-gradient-to-b from-white to-[#f3f4f6]">
+      <div className="bg-gradient-to-b from-white to-neutral-100">
         <div className="flex w-full flex-col items-center gap-2 p-4">
           <HeroCard summary={summary} />
           <LiabilitiesBar amount={liabilitiesAmount} onClick={openLiabilities} />

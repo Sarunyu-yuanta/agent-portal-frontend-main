@@ -49,7 +49,7 @@ function MobileThemeTabs({
               type="button"
               onClick={() => onSelect(themeId)}
               className={`flex min-w-[80px] shrink-0 items-center justify-center border-b-[1.5px] px-3 py-2.5 text-sm leading-[24px] font-bold whitespace-nowrap ${
-                active ? "border-[#0a6ee7] text-[#0a6ee7]" : "border-black/10 text-[#6a7282]"
+                active ? "border-brand-600 text-brand-600" : "border-black/10 text-neutral-500"
               }`}
             >
               {theme.title}
@@ -88,10 +88,10 @@ function MobileThemeHero({
               {getThemeHeroTitle(themeId)}
             </p>
           </div>
-          <p className="text-sm leading-[24px] font-normal text-[#4a5565]">
+          <p className="text-sm leading-[24px] font-normal text-neutral-600">
             {getThemeDescription(themeId)}
           </p>
-          <p className="text-micro leading-[18px] font-normal text-[#6a7282]">
+          <p className="text-micro leading-[18px] font-normal text-neutral-500">
             {t.fund.list.asOf(TOP_PERFORMERS_LIST_UPDATED_AT)}
           </p>
         </div>
@@ -157,7 +157,7 @@ export function MutualFundThemeDetailMobile({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-neutral-900">
           {t.fund.themes.detailTitle}
         </h1>
       </div>
@@ -183,7 +183,7 @@ export function MutualFundThemeDetailMobile({
             />
             <MobilePeriodTabs active={period} onChange={setPeriod} />
 
-            <p className="px-3 text-sm leading-[24px] text-[#101828]">{listCountLabel}</p>
+            <p className="px-3 text-sm leading-[24px] text-neutral-900">{listCountLabel}</p>
 
             <div className="flex w-full flex-col">
               {tagFunds.map((fund, index) => (
@@ -200,7 +200,7 @@ export function MutualFundThemeDetailMobile({
             </div>
 
             {tagFunds.length === 0 ? (
-              <p className="px-3 text-center text-sm text-[#6a7282]">
+              <p className="px-3 text-center text-sm text-neutral-500">
                 {t.fund.list.noFundsInTheme}
               </p>
             ) : null}

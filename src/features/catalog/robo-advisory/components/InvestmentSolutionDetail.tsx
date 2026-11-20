@@ -108,10 +108,10 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
 
   const textBlock = (
     <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0">
-      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
         {solution.name}
       </p>
-      <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">{solution.desc}</p>
+      <p className="w-full truncate text-label leading-[20px] text-neutral-500">{solution.desc}</p>
     </div>
   );
 
@@ -122,7 +122,7 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
           {solution.couponRange}
         </span>
       </div>
-      <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
+      <span className="text-xs leading-[20px] text-neutral-500">Coupon</span>
     </div>
   ) : null;
 
@@ -157,10 +157,10 @@ function SolutionHeroBannerMobile({ solution }: { solution: InvestmentSolution }
           className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0"
           style={{ marginLeft: gapAfterIcon }}
         >
-          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
             {solution.name}
           </p>
-          <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">
+          <p className="w-full truncate text-label leading-[20px] text-neutral-500">
             {solution.desc}
           </p>
         </div>
@@ -212,10 +212,10 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
 
   const textBlock = (
     <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0">
-      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+      <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
         {solution.name}
       </p>
-      <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">{solution.desc}</p>
+      <p className="w-full truncate text-label leading-[20px] text-neutral-500">{solution.desc}</p>
     </div>
   );
 
@@ -226,7 +226,7 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
           {solution.couponRange}
         </span>
       </div>
-      <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
+      <span className="text-xs leading-[20px] text-neutral-500">Coupon</span>
     </div>
   ) : null;
 
@@ -260,10 +260,10 @@ function SolutionHeroBannerTablet({ solution }: { solution: InvestmentSolution }
           className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center gap-0"
           style={{ marginLeft: gapAfterIcon }}
         >
-          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+          <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
             {solution.name}
           </p>
-          <p className="w-full truncate text-label leading-[20px] text-[#6a7282]">
+          <p className="w-full truncate text-label leading-[20px] text-neutral-500">
             {solution.desc}
           </p>
         </div>
@@ -337,10 +337,10 @@ function SolutionHeroBannerDesktop({ solution }: { solution: InvestmentSolution 
         </div>
 
         <div className="relative z-10 flex min-w-[141px] flex-1 flex-col items-start justify-center gap-2 pl-[120px]">
-          <p className="w-full truncate text-lg leading-[28px] font-bold text-[#101828]">
+          <p className="w-full truncate text-lg leading-[28px] font-bold text-neutral-900">
             {solution.name}
           </p>
-          <p className="w-full truncate text-sm leading-[24px] text-[#6a7282]">{solution.desc}</p>
+          <p className="w-full truncate text-sm leading-[24px] text-neutral-500">{solution.desc}</p>
         </div>
 
         {solution.showCoupon && (
@@ -350,7 +350,7 @@ function SolutionHeroBannerDesktop({ solution }: { solution: InvestmentSolution 
                 {solution.couponRange}
               </span>
             </div>
-            <span className="text-xs leading-[20px] text-[#6a7282]">Coupon</span>
+            <span className="text-xs leading-[20px] text-neutral-500">Coupon</span>
           </div>
         )}
       </div>
@@ -401,7 +401,7 @@ export function InvestmentSolutionDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[30px]">
+        <h1 className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-neutral-900 lg:text-lg lg:leading-[30px]">
           <span className="md:hidden">Investment Solution</span>
           <span className="hidden md:inline">{solution.name}</span>
         </h1>
@@ -413,7 +413,7 @@ export function InvestmentSolutionDetail({
         <div className="relative z-10 w-full rounded-t-[24px] bg-white pt-4 pb-10 md:max-lg:px-8 md:max-lg:pt-4 lg:pt-6">
           <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-2 px-4 md:px-8 md:max-lg:px-0 lg:px-20">
             <div className="flex w-full items-center gap-3">
-              <p className="min-w-0 flex-1 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
+              <p className="min-w-0 flex-1 text-sm leading-[24px] text-neutral-600 lg:text-base lg:leading-[24px]">
                 {t.products.common.items(products.length)}
               </p>
               {/* Mobile filter */}
@@ -444,7 +444,7 @@ export function InvestmentSolutionDetail({
                 {t.products.common.filter}
               </Button>
             </div>
-            <p className="w-full text-micro leading-[18px] text-[#6a7282] lg:text-xs lg:leading-[20px]">
+            <p className="w-full text-micro leading-[18px] text-neutral-500 lg:text-xs lg:leading-[20px]">
               <span className="lg:hidden">
                 {t.products.common.updatedAt(INVESTMENT_SOLUTION_UPDATED_AT_MOBILE)}
               </span>

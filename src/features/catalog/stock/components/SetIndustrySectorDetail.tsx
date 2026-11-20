@@ -46,16 +46,16 @@ function SectorHeroBand({
         priority
       />
       <div className="relative z-[1] mx-auto flex max-w-[996px] items-center gap-6 px-4 py-10 md:px-8 lg:px-0">
-        <span className="relative shrink-0 text-[#0a6ee7]">
+        <span className="relative shrink-0 text-brand-600">
           <SectorGlyph id={sector.id} size={64} color="#0a6ee7" />
         </span>
         <div className="relative flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-2xl leading-9 font-bold text-[#101828]">{sector.name}</p>
-          <p className="text-base leading-[24px] text-[#4a5565]">{description}</p>
+          <p className="truncate text-2xl leading-9 font-bold text-neutral-900">{sector.name}</p>
+          <p className="text-base leading-[24px] text-neutral-600">{description}</p>
         </div>
         <div className="relative flex shrink-0 items-center gap-2 whitespace-nowrap">
           {trend === "flat" ? (
-            <span className="text-base leading-[24px] text-[#6a7282]">{sector.changeAmount}</span>
+            <span className="text-base leading-[24px] text-neutral-500">{sector.changeAmount}</span>
           ) : (
             <>
               <span
@@ -104,13 +104,13 @@ export function SetIndustrySectorDetail({
           onBack={onBack}
           className="!pt-8"
         />
-        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
+        <p className={`text-center text-sm text-neutral-500 ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb]">
+    <div className="flex min-h-full w-full flex-1 flex-col bg-neutral-50">
       {/* The header and the strip are siblings of the page root rather than
           sharing a wrapper: a sticky element can't travel outside its parent's
           box, and a two-row wrapper is only as tall as the two rows. */}

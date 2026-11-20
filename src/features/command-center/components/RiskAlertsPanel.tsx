@@ -293,8 +293,8 @@ export function RiskCategoryTabs({
  *
  * `flex flex-wrap`, never `grid grid-cols-1 sm:grid-cols-3`: `system-one` ships
  * an unlayered `.grid-cols-1` that wins the source-order tie against a
- * responsive Tailwind `grid-cols-*`, which is the whole reason the Command
- * Center injects `DASHBOARD_RAIL_CSS`. Flex has nothing to collide with.
+ * responsive Tailwind `grid-cols-*`, which is why the Command Center
+ * grid uses the `.dashboard-split` rule in globals.css. Flex has nothing to collide with.
  *
  * Design-system `Chip`s rather than a grid of bordered count-boxes: this card
  * sits one row under `StatTiles`, and three bordered boxes directly below

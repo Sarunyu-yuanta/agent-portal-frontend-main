@@ -64,7 +64,7 @@ export function CatalogDetailBackHeader({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828] lg:leading-7">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900 lg:leading-7">
           {title}
         </h1>
       </div>
@@ -96,7 +96,7 @@ function TabScrollButton({
       aria-label={
         direction === "prev" ? t.products.common.scrollTabsLeft : t.products.common.scrollTabsRight
       }
-      className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-black/10 bg-white text-[#4a5565] transition-opacity hover:bg-black/[0.02] ${
+      className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-black/10 bg-white text-neutral-600 transition-opacity hover:bg-black/[0.02] ${
         hidden ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
@@ -260,8 +260,8 @@ export function CatalogDetailTextTabs<T extends string>({
                 fill ? "min-w-[80px] flex-1" : "shrink-0"
               } ${
                 active
-                  ? "border-[#0a6ee7] text-[#0a6ee7]"
-                  : "border-black/10 text-[#6a7282] hover:bg-black/[0.03]! hover:text-[#101828]!"
+                  ? "border-brand-600 text-brand-600"
+                  : "border-black/10 text-neutral-500 hover:bg-black/[0.03]! hover:text-neutral-900!"
               }`}
             >
               {icon && <span className="shrink-0">{icon}</span>}

@@ -35,7 +35,7 @@ export function AdvisoryDetailSkeleton({
   return (
     <div
       aria-busy="true"
-      className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20"
+      className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-neutral-50 lg:pt-2 lg:pb-20"
     >
       {/* Mobile + tablet */}
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">

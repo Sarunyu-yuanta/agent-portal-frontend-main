@@ -47,7 +47,7 @@ function AssetTag({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-0.5 rounded bg-[#f3f4f6] whitespace-nowrap text-[rgba(0,0,0,0.6)] ${
+      className={`inline-flex items-center gap-0.5 rounded bg-neutral-100 whitespace-nowrap text-[rgba(0,0,0,0.6)] ${
         compact
           ? "px-1 py-0.5 text-micro leading-[18px] md:gap-0.5 md:px-2 md:py-1 md:text-xs md:leading-[22px]"
           : "gap-0.5 px-2 py-1 text-xs leading-[22px]"

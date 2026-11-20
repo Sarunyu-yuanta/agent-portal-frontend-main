@@ -86,11 +86,11 @@ function StatItem({
         style={labelWidth != null ? { width: labelWidth } : undefined}
       >
         <div className="text-center leading-none">
-          <p className="mb-0 text-xs leading-[20px] font-bold text-[#101828]">{labelLines[0]}</p>
-          <p className="text-xs leading-[20px] font-bold text-[#101828]">{labelLines[1]}</p>
+          <p className="mb-0 text-xs leading-[20px] font-bold text-neutral-900">{labelLines[0]}</p>
+          <p className="text-xs leading-[20px] font-bold text-neutral-900">{labelLines[1]}</p>
         </div>
         <p
-          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-[#4a5565]"}`}
+          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-neutral-600"}`}
         >
           {value}
         </p>
@@ -136,19 +136,19 @@ function RoboPlanCard({
         <div className="flex w-full flex-col gap-1">
           <div className="flex w-full flex-col gap-1">
             <div className="flex flex-col gap-1 pt-1">
-              <p className="text-micro leading-[18px] text-[#4a5565]">{plan.provider}</p>
+              <p className="text-micro leading-[18px] text-neutral-600">{plan.provider}</p>
               <p className="bg-gradient-to-r from-[#00a1e9] to-[#004eba] bg-clip-text text-lg leading-[28px] font-bold text-transparent">
                 {plan.name}
               </p>
             </div>
-            <p className="text-sm leading-[24px] text-[#4a5565]">{plan.description}</p>
+            <p className="text-sm leading-[24px] text-neutral-600">{plan.description}</p>
           </div>
           <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1">
             <RoboRiskLevel tier={plan.riskTier} />
             <PlanSuitabilityBadge suitability={planSuitability(client, plan.riskTier)} />
             <div className="flex min-w-0 flex-[1_0_0] items-center justify-end gap-1 whitespace-nowrap">
-              <p className="text-xs leading-[20px] font-bold text-[#101828]">Available Room</p>
-              <p className="text-xs leading-[20px] text-[#4a5565]">{plan.availableRoom}</p>
+              <p className="text-xs leading-[20px] font-bold text-neutral-900">Available Room</p>
+              <p className="text-xs leading-[20px] text-neutral-600">{plan.availableRoom}</p>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@ function RoboAdvisoryHeroMobile({
   // Figma 33772:197802 — mobile hero 233×40 (2×20px lines, body-2 14px).
   const ROBO_DETAIL_MOBILE_HERO_LINES = t.products.advisory.robo.tagline.heroMobile;
   return (
-    <div className="relative flex w-full flex-1 flex-col items-center overflow-x-clip bg-gradient-to-t from-white to-[#063f84] pb-20">
+    <div className="relative flex w-full flex-1 flex-col items-center overflow-x-clip bg-gradient-to-t from-white to-brand-900 pb-20">
       <RoboAdvisoryChartOverlay layout="mobile" />
 
       <div className="relative z-10 flex h-[170px] w-full shrink-0 items-center gap-2 py-4 pr-4 pl-5">
@@ -332,7 +332,7 @@ function RoboAdvisoryHeroTablet({
 }) {
   const t = useT();
   return (
-    <div className="relative flex min-h-[910px] w-full flex-1 flex-col gap-3 overflow-x-clip bg-gradient-to-t from-white to-[#063f84] pb-20">
+    <div className="relative flex min-h-[910px] w-full flex-1 flex-col gap-3 overflow-x-clip bg-gradient-to-t from-white to-brand-900 pb-20">
       <RoboAdvisoryChartOverlay layout="tablet" />
 
       <div className="relative z-10 flex h-[170px] w-full shrink-0 items-center gap-2 px-8 py-6">
@@ -405,7 +405,7 @@ function RoboAdvisoryHeroDesktop({
 }) {
   const t = useT();
   return (
-    <div className="relative flex w-full flex-col items-center bg-gradient-to-t from-white to-[#063f84] px-14 pb-12">
+    <div className="relative flex w-full flex-col items-center bg-gradient-to-t from-white to-brand-900 px-14 pb-12">
       <div
         className="pointer-events-none absolute top-0 left-[214px] h-[347px] w-[768px] overflow-hidden"
         aria-hidden
@@ -510,7 +510,7 @@ export function RoboAdvisoryDetail({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20">
+    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-neutral-50 lg:pt-2 lg:pb-20">
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
         <RoboAdvisoryMobileBreadcrumb />
         {client ? (

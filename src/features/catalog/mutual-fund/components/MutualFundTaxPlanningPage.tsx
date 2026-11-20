@@ -126,18 +126,18 @@ function TaxFundPreviewCard({
   const href = mutualFundDetailHref(fund.id);
   const inner = (
     <div
-      className="flex w-[132px] shrink-0 flex-col gap-1 rounded-lg bg-[#f3f4f6] pt-1"
+      className="flex w-[132px] shrink-0 flex-col gap-1 rounded-lg bg-neutral-100 pt-1"
       style={{
         boxShadow: "0px 0px 1px rgba(102, 102, 102, 0.16), 0px 4px 4px rgba(102, 102, 102, 0.12)",
       }}
     >
       <TaxCardTags variant={tagVariantForIndex(index, total)} />
       <div className="flex w-full cursor-pointer flex-col gap-2 rounded-lg bg-white p-2 transition-colors hover:bg-black/[0.03]!">
-        <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+        <span className="truncate text-sm leading-[24px] font-bold text-neutral-900">
           {fund.symbol}
         </span>
         <div className="flex items-center gap-1">
-          <span className="text-xs leading-[20px] text-[#4a5565]">{fund.price}</span>
+          <span className="text-xs leading-[20px] text-neutral-600">{fund.price}</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={MF_ASSETS.caretUpFill} alt="" className="size-3" />
           <span className="inline-flex w-fit items-center rounded bg-[#dbfce7] px-1 py-0.5 text-micro leading-[18px] text-[#008236]">
@@ -188,16 +188,16 @@ function TaxSavingFundCard({
     <div className="flex w-full flex-col overflow-hidden rounded-lg border border-black/10">
       <div className="flex w-full items-center justify-between gap-2 p-4">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">
+          <span className="text-xs leading-[20px] text-neutral-500">
             {t.fund.taxPlanning.fundType}
           </span>
-          <span className="text-base leading-[28px] font-bold text-[#101828]">{fundType}</span>
+          <span className="text-base leading-[28px] font-bold text-neutral-900">{fundType}</span>
         </div>
         <div className="flex flex-col items-end gap-0.5">
-          <span className="text-xs leading-[20px] text-[#6a7282]">
+          <span className="text-xs leading-[20px] text-neutral-500">
             {t.fund.taxPlanning.maxInvestment}
           </span>
-          <span className="text-base leading-[28px] font-bold text-[#101828]">
+          <span className="text-base leading-[28px] font-bold text-neutral-900">
             {formatThb(maxInvestment, t.fund.taxPlanning.unitThb)}
           </span>
         </div>
@@ -205,9 +205,9 @@ function TaxSavingFundCard({
 
       <div className="h-px w-full bg-black/10" />
 
-      <div className="flex w-full flex-col gap-2 bg-[#f9fafb] p-4">
+      <div className="flex w-full flex-col gap-2 bg-neutral-50 p-4">
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="text-sm leading-[24px] text-[#6a7282]">
+          <span className="text-sm leading-[24px] text-neutral-500">
             {t.fund.list.recommendedFunds}
           </span>
           {funds.length > 0 && (
@@ -298,7 +298,7 @@ export function MutualFundTaxPlanningPage({
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">
+    <div className="flex w-full flex-1 flex-col bg-neutral-50 pb-20">
       <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-4 pb-2 md:px-8 lg:px-0 lg:pt-8">
         <Button
           variant="plain"
@@ -309,7 +309,7 @@ export function MutualFundTaxPlanningPage({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[32px] font-bold text-neutral-900">
           {t.fund.taxPlanning.title}
         </h1>
       </div>
@@ -322,12 +322,12 @@ export function MutualFundTaxPlanningPage({
               "0px 0px 1px rgba(102, 102, 102, 0.16), 0px 4px 4px rgba(102, 102, 102, 0.12)",
           }}
         >
-          <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-[#f9fafb] p-4">
+          <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-neutral-50 p-4">
             <div className="flex flex-col gap-0.5">
-              <p className="text-sm leading-[24px] font-bold text-[#101828]">
+              <p className="text-sm leading-[24px] font-bold text-neutral-900">
                 {t.fund.taxPlanning.incomeTitle}
               </p>
-              <p className="text-xs leading-[20px] text-[#6a7282]">
+              <p className="text-xs leading-[20px] text-neutral-500">
                 {t.fund.taxPlanning.incomeHint}
               </p>
             </div>
@@ -356,9 +356,9 @@ export function MutualFundTaxPlanningPage({
                 {t.fund.taxPlanning.calculate}
               </Button>
             </div>
-            <div className="flex w-full items-start gap-1.5 rounded bg-[#f9fafb] px-2 py-2">
-              <InfoIcon size={16} className="mt-0.5 shrink-0 text-[#4a5565]" />
-              <p className="min-w-0 flex-1 text-sm leading-[24px] text-[#4a5565]">
+            <div className="flex w-full items-start gap-1.5 rounded bg-neutral-50 px-2 py-2">
+              <InfoIcon size={16} className="mt-0.5 shrink-0 text-neutral-600" />
+              <p className="min-w-0 flex-1 text-sm leading-[24px] text-neutral-600">
                 {t.fund.taxPlanning.disclaimer}
               </p>
             </div>
@@ -366,7 +366,7 @@ export function MutualFundTaxPlanningPage({
 
           {calculatedIncome !== null ? (
             <div className="flex w-full flex-col gap-3">
-              <p className="text-base leading-[28px] font-bold text-[#101828]">
+              <p className="text-base leading-[28px] font-bold text-neutral-900">
                 {t.fund.taxPlanning.title}
               </p>
               {TAX_SAVING_FUND_TYPES.map((fundType) => (

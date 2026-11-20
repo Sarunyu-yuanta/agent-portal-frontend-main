@@ -71,12 +71,12 @@ export function FilterDropdown<T extends string>({
       <div className="flex min-h-[32px] w-full items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3 py-2">
         <span
           className={`min-w-0 flex-1 truncate text-sm leading-[26px] ${
-            isPlaceholder ? "text-[rgba(0,0,0,0.3)]" : "text-[#101828]"
+            isPlaceholder ? "text-[rgba(0,0,0,0.3)]" : "text-neutral-900"
           }`}
         >
           {selected.label}
         </span>
-        <CaretDownIcon size={20} className="shrink-0 text-[#101828]" />
+        <CaretDownIcon size={20} className="shrink-0 text-neutral-900" />
       </div>
     </div>
   );
@@ -118,7 +118,7 @@ export function GlobalBondAllFilterPanel({
       <button
         type="button"
         onClick={onClear}
-        className="cursor-pointer self-start rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm leading-[26px] font-medium whitespace-nowrap text-[#0a6ee7]"
+        className="cursor-pointer self-start rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm leading-[26px] font-medium whitespace-nowrap text-brand-600"
       >
         {t.products.common.clearAllSelection}
       </button>

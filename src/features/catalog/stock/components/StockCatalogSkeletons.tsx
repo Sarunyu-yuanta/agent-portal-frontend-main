@@ -145,7 +145,7 @@ function DrillInSkeleton({
   heroChart: boolean;
 }) {
   return (
-    <div aria-busy="true" className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb]">
+    <div aria-busy="true" className="flex min-h-full w-full flex-1 flex-col bg-neutral-50">
       <div className="bg-white pb-2">
         <BackHeaderSkeleton className="!pt-8" />
       </div>
@@ -185,7 +185,7 @@ export function StockCrossSellDetailSkeleton() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-4 rounded-t-3xl bg-[#f9fafb] pt-6 pb-16">
+      <div className="flex flex-col items-center gap-4 rounded-t-3xl bg-neutral-50 pt-6 pb-16">
         <div className={`flex flex-col gap-4 ${NARROW}`}>
           <div className="flex w-full items-center gap-2 border-b border-black/10 py-3">
             <div className="flex-1">

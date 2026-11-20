@@ -47,7 +47,7 @@ export const SHEET_DASHED = "border-t border-dashed border-[var(--border-default
  * shift.
  */
 export const SHEET_PRESSABLE =
-  "cursor-pointer rounded-lg transition-colors hover:bg-[var(--fill-gray-100)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7]";
+  "cursor-pointer rounded-lg transition-colors hover:bg-[var(--fill-neutral-100)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600";
 
 /**
  * Each tag variant as a disc, a halo and a heading colour.

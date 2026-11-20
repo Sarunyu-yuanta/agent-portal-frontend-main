@@ -54,12 +54,14 @@ function IndexHeroBand({ page }: { page: MarketIndexPage }) {
           className="relative size-16 shrink-0 rounded-full"
         />
         <div className="relative flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-2xl leading-9 font-bold text-[#101828]">{index.code}</p>
-          {description && <p className="text-base leading-[24px] text-[#4a5565]">{description}</p>}
+          <p className="truncate text-2xl leading-9 font-bold text-neutral-900">{index.code}</p>
+          {description && (
+            <p className="text-base leading-[24px] text-neutral-600">{description}</p>
+          )}
         </div>
         <div className="relative flex shrink-0 flex-col items-end gap-2">
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-2xl leading-9 font-bold text-[#101828]">{index.price}</span>
+            <span className="text-2xl leading-9 font-bold text-neutral-900">{index.price}</span>
             <span className="text-base leading-[24px]" style={{ color: HERO_TREND_TEXT[trend] }}>
               {index.changeAmount}
             </span>
@@ -101,13 +103,13 @@ export function MarketIndexDetail({ slug, onBack }: { slug: string; onBack: () =
           onBack={onBack}
           className="!pt-8"
         />
-        <p className={`text-center text-sm text-[#6a7282] ${NARROW}`}>{t.stock.notFound}</p>
+        <p className={`text-center text-sm text-neutral-500 ${NARROW}`}>{t.stock.notFound}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col bg-[#f9fafb]">
+    <div className="flex min-h-full w-full flex-1 flex-col bg-neutral-50">
       {/* The header and the strip are siblings of the page root rather than
           sharing a wrapper: a sticky element can't travel outside its parent's
           box, and a two-row wrapper is only as tall as the two rows. */}

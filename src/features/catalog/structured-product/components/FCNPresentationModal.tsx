@@ -86,8 +86,8 @@ function FCNCard({ product }: { product: StructuredProduct }) {
       >
         <YuantaLogoMark />
         <div className="text-right">
-          <p className="text-sm leading-[24px] font-bold text-[#0a6ee7]">FCN Pricing</p>
-          <p className="text-xs leading-[20px] text-[#0a6ee7]">{labels.asOf(product.offerDate)}</p>
+          <p className="text-sm leading-[24px] font-bold text-brand-600">FCN Pricing</p>
+          <p className="text-xs leading-[20px] text-brand-600">{labels.asOf(product.offerDate)}</p>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
       <div className="grid grid-cols-1 gap-3 px-4 py-4 md:grid-cols-2">
         {/* Left: Underlying Assets */}
         <div className="flex flex-col gap-2">
-          <p className="text-center text-sm font-bold text-[#0a6ee7]">Underlying Assets</p>
+          <p className="text-center text-sm font-bold text-brand-600">Underlying Assets</p>
           <div className="flex flex-col gap-2">
             {tickers.map((ticker, i) => {
               const info = TICKER_INFO[ticker];
@@ -124,12 +124,12 @@ function FCNCard({ product }: { product: StructuredProduct }) {
                     />
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <p className="truncate text-xs leading-[20px] font-semibold text-[#101828]">
+                    <p className="truncate text-xs leading-[20px] font-semibold text-neutral-900">
                       {name}
                     </p>
-                    <p className="truncate text-meta leading-[20px] text-[#6a7282]">{sector}</p>
+                    <p className="truncate text-meta leading-[20px] text-neutral-500">{sector}</p>
                   </div>
-                  <span className="shrink-0 text-xs font-bold text-[#0a6ee7]">{ticker}</span>
+                  <span className="shrink-0 text-xs font-bold text-brand-600">{ticker}</span>
                 </div>
               );
             })}
@@ -138,7 +138,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
 
         {/* Right: Fixed Coupon Note */}
         <div className="flex flex-col gap-2">
-          <p className="text-center text-sm font-bold text-[#0a6ee7]">Fixed Coupon Note</p>
+          <p className="text-center text-sm font-bold text-brand-600">Fixed Coupon Note</p>
           <div
             className="flex flex-col overflow-hidden rounded-xl"
             style={{ backgroundColor: "rgba(255,255,255,0.72)" }}
@@ -151,7 +151,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
                   borderBottom: i < couponRows.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
                 }}
               >
-                <span className="text-xs text-[#4a5565]">{row.label}</span>
+                <span className="text-xs text-neutral-600">{row.label}</span>
                 <span className="text-xs font-bold" style={{ color: row.valueColor }}>
                   {row.value}
                 </span>
@@ -180,7 +180,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
               }}
             />
           </FooterIconCircle>
-          <p className="text-meta leading-[20px] text-[#101828]">
+          <p className="text-meta leading-[20px] text-neutral-900">
             {labels.contact((s) => (
               <strong>{s}</strong>
             ))}
@@ -204,7 +204,7 @@ function FCNCard({ product }: { product: StructuredProduct }) {
               }}
             />
           </FooterIconCircle>
-          <p className="text-meta leading-[20px] text-[#6a7282]">{labels.disclaimer}</p>
+          <p className="text-meta leading-[20px] text-neutral-500">{labels.disclaimer}</p>
         </div>
       </div>
     </div>

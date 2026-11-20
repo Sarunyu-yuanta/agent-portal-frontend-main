@@ -175,7 +175,7 @@ function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: Orde
     case "product":
       return (
         <span className="flex min-w-0 flex-col">
-          <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+          <span className="truncate text-sm leading-[24px] font-bold text-neutral-900">
             {item.title}
           </span>
           <span className="type-caption truncate text-muted-foreground">{item.subtitle}</span>
@@ -186,13 +186,13 @@ function Cell({ item, col, book }: { item: TrendingItem; col: ColDef; book: Orde
     // list and a measure that disagree — render nothing rather than a zero.
     case "sales":
       return item.salesThb === undefined ? null : (
-        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
           {formatAumThb(item.salesThb)}
         </span>
       );
     case "orders":
       return item.orders === undefined ? null : (
-        <span className="text-sm leading-[24px] whitespace-nowrap text-[#101828]">
+        <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {item.orders.toLocaleString("en-US")}
         </span>
       );
@@ -317,7 +317,7 @@ export function ProductTrendingAllTable({
                     key={item.rank}
                     type="button"
                     onClick={() => onSelect(item.target)}
-                    className="flex w-full cursor-pointer items-stretch bg-white text-left transition-colors hover:bg-[#f9fafb]"
+                    className="flex w-full cursor-pointer items-stretch bg-white text-left transition-colors hover:bg-neutral-50"
                   >
                     {cols.map((col) => (
                       <div

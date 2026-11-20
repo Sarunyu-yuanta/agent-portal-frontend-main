@@ -448,7 +448,7 @@ function Row({
       }
       className={
         onOpen
-          ? "cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
+          ? "cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
           : undefined
       }
     >

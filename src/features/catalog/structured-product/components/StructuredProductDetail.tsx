@@ -61,22 +61,24 @@ function AllocationSummary({
       style={{ border: `1px solid ${BORDER_COLOR}` }}
     >
       <div
-        className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3 text-center"
+        className="flex flex-col items-center gap-1 bg-neutral-50 px-4 py-3 text-center"
         style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
       >
-        <span className="text-xs leading-[20px] font-bold text-[#6a7282]">
+        <span className="text-xs leading-[20px] font-bold text-neutral-500">
           Request / Notional Size
         </span>
         <span
-          className={`text-base leading-[28px] font-semibold ${isFull(requestNotionalSize) ? "text-[#0a6ee7]" : "text-[#101828]"}`}
+          className={`text-base leading-[28px] font-semibold ${isFull(requestNotionalSize) ? "text-brand-600" : "text-neutral-900"}`}
         >
           {requestNotionalSize}
         </span>
       </div>
-      <div className="flex flex-col items-center gap-1 bg-[#f9fafb] px-4 py-3 text-center">
-        <span className="text-xs leading-[20px] font-bold text-[#6a7282]">Confirmed / Request</span>
+      <div className="flex flex-col items-center gap-1 bg-neutral-50 px-4 py-3 text-center">
+        <span className="text-xs leading-[20px] font-bold text-neutral-500">
+          Confirmed / Request
+        </span>
         <span
-          className={`text-base leading-[28px] font-semibold ${isFull(confirmedRequest) ? "text-[#008236]" : "text-[#101828]"}`}
+          className={`text-base leading-[28px] font-semibold ${isFull(confirmedRequest) ? "text-[#008236]" : "text-neutral-900"}`}
         >
           {confirmedRequest}
         </span>
@@ -95,12 +97,12 @@ export function DetailTable({ rows }: { rows: DetailRow[] }) {
         <div
           key={row.label}
           className={`flex w-full items-start gap-3 px-4 py-2 text-base leading-[24px] ${
-            i % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
+            i % 2 === 0 ? "bg-neutral-50" : "bg-white"
           }`}
         >
-          <span className="min-w-0 flex-1 text-[#4a5565]">{row.label}</span>
+          <span className="min-w-0 flex-1 text-neutral-600">{row.label}</span>
           {row.multiline ? (
-            <div className="flex min-w-0 flex-1 flex-col items-start gap-3 text-[#101828]">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-3 text-neutral-900">
               {row.multiline.map((line) => (
                 <span key={line} className="whitespace-nowrap">
                   {line}
@@ -110,12 +112,12 @@ export function DetailTable({ rows }: { rows: DetailRow[] }) {
           ) : row.link ? (
             <button
               type="button"
-              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-[#0a6ee7] underline"
+              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-brand-600 underline"
             >
               {row.value}
             </button>
           ) : (
-            <span className="min-w-0 flex-1 text-[#101828]">{row.value}</span>
+            <span className="min-w-0 flex-1 text-neutral-900">{row.value}</span>
           )}
         </div>
       ))}
@@ -207,7 +209,7 @@ export function StructuredProductDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           {product.underlying}
         </h1>
       </div>
@@ -239,7 +241,7 @@ export function StructuredProductDetail({
               {showPrincipalTag && (
                 <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-[#eff6ff] px-2 py-1">
                   <ShieldCheckIcon size={14} weight="fill" color="#2b7fff" className="shrink-0" />
-                  <span className="text-xs leading-[20px] whitespace-nowrap text-[#074ea4]">
+                  <span className="text-xs leading-[20px] whitespace-nowrap text-brand-800">
                     {t.products.structured.tags.principalProtected}
                   </span>
                 </span>
@@ -248,16 +250,16 @@ export function StructuredProductDetail({
 
             <div className="flex w-full items-center gap-2">
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="w-full truncate text-base leading-[28px] font-bold text-[#101828]">
+                <p className="w-full truncate text-base leading-[28px] font-bold text-neutral-900">
                   {product.underlying}
                 </p>
-                <p className="text-xs leading-[20px] text-[#4a5565]">Underlying</p>
+                <p className="text-xs leading-[20px] text-neutral-600">Underlying</p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-0.5">
-                <p className="text-2xl leading-8 font-bold whitespace-nowrap text-[#0a6ee7]">
+                <p className="text-2xl leading-8 font-bold whitespace-nowrap text-brand-600">
                   {product.coupon}
                 </p>
-                <p className="text-xs leading-[20px] font-medium text-[#4a5565]">Coupon</p>
+                <p className="text-xs leading-[20px] font-medium text-neutral-600">Coupon</p>
               </div>
             </div>
           </div>
@@ -290,7 +292,7 @@ export function StructuredProductDetail({
                   />
                 )
               )}
-              <p className="text-center text-xs leading-[20px] whitespace-nowrap text-[#6a7282]">
+              <p className="text-center text-xs leading-[20px] whitespace-nowrap text-neutral-500">
                 {round
                   ? round.previousRef
                     ? t.products.structured.sentRef(round.previousRef)

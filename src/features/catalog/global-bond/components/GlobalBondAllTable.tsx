@@ -142,7 +142,7 @@ export function GlobalBondAllTable({
                 >
                   <IssuerLogo src={row.logo} />
                   <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                    <span className="min-w-0 truncate text-sm leading-[24px] text-[#101828]">
+                    <span className="min-w-0 truncate text-sm leading-[24px] text-neutral-900">
                       {row.name}
                     </span>
                     {row.topPick && <TopPickTag />}
@@ -152,43 +152,43 @@ export function GlobalBondAllTable({
                   className="flex h-[65px] w-[138px] shrink-0 items-center px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.isin}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.isin}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[80px] shrink-0 items-center justify-center px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.currency}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.currency}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[128px] shrink-0 items-center justify-end px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.couponRate}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.couponRate}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[81px] shrink-0 items-center justify-end px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.price}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.price}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[180px] shrink-0 items-center justify-end px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.yieldPct}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.yieldPct}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[122px] shrink-0 items-center justify-center px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.maturity}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.maturity}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[112px] shrink-0 items-center justify-end px-4 py-3.5"
                   style={border}
                 >
-                  <span className="text-sm leading-[24px] text-[#101828]">{row.duration}</span>
+                  <span className="text-sm leading-[24px] text-neutral-900">{row.duration}</span>
                 </div>
                 <div
                   className="flex h-[65px] w-[122px] shrink-0 items-center justify-center px-3 py-[11px]"

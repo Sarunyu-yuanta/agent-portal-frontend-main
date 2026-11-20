@@ -142,8 +142,8 @@ function DefinitStatItem({
   compact?: boolean;
 }) {
   const labelClassName = compact
-    ? "text-center text-xs font-bold leading-[20px] text-[#101828]"
-    : "text-center text-sm font-bold leading-[24px] text-[#101828]";
+    ? "text-center text-xs font-bold leading-[20px] text-neutral-900"
+    : "text-center text-sm font-bold leading-[24px] text-neutral-900";
   const valueTextClassName = compact ? "text-xs leading-[20px]" : "text-sm leading-[24px]";
 
   return (
@@ -162,7 +162,7 @@ function DefinitStatItem({
           </p>
         )}
         <p
-          className={`whitespace-nowrap ${valueTextClassName} ${valueClassName ?? "text-[#4a5565]"}`}
+          className={`whitespace-nowrap ${valueTextClassName} ${valueClassName ?? "text-neutral-600"}`}
         >
           {value}
         </p>
@@ -173,7 +173,7 @@ function DefinitStatItem({
 
 function DefinitPlanDescription({ plan }: { plan: DefinitPlan }) {
   return (
-    <div className="text-sm leading-[24px] text-[#4a5565]">
+    <div className="text-sm leading-[24px] text-neutral-600">
       <p className="mb-0">{plan.intro}</p>
       <ol
         className="list-decimal pl-[21px]"
@@ -221,8 +221,8 @@ function DefinitPlanCard({
               <p
                 className={
                   isCompact
-                    ? "text-micro leading-[18px] text-[#4a5565]"
-                    : "text-xs leading-[20px] text-[#4a5565]"
+                    ? "text-micro leading-[18px] text-neutral-600"
+                    : "text-xs leading-[20px] text-neutral-600"
                 }
               >
                 {DEFINIT_PROVIDER}
@@ -240,8 +240,8 @@ function DefinitPlanCard({
               <p
                 className={
                   isCompact
-                    ? "text-xs leading-[20px] font-bold text-[#101828]"
-                    : "text-sm leading-[24px] font-bold text-[#101828]"
+                    ? "text-xs leading-[20px] font-bold text-neutral-900"
+                    : "text-sm leading-[24px] font-bold text-neutral-900"
                 }
               >
                 Available Room
@@ -249,8 +249,8 @@ function DefinitPlanCard({
               <p
                 className={
                   isCompact
-                    ? "text-xs leading-[20px] text-[#4a5565]"
-                    : "text-sm leading-[24px] text-[#4a5565]"
+                    ? "text-xs leading-[20px] text-neutral-600"
+                    : "text-sm leading-[24px] text-neutral-600"
                 }
               >
                 {plan.availableRoom}
@@ -545,7 +545,7 @@ export function DefinitDetail({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-[#f9fafb] lg:pt-2 lg:pb-20">
+    <div className="flex w-full flex-1 flex-col max-lg:min-h-[calc(var(--dvh)*100-60px)] max-lg:overflow-x-clip max-lg:bg-white lg:bg-neutral-50 lg:pt-2 lg:pb-20">
       <div className="flex min-h-[calc(var(--dvh)*100-60px)] w-full flex-1 flex-col lg:hidden">
         <DefinitMobileBreadcrumb />
         {client ? (

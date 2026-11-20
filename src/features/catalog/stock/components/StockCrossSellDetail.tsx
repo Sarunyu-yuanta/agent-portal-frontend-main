@@ -119,7 +119,7 @@ function StockCrossSellDetailBody({
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-4 rounded-t-3xl bg-[#f9fafb] pt-6 pb-16">
+      <div className="flex flex-col items-center gap-4 rounded-t-3xl bg-neutral-50 pt-6 pb-16">
         <div className={`flex flex-col gap-4 ${NARROW}`}>
           <div className="flex w-full items-center gap-2 border-b border-black/10 py-3">
             <p className="flex-1 text-base" style={{ color: "#4a5565" }}>
@@ -133,14 +133,14 @@ function StockCrossSellDetailBody({
               // dropdown marks its selected row with. Trailing `!` because
               // system-one ships its base utilities unlayered, where they
               // outrank a plain `hover:` variant.
-              className="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-black/10 bg-[#f9fafb] py-2 pr-3.5 pl-2.5 transition-colors hover:border-[#0a6ee7]/25! hover:bg-[#eff6ff]!"
+              className="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-black/10 bg-neutral-50 py-2 pr-3.5 pl-2.5 transition-colors hover:border-brand-600/25! hover:bg-[#eff6ff]!"
             >
               <FunnelSimpleIcon size={20} style={{ color: "#0a6ee7" }} />
               <span className="text-sm font-semibold" style={{ color: "#0a6ee7" }}>
                 {t.stock.crossSell.filter}
               </span>
               {filterCount > 0 && (
-                <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-[#0a6ee7] text-meta font-medium text-white">
+                <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-brand-600 text-meta font-medium text-white">
                   {filterCount}
                 </span>
               )}

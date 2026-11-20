@@ -54,10 +54,10 @@ function DetailTable({ bond }: { bond: FixedIncomeBond }) {
         <div
           key={row.label}
           className={`flex w-full items-start gap-3 px-4 py-2 text-base leading-[24px] ${
-            i % 2 === 0 ? "bg-[#f9fafb]" : "bg-white"
+            i % 2 === 0 ? "bg-neutral-50" : "bg-white"
           }`}
         >
-          <span className="min-w-0 flex-1 text-[#4a5565]">{row.label}</span>
+          <span className="min-w-0 flex-1 text-neutral-600">{row.label}</span>
           {row.documents ? (
             <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
               {row.documents.map((doc) => (
@@ -74,12 +74,12 @@ function DetailTable({ bond }: { bond: FixedIncomeBond }) {
           ) : row.link ? (
             <button
               type="button"
-              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-[#0a6ee7] underline"
+              className="min-w-0 flex-1 cursor-pointer border-none bg-transparent p-0 text-left text-base leading-[24px] text-brand-600 underline"
             >
               {row.value}
             </button>
           ) : (
-            <span className="min-w-0 flex-1 text-[#101828]">{row.value}</span>
+            <span className="min-w-0 flex-1 text-neutral-900">{row.value}</span>
           )}
         </div>
       ))}
@@ -143,7 +143,7 @@ export function FixedIncomeDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           Fixed Income
         </h1>
       </div>
@@ -158,10 +158,10 @@ export function FixedIncomeDetail({
             onClick={() => onCompanySelect?.(bond.companyName)}
             className="flex w-full cursor-pointer items-center gap-1 border-x-0 border-t-0 border-b border-solid border-black/10 bg-transparent p-0 pb-2 text-left"
           >
-            <span className="min-w-0 flex-1 truncate text-base leading-[24px] text-[#4a5565]">
+            <span className="min-w-0 flex-1 truncate text-base leading-[24px] text-neutral-600">
               {bond.fullCompanyName}
             </span>
-            <CaretDoubleRightIcon size={20} className="shrink-0 text-[#101828]" />
+            <CaretDoubleRightIcon size={20} className="shrink-0 text-neutral-900" />
           </button>
 
           <div className="flex w-full flex-col gap-4">
@@ -172,12 +172,12 @@ export function FixedIncomeDetail({
                 className="size-12 rounded-md"
               />
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <p className="w-full truncate text-lg leading-[28px] font-bold text-[#101828]">
+                <p className="w-full truncate text-lg leading-[28px] font-bold text-neutral-900">
                   {bond.symbol}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusTag status={bond.status} label={bond.statusLabel} />
-                  <span className="inline-flex items-center justify-center rounded bg-[#f3f4f6] px-2 py-1 text-xs leading-[20px] whitespace-nowrap text-[#4a5565]">
+                  <span className="inline-flex items-center justify-center rounded bg-neutral-100 px-2 py-1 text-xs leading-[20px] whitespace-nowrap text-neutral-600">
                     {t.products.fixedIncome.category[bond.category]}
                   </span>
                 </div>
@@ -186,7 +186,7 @@ export function FixedIncomeDetail({
                 <p className="text-lg leading-[28px] font-bold whitespace-nowrap text-[#008236]">
                   {bond.ytm}
                 </p>
-                <p className="text-sm leading-[24px] text-[#4a5565]">YTM</p>
+                <p className="text-sm leading-[24px] text-neutral-600">YTM</p>
               </div>
             </div>
 
@@ -209,7 +209,7 @@ export function FixedIncomeDetail({
               <div className="flex w-full flex-col items-center gap-3">
                 <DetailTable bond={bond} />
                 <DealProgress productId={adapted.id} />
-                <p className="text-center text-sm leading-[24px] whitespace-nowrap text-[#6a7282]">
+                <p className="text-center text-sm leading-[24px] whitespace-nowrap text-neutral-500">
                   {t.products.common.updatedAt(bond.updatedAt)}
                 </p>
               </div>

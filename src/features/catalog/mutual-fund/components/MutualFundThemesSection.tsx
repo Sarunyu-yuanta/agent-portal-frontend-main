@@ -124,7 +124,7 @@ function ThemeCard({
 }) {
   const t = useT();
   return (
-    <div className="flex min-h-[380px] w-[308px] shrink-0 flex-col gap-[10px] rounded-lg bg-gradient-to-b from-[#0a6ee7] to-[#f3f4f6] to-[85.462%] px-1 pt-2 pb-1">
+    <div className="flex min-h-[380px] w-[308px] shrink-0 flex-col gap-[10px] rounded-lg bg-gradient-to-b from-brand-600 to-neutral-100 to-[85.462%] px-1 pt-2 pb-1">
       <div className="flex w-full items-start gap-1 px-3">
         <ThemeIcon icon={theme.icon} />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -220,11 +220,11 @@ export function MutualFundThemesSection({
       <div>
         <div className="flex items-center gap-1">
           <Image src={MF_ASSETS.medal} alt="" width={24} height={24} className="size-6 shrink-0" />
-          <h2 className="text-lg leading-[32px] font-bold text-[#101828]">
+          <h2 className="text-lg leading-[32px] font-bold text-neutral-900">
             {t.fund.themes.sectionTitle}
           </h2>
         </div>
-        <p className="text-sm leading-[24px] text-[#101828]">{t.fund.themes.sectionSubtitle}</p>
+        <p className="text-sm leading-[24px] text-neutral-900">{t.fund.themes.sectionSubtitle}</p>
       </div>
 
       {themes.length === 0 ? (

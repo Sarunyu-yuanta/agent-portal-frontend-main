@@ -130,7 +130,7 @@ function SectorHeroIcon({ sector }: { sector: TopIdeaSector }) {
       Icon = LightningIcon;
   }
   return (
-    <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#101828] md:size-8 lg:size-10">
+    <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-neutral-900 md:size-8 lg:size-10">
       <Icon {...iconSm} className="md:hidden" />
       <Icon {...iconMd} className="hidden md:block lg:hidden" />
       <Icon {...iconLg} className="hidden lg:block" />
@@ -275,24 +275,24 @@ function TopIdeaHeroBanner({ sector }: { sector: TopIdeaSector }) {
         <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-4">
           <SectorHeroIcon sector={sector} />
           <div className="flex min-w-[141px] flex-1 flex-col items-start justify-center gap-0.5 max-md:max-w-[210px] md:gap-1 lg:gap-2">
-            <p className="w-full truncate text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[28px]">
+            <p className="w-full truncate text-base leading-[28px] font-bold text-neutral-900 lg:text-lg lg:leading-[28px]">
               {theme}
             </p>
-            <p className="w-full truncate text-xs leading-[20px] text-[#6a7282] lg:text-sm lg:leading-[24px]">
+            <p className="w-full truncate text-xs leading-[20px] text-neutral-500 lg:text-sm lg:leading-[24px]">
               {subtitle}
             </p>
           </div>
         </div>
         <div className="relative flex shrink-0 flex-col items-end justify-center gap-0.5 lg:gap-2">
           <div className="flex items-center gap-0.5 rounded-md bg-white px-1 lg:gap-1">
-            <span className="text-xs leading-[20px] text-[#6a7282] lg:text-sm lg:leading-[24px]">
+            <span className="text-xs leading-[20px] text-neutral-500 lg:text-sm lg:leading-[24px]">
               {t.products.topIdea.upTo}
             </span>
             <span className="text-lg leading-[28px] font-bold text-[#008236] lg:text-xl lg:leading-[34px]">
               {TOP_IDEA_MAX_COUPON}
             </span>
           </div>
-          <span className="text-xs leading-[20px] text-[#6a7282] lg:text-sm lg:leading-[24px]">
+          <span className="text-xs leading-[20px] text-neutral-500 lg:text-sm lg:leading-[24px]">
             Coupon
           </span>
         </div>
@@ -337,7 +337,7 @@ export function TopIdeaDetail({
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-[#101828] lg:text-lg lg:leading-[30px]">
+        <h1 className="min-w-0 flex-1 truncate text-base leading-[28px] font-bold text-neutral-900 lg:text-lg lg:leading-[30px]">
           {theme}
         </h1>
       </div>
@@ -347,7 +347,7 @@ export function TopIdeaDetail({
       <div className="relative z-10 w-full rounded-t-[24px] bg-white pt-4 pb-10 lg:pt-6">
         <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-2 px-4 md:px-8 lg:px-20">
           <div className="flex w-full items-center gap-3">
-            <p className="min-w-0 flex-1 text-sm leading-[24px] text-[#4a5565] lg:text-base lg:leading-[24px]">
+            <p className="min-w-0 flex-1 text-sm leading-[24px] text-neutral-600 lg:text-base lg:leading-[24px]">
               {t.products.common.items(products.length)}
             </p>
             <Button
@@ -367,7 +367,7 @@ export function TopIdeaDetail({
               {t.products.common.filter}
             </Button>
           </div>
-          <p className="w-full text-micro leading-[18px] text-[#6a7282] lg:text-xs lg:leading-[20px]">
+          <p className="w-full text-micro leading-[18px] text-neutral-500 lg:text-xs lg:leading-[20px]">
             <span className="lg:hidden">
               {t.products.common.updatedAt(TOP_IDEA_UPDATED_AT_MOBILE)}
             </span>

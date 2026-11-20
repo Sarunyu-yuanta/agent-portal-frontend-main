@@ -84,7 +84,7 @@ export function ResponsiveBottomSheetModal({
       }}
     >
       <div
-        className={`border border-[rgba(0,0,0,0.1)] bg-white ${desktopRoundedClassName} w-full ${desktopMaxWidth} flex max-h-[calc(var(--vh)*85)] flex-col overflow-hidden shadow-lg`}
+        className={`border border-black/10 bg-white ${desktopRoundedClassName} w-full ${desktopMaxWidth} flex max-h-[calc(var(--vh)*85)] flex-col overflow-hidden shadow-lg`}
         role="dialog"
         aria-modal
         aria-labelledby={titleId}

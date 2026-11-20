@@ -527,7 +527,7 @@ function TradeRow({
           onOpen();
         }
       }}
-      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
+      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
     >
       <TableCell>
         <p className="type-caption whitespace-nowrap text-muted-foreground tabular-nums">

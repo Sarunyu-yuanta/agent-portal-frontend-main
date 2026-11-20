@@ -26,15 +26,15 @@ function GroupLabel({ children }: { children: string }) {
 
 function StatRow({ stats }: { stats: { label: string; value: string }[] }) {
   return (
-    <div className="flex w-full items-center justify-center rounded-lg bg-[#f9fafb] py-1.5 text-center">
+    <div className="flex w-full items-center justify-center rounded-lg bg-neutral-50 py-1.5 text-center">
       {stats.map((s, i) => (
         <div
           key={s.label}
           className="flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-0.5"
           style={i < stats.length - 1 ? { borderRight: "1px solid rgba(0,0,0,0.1)" } : {}}
         >
-          <p className="w-full truncate text-micro leading-[18px] text-[#6a7282]">{s.label}</p>
-          <p className="w-full truncate text-label leading-[20px] font-semibold text-[#4a5565]">
+          <p className="w-full truncate text-micro leading-[18px] text-neutral-500">{s.label}</p>
+          <p className="w-full truncate text-label leading-[20px] font-semibold text-neutral-600">
             {s.value}
           </p>
         </div>
@@ -55,15 +55,17 @@ function FixedIncomeRelatedCard({ bond }: { bond: FixedIncomeBond }) {
             className="size-8 rounded"
           />
           <div className="flex min-w-0 flex-col">
-            <p className="truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+            <p className="truncate text-title-sm leading-[28px] font-bold text-neutral-900">
               {bond.symbol}
             </p>
-            <p className="truncate text-label leading-[20px] text-[#6a7282]">{bond.companyName}</p>
+            <p className="truncate text-label leading-[20px] text-neutral-500">
+              {bond.companyName}
+            </p>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-          <p className="text-title-sm leading-[28px] font-bold text-[#101828]">{bond.ytm}</p>
-          <p className="text-label leading-[20px] text-[#6a7282]">{r.ytm}</p>
+          <p className="text-title-sm leading-[28px] font-bold text-neutral-900">{bond.ytm}</p>
+          <p className="text-label leading-[20px] text-neutral-500">{r.ytm}</p>
         </div>
       </div>
       <StatRow
@@ -91,17 +93,17 @@ function GlobalBondRelatedCard({ issuer }: { issuer: GlobalBondIssuer }) {
             <img alt="" className="absolute inset-0 size-full object-cover" src={issuer.logo} />
           </div>
           <div className="flex min-w-0 flex-col">
-            <p className="truncate text-title-sm leading-[28px] font-bold text-[#101828]">
+            <p className="truncate text-title-sm leading-[28px] font-bold text-neutral-900">
               {issuer.title}
             </p>
-            <p className="truncate text-label leading-[20px] text-[#6a7282]">{issuer.ticker}</p>
+            <p className="truncate text-label leading-[20px] text-neutral-500">{issuer.ticker}</p>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-          <p className="text-title-sm leading-[28px] font-bold text-[#101828]">
+          <p className="text-title-sm leading-[28px] font-bold text-neutral-900">
             {issuer.estimatedYield}
           </p>
-          <p className="text-label leading-[20px] text-[#6a7282]">{r.estYield}</p>
+          <p className="text-label leading-[20px] text-neutral-500">{r.estYield}</p>
         </div>
       </div>
       <StatRow

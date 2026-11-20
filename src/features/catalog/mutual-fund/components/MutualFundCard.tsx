@@ -78,7 +78,7 @@ export function RiskBadge({ risk, inline }: { risk: number; inline?: boolean }) 
   const pill = (
     <span className="inline-flex h-5 shrink-0 items-center gap-1 self-start rounded-2xl border border-black/10 bg-white px-2">
       <RiskMeterIcon risk={risk} />
-      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-[#4a5565]">
+      <span className="text-xs leading-[20px] font-semibold whitespace-nowrap text-neutral-600">
         {t.fund.tags.risk(risk)}
       </span>
     </span>
@@ -117,7 +117,7 @@ export function TagFilterChip({
       aria-pressed={active}
       className={`relative flex shrink-0 cursor-pointer items-center gap-0.5 overflow-hidden rounded-full border py-1.5 pr-2.5 pl-1.5 transition-colors ${
         active
-          ? "border-[#0a6ee7] bg-[#f3f8fe] hover:bg-[#e4f0fd]!"
+          ? "border-brand-600 bg-brand-100 hover:bg-[#e4f0fd]!"
           : "border-black/10 bg-white hover:bg-black/[0.03]!"
       }`}
     >
@@ -130,7 +130,7 @@ export function TagFilterChip({
         )}
       </span>
       <span
-        className={`text-xs leading-[20px] whitespace-nowrap ${active ? "text-[#0a6ee7]" : "text-[#4a5565]"}`}
+        className={`text-xs leading-[20px] whitespace-nowrap ${active ? "text-brand-600" : "text-neutral-600"}`}
       >
         {label}
       </span>
@@ -195,7 +195,7 @@ export function FundTagBadges({ fund }: { fund: MutualFund }) {
           iconSrc={MF_ASSETS.performersTagHighlight}
           label={t.fund.tags.highlight}
           className="bg-[#eff6ff]"
-          labelClassName="text-[#0a6ee7]"
+          labelClassName="text-brand-600"
         />
       ) : null}
     </>
@@ -231,13 +231,13 @@ function ListCardPriceChange({ fund }: { fund: MutualFund }) {
 
   return (
     <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-      <div className="flex items-center justify-end gap-1 text-sm leading-[24px] font-bold text-[#101828]">
+      <div className="flex items-center justify-end gap-1 text-sm leading-[24px] font-bold text-neutral-900">
         <span>{fund.price}</span>
         <span>{fund.currency}</span>
       </div>
       {absNeutral ? (
         <div className="flex w-[105px] items-center gap-1">
-          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-[#4a5565]">
+          <span className="h-4 flex-1 text-right text-xs leading-[20px] text-neutral-600">
             {changeAbs}
           </span>
           <ListCardPercentPill changePct={fund.changePct} />
@@ -266,7 +266,7 @@ function PriceChange({ fund }: { fund: MutualFund }) {
 
   return (
     <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
-      <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-[#101828]">
+      <div className="flex items-center gap-1 text-sm leading-[24px] font-bold text-neutral-900">
         <span>{fund.price}</span>
         <span>{fund.currency}</span>
       </div>
@@ -371,10 +371,10 @@ export function MutualFundListCard({
     <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-clip">
       <div className="flex w-full items-start gap-2">
         <div className="flex h-[52px] min-w-0 flex-1 flex-col gap-1">
-          <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+          <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
             {fund.symbol}
           </span>
-          <p className="line-clamp-2 text-xs leading-[20px] text-[#4a5565]">{fund.name}</p>
+          <p className="line-clamp-2 text-xs leading-[20px] text-neutral-600">{fund.name}</p>
         </div>
         <Sparkline fund={fund} />
         <ListCardPriceChange fund={fund} />
@@ -396,14 +396,14 @@ export function MutualFundListCard({
             iconSrc={MF_ASSETS.performersTagHighlight}
             label={t.fund.tags.highlight}
             className="bg-[#eff6ff]"
-            labelClassName="text-[#0a6ee7]"
+            labelClassName="text-brand-600"
           />
         ) : null}
       </div>
     </div>
   );
 
-  const className = `flex w-full cursor-pointer items-center rounded-lg bg-white px-3 py-2 text-left no-underline text-inherit transition-colors hover:bg-black/[0.02]! focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] ${LIST_CARD_CLASS}`;
+  const className = `flex w-full cursor-pointer items-center rounded-lg bg-white px-3 py-2 text-left no-underline text-inherit transition-colors hover:bg-black/[0.02]! focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${LIST_CARD_CLASS}`;
 
   if (onSelect) {
     return (
@@ -445,10 +445,10 @@ export function MutualFundListCardMobile({
     <div className="flex w-full flex-col gap-2">
       <div className="flex w-full items-start justify-end gap-2">
         <div className="flex h-[52px] min-w-0 flex-1 flex-col gap-1">
-          <span className="truncate text-sm leading-[24px] font-bold text-[#101828]">
+          <span className="truncate text-sm leading-[24px] font-bold text-neutral-900">
             {fund.symbol}
           </span>
-          <p className="line-clamp-2 text-xs leading-[20px] text-[#4a5565]">{fund.name}</p>
+          <p className="line-clamp-2 text-xs leading-[20px] text-neutral-600">{fund.name}</p>
         </div>
         <Sparkline fund={fund} />
         <ListCardPriceChange fund={fund} />
@@ -470,7 +470,7 @@ export function MutualFundListCardMobile({
             iconSrc={MF_ASSETS.performersTagHighlight}
             label={t.fund.tags.highlight}
             className="bg-[#eff6ff]"
-            labelClassName="text-[#0a6ee7]"
+            labelClassName="text-brand-600"
           />
         ) : null}
       </div>
@@ -478,7 +478,7 @@ export function MutualFundListCardMobile({
   );
 
   const className =
-    "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left no-underline text-inherit transition-colors hover:bg-black/[0.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7]";
+    "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left no-underline text-inherit transition-colors hover:bg-black/[0.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600";
 
   if (onSelect) {
     return (
@@ -515,12 +515,12 @@ export function MutualFundCard({
       <div className="flex min-w-0 items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex min-w-0 items-center gap-1">
-            <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-[#101828]">
+            <span className="text-sm leading-[24px] font-bold whitespace-nowrap text-neutral-900">
               {fund.symbol}
             </span>
             {fund.isPick && <PickTag />}
           </div>
-          <p className="truncate text-xs leading-[20px] text-[#4a5565]">{fund.name}</p>
+          <p className="truncate text-xs leading-[20px] text-neutral-600">{fund.name}</p>
         </div>
         <Sparkline fund={fund} />
         <PriceChange fund={fund} />
@@ -531,7 +531,7 @@ export function MutualFundCard({
 
   const href = mutualFundDetailHref(fund.id);
   const rowClassName =
-    "block w-full p-3 text-left no-underline text-inherit cursor-pointer hover:bg-black/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-inset";
+    "block w-full p-3 text-left no-underline text-inherit cursor-pointer hover:bg-black/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-inset";
 
   if (onSelect) {
     return (
@@ -586,7 +586,7 @@ function MutualFundThemeRow({
   const t = useT();
   const href = mutualFundDetailHref(fund.id);
   const className =
-    "block w-full p-3 text-left no-underline text-inherit cursor-pointer hover:bg-black/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:ring-inset";
+    "block w-full p-3 text-left no-underline text-inherit cursor-pointer hover:bg-black/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-inset";
 
   return (
     <Link
@@ -603,7 +603,7 @@ function MutualFundThemeRow({
     >
       <div className="flex flex-col gap-2">
         <div className="flex w-full items-center gap-2">
-          <span className="min-w-0 flex-1 self-start text-sm leading-[24px] font-bold break-words text-[#101828]">
+          <span className="min-w-0 flex-1 self-start text-sm leading-[24px] font-bold break-words text-neutral-900">
             {fund.symbol}
           </span>
           <Sparkline fund={fund} />
@@ -624,7 +624,7 @@ function MutualFundThemeRow({
               iconSrc={MF_ASSETS.performersTagHighlight}
               label={t.fund.tags.highlight}
               className="bg-[#eff6ff]"
-              labelClassName="text-[#0a6ee7]"
+              labelClassName="text-brand-600"
             />
           ) : null}
         </div>

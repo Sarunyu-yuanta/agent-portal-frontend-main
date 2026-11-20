@@ -183,8 +183,8 @@ function FilterChip({
       aria-pressed={active}
       className={`flex h-9 w-full cursor-pointer items-center justify-center gap-1 rounded-full border py-2 pr-3 pl-2 text-sm leading-[24px] transition-colors ${
         active
-          ? "border-[#0a6ee7] bg-[#f3f8fe] text-[#0a6ee7] hover:bg-[#e4f0fd]!"
-          : "border-black/10 bg-white text-[#4a5565] hover:bg-black/[0.03]!"
+          ? "border-brand-600 bg-brand-100 text-brand-600 hover:bg-[#e4f0fd]!"
+          : "border-black/10 bg-white text-neutral-600 hover:bg-black/[0.03]!"
       }`}
     >
       {icon}
@@ -209,7 +209,7 @@ function FilterSection({
   return (
     <div className={`flex w-full flex-col ${compact ? "gap-3" : "gap-4"}`}>
       <div className="flex w-full items-center justify-between gap-2">
-        <p className="text-sm leading-[24px] font-bold text-[#101828]">{title}</p>
+        <p className="text-sm leading-[24px] font-bold text-neutral-900">{title}</p>
         <Button variant="plain" size="xs" onClick={onClear} className="shrink-0">
           {t.fund.filter.clear}
         </Button>

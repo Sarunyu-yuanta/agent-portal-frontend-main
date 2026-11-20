@@ -90,7 +90,7 @@ function PerformancePeriodTabs({
               className={`flex min-h-8 flex-1 items-center justify-center rounded-full px-2 py-1.5 text-xs leading-[20px] font-semibold ${
                 selected
                   ? "bg-white text-[#292524] shadow-[0px_4px_8px_0px_rgba(28,25,23,0.03),0px_8px_16px_0px_rgba(28,25,23,0.02)]"
-                  : "text-[#4a5565]"
+                  : "text-neutral-600"
               }`}
             >
               {period}
@@ -229,7 +229,7 @@ export function MutualFundThemeDetailPage({
                 ))}
               </div>
               {tagFunds.length === 0 ? (
-                <p className="px-3 text-center text-sm font-normal text-[#6a7282]">
+                <p className="px-3 text-center text-sm font-normal text-neutral-500">
                   {t.fund.list.noFundsInTheme}
                 </p>
               ) : null}

@@ -298,7 +298,7 @@ export function ClientOrdersDetail({
                       hoverable
                       tabIndex={0}
                       aria-label={t.orders.clientPage.openDealAria(book.productName)}
-                      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
+                      className="cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)]"
                       // The booking's own receipt, over this page rather than
                       // away from it — the same sheet the list opens.
                       onClick={() => setOpened({ book, booking: b })}

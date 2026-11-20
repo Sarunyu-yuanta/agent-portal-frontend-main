@@ -34,7 +34,7 @@ function BackHeaderSkeleton({ className = "" }: { className?: string }) {
 /** The 126px hero band: title, description, as-of date, and the trailing graphic. */
 function HeroBandSkeleton({ innerClassName }: { innerClassName: string }) {
   return (
-    <div className="w-full bg-[#f9fafb]">
+    <div className="w-full bg-neutral-50">
       <div className={`flex h-[126px] items-center gap-2.5 py-2.5 ${innerClassName}`}>
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
           <Skeleton className="h-7 w-48 max-w-full" />
@@ -271,7 +271,7 @@ function InsightCardSkeleton() {
 /** "บทวิเคราะห์ทั้งหมด": back header, white panel with the 2-column card grid and centred pagination. */
 export function MutualFundInsightsPageSkeleton() {
   return (
-    <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20" aria-busy="true">
+    <div className="flex w-full flex-1 flex-col bg-neutral-50 pb-20" aria-busy="true">
       <BackHeaderSkeleton className={`${COLUMN} pt-8`} />
       <div className={COLUMN}>
         <div className="flex flex-col items-center gap-8 rounded-2xl bg-white px-4 py-8 shadow-[0px_0px_4px_rgba(0,0,0,0.02)] lg:px-14">
@@ -304,7 +304,7 @@ function TaxFundTypeCardSkeleton() {
         </div>
       </div>
       <div className="h-px w-full bg-black/10" />
-      <div className="flex w-full flex-col gap-2 bg-[#f9fafb] p-4">
+      <div className="flex w-full flex-col gap-2 bg-neutral-50 p-4">
         <div className="flex w-full items-center justify-between gap-2">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-4 w-16" />
@@ -332,11 +332,11 @@ export function MutualFundTaxPlanningSkeleton({
   showResults: boolean;
 }) {
   return (
-    <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20" aria-busy="true">
+    <div className="flex w-full flex-1 flex-col bg-neutral-50 pb-20" aria-busy="true">
       <BackHeaderSkeleton className={`${COLUMN} pt-4 lg:pt-8`} />
       <div className={`${COLUMN} py-4`}>
         <div className={`flex w-full flex-col gap-6 rounded-xl bg-white p-6 ${CARD_SHADOW}`}>
-          <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-[#f9fafb] p-4">
+          <div className="flex w-full flex-col gap-3 rounded-xl border border-black/10 bg-neutral-50 p-4">
             <div className="flex flex-col gap-1.5">
               <Skeleton className="h-5 w-24" />
               <Skeleton className="h-3 w-44" />

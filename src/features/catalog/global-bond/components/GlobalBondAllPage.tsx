@@ -152,7 +152,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
         {booking.ui}
         {proposal.ui}
         <div className="flex w-full flex-col items-stretch bg-gradient-to-b from-white from-[43.451%] to-transparent px-4 pt-4 pb-10 md:px-8 md:pt-6 md:pb-20 lg:px-20">
-          <div className="-mx-4 mb-4 flex w-full items-center gap-2 border-b border-[rgba(0,0,0,0.1)] px-4 py-3 md:hidden">
+          <div className="-mx-4 mb-4 flex w-full items-center gap-2 border-b border-black/10 px-4 py-3 md:hidden">
             <Button
               variant="plain"
               size="icon-sm"
@@ -162,7 +162,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
             >
               <ArrowLeftIcon size={24} />
             </Button>
-            <h1 className="min-w-0 flex-1 truncate text-center text-base leading-[28px] font-bold text-[#101828]">
+            <h1 className="min-w-0 flex-1 truncate text-center text-base leading-[28px] font-bold text-neutral-900">
               {labels.title}
             </h1>
             <div className="size-6 shrink-0" aria-hidden />
@@ -178,7 +178,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
             >
               <ArrowLeftIcon size={20} />
             </Button>
-            <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+            <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
               {labels.title}
             </h1>
           </div>
@@ -213,7 +213,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                   <button
                     type="button"
                     onClick={() => setFiltersOpen((open) => !open)}
-                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white py-2.5 pr-4 pl-3 text-sm leading-[26px] font-medium text-[#0a6ee7]"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white py-2.5 pr-4 pl-3 text-sm leading-[26px] font-medium text-brand-600"
                   >
                     <FunnelSimpleIcon size={20} />
                     {t.products.common.filter}
@@ -233,7 +233,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                   <button
                     type="button"
                     onClick={() => setFiltersOpen((open) => !open)}
-                    className="inline-flex max-w-[343px] shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white py-2.5 pr-4 pl-3 text-sm leading-[26px] font-medium text-[#0a6ee7]"
+                    className="inline-flex max-w-[343px] shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white py-2.5 pr-4 pl-3 text-sm leading-[26px] font-medium text-brand-600"
                   >
                     <FunnelSimpleIcon size={20} />
                     {t.products.common.filter}
@@ -293,7 +293,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="shrink-0 cursor-pointer rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm leading-[26px] font-medium whitespace-nowrap text-[#0a6ee7]"
+                      className="shrink-0 cursor-pointer rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 py-2 text-sm leading-[26px] font-medium whitespace-nowrap text-brand-600"
                     >
                       {t.products.common.clearAllSelection}
                     </button>
@@ -304,10 +304,10 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
 
             <div className="flex w-full flex-col items-center gap-3 lg:gap-4">
               <div className="flex w-full items-center justify-between gap-3">
-                <p className="text-sm leading-[24px] font-bold text-[#101828] md:text-base md:leading-[28px]">
+                <p className="text-sm leading-[24px] font-bold text-neutral-900 md:text-base md:leading-[28px]">
                   {t.products.common.itemCount(displayCount)}
                 </p>
-                <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-[#6a7282] md:text-sm md:leading-[24px]">
+                <span className="shrink-0 text-xs leading-[20px] whitespace-nowrap text-neutral-500 md:text-sm md:leading-[24px]">
                   <span className="lg:hidden">{t.products.common.updatedAt(updatedAtShort)}</span>
                   <span className="hidden lg:inline">
                     {t.products.common.updatedAt(updatedAtLong)}
@@ -326,7 +326,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
               {filteredBonds.length > 0 && (
                 <div className="flex w-full flex-wrap-reverse items-center justify-end gap-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs whitespace-nowrap text-[#6a7282]">
+                    <p className="text-xs whitespace-nowrap text-neutral-500">
                       {t.products.pagination.perPage}
                     </p>
                     <select
@@ -335,7 +335,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                         setPageSize(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="cursor-pointer rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2 py-1 text-xs text-[#101828] focus:outline-none"
+                      className="cursor-pointer rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2 py-1 text-xs text-neutral-900 focus:outline-none"
                     >
                       {PAGE_SIZE_OPTIONS.map((n) => (
                         <option key={n} value={n}>
@@ -345,7 +345,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                     </select>
                   </div>
                   <div className="flex items-center gap-3">
-                    <p className="text-xs whitespace-nowrap text-[#6a7282]">
+                    <p className="text-xs whitespace-nowrap text-neutral-500">
                       {t.products.pagination.showing(
                         {
                           from: (safePage - 1) * pageSize + 1,
@@ -353,7 +353,7 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
                           total: filteredBonds.length,
                         },
                         (n) => (
-                          <span className="font-medium text-[#101828]">{n}</span>
+                          <span className="font-medium text-neutral-900">{n}</span>
                         ),
                       )}
                     </p>

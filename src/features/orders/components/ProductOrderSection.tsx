@@ -444,7 +444,7 @@ export function ProductOrderSection({
                       }}
                       // The row just booked pulses, then stays highlighted — see
                       // `.row-just-added` in globals.css.
-                      className={`cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-[#0a6ee7] focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)] ${
+                      className={`cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:outline-none focus-visible:ring-inset active:bg-[var(--bg-default-pressed)] ${
                         b.id === newBookingId ? "row-just-added" : ""
                       }`}
                     >
@@ -644,10 +644,12 @@ function CheckMark({ item }: { item: RequirementItem | undefined }) {
 function Total({ label, value, tone }: { label: string; value: string; tone?: "green" }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-black/10 px-4 py-3">
-      <span className="text-xs leading-[20px] tracking-wide text-[#6a7282] uppercase">{label}</span>
+      <span className="text-xs leading-[20px] tracking-wide text-neutral-500 uppercase">
+        {label}
+      </span>
       <span
         className={`text-lg leading-[28px] font-bold tabular-nums ${
-          tone === "green" ? "text-[var(--fill-green-600)]" : "text-[#101828]"
+          tone === "green" ? "text-[var(--fill-green-600)]" : "text-neutral-900"
         }`}
       >
         {value}

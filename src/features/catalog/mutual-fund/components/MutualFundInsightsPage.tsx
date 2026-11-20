@@ -29,7 +29,7 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
   const { items, totalPages } = insights;
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-[#f9fafb] pb-20">
+    <div className="flex w-full flex-1 flex-col bg-neutral-50 pb-20">
       <div className="mx-auto flex w-full max-w-[996px] items-center gap-2 px-4 pt-8 pb-2 md:px-8 lg:px-0">
         <Button
           variant="plain"
@@ -40,7 +40,7 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
         >
           <ArrowLeftIcon size={20} />
         </Button>
-        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-[#101828]">
+        <h1 className="min-w-0 flex-1 truncate text-lg leading-[30px] font-bold text-neutral-900">
           {t.insights.allResearch}
         </h1>
       </div>

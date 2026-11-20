@@ -50,11 +50,11 @@ function StatItem({
         style={labelWidth != null ? { width: labelWidth } : undefined}
       >
         <div className="text-center leading-none">
-          <p className="mb-0 text-xs leading-[20px] font-bold text-[#101828]">{labelLines[0]}</p>
-          <p className="text-xs leading-[20px] font-bold text-[#101828]">{labelLines[1]}</p>
+          <p className="mb-0 text-xs leading-[20px] font-bold text-neutral-900">{labelLines[0]}</p>
+          <p className="text-xs leading-[20px] font-bold text-neutral-900">{labelLines[1]}</p>
         </div>
         <p
-          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-[#4a5565]"}`}
+          className={`text-xs leading-[20px] whitespace-nowrap ${valueClassName ?? "text-neutral-600"}`}
         >
           {value}
         </p>
@@ -73,10 +73,10 @@ function DetailRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex w-full gap-3 rounded-lg bg-[#f9fafb] px-3 py-2">
+    <div className="flex w-full gap-3 rounded-lg bg-neutral-50 px-3 py-2">
       <Image src={iconSrc} alt="" width={24} height={24} className="size-6 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm leading-[24px] font-bold text-[#101828]">{title}</p>
+        <p className="text-sm leading-[24px] font-bold text-neutral-900">{title}</p>
         {children}
       </div>
     </div>
@@ -103,11 +103,11 @@ function DownloadDocumentsButton({ className }: { className?: string }) {
 
 function PlanSummary({ summary }: { summary: PlanDetailSummary }) {
   if (summary.kind === "paragraph") {
-    return <p className="text-sm leading-[24px] text-[#4a5565]">{summary.text}</p>;
+    return <p className="text-sm leading-[24px] text-neutral-600">{summary.text}</p>;
   }
 
   return (
-    <div className="text-sm leading-[24px] text-[#4a5565]">
+    <div className="text-sm leading-[24px] text-neutral-600">
       <p className="mb-0 whitespace-pre-wrap">{summary.intro}</p>
       <ol className="list-decimal pl-[21px]">
         {summary.factors.map((factor) => (
@@ -192,28 +192,28 @@ function PlanDetailContent({
 
       <div className="flex w-full flex-col gap-2">
         <DetailRow iconSrc={ROBO_ASSETS.modalIconHeadCircuit} title="Trading style:">
-          <p className="text-sm leading-[24px] text-[#4a5565]">{detail.tradingStyle}</p>
+          <p className="text-sm leading-[24px] text-neutral-600">{detail.tradingStyle}</p>
         </DetailRow>
         {presentation.showMarketTiming ? (
           <DetailRow iconSrc={ROBO_ASSETS.modalIconClockAfternoon} title="Market Timing">
-            <p className="text-sm leading-[24px] text-[#4a5565]">{detail.marketTiming}</p>
+            <p className="text-sm leading-[24px] text-neutral-600">{detail.marketTiming}</p>
           </DetailRow>
         ) : null}
         <DetailRow iconSrc={ROBO_ASSETS.modalIconTimer} title="Timing">
-          <p className="text-sm leading-[24px] text-[#4a5565]">{detail.timing}</p>
+          <p className="text-sm leading-[24px] text-neutral-600">{detail.timing}</p>
         </DetailRow>
         <DetailRow iconSrc={ROBO_ASSETS.modalIconMoneyWavy} title={labels.topUpMin}>
-          <p className="text-sm leading-[24px] text-[#4a5565]">{detail.topUpMin}</p>
+          <p className="text-sm leading-[24px] text-neutral-600">{detail.topUpMin}</p>
         </DetailRow>
         <DetailRow iconSrc={ROBO_ASSETS.modalIconBrain} title="Knowledge style:">
-          <ul className="list-disc pl-5 text-sm leading-[24px] text-[#4a5565]">
+          <ul className="list-disc pl-5 text-sm leading-[24px] text-neutral-600">
             {detail.knowledgeStyles.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </DetailRow>
         <DetailRow iconSrc={ROBO_ASSETS.modalIconSealCheck} title={labels.targetInvestors}>
-          <ul className="list-disc pl-5 text-sm leading-[24px] text-[#4a5565]">
+          <ul className="list-disc pl-5 text-sm leading-[24px] text-neutral-600">
             {detail.targetInvestors.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -227,11 +227,13 @@ function PlanDetailContent({
               "0px 0px 2px rgba(102, 102, 102, 0.16), 0px 4px 8px rgba(102, 102, 102, 0.12)",
           }}
         >
-          <div className="bg-[#f3f4f6] px-3 py-2">
-            <p className="text-sm leading-[24px] font-bold text-[#101828]">{labels.allocation}</p>
+          <div className="bg-neutral-100 px-3 py-2">
+            <p className="text-sm leading-[24px] font-bold text-neutral-900">{labels.allocation}</p>
           </div>
           <div className="flex flex-col items-center gap-3 px-3 pt-3 pb-4">
-            <p className="w-full text-xs leading-[20px] text-[#4a5565]">{labels.allocationTotal}</p>
+            <p className="w-full text-xs leading-[20px] text-neutral-600">
+              {labels.allocationTotal}
+            </p>
             <div className="flex w-full items-center justify-between px-2 max-sm:flex-col max-sm:gap-4">
               <AllocationDonut slices={detail.allocation} className="size-[120px]" />
               <div className="flex flex-col gap-2">
@@ -242,9 +244,9 @@ function PlanDetailContent({
                         className="size-3 shrink-0 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="text-xs leading-[20px] text-[#4a5565]">{item.label}</span>
+                      <span className="text-xs leading-[20px] text-neutral-600">{item.label}</span>
                     </div>
-                    <span className="text-xs leading-[20px] text-[#4a5565]">{item.percent}%</span>
+                    <span className="text-xs leading-[20px] text-neutral-600">{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -255,7 +257,7 @@ function PlanDetailContent({
 
       <div className="flex w-full flex-col gap-2">
         <div className="flex items-center gap-1">
-          <p className="text-sm leading-[24px] font-bold text-[#101828]">{labels.fees}</p>
+          <p className="text-sm leading-[24px] font-bold text-neutral-900">{labels.fees}</p>
           <Image
             src={ROBO_ASSETS.modalIconInfo}
             alt=""
@@ -273,15 +275,17 @@ function PlanDetailContent({
                   index < detail.fees.length - 1 ? "border-b border-dashed border-black/10" : ""
                 }`}
               >
-                <p className="min-w-0 flex-1 text-xs leading-[20px] text-[#101828]">{fee.label}</p>
-                <p className="shrink-0 text-sm leading-[24px] font-bold text-[#0a6ee7]">
+                <p className="min-w-0 flex-1 text-xs leading-[20px] text-neutral-900">
+                  {fee.label}
+                </p>
+                <p className="shrink-0 text-sm leading-[24px] font-bold text-brand-600">
                   {fee.value}
                 </p>
               </div>
             ))}
           </div>
           {presentation.showFeeFootnote && detail.feeFootnote ? (
-            <p className="text-micro leading-[18px] text-[#4a5565]">{detail.feeFootnote}</p>
+            <p className="text-micro leading-[18px] text-neutral-600">{detail.feeFootnote}</p>
           ) : null}
         </div>
       </div>
