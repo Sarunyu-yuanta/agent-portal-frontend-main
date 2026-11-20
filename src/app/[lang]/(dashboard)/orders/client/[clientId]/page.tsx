@@ -28,12 +28,13 @@ import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { normalizeOrderTab } from "@/features/orders/lib/order-tabs";
 import { ClientOrdersDetail } from "@/features/orders/components/ClientOrdersDetail";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
+import { ROUTES } from "@/lib/routes";
 
 export default function ClientOrdersPage({ params }: { params: Promise<{ clientId: string }> }) {
   const locale = useLocale();
   // Same gate as the rest of Order Management — above every hook, so flipping
   // the flag cannot change the hook order.
-  if (!ORDER_BOOKING_ENABLED) redirect(localizePath("/product-catalog", locale));
+  if (!ORDER_BOOKING_ENABLED) redirect(localizePath(ROUTES.productCatalog, locale));
   return (
     <Suspense fallback={null}>
       <ClientOrdersPageInner params={params} />
@@ -63,7 +64,7 @@ function ClientOrdersPageInner({ params }: { params: Promise<{ clientId: string 
     return (
       <CatalogNotFound
         message={client ? t.orders.clientPage.noBookingsInDesk : t.states.notFoundClient}
-        onBack={() => router.push("/orders")}
+        onBack={() => router.push(ROUTES.orders)}
       />
     );
   }

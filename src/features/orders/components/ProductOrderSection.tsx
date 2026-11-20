@@ -76,6 +76,8 @@ import type { Booking, RequirementItem, RequirementKey, RequirementStatus } from
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { formatInteger } from "@/lib/format/number";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const PAGE_SIZE = 10;
 
@@ -260,10 +262,10 @@ export function ProductOrderSection({
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const totalPages = pageCount(rows.length, PAGE_SIZE);
   // A search that shrinks the list can leave the page past its end.
   const current = Math.min(page, totalPages);
-  const visible = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const visible = pageSlice(rows, current, PAGE_SIZE);
 
   // "IC" figures are this IC's own share of the deal; the others are the whole
   // deal, every IC's bookings together.
@@ -280,7 +282,6 @@ export function ProductOrderSection({
     .filter((b) => b.createdBy === currentIc.name && sentIds.has(b.id))
     .reduce((sum, b) => sum + b.amount, 0);
 
-  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
   const canBook = variant === "product" && isBookingOpen(book);
   // Empty only when there is nothing at all to draw — a page of other ICs'
   // summary alone still explains where the deal's figure comes from.
@@ -479,7 +480,7 @@ export function ProductOrderSection({
                       ))}
                       <TableCell style={CENTER}>
                         <span className={`type-body-2 font-semibold tabular-nums ${struck}`}>
-                          {money(b.amount)}
+                          {formatInteger(b.amount)}
                         </span>
                       </TableCell>
                       <TableCell style={CENTER}>
@@ -523,7 +524,7 @@ export function ProductOrderSection({
                         <span>
                           {t.orders.productOrders.othersLine(others.count)}{" "}
                           <span className="font-semibold tabular-nums">
-                            {money(others.amount)} {book.currency}
+                            {formatInteger(others.amount)} {book.currency}
                           </span>
                         </span>
                       </div>
@@ -574,17 +575,17 @@ export function ProductOrderSection({
               cell is the issue's quota being drawn down, which is a different
               claim about the same arithmetic. The split of that figure between
               this IC and the rest is on the Detail tab — see `DealProgress`. */}
-          <Total label={words.myTotal} value={money(notionalIc)} />
+          <Total label={words.myTotal} value={formatInteger(notionalIc)} />
           <Total
             label={t.orders.productOrders.myCompleted}
-            value={money(confirmedIc)}
+            value={formatInteger(confirmedIc)}
             tone="green"
           />
           <Total
             label={
               book.mode === "basket" ? t.orders.progress.dealTotal : t.orders.progress.quotaUsed
             }
-            value={`${money(book.mode === "basket" ? notional : book.quotaUsed)} / ${money(book.targetAmount)}`}
+            value={`${formatInteger(book.mode === "basket" ? notional : book.quotaUsed)} / ${formatInteger(book.targetAmount)}`}
           />
           <Total
             label={
@@ -592,7 +593,7 @@ export function ProductOrderSection({
                 ? t.orders.productOrders.dealCompleted
                 : t.orders.productOrders.allCompleted
             }
-            value={money(book.confirmedAmount)}
+            value={formatInteger(book.confirmedAmount)}
             tone="green"
           />
         </div>

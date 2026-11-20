@@ -9,6 +9,7 @@ import { useT } from "@/i18n/I18nProvider";
 import { NoteComposer, draftHasContent, emptyDraft, type ComposerDraft } from "./NoteComposer";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
 
 const CLIENT_PAGE = /^\/client\/([^/]+)/;
 
@@ -88,7 +89,7 @@ export function FloatingNoteButton() {
       setOpen(false);
     } catch (err) {
       // The panel stays open with the draft, and says so.
-      console.warn("[FloatingNoteButton] create failed", err);
+      reportError("[FloatingNoteButton] create failed", err);
       setSubmitError(t.planner.notes.saveFailedRetry);
     } finally {
       setSaving(false);

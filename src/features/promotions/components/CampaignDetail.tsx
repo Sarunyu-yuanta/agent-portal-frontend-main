@@ -41,6 +41,8 @@ import { PromotionBody } from "./PromotionBody";
 import { ShareDialog } from "./ShareDialog";
 import { useLocale } from "@/i18n/I18nProvider";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { reportError } from "@/lib/report-error";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * One campaign, in full.
@@ -139,7 +141,7 @@ function CampaignDetailInner({ id }: { id: string }) {
         // A rule refusal carries copy written for the IC; anything else is a
         // transport failure and gets the generic line — never a raw English
         // `Error.message`.
-        console.warn("[shareMaterial]", error);
+        reportError("[shareMaterial]", error);
         addToast({
           status: "critical",
           message:
@@ -157,7 +159,7 @@ function CampaignDetailInner({ id }: { id: string }) {
     return (
       <NotFoundState
         message={t.campaigns.detail.notFound}
-        onBack={() => router.push("/promotions")}
+        onBack={() => router.push(ROUTES.promotions)}
         backLabel={t.campaigns.detail.backToList}
       />
     );

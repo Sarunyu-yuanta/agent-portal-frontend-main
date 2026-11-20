@@ -28,6 +28,7 @@ import { useRiskCta } from "@/features/command-center/hooks/use-risk-cta";
 import { ErrorState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 import type { RiskSeverity } from "@/types/risk-alert";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Every risk finding across the book, filtered.
@@ -63,7 +64,7 @@ function RiskAlertsPageInner() {
   const { rows, isLoading, error, retry, acknowledge } = useRiskAlertRows();
   // Falls back to the Command Center on a cold entry — a pasted link, or a
   // session restored straight onto this page with no trail to walk up.
-  const goBack = useSectionBack(() => "/command-center");
+  const goBack = useSectionBack(() => ROUTES.commandCenter);
   // Opened from a Dashboard that was scrolled down.
   useScrollTopOnChange([]);
 

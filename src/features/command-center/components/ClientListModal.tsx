@@ -10,6 +10,7 @@ import { formatAumThb, getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
+import { clientPath } from "@/lib/routes";
 
 export function ClientListModal({
   open,
@@ -44,7 +45,7 @@ export function ClientListModal({
               return (
                 <Link
                   key={client.id}
-                  href={`/client/${client.id}`}
+                  href={clientPath(client.id)}
                   onClick={onClose}
                   className="flex items-center gap-3 p-3 no-underline transition-colors hover:bg-[var(--fill-p1-100)]"
                 >

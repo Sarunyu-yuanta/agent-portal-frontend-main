@@ -39,7 +39,7 @@ import { useOrders } from "@/features/orders/store/orders-context";
 import { useToasts } from "@/hooks/use-toasts";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import {
   ALL_ASSETS,
   ALL_ASSET_LABEL,
@@ -48,7 +48,7 @@ import {
   buildAllRows,
   type AllRow,
 } from "@/features/orders/lib/all-orders";
-import { findBookableProduct, type BookableProduct } from "@/features/orders/lib/bookable-products";
+import { findBookableProduct } from "@/features/orders/lib/bookable-products";
 import { BookingDetailModal } from "./BookingDetailModal";
 import {
   checksAtBooking,
@@ -70,16 +70,11 @@ import type { TransactionSide } from "@/types/transaction";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { PLACEHOLDER_PRODUCT } from "@/features/orders/lib/bookable-products";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const COLUMNS = 6;
 const SIDES: TransactionSide[] = ["buy", "sell", "switch"];
-
-const FALLBACK_PRODUCT = {
-  id: "",
-  tags: [],
-  currency: "",
-  minInvestment: "0",
-} as unknown as BookableProduct;
 
 /**
  * @param clientId One client's records only — the client profile's Order tab
@@ -160,9 +155,9 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
   const previewed = rows.filter((r) => matches(r, draft)).length;
   const activeFilters = (asset ? 1 : 0) + (side ? 1 : 0);
 
-  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
+  const totalPages = pageCount(visible.length, pageSize);
   const safePage = Math.min(page, totalPages);
-  const paged = visible.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = pageSlice(visible, safePage, pageSize);
 
   // Looked up in every row, not the filtered ones — a filter changed behind an
   // open receipt must not blank it.
@@ -180,7 +175,7 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
     }
     setOpenedId(r.id);
   };
-  const readiness = useRosterReadiness(clients, bookingProduct ?? FALLBACK_PRODUCT);
+  const readiness = useRosterReadiness(clients, bookingProduct ?? PLACEHOLDER_PRODUCT);
 
   if (isLoading) return <OrdersPanelSkeleton withCreate />;
 

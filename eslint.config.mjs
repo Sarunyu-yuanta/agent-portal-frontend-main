@@ -82,7 +82,8 @@ const eslintConfig = defineConfig([
   {
     files: ["src/**"],
     rules: {
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      // Report recovered errors through `reportError` (src/lib/report-error.ts).
+      "no-console": "error",
       "no-restricted-imports": [
         "error",
         { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS, NO_MOCK_IMPORTS] },
@@ -103,6 +104,10 @@ const eslintConfig = defineConfig([
     rules: {
       "no-restricted-imports": ["error", { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS] }],
     },
+  },
+  {
+    files: ["src/lib/report-error.ts", "src/app/**/error.tsx", "src/app/global-error.tsx"],
+    rules: { "no-console": "off" },
   },
   globalIgnores([
     // Default ignores of eslint-config-next:

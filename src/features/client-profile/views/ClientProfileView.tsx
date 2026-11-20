@@ -46,6 +46,7 @@ import {
   useClientProfile,
   useClientsResource,
 } from "@/features/clients/hooks/use-clients";
+import { ROUTES, clientPath } from "@/lib/routes";
 
 export function ClientProfileView({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -89,7 +90,7 @@ function ClientPageInner({ id }: { id: string }) {
     return (
       <NotFoundState
         message={t.states.notFoundClient}
-        onBack={() => router.push("/client-hub")}
+        onBack={() => router.push(ROUTES.clientHub)}
         backLabel={t.states.backToClientHub}
       />
     );
@@ -118,7 +119,7 @@ function ClientProfile({ id, client, clients }: { id: string; client: Client; cl
   // `replace`: sub-tabs are views of one profile, not stops worth unwinding.
   const tabParam = searchParams.get("tab");
   const activeTab = tabParam && CLIENT_TABS.includes(tabParam) ? tabParam : "overview";
-  const setActiveTab = (tab: string) => setQueryState(`/client/${id}?tab=${tab}`, "replace");
+  const setActiveTab = (tab: string) => setQueryState(clientPath(id, tab), "replace");
 
   // Holdings sort state
   const [holdingsSortDir, setHoldingsSortDir] = useState<SortDir>("none");

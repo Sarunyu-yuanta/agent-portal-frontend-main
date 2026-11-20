@@ -18,6 +18,7 @@ import { getInitial } from "@/lib/client-utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useT } from "@/i18n/I18nProvider";
 import { useClientProfile } from "@/features/clients/hooks/use-clients";
+import { clientPath } from "@/lib/routes";
 
 /** How long the tick stays after a copy. Long enough to be seen if you glanced
  * away, short enough that the row is back to normal before you need it again. */
@@ -312,7 +313,7 @@ export function HolderContact({
             `onClick` closes the panel as it navigates: leaving it mounted over
             the page it just opened is the same overlap the day popover had. */}
         <Link
-          href={`/client/${clientId}`}
+          href={clientPath(clientId)}
           onClick={onClose}
           className="type-body-2 text-primary-action flex h-9 w-full items-center justify-center rounded-lg border border-transparent bg-transparent font-medium transition-colors hover:bg-[var(--bg-default-secondary)]!"
         >

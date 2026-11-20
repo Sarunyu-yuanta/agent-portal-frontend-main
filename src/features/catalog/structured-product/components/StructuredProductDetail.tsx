@@ -27,6 +27,7 @@ import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "@/features/catalog/components/PackageFilesModal";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import { formatInteger } from "@/lib/format/number";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 
@@ -171,7 +172,6 @@ export function StructuredProductDetail({
   // instead of the figures frozen into the product's JSON — those never moved
   // when someone booked, so the box and the Order tab disagreed.
   const round = ORDER_BOOKING_ENABLED && book ? headlineRound(book) : null;
-  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
   // The page owns the toast stack rather than the modal: a booking confirms by
   // *closing* the modal, and a toast rendered inside it would leave with it.
@@ -278,8 +278,8 @@ export function StructuredProductDetail({
               <DealProgress productId={product.id} />
               {round && book ? (
                 <AllocationSummary
-                  requestNotionalSize={`${money(round.amount)} / ${money(book.targetAmount)}`}
-                  confirmedRequest={`${money(round.confirmed)} / ${money(round.amount)}`}
+                  requestNotionalSize={`${formatInteger(round.amount)} / ${formatInteger(book.targetAmount)}`}
+                  confirmedRequest={`${formatInteger(round.confirmed)} / ${formatInteger(round.amount)}`}
                 />
               ) : (
                 product.requestNotionalSize != null &&

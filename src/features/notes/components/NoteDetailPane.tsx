@@ -14,6 +14,7 @@ import { formatDateTime, reminderTag, TAG_CHIP_TONE } from "@/features/notes/lib
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Note } from "@/types/note";
+import { reportError } from "@/lib/report-error";
 
 /**
  * A tag that can carry a real icon.
@@ -214,7 +215,7 @@ export function NoteDetailPane({
     Promise.resolve(save(patch)).then(
       () => setSaveFailed(false),
       (err: unknown) => {
-        console.warn("[NoteDetailPane] save failed", err);
+        reportError("[NoteDetailPane] save failed", err);
         setSavingFrom(null);
         setSaveFailed(true);
       },

@@ -7,6 +7,8 @@ import { CheckCircleIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { useT } from "@/i18n/I18nProvider";
 import { requestPasswordReset } from "@/features/auth/api/auth.api";
+import { reportError } from "@/lib/report-error";
+import { ROUTES } from "@/lib/routes";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -45,7 +47,7 @@ export function ForgotPasswordView() {
       await requestPasswordReset(trimmed);
       setSubmitted(true);
     } catch (err) {
-      console.warn("[forgot-password]", err);
+      reportError("[forgot-password]", err);
       setRequestError(t.auth.forgot.requestFailed);
     } finally {
       setSubmitting(false);
@@ -74,7 +76,7 @@ export function ForgotPasswordView() {
             variant="outline"
             size="lg"
             className="w-full"
-            onClick={() => router.push("/login")}
+            onClick={() => router.push(ROUTES.login)}
           >
             {t.auth.login}
           </Button>
@@ -113,7 +115,7 @@ export function ForgotPasswordView() {
                 variant="plain"
                 size="lg"
                 className="w-full"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push(ROUTES.login)}
               >
                 {t.auth.login}
               </Button>

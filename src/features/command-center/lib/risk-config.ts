@@ -21,11 +21,12 @@ import {
 import type { Locale } from "@/i18n/config";
 import { formatDate, formatTime } from "@/i18n/format";
 import type { RiskAlertCategory, RiskSeverity } from "@/types/risk-alert";
+import { ROUTES } from "@/lib/routes";
 
 /** Where "ดูทั้งหมด" lands. Exported from here rather than from the panel the
  *  way `CALL_LOG_PAGE` is: the sub page needs the string, and importing it out
  *  of the card component would pull the whole panel into the page's graph. */
-export const RISK_ALERTS_PAGE = "/command-center/risk-alerts";
+export const RISK_ALERTS_PAGE = ROUTES.riskAlerts;
 
 /** Worst first — the order the strip and the chip row are drawn in. */
 export const SEVERITY_ORDER: RiskSeverity[] = ["critical", "warning", "watch"];

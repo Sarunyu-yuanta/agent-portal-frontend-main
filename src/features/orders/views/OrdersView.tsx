@@ -30,6 +30,7 @@ import { AllOrdersPanel } from "@/features/orders/components/AllOrdersPanel";
 import { DEFAULT_ORDER_TAB, ORDER_TABS, normalizeOrderTab } from "@/features/orders/lib/order-tabs";
 import { useT } from "@/i18n/I18nProvider";
 import { useHasLoaded } from "@/lib/api/resource";
+import { ROUTES } from "@/lib/routes";
 
 export function OrdersView() {
   const locale = useLocale();
@@ -37,7 +38,7 @@ export function OrdersView() {
   // redirects somewhere real, so a bookmarked link doesn't 404 when the flag
   // is off. The page body is a separate component so this guard sits above
   // every hook rather than in front of them.
-  if (!ORDER_BOOKING_ENABLED) redirect(localizePath("/product-catalog", locale));
+  if (!ORDER_BOOKING_ENABLED) redirect(localizePath(ROUTES.productCatalog, locale));
   return (
     // `useSearchParams` suspends. The tab and every filter live in the URL so a
     // book's "back to Order Management" lands on the tab it came from.

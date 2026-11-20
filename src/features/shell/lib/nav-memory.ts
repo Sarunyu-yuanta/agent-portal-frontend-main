@@ -14,6 +14,7 @@
  */
 
 import { navRead, navRemove, navWrite } from "@/lib/nav-session";
+import { ROUTES } from "@/lib/routes";
 
 export type NavSectionKey =
   | "command-center"
@@ -38,21 +39,21 @@ type NavSection = {
 };
 
 const SECTIONS: NavSection[] = [
-  { key: "command-center", root: "/command-center", prefixes: ["/command-center"] },
+  { key: "command-center", root: ROUTES.commandCenter, prefixes: [ROUTES.commandCenter] },
   // Full Profile (/client/:id) is Client 360's deepest level, not its own section.
-  { key: "client-hub", root: "/client-hub", prefixes: ["/client-hub", "/client"] },
-  { key: "product-catalog", root: "/product-catalog", prefixes: ["/product-catalog"] },
-  { key: "insights", root: "/insights", prefixes: ["/insights"] },
-  { key: "promotions", root: "/promotions", prefixes: ["/promotions"] },
+  { key: "client-hub", root: ROUTES.clientHub, prefixes: [ROUTES.clientHub, "/client"] },
+  { key: "product-catalog", root: ROUTES.productCatalog, prefixes: [ROUTES.productCatalog] },
+  { key: "insights", root: ROUTES.insights, prefixes: [ROUTES.insights] },
+  { key: "promotions", root: ROUTES.promotions, prefixes: [ROUTES.promotions] },
   // A book (/orders/:productId) is Order Management's deepest level, not its
   // own section — the same shape as Full Profile under Client 360.
-  { key: "orders", root: "/orders", prefixes: ["/orders"] },
-  { key: "performance", root: "/performance", prefixes: ["/performance"] },
-  { key: "ic-learning", root: "/ic-learning", prefixes: ["/ic-learning"] },
-  { key: "yaa-team-head", root: "/yaa-team-head", prefixes: ["/yaa-team-head"] },
-  { key: "notes", root: "/notes", prefixes: ["/notes"] },
-  { key: "calendar", root: "/calendar", prefixes: ["/calendar"] },
-  { key: "reminders", root: "/reminders", prefixes: ["/reminders"] },
+  { key: "orders", root: ROUTES.orders, prefixes: [ROUTES.orders] },
+  { key: "performance", root: ROUTES.performance, prefixes: [ROUTES.performance] },
+  { key: "ic-learning", root: ROUTES.icLearning, prefixes: [ROUTES.icLearning] },
+  { key: "yaa-team-head", root: ROUTES.yaaTeamHead, prefixes: [ROUTES.yaaTeamHead] },
+  { key: "notes", root: ROUTES.notes, prefixes: [ROUTES.notes] },
+  { key: "calendar", root: ROUTES.calendar, prefixes: [ROUTES.calendar] },
+  { key: "reminders", root: ROUTES.reminders, prefixes: [ROUTES.reminders] },
 ];
 
 const isUnder = (pathname: string, prefix: string) =>
@@ -334,5 +335,5 @@ export function rememberCatalogList(url: string) {
 }
 
 export function catalogListUrl(): string {
-  return navRead(CATALOG_LIST_KEY) ?? "/product-catalog";
+  return navRead(CATALOG_LIST_KEY) ?? ROUTES.productCatalog;
 }

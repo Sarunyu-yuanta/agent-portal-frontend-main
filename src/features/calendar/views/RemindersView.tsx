@@ -14,6 +14,7 @@ import { todayDateKey } from "@/features/calendar/lib/calendar-grid";
 import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals";
 import { CalendarRemindersTab } from "@/features/calendar/components/CalendarRemindersTab";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Every reminder as one list — the same set the Calendar lays out by day. The
@@ -27,7 +28,7 @@ import { useClients } from "@/features/clients/hooks/use-clients";
  */
 export function RemindersView() {
   const locale = useLocale();
-  if (!CALENDAR_ENABLED) redirect(localizePath("/client-hub", locale));
+  if (!CALENDAR_ENABLED) redirect(localizePath(ROUTES.clientHub, locale));
   return <RemindersPageInner />;
 }
 

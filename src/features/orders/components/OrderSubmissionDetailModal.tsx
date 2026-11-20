@@ -40,6 +40,7 @@ import { NotFoundState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { OrderBook, OrderSubmission } from "@/types/order";
+import { clientPath } from "@/lib/routes";
 
 export type OrderSubmissionRef = { productId: string; submissionId: string };
 
@@ -171,7 +172,7 @@ function Body({
                   {carried.map((b) => (
                     <div key={b.id} className="flex items-center justify-between gap-4 py-1">
                       <Link
-                        href={`/client/${b.clientId}`}
+                        href={clientPath(b.clientId)}
                         onClick={onClose}
                         className={`-ml-2 flex min-w-0 items-center gap-2 px-2 py-0.5 no-underline ${SHEET_PRESSABLE}`}
                       >

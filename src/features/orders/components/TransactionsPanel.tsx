@@ -41,7 +41,7 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { TRANSACTION_CHANNELS } from "@/features/orders/lib/transaction-channels";
-import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import { formatLogTime } from "@/features/orders/lib/order-book";
 import { offeredSymbol } from "@/features/orders/lib/offered-products";
 import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
@@ -65,6 +65,7 @@ import type {
   TransactionSide,
   TransactionStatus,
 } from "@/types/transaction";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const COLUMNS = 9;
 
@@ -223,9 +224,9 @@ export function TransactionsPanel({
     setFilterOpen(true);
   };
 
-  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
+  const totalPages = pageCount(visible.length, pageSize);
   const safePage = Math.min(page, totalPages);
-  const paged = visible.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = pageSlice(visible, safePage, pageSize);
   // Looked up in the unfiltered rows: a chip clicked behind the open modal
   // must not blank out the trade being read.
   const open = trades.find((t: ClientTransaction) => t.id === openId) ?? null;

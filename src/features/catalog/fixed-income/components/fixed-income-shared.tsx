@@ -17,7 +17,6 @@ export const HEADER_TEXT_CLS = "text-sm leading-[24px] text-[#6a7282]";
  * table already imports from here — it is the catalog's table module in
  * practice, whatever the filename says.
  */
-export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 /** Card/table drop-shadow used across GlobalBond tables. */
 export const TABLE_SHADOW =

@@ -10,6 +10,7 @@ import { NOTES_ENABLED } from "@/config/feature-flags";
 import { NotesSplitView } from "@/features/notes/components/NotesSplitView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * The full note history — every note the RM has written, client-linked or
@@ -23,7 +24,7 @@ export function NotesView() {
   // sends it somewhere real rather than showing a feature that isn't shipping
   // yet. `redirect` during a Client Component's render is supported and turns
   // into a server-side redirect on a cold load.
-  if (!NOTES_ENABLED) redirect(localizePath("/client-hub", locale));
+  if (!NOTES_ENABLED) redirect(localizePath(ROUTES.clientHub, locale));
 
   return (
     <Suspense fallback={null}>

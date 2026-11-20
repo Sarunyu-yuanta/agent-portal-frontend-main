@@ -20,6 +20,7 @@ import {
   useInsightStrategies,
   useInsightStrategy,
 } from "@/features/insights/hooks/use-insights";
+import { ROUTES } from "@/lib/routes";
 
 export function InsightDetail({ id }: { id: string }) {
   const { data: strategy, isLoading } = useInsightStrategy(id);
@@ -44,7 +45,7 @@ export function InsightDetail({ id }: { id: string }) {
     return (
       <NotFoundState
         message={d.notFound}
-        onBack={() => router.push("/insights")}
+        onBack={() => router.push(ROUTES.insights)}
         backLabel={d.backToInsights}
       />
     );

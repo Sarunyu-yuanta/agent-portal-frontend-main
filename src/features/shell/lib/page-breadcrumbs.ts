@@ -45,6 +45,7 @@ import {
   productCategoryTitle,
 } from "@/features/catalog/lib/product-catalog-routes";
 import type { Client } from "@/types/client";
+import { ROUTES } from "@/lib/routes";
 
 export type Crumb = { label: string; href?: string };
 export type BreadcrumbContext = { clients: Client[]; isPrivate: boolean };
@@ -53,22 +54,22 @@ export type BreadcrumbContext = { clients: Client[]; isPrivate: boolean };
 type LabelContext = BreadcrumbContext & { t: Dictionary };
 
 const SECTION_ROOT: Record<NavSectionKey, { path: string }> = {
-  "command-center": { path: "/command-center" },
-  "client-hub": { path: "/client-hub" },
-  "product-catalog": { path: "/product-catalog" },
+  "command-center": { path: ROUTES.commandCenter },
+  "client-hub": { path: ROUTES.clientHub },
+  "product-catalog": { path: ROUTES.productCatalog },
   // Insight articles all come from the House View tab, which is what this
   // breadcrumb has always called the level above them.
-  insights: { path: "/insights" },
-  promotions: { path: "/promotions" },
-  orders: { path: "/orders" },
+  insights: { path: ROUTES.insights },
+  promotions: { path: ROUTES.promotions },
+  orders: { path: ROUTES.orders },
   // Matches the header title in `page-chrome.ts` — the two are allowed to
   // differ from the sidebar's own label, but not from each other.
-  performance: { path: "/performance" },
-  "ic-learning": { path: "/ic-learning" },
-  "yaa-team-head": { path: "/yaa-team-head" },
-  notes: { path: "/notes" },
-  calendar: { path: "/calendar" },
-  reminders: { path: "/reminders" },
+  performance: { path: ROUTES.performance },
+  "ic-learning": { path: ROUTES.icLearning },
+  "yaa-team-head": { path: ROUTES.yaaTeamHead },
+  notes: { path: ROUTES.notes },
+  calendar: { path: ROUTES.calendar },
+  reminders: { path: ROUTES.reminders },
 };
 
 const sectionLabel = (section: NavSectionKey, t: Dictionary) =>
@@ -257,10 +258,10 @@ const COMMAND_CENTER_SUBPAGE: Record<
   string,
   keyof Dictionary["shell"]["breadcrumb"]["commandCenter"]
 > = {
-  "/command-center/call-log": "callLog",
-  "/command-center/next-best-actions": "nextBestActions",
+  [ROUTES.callLog]: "callLog",
+  [ROUTES.nextBestActions]: "nextBestActions",
   // 27 characters, inside the 28 a leaf rung gets before `truncate` bites.
-  "/command-center/risk-alerts": "riskAlerts",
+  [ROUTES.riskAlerts]: "riskAlerts",
 };
 
 function labelFor(pathname: string, ctx: LabelContext): string | null {

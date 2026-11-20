@@ -40,8 +40,9 @@ import type { Client } from "@/types/client";
 import type { ProductRow } from "@/types/portfolio";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
 import { useHasLoaded } from "@/lib/api/resource";
-
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
+import { pageCount, pageSlice } from "@/lib/pagination";
+import { ROUTES, clientPath } from "@/lib/routes";
 
 /**
  * The Columns menu is remembered as the set of *hidden* columns, not visible
@@ -161,7 +162,7 @@ function ClientHubPageInner() {
     !isLoading && !error && clientParam && !selectedClient ? clientParam : null;
   useEffect(() => {
     if (!unknownClientParam) return;
-    setQueryState("/client-hub", "replace");
+    setQueryState(ROUTES.clientHub, "replace");
     addToast({ status: "warning", message: t.client.hub.clientParamNotFound });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per bad id
   }, [unknownClientParam]);
@@ -222,9 +223,9 @@ function ClientHubPageInner() {
 
   const originalIndexMap = useMemo(() => new Map(clients.map((c, i) => [c.id, i + 1])), [clients]);
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const totalPages = pageCount(sorted.length, pageSize);
   const safePage = Math.min(currentPage, totalPages);
-  const paged = sorted.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = pageSlice(sorted, safePage, pageSize);
 
   const productRows = useMemo(() => buildProductRows(clients), [clients]);
 
@@ -267,7 +268,7 @@ function ClientHubPageInner() {
       pushedPanelRef.current = false;
       router.back();
     } else {
-      setQueryState("/client-hub", "replace");
+      setQueryState(ROUTES.clientHub, "replace");
     }
   }
 
@@ -279,7 +280,7 @@ function ClientHubPageInner() {
    * on the way back is just something to dismiss.
    */
   const goToProfile = (clientId: string, tab?: string) => {
-    const href = tab ? `/client/${clientId}?tab=${tab}` : `/client/${clientId}`;
+    const href = tab ? clientPath(clientId, tab) : clientPath(clientId);
 
     if (clientParam) {
       // Two things remember the panel, and both have to forget it — browser
@@ -293,8 +294,8 @@ function ClientHubPageInner() {
       // navigation below instead of racing `NavStateMemory`'s effect, which may
       // never run for a URL we leave in the same tick. `recordVisit` is
       // idempotent, so it doesn't matter if that effect fires anyway.
-      setQueryState("/client-hub", "replace");
-      recordVisit("/client-hub", "/client-hub");
+      setQueryState(ROUTES.clientHub, "replace");
+      recordVisit(ROUTES.clientHub, ROUTES.clientHub);
     }
 
     if (pushedPanelRef.current) {

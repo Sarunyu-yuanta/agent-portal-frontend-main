@@ -55,6 +55,7 @@ import { zoneForDays } from "@/lib/notification-zones";
 import type { NbaAction } from "@/types/sales";
 import type { Client } from "@/types/client";
 import type { Note } from "@/types/note";
+import { clientPath } from "@/lib/routes";
 
 // ── Reminders ───────────────────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ export function buildQueue({
       done: false,
       clientIds: [client.id],
       dayItem: null,
-      href: `/client/${client.id}?tab=kyc`,
+      href: clientPath(client.id, "kyc"),
     });
   }
 
@@ -292,7 +293,7 @@ export function buildDayQueue({
       done: false,
       clientIds: [client.id],
       dayItem: null,
-      href: `/client/${client.id}?tab=kyc`,
+      href: clientPath(client.id, "kyc"),
     });
   }
 

@@ -8,6 +8,7 @@ import { NoteDetailPane } from "./NoteDetailPane";
 import { NoteModalShell, NoteDeleteConfirmModal } from "./note-modal-shell";
 import { useT } from "@/i18n/I18nProvider";
 import type { Note } from "@/types/note";
+import { reportError } from "@/lib/report-error";
 
 /**
  * The modal an existing note opens into wherever a reminder points at it —
@@ -65,7 +66,7 @@ export function NoteEditModal({
         body: values?.body ?? panelNote.body,
       });
     } catch (err) {
-      console.warn("[NoteEditModal] save failed", err);
+      reportError("[NoteEditModal] save failed", err);
       addToast({ status: "critical", message: t.planner.saveFailedKept });
       return;
     } finally {
@@ -82,7 +83,7 @@ export function NoteEditModal({
     try {
       await removeNote(target.id);
     } catch (err) {
-      console.warn("[NoteEditModal] delete failed", err);
+      reportError("[NoteEditModal] delete failed", err);
       addToast({ status: "critical", message: t.states.deleteError });
       return;
     }

@@ -60,17 +60,9 @@ import {
   bookingModeForDesk,
   findBookableProduct,
   ordersListHref,
-  type BookableProduct,
   type Desk,
 } from "@/features/orders/lib/bookable-products";
 
-/** Stands in while no booking is open — see `OrderRecordsTable`. */
-const FALLBACK_PRODUCT = {
-  id: "",
-  tags: [],
-  currency: "",
-  minInvestment: "0",
-} as unknown as BookableProduct;
 import { BookingDetailModal } from "./BookingDetailModal";
 import { useClientReadiness } from "@/features/orders/hooks/use-order-books";
 import { useToasts } from "@/hooks/use-toasts";
@@ -82,6 +74,7 @@ import type { Client } from "@/types/client";
 import type { Booking, OrderBook } from "@/types/order";
 import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { PLACEHOLDER_PRODUCT } from "@/features/orders/lib/bookable-products";
 
 /** One product this client holds, with their own bookings on it. */
 type Holding = { book: OrderBook; bookings: Booking[] };
@@ -116,7 +109,7 @@ export function ClientOrdersDetail({
       }
     : null;
   const openedProduct = opened ? findBookableProduct(opened.book.productId) : undefined;
-  const readiness = useClientReadiness(client, openedProduct ?? FALLBACK_PRODUCT);
+  const readiness = useClientReadiness(client, openedProduct ?? PLACEHOLDER_PRODUCT);
   const {
     data: books,
     isLoading: booksLoading,

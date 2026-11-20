@@ -23,6 +23,7 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { usePageBreadcrumb, type Crumb } from "./page-breadcrumbs";
 import { useT } from "@/i18n/I18nProvider";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Everything the dashboard shell needs to know about the page inside it, all
@@ -66,23 +67,23 @@ export type PageChrome = {
 };
 
 const PAGE_TITLES: Record<string, string> = {
-  "/command-center": "Command Center",
-  "/client-hub": "Client 360",
-  "/pipeline": "Pipeline",
-  "/ai-insights": "AI Insights",
-  "/promotions": "Promotion/Events",
+  [ROUTES.commandCenter]: "Command Center",
+  [ROUTES.clientHub]: "Client 360",
+  [ROUTES.pipeline]: "Pipeline",
+  [ROUTES.aiInsights]: "AI Insights",
+  [ROUTES.promotions]: "Promotion/Events",
   // Was "Performance & Targets" while the built dashboard was live — restore
   // that alongside `performance/page.tsx` when it comes back off hold.
-  "/performance": "Performance",
-  "/compliance": "Compliance & Risk",
-  "/insights": "Insights",
-  "/ic-learning": "IC Learning",
-  "/yaa-team-head": "YAA/Team Head",
-  "/product-catalog": "Product Catalog",
-  "/orders": "Order Management",
-  "/notes": "Notes",
-  "/calendar": "Calendar",
-  "/reminders": "Reminders",
+  [ROUTES.performance]: "Performance",
+  [ROUTES.compliance]: "Compliance & Risk",
+  [ROUTES.insights]: "Insights",
+  [ROUTES.icLearning]: "IC Learning",
+  [ROUTES.yaaTeamHead]: "YAA/Team Head",
+  [ROUTES.productCatalog]: "Product Catalog",
+  [ROUTES.orders]: "Order Management",
+  [ROUTES.notes]: "Notes",
+  [ROUTES.calendar]: "Calendar",
+  [ROUTES.reminders]: "Reminders",
 };
 
 /**
@@ -91,21 +92,21 @@ const PAGE_TITLES: Record<string, string> = {
  * with, so the header stays recognisable even without a nav entry.
  */
 const PAGE_ICONS = {
-  "/command-center": LayoutIcon,
-  "/client-hub": UsersIcon,
-  "/pipeline": FunnelIcon,
-  "/ai-insights": BrainIcon,
-  "/promotions": MegaphoneIcon,
-  "/performance": GaugeIcon,
-  "/compliance": ShieldCheckIcon,
-  "/insights": ChartBarIcon,
-  "/ic-learning": GraduationCapIcon,
-  "/yaa-team-head": UsersThreeIcon,
-  "/product-catalog": SquaresFourIcon,
-  "/orders": ClipboardTextIcon,
-  "/notes": NotePencilIcon,
-  "/calendar": CalendarBlankIcon,
-  "/reminders": AlarmIcon,
+  [ROUTES.commandCenter]: LayoutIcon,
+  [ROUTES.clientHub]: UsersIcon,
+  [ROUTES.pipeline]: FunnelIcon,
+  [ROUTES.aiInsights]: BrainIcon,
+  [ROUTES.promotions]: MegaphoneIcon,
+  [ROUTES.performance]: GaugeIcon,
+  [ROUTES.compliance]: ShieldCheckIcon,
+  [ROUTES.insights]: ChartBarIcon,
+  [ROUTES.icLearning]: GraduationCapIcon,
+  [ROUTES.yaaTeamHead]: UsersThreeIcon,
+  [ROUTES.productCatalog]: SquaresFourIcon,
+  [ROUTES.orders]: ClipboardTextIcon,
+  [ROUTES.notes]: NotePencilIcon,
+  [ROUTES.calendar]: CalendarBlankIcon,
+  [ROUTES.reminders]: AlarmIcon,
 } satisfies Record<keyof typeof PAGE_TITLES, PhosphorIcon>;
 
 /**
@@ -153,19 +154,22 @@ export function usePageChrome(): PageChrome {
     titleIcon:
       breadcrumb || !titleKey ? null : (PAGE_ICONS[titleKey as keyof typeof PAGE_ICONS] ?? null),
     breadcrumb,
-    isPerformance: pathname.startsWith("/performance"),
-    isFullWidth: pathname.startsWith("/product-catalog") || pathname.startsWith("/client-hub"),
+    isPerformance: pathname.startsWith(ROUTES.performance),
+    isFullWidth:
+      pathname.startsWith(ROUTES.productCatalog) || pathname.startsWith(ROUTES.clientHub),
     // Notes and Calendar: each is one surface rather than a document on a
     // background, which is exactly the shape that gains nothing from a frame
     // and a heading on a phone.
     isMobileFullBleed:
-      pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+      pathname === ROUTES.notes || pathname === ROUTES.calendar || pathname === ROUTES.reminders,
     // Each owns the whole area below the top bar and never scrolls the page:
     // Notes is master/detail, Calendar's six weeks split the height between
     // them (each cell counts how many pills fit), and Reminders' timeline
     // scrolls inside itself.
-    isFullHeight: pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
-    isEdgeToEdge: pathname === "/notes" || pathname === "/calendar" || pathname === "/reminders",
+    isFullHeight:
+      pathname === ROUTES.notes || pathname === ROUTES.calendar || pathname === ROUTES.reminders,
+    isEdgeToEdge:
+      pathname === ROUTES.notes || pathname === ROUTES.calendar || pathname === ROUTES.reminders,
     // Full Profile puts the breadcrumb inside its own sticky identity bar (and
     // pulls itself up over the layout's padding to do it), so a second one
     // above would overlap.

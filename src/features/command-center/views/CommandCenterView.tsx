@@ -49,6 +49,7 @@ import { parseTimePreview } from "@/features/command-center/lib/time-of-day-sky"
 import type { RiskSeverity } from "@/types/risk-alert";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * The page an IC opens first.
@@ -80,7 +81,7 @@ export function CommandCenterView() {
   );
 }
 
-const PATH = "/command-center";
+const PATH = ROUTES.commandCenter;
 
 /** Column widths, inlined for the reason this page already had to learn once:
  *  `@sarunyu/system-one` ships a plain `.grid-cols-1` and loads after

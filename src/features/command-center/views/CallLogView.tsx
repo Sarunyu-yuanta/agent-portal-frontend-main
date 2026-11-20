@@ -32,6 +32,9 @@ import { buildCallLog, type CallLogRow } from "@/features/command-center/lib/cal
 import { useT } from "@/i18n/I18nProvider";
 import { relativeCallDate } from "@/features/clients/lib/call-log-format";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
+import { pageCount, pageSlice } from "@/lib/pagination";
+import { ROUTES, clientPath } from "@/lib/routes";
 
 /**
  * Every logged call across the book, in full.
@@ -55,7 +58,6 @@ import { useClientsResource } from "@/features/clients/hooks/use-clients";
 const ALL_CLIENTS = "all";
 
 /** Matches Client 360's table, so the two pages page the same way. */
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 export function CallLogView() {
   const { data: clients, isLoading } = useClientsResource();
@@ -64,7 +66,7 @@ export function CallLogView() {
   const t = useT();
   // Falls back to the Dashboard on a cold entry — a pasted link, or a session
   // restored straight onto this page, where there is no trail to walk up.
-  const goBack = useSectionBack(() => "/command-center");
+  const goBack = useSectionBack(() => ROUTES.commandCenter);
 
   // Same in reverse: opened from a Dashboard that was scrolled down.
   useScrollTopOnChange([]);
@@ -99,13 +101,13 @@ export function CallLogView() {
 
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
+  const totalPages = pageCount(visible.length, pageSize);
   /** Clamped rather than reset: narrowing the filter while on page 3 leaves the
    *  stored page out of range, and snapping to the last page that still exists
    *  keeps the reader where they were rather than throwing them to the top. */
   const safePage = Math.min(currentPage, totalPages);
   const paged = useMemo(
-    () => visible.slice((safePage - 1) * pageSize, safePage * pageSize),
+    () => pageSlice(visible, safePage, pageSize),
     [visible, safePage, pageSize],
   );
 
@@ -247,7 +249,7 @@ export function CallLogView() {
         onClose={() => setDetail(null)}
         onViewClient={(clientId) => {
           setDetail(null);
-          router.push(`/client/${clientId}?tab=call-log`);
+          router.push(clientPath(clientId, "call-log"));
         }}
       />
     </div>

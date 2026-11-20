@@ -8,6 +8,8 @@ import { EyeIcon, EyeSlashIcon, CheckCircleIcon, LinkBreakIcon } from "@phosphor
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { useT } from "@/i18n/I18nProvider";
 import { ResetLinkError, resetPassword } from "@/features/auth/api/auth.api";
+import { reportError } from "@/lib/report-error";
+import { ROUTES } from "@/lib/routes";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -71,7 +73,7 @@ function ResetPasswordInner() {
       await resetPassword(token, password);
       setSubmitted(true);
     } catch (err) {
-      console.warn("[reset-password]", err);
+      reportError("[reset-password]", err);
       if (err instanceof ResetLinkError) setLinkInvalid(true);
       else setRequestError(t.auth.reset.requestFailed);
     } finally {
@@ -93,7 +95,7 @@ function ResetPasswordInner() {
           variant="primary"
           size="lg"
           className="w-full"
-          onClick={() => router.push("/forgot-password")}
+          onClick={() => router.push(ROUTES.forgotPassword)}
         >
           {t.auth.reset.requestNew}
         </Button>
@@ -115,7 +117,7 @@ function ResetPasswordInner() {
             variant="outline"
             size="lg"
             className="w-full"
-            onClick={() => router.push("/login")}
+            onClick={() => router.push(ROUTES.login)}
           >
             {t.auth.login}
           </Button>

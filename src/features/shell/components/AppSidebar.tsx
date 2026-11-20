@@ -41,6 +41,7 @@ import {
   type NavSectionKey,
 } from "@/features/shell/lib/nav-memory";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * What the firm puts in front of you: clients and research. Shared,
@@ -48,21 +49,21 @@ import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
  */
 const workspaceItems: NavItem[] = [
   {
-    href: "/command-center",
+    href: ROUTES.commandCenter,
     section: "command-center",
     label: "Command Center",
     icon: LayoutIcon,
     badge: null,
   },
   {
-    href: "/client-hub",
+    href: ROUTES.clientHub,
     section: "client-hub",
     label: "Client 360",
     icon: UsersIcon,
     badge: null,
   },
   {
-    href: "/insights",
+    href: ROUTES.insights,
     section: "insights",
     label: "Insights",
     icon: ChartBarIcon,
@@ -71,7 +72,7 @@ const workspaceItems: NavItem[] = [
   ...(PROMOTIONS_ENABLED
     ? [
         {
-          href: "/promotions",
+          href: ROUTES.promotions,
           section: "promotions" as const,
           label: "Promotion/Events",
           icon: MegaphoneIcon,
@@ -92,7 +93,7 @@ const workspaceItems: NavItem[] = [
  */
 const salesItems: NavItem[] = [
   {
-    href: "/product-catalog",
+    href: ROUTES.productCatalog,
     section: "product-catalog",
     label: "Product Catalog",
     icon: SquaresFourIcon,
@@ -101,7 +102,7 @@ const salesItems: NavItem[] = [
   ...(ORDER_BOOKING_ENABLED
     ? [
         {
-          href: "/orders",
+          href: ROUTES.orders,
           section: "orders" as const,
           label: "Order Management",
           icon: ClipboardTextIcon,
@@ -120,7 +121,7 @@ const growthItems: NavItem[] = [
   ...(PERFORMANCE_ENABLED
     ? [
         {
-          href: "/performance",
+          href: ROUTES.performance,
           section: "performance" as const,
           label: "Performance",
           icon: GaugeIcon,
@@ -131,7 +132,7 @@ const growthItems: NavItem[] = [
   ...(IC_LEARNING_ENABLED
     ? [
         {
-          href: "/ic-learning",
+          href: ROUTES.icLearning,
           section: "ic-learning" as const,
           label: "IC Learning",
           icon: GraduationCapIcon,
@@ -142,7 +143,7 @@ const growthItems: NavItem[] = [
   ...(YAA_TEAM_HEAD_ENABLED
     ? [
         {
-          href: "/yaa-team-head",
+          href: ROUTES.yaaTeamHead,
           section: "yaa-team-head" as const,
           label: "YAA/Team Head",
           icon: UsersThreeIcon,
@@ -169,7 +170,7 @@ const plannerItems: NavItem[] = [
   ...(NOTES_ENABLED
     ? [
         {
-          href: "/notes",
+          href: ROUTES.notes,
           section: "notes" as const,
           label: "Notes",
           icon: NotePencilIcon,
@@ -180,7 +181,7 @@ const plannerItems: NavItem[] = [
   ...(CALENDAR_ENABLED
     ? [
         {
-          href: "/calendar",
+          href: ROUTES.calendar,
           section: "calendar" as const,
           label: "Calendar",
           icon: CalendarBlankIcon,
@@ -190,7 +191,7 @@ const plannerItems: NavItem[] = [
         // rather than a tab on Calendar so the month grid can own the whole
         // screen.
         {
-          href: "/reminders",
+          href: ROUTES.reminders,
           section: "reminders" as const,
           label: "Reminders",
           icon: AlarmIcon,

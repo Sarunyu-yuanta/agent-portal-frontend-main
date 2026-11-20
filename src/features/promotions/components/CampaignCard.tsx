@@ -7,6 +7,7 @@ import { campaignDateLine } from "@/features/promotions/lib/campaign-data";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Campaign } from "@/types/campaign";
+import { campaignPath } from "@/lib/routes";
 
 /**
  * One campaign in the grid: the design system's `Card variant="event"`.
@@ -65,7 +66,7 @@ export function CampaignCard({
 
   return (
     <Link
-      href={`/promotions/${campaign.id}`}
+      href={campaignPath(campaign.id)}
       // `group` so the hover is owned by the whole card rather than by
       // whichever part of it the pointer happens to be over.
       className="group relative block rounded-[8px] no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary-action)]"

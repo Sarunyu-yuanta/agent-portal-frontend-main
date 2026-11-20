@@ -20,6 +20,8 @@ import { useT } from "@/i18n/I18nProvider";
 import type { Note } from "@/types/note";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
+import { clientPath } from "@/lib/routes";
 
 /**
  * Notes tab on a client's Full Profile — a wall of cards rather than the Notes
@@ -108,7 +110,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
   useEffect(() => {
     if (!unknownNoteParam) return;
     setQueryState(
-      withQuery(`/client/${clientId}`, searchParams, { tab: "notes", note: null }),
+      withQuery(clientPath(clientId), searchParams, { tab: "notes", note: null }),
       "replace",
     );
     addToast({ status: "warning", message: t.client.notes.notFound });
@@ -116,7 +118,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
   }, [noteParam, isLoading]);
 
   const hrefFor = (noteId: string | null) =>
-    withQuery(`/client/${clientId}`, searchParams, { tab: "notes", note: noteId });
+    withQuery(clientPath(clientId), searchParams, { tab: "notes", note: noteId });
 
   const navigateClosed = () => {
     if (pushedPanelRef.current) {
@@ -132,7 +134,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
     // failure is logged rather than toasted.
     if (note && draftBlank) {
       removeNote(note.id).catch((err: unknown) =>
-        console.warn("[ClientNotesTab] prune failed", err),
+        reportError("[ClientNotesTab] prune failed", err),
       );
     }
   };
@@ -191,7 +193,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
       }
     } catch (err) {
       // The modal stays open with what was typed.
-      console.warn("[ClientNotesTab] save failed", err);
+      reportError("[ClientNotesTab] save failed", err);
       addToast({ status: "critical", message: t.client.notes.saveFailed });
       return;
     } finally {
@@ -214,7 +216,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
     try {
       await removeNote(target.id);
     } catch (err) {
-      console.warn("[ClientNotesTab] delete failed", err);
+      reportError("[ClientNotesTab] delete failed", err);
       addToast({ status: "critical", message: t.client.notes.deleteFailed });
       return;
     }

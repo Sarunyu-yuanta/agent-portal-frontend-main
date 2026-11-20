@@ -21,6 +21,7 @@ import { Avatar, type TagVariant } from "@sarunyu/system-one";
 import { useT } from "@/i18n/I18nProvider";
 import { LocaleLink as Link } from "@/i18n/navigation";
 import { getInitial } from "@/lib/client-utils";
+import { clientPath } from "@/lib/routes";
 
 /** How long a copied row claims it copied. */
 const COPIED_MS = 1500;
@@ -267,7 +268,7 @@ export function ClientRow({ clientId, name }: { clientId: string; name: string }
   return (
     <SheetRow label={t.orders.sheet.client}>
       <Link
-        href={`/client/${clientId}`}
+        href={clientPath(clientId)}
         className={`-mr-2 flex min-w-0 items-center gap-2 px-2 py-0.5 no-underline ${SHEET_PRESSABLE}`}
       >
         {/* `getInitial`, not the two-letter helpers: the design system's Avatar

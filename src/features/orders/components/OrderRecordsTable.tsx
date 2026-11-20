@@ -75,11 +75,7 @@ import {
   emailStatus,
   paymentStatus,
 } from "@/features/orders/lib/booking-status";
-import {
-  findBookableProduct,
-  type BookableProduct,
-  type BookingMode,
-} from "@/features/orders/lib/bookable-products";
+import { findBookableProduct, type BookingMode } from "@/features/orders/lib/bookable-products";
 import { useOrderBook, useRosterReadiness } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
@@ -89,25 +85,11 @@ import type { SortDir } from "@/types/table";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { PLACEHOLDER_PRODUCT } from "@/features/orders/lib/bookable-products";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const COLUMNS = 5;
 const PAGE_SIZE = 12;
-
-/**
- * Stands in while no booking is open, so `useRosterReadiness` can be called
- * unconditionally.
- *
- * Its verdict is never read — the modal only renders once a real product has
- * resolved — and it asks for the strictest risk rating there is, so a future
- * edit that *did* read it could not let anything through by accident. Same
- * bargain `PLACEHOLDER_CLIENT` strikes in the booking form.
- */
-const FALLBACK_PRODUCT = {
-  id: "",
-  tags: [],
-  currency: "",
-  minInvestment: "0",
-} as unknown as BookableProduct;
 
 /**
  * One line of the list.
@@ -269,7 +251,7 @@ export function OrderRecordsTable({
     : null;
   const openedProduct = opened ? findBookableProduct(opened.book.productId) : undefined;
   const offerProduct = openedOffer ? findBookableProduct(openedOffer.book.productId) : undefined;
-  const readiness = useRosterReadiness(clients, openedProduct ?? FALLBACK_PRODUCT);
+  const readiness = useRosterReadiness(clients, openedProduct ?? PLACEHOLDER_PRODUCT);
 
   /**
    * The order to point at — `?flash=<submissionId>`, set by the bell's order
@@ -336,11 +318,11 @@ export function OrderRecordsTable({
     else notice(t.states.notFoundProduct, "warning");
   };
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const totalPages = pageCount(rows.length, PAGE_SIZE);
   // Clamped rather than reset: a filter that shortens the list past the current
   // page should land on the last one, not silently on an empty table.
   const current = Math.min(page, totalPages);
-  const visible = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const visible = pageSlice(rows, current, PAGE_SIZE);
 
   // Bring the order's first row into view — once, on arrival.
   const flashLanded = useRef(false);

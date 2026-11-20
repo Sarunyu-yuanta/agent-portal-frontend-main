@@ -56,6 +56,7 @@ import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Booking, OrderBook, RequirementItem } from "@/types/order";
 import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { reportError } from "@/lib/report-error";
 
 /**
  * The disc, by the step the booking is at rather than by its deal status.
@@ -220,7 +221,7 @@ function Body({
     } catch (err) {
       // Stays open on the same booking, button back to normal. The likeliest
       // real cause is the back office having picked the order up meanwhile.
-      console.warn("[cancelBooking]", err);
+      reportError("[cancelBooking]", err);
       onNotice(words.cancelFailed, "critical");
       setConfirming(false);
       return;

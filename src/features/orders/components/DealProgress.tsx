@@ -18,8 +18,7 @@ import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
 import { useOrderBook } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
-
-const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+import { formatInteger } from "@/lib/format/number";
 
 export function DealProgress({ productId }: { productId: string }) {
   const currentIc = useCurrentIc();
@@ -47,7 +46,7 @@ export function DealProgress({ productId }: { productId: string }) {
           {label}
         </span>
         <span className="text-lg leading-[28px] font-bold text-[#101828] tabular-nums">
-          {money(used)} / {money(target)}{" "}
+          {formatInteger(used)} / {formatInteger(target)}{" "}
           <span className="text-sm font-normal text-[#6a7282]">{book.currency}</span>
         </span>
       </div>
@@ -56,10 +55,10 @@ export function DealProgress({ productId }: { productId: string }) {
         role="img"
         aria-label={t.orders.progress.progressAria(
           label,
-          money(mine),
-          money(others),
-          money(remaining),
-          money(target),
+          formatInteger(mine),
+          formatInteger(others),
+          formatInteger(remaining),
+          formatInteger(target),
           book.currency,
         )}
       >
@@ -67,16 +66,20 @@ export function DealProgress({ productId }: { productId: string }) {
         <div className="h-full bg-[var(--fill-emerald-400)]" style={{ width: pct(others) }} />
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs leading-[20px] text-[#6a7282]">
-        <Legend swatch="bg-primary-action" label={t.orders.progress.mine} value={money(mine)} />
+        <Legend
+          swatch="bg-primary-action"
+          label={t.orders.progress.mine}
+          value={formatInteger(mine)}
+        />
         <Legend
           swatch="bg-[var(--fill-emerald-400)]"
           label={t.orders.progress.otherIcs}
-          value={money(others)}
+          value={formatInteger(others)}
         />
         <Legend
           swatch="border border-[var(--fill-gray-300)] bg-[var(--fill-gray-100)]"
           label={t.orders.progress.remaining}
-          value={money(remaining)}
+          value={formatInteger(remaining)}
         />
       </div>
     </div>

@@ -44,6 +44,7 @@ import {
   getBookableGlobalBond,
   globalBondIssuerIdForBookable,
 } from "@/features/catalog/global-bond/lib/global-bond-data";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * What the order machinery needs of a product: a name, a currency, a minimum
@@ -152,7 +153,7 @@ export function catalogHrefFor(product: BookableProduct): string {
   }
   if (deskForId(product.id) === "Global Bond") {
     const issuerId = globalBondIssuerIdForBookable(product.id);
-    return issuerId ? `/product-catalog/global-bond/${issuerId}` : "/product-catalog";
+    return issuerId ? `/product-catalog/global-bond/${issuerId}` : ROUTES.productCatalog;
   }
   if (product.id.startsWith("thai-")) {
     const theme = THAI_STRUCTURED_PRODUCTS.find(
@@ -160,7 +161,7 @@ export function catalogHrefFor(product: BookableProduct): string {
     )?.theme;
     return theme
       ? `/product-catalog/thai-structured/${encodeURIComponent(theme)}`
-      : "/product-catalog";
+      : ROUTES.productCatalog;
   }
   return `/product-catalog/product/${encodeURIComponent(product.id)}`;
 }
@@ -196,3 +197,18 @@ export function clientOrdersHref(clientId: string, tabId: string): string {
  * own and the page had nothing for the IC to do. Anything that used to link to
  * a book links to its desk's tab instead — see {@link ordersListHref}.
  */
+
+/**
+ * Stands in while no booking is open, so readiness hooks can be called
+ * unconditionally.
+ *
+ * Its verdict is never read — the modal only renders once a real product has
+ * resolved — and it asks for the strictest risk rating there is, so a future
+ * edit that *did* read it could not let anything through by accident.
+ */
+export const PLACEHOLDER_PRODUCT = {
+  id: "",
+  tags: [],
+  currency: "",
+  minInvestment: "0",
+} as unknown as BookableProduct;

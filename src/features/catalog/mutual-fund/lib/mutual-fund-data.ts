@@ -1,5 +1,6 @@
 import mutualFundsRaw from "@/mocks/mutual-funds.json";
 import navHistoryRaw from "@/mocks/mutual-fund-nav-history.json";
+import { insightPath } from "@/lib/routes";
 
 export type MutualFundCategoryId =
   | "global-equity"
@@ -315,7 +316,7 @@ export function mutualFundInsightsHref(): string {
 }
 
 export function mutualFundInsightDetailHref(detailId: string): string {
-  return `/insights/${encodeURIComponent(detailId)}`;
+  return insightPath(encodeURIComponent(detailId));
 }
 
 /** Figma 38285:291118 — insights list grid page size. */

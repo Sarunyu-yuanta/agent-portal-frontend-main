@@ -1,3 +1,4 @@
+import { ROUTES } from "@/lib/routes";
 /**
  * The Product Catalog's category tabs, and the URLs that address them.
  *
@@ -22,7 +23,7 @@ export const PRODUCT_CATEGORIES = [
   { id: "robo-advisory", title: "Portfolio Advisory" },
 ];
 
-export const CATALOG_PATH = "/product-catalog";
+export const CATALOG_PATH = ROUTES.productCatalog;
 
 /**
  * Where a catalog URL with no (or an unknown) `?category=` lands.

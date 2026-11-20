@@ -10,6 +10,7 @@ import {
 } from "@/features/insights/lib/house-view-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { HouseViewStrategy } from "@/types/research";
+import { insightPath } from "@/lib/routes";
 
 export function PlaybookCardCompact({
   strategy,
@@ -26,9 +27,9 @@ export function PlaybookCardCompact({
     <div
       role="button"
       tabIndex={0}
-      onClick={() => router.push(`/insights/${strategy.id}`)}
+      onClick={() => router.push(insightPath(strategy.id))}
       onKeyDown={(e) => {
-        if (e.key === "Enter") router.push(`/insights/${strategy.id}`);
+        if (e.key === "Enter") router.push(insightPath(strategy.id));
       }}
       className={`flex min-h-[116px] w-full cursor-pointer overflow-hidden transition-colors hover:bg-muted/30 ${noBorder ? "" : "rounded-2xl border border-border bg-card"}`}
     >

@@ -3,6 +3,7 @@
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { NotFoundState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * `notFound()` called from a dashboard page. Rendered inside the dashboard
@@ -16,7 +17,7 @@ export default function DashboardNotFound() {
   return (
     <NotFoundState
       message={t.states.notFoundPage}
-      onBack={() => router.push("/command-center")}
+      onBack={() => router.push(ROUTES.commandCenter)}
       backLabel={t.common.backHome}
     />
   );

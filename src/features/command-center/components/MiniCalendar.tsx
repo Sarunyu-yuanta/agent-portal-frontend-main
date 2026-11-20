@@ -27,6 +27,7 @@ import { formatDate, weekdayNames } from "@/i18n/format";
 import { useLocale, useT } from "@/i18n/I18nProvider";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
 /**
  * The month, small.
  *
@@ -114,7 +115,7 @@ export function MiniCalendar({
       setCreateOpen(false);
     } catch (err) {
       // The modal stays open with what was typed.
-      console.warn("[MiniCalendar] create failed", err);
+      reportError("[MiniCalendar] create failed", err);
       addToast({ status: "critical", message: t.commandCenter.calendar.reminderAddError });
     } finally {
       setSaving(false);

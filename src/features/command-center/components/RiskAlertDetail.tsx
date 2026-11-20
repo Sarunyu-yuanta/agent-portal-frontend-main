@@ -16,6 +16,7 @@ import type { RiskAlertRow } from "@/features/command-center/lib/risk-feed";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { RiskAlert } from "@/types/risk-alert";
+import { clientPath } from "@/lib/routes";
 
 /**
  * The shell every block of *information* in this panel wears — the prose
@@ -161,7 +162,7 @@ export function RiskAlertDetail({
                    colour of its own. Hover is the whole hint, which is exactly
                    the weight a bonus path should have. */
                 <Link
-                  href={`/client/${alert.clientId}`}
+                  href={clientPath(alert.clientId)}
                   title={t.commandCenter.riskDetail.viewClientProfile}
                   className="type-body-1 hover:text-primary-action min-w-0 truncate leading-snug font-bold! text-foreground no-underline transition-colors"
                 >
@@ -222,7 +223,7 @@ export function RiskAlertDetail({
                 affordance, which is why this one is labelled. */}
             {alert.clientId && (
               <Link
-                href={`/client/${alert.clientId}`}
+                href={clientPath(alert.clientId)}
                 className="text-primary-action inline-flex w-fit items-center gap-0.5 self-start text-label font-semibold no-underline hover:underline"
               >
                 {t.commandCenter.riskDetail.viewClientProfile}

@@ -14,6 +14,7 @@ import { getInitials } from "@/lib/client-utils";
 import { useT } from "@/i18n/I18nProvider";
 import { RowIcon } from "./CardHeader";
 import { NBA_ROW_LIMIT, type NbaRow } from "@/features/command-center/lib/dashboard-data";
+import { clientPath } from "@/lib/routes";
 
 /**
  * The AI's suggested next move per client, brought over from the Command
@@ -110,7 +111,7 @@ export function NbaPanel({
       {rows.slice(0, limit).map(({ action, displayName, revenueThbM }) => {
         const category = CATEGORY[action.action];
         const { Icon, tone, variant } = category ?? FALLBACK;
-        const href = `/client/${action.clientId}`;
+        const href = clientPath(action.clientId);
 
         return (
           <div

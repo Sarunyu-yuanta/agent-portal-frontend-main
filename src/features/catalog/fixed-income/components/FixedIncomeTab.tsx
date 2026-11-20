@@ -22,7 +22,6 @@ import {
 import {
   BORDER_COLOR,
   HEADER_TEXT_CLS,
-  PAGE_SIZE_OPTIONS,
   SCROLLABLE_TABLE_BODY_CLS,
   TABLE_CARD_STYLE,
   headerBorderStyle,
@@ -44,6 +43,8 @@ const bookable = (bond: FixedIncomeBond) => ORDER_BOOKING_ENABLED && bond.action
 import { FixedIncomeAppliedFilterChips } from "./FixedIncomeAppliedFilterChips";
 import { CatalogSectionEmpty } from "@/features/catalog/components/ProductCatalogEmpty";
 import { useT } from "@/i18n/I18nProvider";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 function offerTypeVariant(type: string): TagVariant {
   if (type === "PO") return "blue";
@@ -423,9 +424,9 @@ export function FixedIncomeTab({
   );
 
   const total = filteredBonds.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = pageCount(total, pageSize);
   const safePage = Math.min(currentPage, totalPages);
-  const pagedBonds = filteredBonds.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const pagedBonds = pageSlice(filteredBonds, safePage, pageSize);
 
   const activeFilterCount = countFixedIncomeFilters(appliedFilters);
   const appliedFilterChips = useMemo(

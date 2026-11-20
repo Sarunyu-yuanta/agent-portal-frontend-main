@@ -10,6 +10,7 @@ import { CALENDAR_ENABLED } from "@/config/feature-flags";
 import { CalendarView } from "@/features/calendar/components/CalendarView";
 import { CalendarPageSkeleton } from "@/features/calendar/components/CalendarPageSkeleton";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Month calendar of every note carrying a reminder — the same data as the
@@ -26,7 +27,7 @@ export default function CalendarPage() {
   // Out of the current delivery phase — same guard, and the same reasoning, as
   // `/notes` (see `lib/feature-flags`). The page body is a separate component
   // so the guard sits above every hook rather than in front of them.
-  if (!CALENDAR_ENABLED) redirect(localizePath("/client-hub", locale));
+  if (!CALENDAR_ENABLED) redirect(localizePath(ROUTES.clientHub, locale));
   return (
     <Suspense fallback={<CalendarPageSkeleton />}>
       <CalendarPageInner />
@@ -38,7 +39,7 @@ function CalendarPageInner() {
   const locale = useLocale();
   // Old links (bookmarks, the pre-split Dashboard card) pointed the list at
   // `?tab=reminder`; send them to where it lives now.
-  if (useSearchParams().get("tab") === "reminder") redirect(localizePath("/reminders", locale));
+  if (useSearchParams().get("tab") === "reminder") redirect(localizePath(ROUTES.reminders, locale));
 
   const clients = useClients();
   const { notes, isLoading } = useNotes();

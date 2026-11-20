@@ -24,6 +24,7 @@ import {
 import { useOrderBook } from "./use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import { reportError } from "@/lib/report-error";
 
 export function useSendProposal(options?: {
   /**
@@ -129,7 +130,7 @@ export async function sendAndReport(
     onNotice(proposalSentMessage(t, underlying, rows), "success");
     return true;
   } catch (err) {
-    console.warn("[sendProposal]", err);
+    reportError("[sendProposal]", err);
     onNotice(t.orders.proposal.sendFailed, "critical");
     return false;
   }

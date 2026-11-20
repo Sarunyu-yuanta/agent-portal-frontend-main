@@ -22,6 +22,7 @@ import { Research } from "@/features/insights/components/Research";
 import { useT } from "@/i18n/I18nProvider";
 import { useHasLoaded } from "@/lib/api/resource";
 import { useInsightStrategies, useResearch } from "@/features/insights/hooks/use-insights";
+import { ROUTES } from "@/lib/routes";
 
 /** The Insights tab's "playbooks + sidebar" two-column split. */
 function InsightsLayout({ children }: { children: React.ReactNode }) {
@@ -91,7 +92,7 @@ function InsightsPageInner() {
 
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) =>
-      setQueryState(withQuery("/insights", searchParams, updates), "replace"),
+      setQueryState(withQuery(ROUTES.insights, searchParams, updates), "replace"),
     [searchParams],
   );
 

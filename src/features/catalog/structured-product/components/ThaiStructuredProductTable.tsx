@@ -5,7 +5,6 @@ import { LocaleLink as Link } from "@/i18n/navigation";
 import { Pagination } from "@sarunyu/system-one";
 import {
   HEADER_TEXT_CLS,
-  PAGE_SIZE_OPTIONS,
   SCROLLABLE_TABLE_BODY_CLS,
   TABLE_CARD_STYLE,
   cellBorderStyle,
@@ -20,6 +19,8 @@ import { useOpenProducts, useProcessingProductIds } from "@/features/orders/hook
 import type { ThaiStructuredProduct } from "@/features/catalog/structured-product/lib/thai-structured-data";
 import { CatalogSectionEmpty } from "@/features/catalog/components/ProductCatalogEmpty";
 import { useT } from "@/i18n/I18nProvider";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const MIN_WIDTH = "min-w-[1290px]";
 
@@ -180,9 +181,9 @@ export function ThaiStructuredProductTable({
   const tableCardRef = useRef<HTMLDivElement>(null);
 
   const total = products.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = pageCount(total, pageSize);
   const safePage = Math.min(currentPage, totalPages);
-  const paged = products.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = pageSlice(products, safePage, pageSize);
 
   return (
     <div className="flex flex-col gap-3">

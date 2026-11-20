@@ -43,6 +43,7 @@ import { useLocale, useT } from "@/i18n/I18nProvider";
 import { weekdayNames } from "@/i18n/format";
 import type { Note } from "@/types/note";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
 
 export function CalendarView({
   notes,
@@ -122,7 +123,7 @@ export function CalendarView({
       });
     } catch (err) {
       // The modal stays open with what was typed.
-      console.warn("[CalendarView] create failed", err);
+      reportError("[CalendarView] create failed", err);
       addToast({ status: "critical", message: t.planner.calendar.reminderAddFailed });
       return;
     } finally {
@@ -157,7 +158,7 @@ export function CalendarView({
         body: values?.body ?? panelNote.body,
       });
     } catch (err) {
-      console.warn("[CalendarView] save failed", err);
+      reportError("[CalendarView] save failed", err);
       addToast({ status: "critical", message: t.planner.saveFailedKept });
       return;
     } finally {
@@ -174,7 +175,7 @@ export function CalendarView({
     try {
       await removeNote(target.id);
     } catch (err) {
-      console.warn("[CalendarView] delete failed", err);
+      reportError("[CalendarView] delete failed", err);
       addToast({ status: "critical", message: t.states.deleteError });
       return;
     }

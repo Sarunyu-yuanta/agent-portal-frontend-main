@@ -38,6 +38,7 @@ import type {
   CampaignStatus,
   ClientSegment,
 } from "@/types/campaign";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Promotions & Events — what the firm is running, and who of this IC's clients
@@ -71,7 +72,7 @@ export function PromotionsView() {
   );
 }
 
-const PATH = "/promotions";
+const PATH = ROUTES.promotions;
 
 /**
  * Two tabs, one per campaign type, with no combined view — see `CampaignTab`

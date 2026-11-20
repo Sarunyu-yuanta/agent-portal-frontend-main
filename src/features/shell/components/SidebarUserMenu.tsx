@@ -8,6 +8,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
 import { pageZoom } from "@/lib/page-zoom";
 import { useT } from "@/i18n/I18nProvider";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Floor for the panel width, for when the rail is too narrow to derive a usable
@@ -139,7 +140,7 @@ export function SidebarUserMenu({
     // `replace`, not `push`: there is no session to tear down yet (see
     // `src/app/login/page.tsx`), so leaving no dashboard entry behind to go
     // Back into is the closest this gets to actually signing out.
-    router.replace("/login");
+    router.replace(ROUTES.login);
   }
 
   return (

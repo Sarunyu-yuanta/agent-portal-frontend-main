@@ -10,8 +10,9 @@ import { RowIcon } from "./CardHeader";
 import { KycRow } from "./KycAlertsPanel";
 import { REMINDER_ROW_LIMIT, type QueueItem } from "@/features/command-center/lib/dashboard-data";
 import { useT } from "@/i18n/I18nProvider";
+import { ROUTES } from "@/lib/routes";
 
-const REMINDERS_PAGE = "/reminders";
+const REMINDERS_PAGE = ROUTES.reminders;
 
 /** A reminder already placed on its calendar day, ready for the preview row. */
 export type PreviewReminder = {

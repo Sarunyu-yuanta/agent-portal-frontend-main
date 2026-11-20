@@ -100,6 +100,7 @@ import type {
 import { useClients, useClientsResource } from "@/features/clients/hooks/use-clients";
 import { useAccountIdentity, useClientCallLogs } from "@/features/clients/hooks/use-clients";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
 
 /**
  * Steps that come before the client list, in the same modal — Order
@@ -673,7 +674,7 @@ function BookingForm({
               // The form stays as the IC filled it, and the buttons come back:
               // a failure used to leave `booking` true, disabling both the
               // primary and Cancel with only the ✕ as a way out.
-              console.warn("[placeOrder]", err);
+              reportError("[placeOrder]", err);
               onNotice(t.orders.words[bookingModeFor(product)].actionFailed, "critical");
               return;
             } finally {
@@ -1007,7 +1008,7 @@ function StatusGrid({
         keys: [item.key],
       });
     } catch (err) {
-      console.warn("[sendRequirementRequest]", err);
+      reportError("[sendRequirementRequest]", err);
       onNotice(t.orders.booking.requestFailed(item.label), "critical");
       return;
     } finally {

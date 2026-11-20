@@ -9,6 +9,7 @@ import { AuthShell } from "@/features/auth/components/AuthShell";
 import { AuthPendingScreen } from "@/features/auth/components/AuthPendingScreen";
 import { useT } from "@/i18n/I18nProvider";
 import { SignInError, signIn, type Credentials } from "@/features/auth/api/auth.api";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * No auth backend exists yet, so submitting goes straight to the home page
@@ -104,7 +105,7 @@ export function LoginView() {
             }
           />
           <Link
-            href="/forgot-password"
+            href={ROUTES.forgotPassword}
             className="text-primary-action self-end text-sm font-semibold hover:underline"
           >
             {t.auth.forgotPassword}

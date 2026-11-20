@@ -16,6 +16,7 @@ import { ContactFields } from "@/features/calendar/components/HolderContact";
 import { CardHeader } from "./CardHeader";
 import { useT } from "@/i18n/I18nProvider";
 import type { CallLogRow } from "@/features/command-center/lib/call-log-feed";
+import { ROUTES, clientPath } from "@/lib/routes";
 
 /** Outbound is the desk reaching out, inbound is the client. One glyph and one
  *  hue each — a bare arrow rather than a tinted square, since the direction is
@@ -185,10 +186,10 @@ export function CallDetailModal({
 }
 
 /** The whole book's log, as its own page. */
-export const CALL_LOG_PAGE = "/command-center/call-log";
+export const CALL_LOG_PAGE = ROUTES.callLog;
 
 function callLogHref(clientId: string): string {
-  return `/client/${clientId}?tab=call-log`;
+  return clientPath(clientId, "call-log");
 }
 
 function MoreRow({ count }: { count: number }) {

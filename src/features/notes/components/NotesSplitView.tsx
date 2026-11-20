@@ -13,6 +13,7 @@ import { NoteDetailPane } from "./NoteDetailPane";
 import { useT } from "@/i18n/I18nProvider";
 import type { Note } from "@/types/note";
 import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
+import { reportError } from "@/lib/report-error";
 
 /** Distinguishes one composition from the next, so clicking New Note twice in a
  * row gives the editor a key it hasn't seen and it mounts empty. */
@@ -214,7 +215,7 @@ export function NotesSplitView({
       // over a note that never went away. `removeNote` lets its errors out, so
       // the catch is what keeps that from surfacing as an unhandled rejection.
       void removeNote(id)
-        .catch((err) => console.warn("[NotesSplitView] discard failed", err))
+        .catch((err) => reportError("[NotesSplitView] discard failed", err))
         .finally(() => setDiscardingIds((prev) => prev.filter((x) => x !== id)));
     });
 
@@ -309,7 +310,7 @@ export function NotesSplitView({
       .then(
         () => setDraft(null),
         (err: unknown) => {
-          console.warn("[NotesSplitView] create failed", err);
+          reportError("[NotesSplitView] create failed", err);
           addToast({ status: "critical", message: t.planner.notes.createFailed });
         },
       )
@@ -372,7 +373,7 @@ export function NotesSplitView({
       if (target.id === selectedId) setSelectedId(null);
       addToast({ status: "success", message: t.planner.notes.noteDeleted });
     } catch (err) {
-      console.warn("[NotesSplitView] delete failed", err);
+      reportError("[NotesSplitView] delete failed", err);
       addToast({ status: "critical", message: t.planner.notes.noteDeleteFailed });
     }
   };

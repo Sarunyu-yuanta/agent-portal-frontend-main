@@ -12,6 +12,7 @@ import {
   catalogListHref,
   CATALOG_PATH,
 } from "@/features/catalog/lib/product-catalog-routes";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Where a page's back button lands when there's no trail behind it — a pasted
@@ -26,9 +27,9 @@ function sectionRoot(pathname: string): string {
     const category = catalogCategoryForPath(pathname);
     return category ? catalogListHref(category) : catalogListUrl();
   }
-  if (pathname.startsWith("/insights/")) return "/insights";
-  if (pathname.startsWith("/promotions/")) return "/promotions";
-  if (pathname.startsWith("/client/")) return "/client-hub";
+  if (pathname.startsWith("/insights/")) return ROUTES.insights;
+  if (pathname.startsWith("/promotions/")) return ROUTES.promotions;
+  if (pathname.startsWith("/client/")) return ROUTES.clientHub;
   return "/";
 }
 

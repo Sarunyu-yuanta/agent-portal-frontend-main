@@ -28,8 +28,9 @@ import {
 } from "./GlobalBondAllFilterPanel";
 import { useOverseasBonds } from "@/features/catalog/hooks/use-catalog";
 import { GlobalBondAllPageSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
-import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import { useLocale, useT } from "@/i18n/I18nProvider";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const UPDATED_AT_MONTHS = [
   "January",
@@ -98,11 +99,11 @@ export function GlobalBondAllPage({ onBack }: { onBack: () => void }) {
   // two are equal today (the mock list is generated to that length) but only
   // the former stays right once this list comes from an endpoint.
   const displayCount = hasActiveFilters ? filteredBonds.length : allBonds.length;
-  const totalPages = Math.max(1, Math.ceil(filteredBonds.length / pageSize));
+  const totalPages = pageCount(filteredBonds.length, pageSize);
   const safePage = Math.min(currentPage, totalPages);
 
   const pagedBonds = useMemo(
-    () => filteredBonds.slice((safePage - 1) * pageSize, safePage * pageSize),
+    () => pageSlice(filteredBonds, safePage, pageSize),
     [filteredBonds, safePage, pageSize],
   );
 

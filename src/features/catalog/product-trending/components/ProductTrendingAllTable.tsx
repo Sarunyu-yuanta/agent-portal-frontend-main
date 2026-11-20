@@ -17,7 +17,6 @@ import { MF_ASSETS } from "@/features/catalog/mutual-fund/lib/mutual-fund-assets
 import { PaginationSkeleton, Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import {
   HEADER_TEXT_CLS,
-  PAGE_SIZE_OPTIONS,
   SCROLLABLE_TABLE_BODY_CLS,
   TABLE_CARD_STYLE,
   cellBorderStyle,
@@ -34,6 +33,9 @@ import {
 } from "@/features/catalog/product-trending/lib/product-trending-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { OrderBook } from "@/types/order";
+import { formatInteger } from "@/lib/format/number";
+import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
+import { pageCount, pageSlice } from "@/lib/pagination";
 
 const MIN_WIDTH = "min-w-[760px]";
 
@@ -77,12 +79,11 @@ export function TrendingFill({ book }: { book: OrderBook }) {
   // what it is given as `aria-valuenow`, so an unrounded `pct` had a screen
   // reader announcing 33.33333333333333 beside a printed "33%".
   const pct = Math.round(fill.pct);
-  const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2">
       <LinearProgress value={pct} className="min-w-[40px] flex-1" />
       <span className="type-caption whitespace-nowrap text-muted-foreground">
-        {money(taken)} / {money(book.targetAmount)} {book.currency}
+        {formatInteger(taken)} / {formatInteger(book.targetAmount)} {book.currency}
       </span>
       {/* Bold and last, where the eye lands after the bar — the bar is the
           shape of the answer, this is the answer. */}
@@ -250,9 +251,9 @@ export function ProductTrendingAllTable({
   // table scrolls sideways rather than crushing it.
   const minWidth = fill ? "min-w-[860px]" : MIN_WIDTH;
   const total = items.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = pageCount(total, pageSize);
   const safePage = Math.min(currentPage, totalPages);
-  const paged = items.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paged = pageSlice(items, safePage, pageSize);
 
   return (
     <div className="w-full bg-white" style={{ paddingTop: 24, paddingBottom: 40 }}>

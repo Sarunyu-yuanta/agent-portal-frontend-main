@@ -36,6 +36,7 @@ import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals"
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
+import { clientPath } from "@/lib/routes";
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
@@ -136,7 +137,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     // a reminder has one.
     const kycClientId = kycNotificationTargets.get(notifItem.id);
     if (kycClientId) {
-      router.push(`/client/${kycClientId}?tab=kyc`);
+      router.push(clientPath(kycClientId, "kyc"));
       return;
     }
     const target = notificationTargets.get(notifItem.id);
