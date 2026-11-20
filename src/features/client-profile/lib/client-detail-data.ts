@@ -22,7 +22,6 @@ export const clientDetailById = Object.fromEntries(
  *  palette itself lives with the donut that draws it. */
 export { ALLOCATION_COLORS } from "@/components/charts/AllocationDonut";
 
-export type SortDir = "none" | "asc" | "desc";
 export type HoldingsSortKey = "value" | "pnlPct" | "pct" | null;
 
 /** Human "last contact" label derived from the most recent call log. */

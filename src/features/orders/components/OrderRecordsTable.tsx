@@ -59,7 +59,6 @@ import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty
 import { getAccountIdentity } from "@/mocks/client-profiles";
 import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { maskName } from "@/lib/mask-name";
-import type { Booking, OrderBook, ProposalLog } from "@/types/domain";
 import {
   USD_THB,
   formatLogTime,
@@ -88,6 +87,8 @@ import { useOrderBook, useRosterReadiness } from "@/features/orders/hooks/use-or
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Booking, OrderBook, ProposalLog } from "@/types/order";
+import type { SortDir } from "@/types/table";
 
 const COLUMNS = 5;
 const PAGE_SIZE = 12;
@@ -169,7 +170,6 @@ function buildRows(
 }
 
 type SortKey = "at" | "client" | "product" | "amount";
-type SortDir = "none" | "asc" | "desc";
 
 /**
  * What a column sorts on.

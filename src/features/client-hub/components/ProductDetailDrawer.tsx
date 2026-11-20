@@ -12,8 +12,9 @@ import { maskName } from "@/lib/mask-name";
 import { getInitials, formatThbAmount } from "@/lib/client-utils";
 import { PRODUCT_SUB_DATA, type SubProduct } from "@/mocks/product-sub-data";
 import { ClientDetailPanel } from "./ClientDetailPanel";
-import type { Client, ProductRow } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { ProductRow } from "@/types/portfolio";
 
 /** Content of the product drawer: stats, holdings/clients tabs, and a pushed
  * client detail overlay. Owns its own tab/expand/push state so remounting on a

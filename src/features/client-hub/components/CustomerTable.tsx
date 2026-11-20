@@ -14,9 +14,10 @@ import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty
 import { useFlipRows } from "@/hooks/use-flip-rows";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { CUSTOMER_COLUMNS } from "./columns";
-import type { ColumnId, SortDir, SortKey } from "@/features/client-hub/lib/types";
-import type { Client } from "@/types/domain";
+import type { ColumnId, SortKey } from "@/features/client-hub/lib/types";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { SortDir } from "@/types/table";
 
 const NO_WIDTH = 60;
 

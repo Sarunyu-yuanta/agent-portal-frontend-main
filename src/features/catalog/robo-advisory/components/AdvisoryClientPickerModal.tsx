@@ -9,7 +9,6 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useClients } from "@/hooks/use-api";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { Client } from "@/types/domain";
 import {
   advisoryAccountStatus,
   riskProfileLabel,
@@ -17,6 +16,7 @@ import {
 } from "@/features/catalog/robo-advisory/lib/portfolio-advisory-client";
 import { AdvisoryAccountTag } from "./portfolio-advisory-ui";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 const SERVICE_TITLE: Record<AdvisoryService, string> = {
   robo: "Robo Advisory",

@@ -5,7 +5,6 @@ import { Alert, Button, Tag } from "@sarunyu/system-one";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { ContactChips } from "@/features/calendar/components/HolderContact";
-import type { RiskAlert } from "@/types/domain";
 import {
   deadlineLabel,
   detectedAtLabel,
@@ -16,6 +15,7 @@ import {
 import type { RiskAlertRow } from "@/features/command-center/lib/risk-feed";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { RiskAlert } from "@/types/risk-alert";
 
 /**
  * The shell every block of *information* in this panel wears — the prose

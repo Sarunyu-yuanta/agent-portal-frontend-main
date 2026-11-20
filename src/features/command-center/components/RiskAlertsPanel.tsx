@@ -5,7 +5,6 @@ import { Button, Chip, Tag, TabGroup, Toaster } from "@sarunyu/system-one";
 import { ClockCountdownIcon, ShieldCheckIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { withQuery } from "@/lib/query-state";
-import type { RiskAlert, RiskAlertCategory, RiskSeverity } from "@/types/domain";
 import { CardHeader, RowIcon } from "./CardHeader";
 import { RiskAlertDetail } from "./RiskAlertDetail";
 import {
@@ -27,6 +26,7 @@ import {
 import { useRiskCta } from "@/features/command-center/hooks/use-risk-cta";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { RiskAlert, RiskAlertCategory, RiskSeverity } from "@/types/risk-alert";
 
 /**
  * What the book is exposed to right now: margin, suitability and market

@@ -11,7 +11,6 @@ import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import type { Note } from "@/types/domain";
 import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { NotesGallery } from "@/features/notes/components/NotesGallery";
 import { NoteDetailPane } from "@/features/notes/components/NoteDetailPane";
@@ -20,6 +19,7 @@ import {
   NoteDeleteConfirmModal,
 } from "@/features/notes/components/note-modal-shell";
 import { useT } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /**
  * Notes tab on a client's Full Profile — a wall of cards rather than the Notes

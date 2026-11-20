@@ -28,9 +28,9 @@ import {
   formatKycDate,
   kycExpiry,
 } from "@/features/client-profile/lib/client-detail-data";
-import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 /** How far off the KYC expiry is, in words — the date alone doesn't say. */
 function countdownLabel(daysLeft: number, t: Dictionary): string {

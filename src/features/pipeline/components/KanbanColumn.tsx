@@ -16,15 +16,15 @@ import {
   STAGE_META,
   STAGE_ADVANCE,
   columnTotal,
-  type Deal,
   type Stage,
 } from "@/features/pipeline/lib/pipeline-data";
+import type { PipelineDeal } from "@/types/sales";
 
 function DealCard({
   deal,
   onAdvanceRequest,
 }: {
-  deal: Deal;
+  deal: PipelineDeal;
   onAdvanceRequest: (id: string, next: Stage) => void;
 }) {
   const { isPrivate } = usePrivacy();
@@ -73,7 +73,7 @@ function DealCard({
         )}
       </div>
 
-      {/* Deal size */}
+      {/* PipelineDeal size */}
       <p className="type-h6 leading-none text-foreground">{deal.dealSize}</p>
 
       {/* Days / status */}
@@ -125,7 +125,7 @@ export function KanbanColumn({
   onAdvanceRequest,
 }: {
   stage: Stage;
-  deals: Deal[];
+  deals: PipelineDeal[];
   dimmed?: boolean;
   onAdvanceRequest: (id: string, next: Stage) => void;
 }) {

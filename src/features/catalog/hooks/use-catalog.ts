@@ -96,7 +96,7 @@ import {
   getRelatedProducts,
   getStockProductDetail,
   getStockTabNotice,
-  type RelatedProducts,
+  type StockRelatedProducts,
   type StockNoticeTab,
   type StockProductDetail,
   type StockTabNotice,
@@ -132,8 +132,7 @@ import {
   type MarketCatalog,
   type MarketId,
 } from "@/features/catalog/stock/lib/stock-data";
-
-type HouseViewStrategy = (typeof mockHouseViewStrategies)[number];
+import type { HouseViewStrategy } from "@/types/research";
 
 // ── Insights ──────────────────────────────────────────────────────────────────
 
@@ -418,7 +417,9 @@ function useStockTabNotice(
 
 /** Related Product tab: the DR / derivative / structured / bond / fund slices
  *  that reference this ticker. Also decides whether that tab is offered. */
-export function useStockRelatedProducts(symbol: string | null): Resource<RelatedProducts | null> {
+export function useStockRelatedProducts(
+  symbol: string | null,
+): Resource<StockRelatedProducts | null> {
   const related = useMemo(() => (symbol ? getRelatedProducts(symbol) : null), [symbol]);
   return useStatic(related);
 }

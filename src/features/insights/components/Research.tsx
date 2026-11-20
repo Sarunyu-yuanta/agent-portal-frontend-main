@@ -23,7 +23,7 @@ import {
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { FadeIn } from "@/components/ui/fade-in";
 import { EmptyState } from "@/components/ui/empty-state";
-import { type AnalystItem } from "@/mocks/mock-data";
+import type { Analyst } from "@/types/research";
 import { useResearch } from "@/features/catalog/hooks/use-catalog";
 import { useHasLoaded } from "@/hooks/use-api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -127,7 +127,7 @@ function formatBuddhistDate(d: Date): string {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function AnalystCard({ analyst }: { analyst: AnalystItem }) {
+function AnalystCard({ analyst }: { analyst: Analyst }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/30 sm:gap-4 sm:p-5">
       {/* eslint-disable-next-line @next/next/no-img-element -- fixed-size headshot, no responsive sizes needed */}

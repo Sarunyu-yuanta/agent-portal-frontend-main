@@ -30,14 +30,14 @@ import {
   type CampaignFilters as Filters,
   type CampaignTab,
 } from "@/features/promotions/lib/campaign-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import type {
   CampaignFormat,
   CampaignProduct,
   CampaignStatus,
   ClientSegment,
-} from "@/types/domain";
-import { useT } from "@/i18n/I18nProvider";
-import type { Dictionary } from "@/i18n/dictionaries/th";
+} from "@/types/campaign";
 
 /**
  * Promotions & Events — what the firm is running, and who of this IC's clients

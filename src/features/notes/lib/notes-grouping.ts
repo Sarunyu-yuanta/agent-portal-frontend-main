@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatDate } from "@/i18n/format";
-import type { Note } from "@/types/domain";
+import type { Note } from "@/types/note";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

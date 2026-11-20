@@ -38,14 +38,14 @@ import {
   seedRsvps,
   seedShareLogs,
 } from "@/mocks/campaign-mock-data";
+import type { Dictionary } from "@/i18n/dictionaries/th";
 import type {
   CampaignClient,
   CampaignClientStatus,
   CampaignRsvp,
   RsvpStatus,
   ShareLog,
-} from "@/types/domain";
-import type { Dictionary } from "@/i18n/dictionaries/th";
+} from "@/types/campaign";
 
 /** Which rule refused — a screen turns it into IC copy with {@link campaignRuleMessage}. */
 export type CampaignRuleCode =

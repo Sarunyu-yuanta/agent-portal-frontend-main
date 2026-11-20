@@ -14,7 +14,7 @@
  */
 
 import type { Desk } from "./bookable-products";
-import type { TransactionAsset } from "@/types/domain";
+import type { TransactionAsset } from "@/types/transaction";
 
 export type OrderTab =
   | { id: string; title: string; kind: "all" }

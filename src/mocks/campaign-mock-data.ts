@@ -41,7 +41,7 @@ import type {
   ClientSegment,
   RsvpStatus,
   ShareLog,
-} from "@/types/domain";
+} from "@/types/campaign";
 
 /** Whoever is signed in — the `sentBy` on every ShareLog this session writes. */
 export const CAMPAIGN_ACTOR = NOTE_AUTHOR;

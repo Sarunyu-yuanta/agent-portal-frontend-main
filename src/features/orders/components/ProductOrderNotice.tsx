@@ -10,9 +10,9 @@
  */
 
 import { Alert } from "@sarunyu/system-one";
-import type { OrderBook } from "@/types/domain";
 import { isBookingOpen } from "@/features/orders/lib/order-book";
 import { useT } from "@/i18n/I18nProvider";
+import type { OrderBook } from "@/types/order";
 
 export function ProductOrderNotice({ book }: { book: OrderBook | null | undefined }) {
   const t = useT();

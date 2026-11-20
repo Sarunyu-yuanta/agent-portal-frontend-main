@@ -8,8 +8,8 @@ import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sh
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { formatAumThb, getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 export function ClientListModal({
   open,

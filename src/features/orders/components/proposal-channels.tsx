@@ -16,7 +16,7 @@ import {
   EnvelopeSimpleIcon,
   WaveformIcon,
 } from "@phosphor-icons/react";
-import type { ProposalChannel } from "@/types/domain";
+import type { ProposalChannel } from "@/types/order";
 
 export const PROPOSAL_CHANNEL_ORDER: ProposalChannel[] = ["app", "email", "line", "voice-ai"];
 

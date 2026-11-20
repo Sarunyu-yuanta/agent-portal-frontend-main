@@ -5,7 +5,6 @@ import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import { Button } from "@sarunyu/system-one";
 import { FireIcon } from "@phosphor-icons/react";
 import { formatAumThb } from "@/lib/client-utils";
-import type { OrderBook } from "@/types/domain";
 import { CARD_SHADOW, PercentPill } from "@/features/catalog/stock/components/stock-ui";
 import { stockProductHref } from "@/features/catalog/stock/lib/stock-product-detail-data";
 import { RankBadge, TrendingFill, TrendingSortChips } from "./ProductTrendingAllTable";
@@ -33,6 +32,7 @@ import { useProductTrendingGroups } from "@/features/catalog/hooks/use-catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CatalogSectionEmpty } from "@/features/catalog/components/ProductCatalogEmpty";
 import { useT } from "@/i18n/I18nProvider";
+import type { OrderBook } from "@/types/order";
 
 function TrendingRow({
   item,

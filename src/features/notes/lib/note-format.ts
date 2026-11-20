@@ -1,8 +1,8 @@
 import type { TagProps, TagVariant } from "@sarunyu/system-one";
-import type { Note } from "@/types/domain";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatDate, formatDateTime as fmtDateTime, formatTime } from "@/i18n/format";
+import type { Note } from "@/types/note";
 
 export function formatDateTime(iso: string, locale: Locale): string {
   return fmtDateTime(locale, iso);
@@ -28,7 +28,7 @@ export function formatListStamp(iso: string, locale: Locale): string {
  * A reminder is a day, not a moment — the UI only ever asks for a date.
  *
  * `reminderAt` stays a full ISO timestamp because that is what the `Note` type
- * in `types/domain` declares, so rather than carry whatever hour the picker
+ * in `@/types/note` declares, so rather than carry whatever hour the picker
  * happened to open at, the time is pinned here.
  * Morning rather than midnight: a reminder for the 27th means "on the 27th", and
  * midnight would land it in the previous evening for anyone reading a raw

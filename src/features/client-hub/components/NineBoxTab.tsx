@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { AvatarStack } from "@sarunyu/system-one";
 import { getInitial } from "@/lib/client-utils";
-import { type mockClients } from "@/mocks/mock-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
-
-type Client = (typeof mockClients)[number];
+import type { Client } from "@/types/client";
 
 function formatTotalAum(clients: Client[]): string | null {
   if (clients.length === 0) return null;

@@ -7,14 +7,6 @@
  * target the catalogue disagrees with.
  */
 
-import type {
-  Booking,
-  OrderBook,
-  OrderBookStatus,
-  OrderLogEntry,
-  OrderSubmission,
-  RequirementRequest,
-} from "@/types/domain";
 import { BACKOFFICE_ACTOR } from "@/mocks/order-mock-data";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import type { Locale } from "@/i18n/config";
@@ -25,6 +17,14 @@ import {
   type BookableProduct,
   type BookingMode,
 } from "./bookable-products";
+import type {
+  Booking,
+  OrderBook,
+  OrderBookStatus,
+  OrderLogEntry,
+  OrderSubmission,
+  RequirementRequest,
+} from "@/types/order";
 
 /**
  * A mock FX rate, used only to say what a client's THB cash is worth against a

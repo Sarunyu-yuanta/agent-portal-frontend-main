@@ -12,8 +12,8 @@ import {
 import { buildProductRows, getClientTotals } from "@/features/client-hub/lib/client-hub-data";
 import { formatAumThb } from "@/lib/client-utils";
 import { useCountUp } from "@/hooks/use-count-up";
-import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 /**
  * What the desk's book is made of.

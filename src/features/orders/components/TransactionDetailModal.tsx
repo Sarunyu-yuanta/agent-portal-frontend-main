@@ -21,7 +21,6 @@ import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sh
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { getAccountIdentity } from "@/mocks/client-profiles";
 import { maskName } from "@/lib/mask-name";
-import type { ClientTransaction, TransactionStatus } from "@/types/domain";
 import {
   ClientRow,
   CopyRow,
@@ -42,6 +41,7 @@ import {
 } from "@/features/orders/lib/transaction-display";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { ClientTransaction, TransactionStatus } from "@/types/transaction";
 
 /** The disc's glyph — the verdict, before a word of it is read. */
 const STATUS_GLYPH: Record<TransactionStatus, React.ReactNode> = {

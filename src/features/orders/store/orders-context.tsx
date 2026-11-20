@@ -62,7 +62,7 @@ import type {
   RequirementItem,
   RequirementKey,
   RequirementRequest,
-} from "@/types/domain";
+} from "@/types/order";
 
 /**
  * How long a client takes to go and fill their forms in, in the mock.

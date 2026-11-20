@@ -13,10 +13,16 @@ import { mockComplianceAlerts } from "@/mocks/mock-data";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords } from "@/lib/client-utils";
-import type { KycRow } from "@/features/compliance/lib/compliance-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { KycRecord } from "@/types/compliance";
 
-export function KycDetailPanel({ row, onClose: _onClose }: { row: KycRow; onClose: () => void }) {
+export function KycDetailPanel({
+  row,
+  onClose: _onClose,
+}: {
+  row: KycRecord;
+  onClose: () => void;
+}) {
   const { isPrivate } = usePrivacy();
   const t = useT();
   const d = t.compliance.detail;

@@ -21,8 +21,8 @@ import {
   getClientsByCash,
   type KycDueEntry,
 } from "@/features/client-hub/lib/client-hub-data";
-import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 const SEGMENT_COLORS: Record<string, string> = {
   UHNW: "#3b82f6",

@@ -1,3 +1,4 @@
+import type { TransactionAsset } from "@/types/transaction";
 /**
  * Ids for products that are offered but never booked — stocks and mutual
  * funds. A Proposal on one is logged under one of these, and Order
@@ -7,8 +8,6 @@
  * (see `bookable-products`), and one place mints and reads them so the pages
  * that send and the tabs that list cannot drift apart.
  */
-
-import type { TransactionAsset } from "@/types/domain";
 
 /** The assets a Proposal can be sent for without a booking. TFEX has none. */
 export type OfferedAsset = Extract<TransactionAsset, "stock" | "mutual-fund">;

@@ -20,7 +20,7 @@ Scope note: this doc is the ground truth of what data exists; the API design is 
 
 ## 1. Core dashboard data
 
-Raw JSON in `src/data/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a sibling `src/lib/*-mock-data.ts`). Target types live in `src/types/domain.ts`.
+Raw JSON in `src/mocks/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a sibling `src/mocks/*-mock-data.ts`). Target types live in `src/types/*.ts`, one module per domain.
 
 ### 1.1 Clients
 
@@ -115,7 +115,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a 
 
 - **What**: A client's buy/sell transactions through the trading platforms — read-only, shown on Order Management's transaction tabs.
 - **Lives in**: `src/mocks/transaction-mock-data.ts` — **generated**, no JSON. A fixed-seed sequence over the catalogue's products and the mock clients, so every symbol and name on screen is one the rest of the app knows.
-- **Shape**: `ClientTransaction` in `src/types/domain.ts`
+- **Shape**: `ClientTransaction` in `src/types/transaction.ts`
 - **Used in**: `useTransactions(asset)` in `orders/use-transactions.ts` — the only reader; nothing imports the mock file directly.
 
 ### 1.8 House View Strategies
@@ -137,7 +137,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a 
 ### 1.10 Client Details (per-client 360 record)
 
 - **What**: The deep-dive data behind a client's Overview tab — net asset value, allocation pie, top holdings, behavioral profile, open tasks, recent activity timeline, AI priority/risk alert callouts.
-- **Lives in**: `src/mocks/client-details.json` + `mock-data.ts` (`mockClientDetails`; `ClientDetail` and its parts are typed there and re-exported from `types/domain.ts`)
+- **Lives in**: `src/mocks/client-details.json` + `mock-data.ts` (`mockClientDetails`; typed by `ClientDetail` in `src/types/client.ts`)
 - **Shape**: keyed `Record<clientId, ClientDetail>`; `assetSummary` is optional per record; `aiHighPriority`/`aiRiskAlert` nullable
 - **Records**: 8 (keys `"110001"`–`"110008"`)
 - **Used in**: Client 360 Overview tab, `ClientAssetSidebarContent.tsx`, Client Hub
@@ -161,7 +161,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a 
 
 - **What**: A rule-based finding on a client's account — margin call, force sell, overdue settlement, concentration, expired suitability, price band, wash trade — with a due date, metrics and a recommended action.
 - **Lives in**: `src/mocks/risk-alerts.json` + `src/mocks/risk-mock-data.ts` (`mockRiskAlerts`)
-- **Shape**: `RiskAlert` in `types/domain.ts`. Raw: `{ id, kind, severity, ruleCode, clientId, accountLabel, title, message, metrics, recommendedAction, contactAllowed, contactNote, dismissible, detectedMinutesAgo, dueOffset }`
+- **Shape**: `RiskAlert` in `src/types/risk-alert.ts`. Raw: `{ id, kind, severity, ruleCode, clientId, accountLabel, title, message, metrics, recommendedAction, contactAllowed, contactNote, dismissible, detectedMinutesAgo, dueOffset }`
 - **Records**: 12 across 10 kinds
 - **Note**: two offsets in two units on purpose — `dueOffset` in **days** (a deadline is a date), `detectedMinutesAgo` in **minutes** (a detection is a span). The real API sends `dueDate` and a detection timestamp; `daysLeft` is computed client-side.
 - **Used in**: `useRiskAlertsResource()` / `useRiskAlert(id)` in `src/features/command-center/hooks/use-risk-alerts.ts` — Command Center risk panel, `/command-center/risk-alerts`
@@ -336,7 +336,7 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 
 - **What**: A free-text note an RM/IC writes, optionally tagged to clients, with an optional reminder date. `/calendar` and `/reminders` are both views of the notes that carry a reminder.
 - **Lives in**: `NotesProvider` / `useNotes()` in `src/features/notes/store/notes-context.tsx`
-- **Shape**: `Note` in `src/types/domain.ts`:
+- **Shape**: `Note` in `src/types/note.ts`:
   ```
   { id: string, clientIds: string[],
     title: string|null, body: string, author: string,
@@ -357,7 +357,7 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 
 - **What**: Promotions and events an IC invites clients to — eligibility conditions, approved share materials, per-client invite status, RSVPs, and the share log.
 - **Lives in**: `src/mocks/campaigns.json` + `src/mocks/campaign-mock-data.ts` (`mockCampaigns`, `seedCampaignClients`, `seedRsvps`, `seedShareLogs`) — held and mutated in `src/features/promotions/store/campaigns-context.tsx`
-- **Shape**: `Campaign` in `types/domain.ts`. Raw: `{ id, type: "promotion"|"event", title, summary, description, cover, featured, products, segments, startOffset, endOffset, conditions, terms, disclaimer, materials, clients }`
+- **Shape**: `Campaign` in `src/types/campaign.ts`. Raw: `{ id, type: "promotion"|"event", title, summary, description, cover, featured, products, segments, startOffset, endOffset, conditions, terms, disclaimer, materials, clients }`
 - **Records**: 15 campaigns — 10 promotions, 5 events. Dates are offsets from today, like the order seeds.
 - **Mutators**: `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus` — only `shareMaterial` has a UI caller. Event invites ("ชวนลูกค้า") also go through `shareMaterial`, not `registerClients`, so they don't check or reserve seats. The other three are store-only today.
 - **Rules the endpoint must enforce** (the store enforces them today; a disabled button is not a control): only an approved material can be shared; a closed campaign takes no shares; every share writes a `ShareLog`, which is append-only — it is the compliance record.

@@ -6,7 +6,6 @@ import { ArrowLeftIcon, FireIcon } from "@phosphor-icons/react";
 import { formatAumThb } from "@/lib/client-utils";
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
 import { bookFill } from "@/features/orders/lib/order-book";
-import type { OrderBook } from "@/types/domain";
 import {
   bookForItem,
   trendingRows,
@@ -34,6 +33,7 @@ import {
   type TrendingTarget,
 } from "@/features/catalog/product-trending/lib/product-trending-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { OrderBook } from "@/types/order";
 
 const MIN_WIDTH = "min-w-[760px]";
 

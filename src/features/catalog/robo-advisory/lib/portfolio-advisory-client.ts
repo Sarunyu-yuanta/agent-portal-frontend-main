@@ -1,6 +1,6 @@
-import type { Client } from "@/types/domain";
 import { ROBO_RISK_CONFIG, type RoboRiskTier } from "./robo-risk-level";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Client } from "@/types/client";
 
 /** The two Portfolio Advisory services; each client opens an account per service. */
 export type AdvisoryService = "robo" | "definit";

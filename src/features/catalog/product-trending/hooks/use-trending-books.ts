@@ -23,7 +23,6 @@ import { useMemo } from "react";
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
 import { bookFillThb, isBookingOpen } from "@/features/orders/lib/order-book";
 import { useBooksByIds } from "@/features/orders/hooks/use-order-books";
-import type { OrderBook } from "@/types/domain";
 import {
   isRankedSort,
   sortTrendingItems,
@@ -32,6 +31,7 @@ import {
   type TrendingItem,
   type TrendingSort,
 } from "@/features/catalog/product-trending/lib/product-trending-data";
+import type { OrderBook } from "@/types/order";
 
 /** Every trending product's book, keyed by the id on `TrendingItem.bookableId`. */
 export function useTrendingBooks(): Map<string, OrderBook> {

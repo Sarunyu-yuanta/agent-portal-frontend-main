@@ -21,13 +21,12 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
  *
  * ─── Backend handoff ─────────────────────────────────────────────────────────
  * Nothing new is mocked here. Every input is a dataset that already exists
- * (`@/lib/mock-data`, the notes context, the calendar's alert stand-in), so
+ * (`@/mocks/mock-data`, the notes context, the calendar's alert stand-in), so
  * pointing those at real endpoints lights this page up with them.
  */
 
-import { mockHouseViewStrategies, type mockNBAActions } from "@/mocks/mock-data";
+import { mockHouseViewStrategies } from "@/mocks/mock-data";
 import { maskName } from "@/lib/mask-name";
-import type { Client, Note } from "@/types/domain";
 import {
   addDays,
   addMonths,
@@ -53,6 +52,9 @@ import { getRelatedProducts } from "@/features/insights/lib/house-view-data";
 import { kycExpiry, kycExpiryLabel } from "@/features/client-profile/lib/client-detail-data";
 import { lastCheckpointCrossed } from "@/features/shell/hooks/use-kyc-notification-feed";
 import { zoneForDays } from "@/lib/notification-zones";
+import type { NbaAction } from "@/types/sales";
+import type { Client } from "@/types/client";
+import type { Note } from "@/types/note";
 
 // ── Reminders ───────────────────────────────────────────────────────────────
 
@@ -460,17 +462,6 @@ export function buildMonthDots({
 }
 
 // ── Next Best Actions ───────────────────────────────────────────────────────
-
-/**
- * One AI-suggested action on one client.
- *
- * Typed off `mockNBAActions` here rather than imported from
- * `command-center/command-center-data`, which is where this type used to live.
- * The dataset is real and shared (`nba-actions.json` → `@/lib/mock-data`); the
- * Command Center page around it is an early sketch that predates most of the
- * app, and the Dashboard should not be the reason it has to stay.
- */
-export type NbaAction = (typeof mockNBAActions)[number];
 
 export type NbaRow = {
   action: NbaAction;

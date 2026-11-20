@@ -40,9 +40,9 @@ import {
   getAssetProductDetail,
   type AssetAccountItem,
 } from "@/mocks/asset-account-details";
-import type { Client } from "@/types/domain";
 import { useLocale } from "@/i18n/I18nProvider";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 export function ClientDetailPanel({
   client,

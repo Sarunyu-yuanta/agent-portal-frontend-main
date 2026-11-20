@@ -36,8 +36,9 @@ import type {
   SortKey,
   ViewFilter,
 } from "@/features/client-hub/lib/types";
-import type { Client, ProductRow } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { ProductRow } from "@/types/portfolio";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 

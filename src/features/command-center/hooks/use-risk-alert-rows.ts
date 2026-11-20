@@ -4,7 +4,6 @@ import { useCallback, useMemo } from "react";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useRiskAlertsResource } from "./use-risk-alerts";
 import { useStoredIds } from "@/hooks/use-stored-ids";
-import type { RiskAlert } from "@/types/domain";
 import {
   buildRiskAlertRows,
   isRiskAlertId,
@@ -13,6 +12,7 @@ import {
   RISK_ACK_IDS_PREF,
   type RiskAlertRow,
 } from "@/features/command-center/lib/risk-feed";
+import type { RiskAlert } from "@/types/risk-alert";
 
 /**
  * Every risk finding across the book, ranked, with the acknowledgement store

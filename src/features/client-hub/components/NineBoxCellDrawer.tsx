@@ -6,8 +6,8 @@ import { getInitials, formatAumThb } from "@/lib/client-utils";
 import { useSlideOver, SlideOverPanel } from "@/components/ui/slide-over";
 import { ClientDetailPanel } from "./ClientDetailPanel";
 import { NINE_BOX_HEAT_STYLES, type NineBoxCellInfo } from "./NineBoxTab";
-import type { Client } from "@/types/domain";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 /** Content of the nine-box cell drawer: segment header, client list, and a
  * pushed client detail overlay. */

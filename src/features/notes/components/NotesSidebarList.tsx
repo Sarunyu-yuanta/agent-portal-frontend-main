@@ -5,7 +5,6 @@ import { Button, SearchInput } from "@sarunyu/system-one";
 import { BellIcon, NotePencilIcon, XIcon } from "@phosphor-icons/react";
 import { ClientAvatarStack } from "@/components/ui/client-avatar-stack";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Note } from "@/types/domain";
 import { LOCAL_ID_PREFIX } from "@/features/notes/store/notes-context";
 import { useClientNames } from "@/features/client-hub/hooks/use-client-names";
 import { groupNotesByDate, snippet } from "@/features/notes/lib/notes-grouping";
@@ -13,6 +12,7 @@ import { formatListStamp } from "@/features/notes/lib/note-format";
 import { useIsoLayoutEffect } from "@/hooks/use-iso-layout-effect";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 type Filter = "all" | "clients" | "reminders";
 

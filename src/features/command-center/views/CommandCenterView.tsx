@@ -31,7 +31,6 @@ import { ClientListModal } from "@/features/command-center/components/ClientList
 import { KycAlertsPanel } from "@/features/command-center/components/KycAlertsPanel";
 import { RiskAlertsPanel } from "@/features/command-center/components/RiskAlertsPanel";
 import { parseRiskCategory, SEVERITY_ORDER } from "@/features/command-center/lib/risk-config";
-import type { RiskSeverity } from "@/types/domain";
 import { buildCallLog } from "@/features/command-center/lib/call-log-feed";
 import {
   buildQueue,
@@ -49,6 +48,7 @@ import { useRiskAlertRows } from "@/features/command-center/hooks/use-risk-alert
 import { useLocale, useT } from "@/i18n/I18nProvider";
 import { GreetingCard } from "@/features/command-center/components/GreetingCard";
 import { parseTimePreview } from "@/features/command-center/lib/time-of-day-sky";
+import type { RiskSeverity } from "@/types/risk-alert";
 
 /**
  * The page an IC opens first.

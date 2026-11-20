@@ -8,7 +8,6 @@ import { ClientAssetSidebarContent } from "@/features/portfolio/components/Clien
 import { ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import { ErrorState, NotFoundState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
-import type { Client } from "@/types/domain";
 import {
   useClientAssetAccounts,
   useClientCallLogs,
@@ -34,7 +33,6 @@ import type { LiabilitiesDetail } from "@/mocks/liabilities-details";
 import {
   clientDetailById,
   kycExpiryLabel,
-  type SortDir,
   type HoldingsSortKey,
 } from "@/features/client-profile/lib/client-detail-data";
 import { CLIENT_TABS, CLIENT_TAB_ITEMS } from "@/features/client-profile/lib/client-tabs";
@@ -46,6 +44,8 @@ import { ClientOrdersTab } from "@/features/orders/components/ClientOrdersTab";
 import { KycTab } from "@/features/client-profile/components/KycTab";
 import { OverviewTab } from "@/features/client-profile/components/OverviewTab";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { SortDir } from "@/types/table";
 
 export function ClientProfileView({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);

@@ -8,7 +8,7 @@
  * backend or a rules service owns.
  */
 
-import { type mockPipelineDeals } from "@/mocks/mock-data";
+import type { PipelineDeal } from "@/types/sales";
 
 export const STAGES = [
   "Qualified",
@@ -20,7 +20,6 @@ export const STAGES = [
 ] as const;
 
 export type Stage = (typeof STAGES)[number];
-export type Deal = (typeof mockPipelineDeals)[number];
 
 /** Stage labels: `t.pipeline.stage[stage]`. */
 export const STAGE_META: Record<Stage, { dot: string }> = {
@@ -56,7 +55,7 @@ export function parseDealValue(dealSize: string) {
   return parseFloat(dealSize.replace(/[฿,\sM]/g, "")) || 0;
 }
 
-export function columnTotal(deals: Deal[]) {
+export function columnTotal(deals: PipelineDeal[]) {
   const sum = deals.reduce((acc, d) => acc + parseDealValue(d.dealSize), 0);
   return sum > 0 ? `฿ ${sum}M` : "—";
 }

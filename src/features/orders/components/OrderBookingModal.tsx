@@ -55,16 +55,6 @@ import { getCallLogs } from "@/mocks/call-log-data";
 import { IC_NAME, IC_TEAM } from "@/features/auth/lib/current-ic";
 import { formatThbAmount, getInitial, parseAmount } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type {
-  Booking,
-  Client,
-  ClientReadiness,
-  RequirementItem,
-  RequirementKey,
-  EvidenceChannel,
-  OrderEvidence,
-  RequirementStatus,
-} from "@/types/domain";
 import { bookingModeFor, type BookableProduct } from "@/features/orders/lib/bookable-products";
 import { BackButton } from "./BackButton";
 import { ProposalSteps, type ProposalStep, type ProposalSubject } from "./SendProposalDialog";
@@ -101,6 +91,16 @@ import {
 } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type {
+  Booking,
+  ClientReadiness,
+  EvidenceChannel,
+  OrderEvidence,
+  RequirementItem,
+  RequirementKey,
+  RequirementStatus,
+} from "@/types/order";
 
 /**
  * Steps that come before the client list, in the same modal — Order
@@ -1351,7 +1351,7 @@ function amountCheck(
    * booking could be placed, fill a basket, and then hold the whole product at
    * "วงเงินไม่เพียงพอ" until the IC found it and cancelled it. The check that
    * decides belongs where the number is typed, so that state no longer exists
-   * (see `Booking` in `types/domain.ts`).
+   * (see `Booking` in `@/types/order`).
    */
   const overCash = amount > 0 && amount > cashAvailable;
   return {

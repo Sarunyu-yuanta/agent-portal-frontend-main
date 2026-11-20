@@ -4,7 +4,6 @@ import { useSyncExternalStore } from "react";
 import { mockHouseViewStrategies } from "@/mocks/mock-data";
 import { mockCampaigns } from "@/mocks/campaign-mock-data";
 import { maskName } from "@/lib/mask-name";
-import type { Client } from "@/types/domain";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useT } from "@/i18n/I18nProvider";
 import {
@@ -45,6 +44,7 @@ import {
   normalizeProductCategory,
   productCategoryTitle,
 } from "@/features/catalog/lib/product-catalog-routes";
+import type { Client } from "@/types/client";
 
 export type Crumb = { label: string; href?: string };
 export type BreadcrumbContext = { clients: Client[]; isPrivate: boolean };

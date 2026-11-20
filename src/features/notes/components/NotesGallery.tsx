@@ -1,11 +1,11 @@
 "use client";
 
 import { BellIcon, CheckCircleIcon, PlusIcon } from "@phosphor-icons/react";
-import type { Note } from "@/types/domain";
 import { groupNotesByDate } from "@/features/notes/lib/notes-grouping";
 import { formatDayOnly, reminderTag, REMINDER_TONE } from "@/features/notes/lib/note-format";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /**
  * Notes as a wall of cards rather than a list beside a reader.

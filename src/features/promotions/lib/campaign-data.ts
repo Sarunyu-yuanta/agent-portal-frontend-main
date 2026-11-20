@@ -15,6 +15,10 @@
  * stay testable and the components stay about layout.
  */
 
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Locale } from "@/i18n/config";
+import { formatDate } from "@/i18n/format";
+import type { Client } from "@/types/client";
 import type {
   Campaign,
   CampaignClient,
@@ -24,13 +28,9 @@ import type {
   CampaignRsvp,
   CampaignStatus,
   CampaignType,
-  Client,
   ClientSegment,
   RsvpStatus,
-} from "@/types/domain";
-import type { Dictionary } from "@/i18n/dictionaries/th";
-import type { Locale } from "@/i18n/config";
-import { formatDate } from "@/i18n/format";
+} from "@/types/campaign";
 
 // ── Dates and status ────────────────────────────────────────────────────────
 

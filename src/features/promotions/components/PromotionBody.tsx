@@ -2,9 +2,9 @@
 
 import { CheckIcon } from "@phosphor-icons/react";
 import { Alert, Tag } from "@sarunyu/system-one";
-import type { Campaign } from "@/types/domain";
 import { DetailSectionGroup, DetailSubsection } from "./DetailSection";
 import { useT } from "@/i18n/I18nProvider";
+import type { Campaign } from "@/types/campaign";
 
 /**
  * What the offer is, who it is for, and the small print.

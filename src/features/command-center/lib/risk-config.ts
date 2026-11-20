@@ -18,9 +18,9 @@ import {
   WarningCircleIcon,
   XCircleIcon,
 } from "@phosphor-icons/react";
-import type { RiskAlertCategory, RiskSeverity } from "@/types/domain";
 import type { Locale } from "@/i18n/config";
 import { formatDate, formatTime } from "@/i18n/format";
+import type { RiskAlertCategory, RiskSeverity } from "@/types/risk-alert";
 
 /** Where "ดูทั้งหมด" lands. Exported from here rather than from the panel the
  *  way `CALL_LOG_PAGE` is: the sub page needs the string, and importing it out

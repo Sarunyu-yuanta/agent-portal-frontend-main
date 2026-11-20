@@ -15,13 +15,10 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords, formatAumThb, formatPlYtdPct } from "@/lib/client-utils";
 import { useT } from "@/i18n/I18nProvider";
-import {
-  CATEGORY_CONFIG,
-  confidenceColor,
-  type Insight,
-} from "@/features/ai-insights/lib/insight-config";
+import { CATEGORY_CONFIG, confidenceColor } from "@/features/ai-insights/lib/insight-config";
+import type { AiInsight } from "@/types/sales";
 
-export function InsightDrawerPanel({ insight }: { insight: Insight }) {
+export function InsightDrawerPanel({ insight }: { insight: AiInsight }) {
   const { isPrivate } = usePrivacy();
   const t = useT();
   const ai = t.research.aiInsights;
@@ -122,7 +119,7 @@ export function InsightDrawerPanel({ insight }: { insight: Insight }) {
           </div>
         )}
 
-        {/* 2. AI Insight */}
+        {/* 2. AI AiInsight */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <p className="text-meta font-semibold tracking-wide text-muted-foreground uppercase">

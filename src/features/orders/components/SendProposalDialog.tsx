@@ -45,7 +45,6 @@ import { useOrders } from "@/features/orders/store/orders-context";
 import { useClients } from "@/hooks/use-api";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { OrderBook, ProposalChannel } from "@/types/domain";
 import {
   DEFAULT_PROPOSAL_CHANNELS,
   PROPOSAL_CHANNEL_META,
@@ -59,6 +58,7 @@ import {
   proposalOutcome,
 } from "@/features/orders/lib/order-proposals";
 import { useT } from "@/i18n/I18nProvider";
+import type { OrderBook, ProposalChannel } from "@/types/order";
 
 /**
  * What a Proposal can be about — any product the IC can put in front of a

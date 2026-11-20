@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useToasts } from "@/hooks/use-toasts";
 import { useNotes, LOCAL_ID_PREFIX } from "@/features/notes/store/notes-context";
-import type { Note } from "@/types/domain";
 import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { NotesSidebarList, DISCARD_REMOVE_MS } from "./NotesSidebarList";
 import { NoteDetailPane } from "./NoteDetailPane";
 import { useT } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /** Distinguishes one composition from the next, so clicking New Note twice in a
  * row gives the editor a key it hasn't seen and it mounts empty. */

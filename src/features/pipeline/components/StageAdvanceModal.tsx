@@ -10,10 +10,10 @@ import {
   STAGE_META,
   STAGE_ADVANCE,
   ADVANCE_CHECKLIST,
-  type Deal,
   type Stage,
 } from "@/features/pipeline/lib/pipeline-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { PipelineDeal } from "@/types/sales";
 
 export function StageAdvanceModal({
   deal,
@@ -21,7 +21,7 @@ export function StageAdvanceModal({
   onConfirm,
   onCancel,
 }: {
-  deal: Deal;
+  deal: PipelineDeal;
   next: Stage;
   onConfirm: () => void;
   onCancel: () => void;
@@ -76,7 +76,7 @@ export function StageAdvanceModal({
             </span>
           </div>
 
-          {/* Deal summary strip */}
+          {/* PipelineDeal summary strip */}
           <div className="flex items-center gap-3 rounded-xl bg-muted/50 px-3 py-2.5">
             <Avatar type="text" initials={getInitialsFromWords(maskedClient)} size="s" />
             <div className="min-w-0 flex-1">

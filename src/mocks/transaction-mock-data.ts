@@ -13,17 +13,17 @@
  * with the real endpoint; nothing reads this file directly.
  */
 
-import type {
-  ClientTransaction,
-  TransactionAsset,
-  TransactionSide,
-  TransactionStatus,
-} from "@/types/domain";
 import { mockClients } from "./mock-data";
 import { stampFromDaysAgo } from "./order-mock-data";
 import { STOCK_TOP_PICK } from "@/features/catalog/stock/lib/stock-data";
 import { getSectorStockBatch } from "@/features/catalog/stock/lib/stock-industry-sector-data";
 import { getTopPerformers } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
+import type {
+  ClientTransaction,
+  TransactionAsset,
+  TransactionSide,
+  TransactionStatus,
+} from "@/types/transaction";
 
 /** The platforms a client can trade each asset through. */
 export const TRANSACTION_CHANNELS: Record<TransactionAsset, string[]> = {

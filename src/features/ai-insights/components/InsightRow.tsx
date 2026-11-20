@@ -4,11 +4,8 @@ import { Button, Tag } from "@sarunyu/system-one";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { useT } from "@/i18n/I18nProvider";
-import {
-  CATEGORY_CONFIG,
-  confidenceColor,
-  type Insight,
-} from "@/features/ai-insights/lib/insight-config";
+import { CATEGORY_CONFIG, confidenceColor } from "@/features/ai-insights/lib/insight-config";
+import type { AiInsight } from "@/types/sales";
 
 export function InsightRow({
   insight,
@@ -16,7 +13,7 @@ export function InsightRow({
   isSelected,
   onSelect,
 }: {
-  insight: Insight;
+  insight: AiInsight;
   isLast: boolean;
   isSelected: boolean;
   onSelect: (id: string) => void;

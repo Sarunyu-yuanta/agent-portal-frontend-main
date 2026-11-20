@@ -1,9 +1,9 @@
-import type { Note } from "@/types/domain";
 import { dayKey } from "./calendar-grid";
 import { actionKindRank } from "@/features/calendar/components/market-taxonomy";
 import { marketFeed } from "./mock-market-feed";
 import type { MarketFact } from "./market-feed";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Note } from "@/types/note";
 
 /**
  * What put a row on a day.

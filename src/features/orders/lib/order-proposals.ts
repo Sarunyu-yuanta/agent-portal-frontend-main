@@ -16,8 +16,8 @@
  * was is on `Booking.placedVia`, for a report that wants to split them.
  */
 
-import type { Booking, OrderBook, ProposalLog } from "@/types/domain";
 import { bookingPhase, isBookClosed, ownBookings, type OrderStepFilter } from "./order-book";
+import type { Booking, OrderBook, ProposalLog } from "@/types/order";
 
 export type ProposalOutcome = "open" | "won" | "lost";
 

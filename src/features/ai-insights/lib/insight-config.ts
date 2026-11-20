@@ -1,9 +1,7 @@
 import { ChartBarIcon, SparkleIcon, UsersIcon, WarningIcon } from "@phosphor-icons/react";
-import type { mockInsights } from "@/mocks/mock-data";
 
 export type SortOption = "priority" | "recent";
 export type TabId = "all" | "product" | "risk" | "engagement" | "portfolio";
-export type Insight = (typeof mockInsights)[number];
 
 /** Labels: `t.research.aiInsights.category[type]` / `.primaryAction[type]`. */
 export const CATEGORY_CONFIG = {

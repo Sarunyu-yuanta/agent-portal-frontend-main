@@ -11,7 +11,7 @@
  */
 
 import { maskName } from "@/lib/mask-name";
-import type { RiskAlert, RiskAlertCategory, RiskSeverity } from "@/types/domain";
+import type { RiskAlert, RiskAlertCategory, RiskSeverity } from "@/types/risk-alert";
 
 /** One finding, as a row: the alert, the name as it may be shown, and whether
  *  this IC has already waved it through. */

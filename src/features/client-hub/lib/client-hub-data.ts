@@ -17,7 +17,8 @@ import { ASSET_CLASS, LIABILITIES_MULTIPLIER, displayAssetLabel } from "@/lib/cl
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { getNineBoxCell } from "@/features/client-hub/components/NineBoxTab";
 import type { ProductSortKey, SortKey } from "./types";
-import type { Client, ProductRow, ProductHolder } from "@/types/domain";
+import type { Client } from "@/types/client";
+import type { ProductHolder, ProductRow } from "@/types/portfolio";
 
 /** Allocation slices for a client, falling back to the default mix. */
 function slicesFor(client: Client) {

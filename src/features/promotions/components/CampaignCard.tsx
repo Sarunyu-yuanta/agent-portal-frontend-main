@@ -3,10 +3,10 @@
 import { LocaleLink as Link } from "@/i18n/navigation";
 import { Card, Tag } from "@sarunyu/system-one";
 import type { CardTagStatus } from "@sarunyu/system-one";
-import type { Campaign } from "@/types/domain";
 import { campaignDateLine } from "@/features/promotions/lib/campaign-data";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Campaign } from "@/types/campaign";
 
 /**
  * One campaign in the grid: the design system's `Card variant="event"`.

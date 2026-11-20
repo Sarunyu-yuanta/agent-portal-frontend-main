@@ -11,7 +11,7 @@
 
 import { useStatic, type Resource } from "@/hooks/use-api";
 import { mockTransactions } from "@/mocks/transaction-mock-data";
-import type { ClientTransaction, TransactionAsset } from "@/types/domain";
+import type { ClientTransaction, TransactionAsset } from "@/types/transaction";
 
 export function useTransactions(asset: TransactionAsset): Resource<ClientTransaction[]> {
   return useStatic(mockTransactions[asset]);

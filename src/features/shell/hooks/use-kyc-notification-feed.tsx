@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { IdentificationCardIcon } from "@phosphor-icons/react";
-import type { Client } from "@/types/domain";
 import { kycExpiry, kycExpiryLabel } from "@/features/client-profile/lib/client-detail-data";
 import { zoneForDays, type ZonedNotification } from "@/lib/notification-zones";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 /**
  * The checkpoints a KYC expiry rings at: 30 days out, then 15, 7, 1, and the

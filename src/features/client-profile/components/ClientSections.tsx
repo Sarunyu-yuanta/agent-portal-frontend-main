@@ -15,10 +15,10 @@ import {
   PhoneOutgoingIcon,
 } from "@phosphor-icons/react";
 import { relativeCallDate, type CallLogEntry } from "@/mocks/call-log-data";
-import { type SortDir } from "@/features/client-profile/lib/client-detail-data";
 import { AllocationDonutWithTiles } from "@/components/charts/AllocationDonut";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
+import type { SortDir } from "@/types/table";
 
 export function CurrentAllocationSection({
   slices,

@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Button, Chip, SearchInput } from "@sarunyu/system-one";
 import { FunnelSimpleIcon, XIcon } from "@phosphor-icons/react";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
-import type { CampaignFormat, CampaignProduct, ClientSegment } from "@/types/domain";
 import {
   type CampaignFilters as Filters,
   type CampaignTab,
 } from "@/features/promotions/lib/campaign-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { CampaignFormat, CampaignProduct, ClientSegment } from "@/types/campaign";
 
 /**
  * Search in the open, the four narrowing axes behind a button.

@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import type { Note } from "@/types/domain";
 import {
   dayFromKey,
   dayOffset,
@@ -10,6 +9,7 @@ import { concernsSomeone, groupDayItems, type DayItem } from "@/features/calenda
 import { itemBadge } from "@/features/calendar/components/source-badge";
 import { isDue, zoneForDays, type ZonedNotification } from "@/lib/notification-zones";
 import { useT } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /**
  * The header bell's reminder rows and click targets — every client's reminders,

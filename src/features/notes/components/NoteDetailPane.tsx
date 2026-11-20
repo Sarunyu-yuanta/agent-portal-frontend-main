@@ -5,7 +5,6 @@ import { ArrowLeftIcon, BellIcon, TrashIcon, UserIcon, XIcon } from "@phosphor-i
 import { Tooltip } from "@sarunyu/system-one";
 import type { TagVariant } from "@sarunyu/system-one";
 import { ClientAvatarStack } from "@/components/ui/client-avatar-stack";
-import type { Note } from "@/types/domain";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useClientNames } from "@/features/client-hub/hooks/use-client-names";
 import { ClientField, ReminderField } from "./NoteAttributeFields";
@@ -14,6 +13,7 @@ import { NoteEditorFields } from "./NoteEditorFields";
 import { formatDateTime, reminderTag, TAG_CHIP_TONE } from "@/features/notes/lib/note-format";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /**
  * A tag that can carry a real icon.

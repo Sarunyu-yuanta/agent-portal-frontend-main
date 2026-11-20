@@ -17,6 +17,7 @@ import { PlaybookCard } from "./PlaybookCard";
 import { PlaybookCardCompact } from "./PlaybookCardCompact";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { HouseViewStrategy } from "@/types/research";
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
@@ -49,13 +50,12 @@ const GRID_LIMIT = 4;
 /** Same placeholder the Research tab serves — the app has no real report files. */
 const FULL_REPORT_PDF_URL = "/mock-reports/sample-report.pdf";
 
-type Strategy = (typeof mockHouseViewStrategies)[number];
-type PeriodGroup = { period: string; periodLabel: string; items: Strategy[] };
+type PeriodGroup = { period: string; periodLabel: string; items: HouseViewStrategy[] };
 type ModalGroup = PeriodGroup | null;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function groupByPeriodLabel(strategies: Strategy[]): PeriodGroup[] {
+function groupByPeriodLabel(strategies: HouseViewStrategy[]): PeriodGroup[] {
   const seen = new Set<string>();
   const order: { period: string; periodLabel: string }[] = [];
   for (const s of strategies) {

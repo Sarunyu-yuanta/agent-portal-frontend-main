@@ -23,7 +23,6 @@ import { getInitial } from "@/lib/client-utils";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
-import type { OrderBook, OrderSubmission } from "@/types/domain";
 import { ordersListHref } from "@/features/orders/lib/bookable-products";
 import {
   CopyRow,
@@ -40,6 +39,7 @@ import { useOrderBooks } from "@/features/orders/hooks/use-order-books";
 import { NotFoundState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { OrderBook, OrderSubmission } from "@/types/order";
 
 export type OrderSubmissionRef = { productId: string; submissionId: string };
 

@@ -6,9 +6,9 @@
 
 import type { TagVariant } from "@sarunyu/system-one";
 import type { Dictionary } from "@/i18n/dictionaries/th";
-import type { Booking, OrderBook, RequirementItem, RequirementKey } from "@/types/domain";
 import { REQUIREMENT_CATALOG } from "./order-requirements";
 import { submissionFor } from "./order-book";
+import type { Booking, OrderBook, RequirementItem, RequirementKey } from "@/types/order";
 
 /** The four, in the order every surface lists them — see `productRequirementKeys`. */
 const CHECK_ORDER: RequirementKey[] = ["wealth", "acknowledge", "kyc", "risk-profile"];

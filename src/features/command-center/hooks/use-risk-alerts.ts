@@ -23,7 +23,7 @@
 import { useMemo } from "react";
 import { useStatic, type Resource } from "@/hooks/use-api";
 import { mockRiskAlerts } from "@/mocks/risk-mock-data";
-import type { RiskAlert } from "@/types/domain";
+import type { RiskAlert } from "@/types/risk-alert";
 
 /** Every open finding across the book, in authored order. */
 export function useRiskAlertsResource(): Resource<RiskAlert[]> {

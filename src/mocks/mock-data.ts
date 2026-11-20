@@ -1,5 +1,4 @@
 import clientsRaw from "@/mocks/clients.json";
-import type { MembershipTier } from "@/components/ui/tier-badge";
 import nbaActionsRaw from "@/mocks/nba-actions.json";
 import pipelineDealsRaw from "@/mocks/pipeline-deals.json";
 import miniKanbanRaw from "@/mocks/mini-kanban.json";
@@ -10,25 +9,20 @@ import houseViewStrategiesRaw from "@/mocks/house-view-strategies.json";
 import performanceRaw from "@/mocks/performance.json";
 import clientDetailsRaw from "@/mocks/client-details.json";
 import notificationsRaw from "@/mocks/notifications.json";
-
-// ── Narrow string-literal types that JSON cannot express ──────────────────────
-
-type ClientStatus = "success" | "error" | "hold" | "processing";
-type PriorityVariant = "red" | "yellow" | "blue";
-type ComplianceType = "critical" | "warning";
-type KYCStatus = "success" | "error" | "hold" | "processing";
-type ConvictionVariant = "green" | "yellow" | "red";
-type NotificationType = "icon";
-type PerformanceStatus = "Lagging" | "On Track";
+import type { Client, ClientDetail } from "@/types/client";
+import type { ComplianceAlert, KycRecord, KycRecordData } from "@/types/compliance";
+import type { Analyst, HouseViewStrategy } from "@/types/research";
+import type {
+  AiInsight,
+  MiniKanbanItem,
+  NbaAction,
+  PerformanceData,
+  PipelineDeal,
+} from "@/types/sales";
 
 // ── Single source of truth: client name lives only in clients.json ────────────
 
-export const mockClients = clientsRaw as Array<
-  Omit<(typeof clientsRaw)[number], "status" | "membershipTier"> & {
-    status: ClientStatus;
-    membershipTier: MembershipTier;
-  }
->;
+export const mockClients = clientsRaw as Client[];
 
 // Lookup map — used below to enrich all other datasets
 const nameById = Object.fromEntries(mockClients.map((c) => [c.id, c.name]));
@@ -42,24 +36,29 @@ const shortName = (id: string) => {
 
 // ── Enriched exports (clientId → clientName/client derived at import time) ────
 
-export const mockNBAActions = nbaActionsRaw.map((a) => ({
+export const mockNBAActions: NbaAction[] = nbaActionsRaw.map((a) => ({
   ...a,
   clientName: nameById[a.clientId] ?? a.clientId,
-  priorityVariant: a.priorityVariant as PriorityVariant,
+  priority: a.priority as NbaAction["priority"],
+  priorityVariant: a.priorityVariant as NbaAction["priorityVariant"],
+  tier: a.tier as NbaAction["tier"],
 }));
 
-export const mockPipelineDeals = pipelineDealsRaw.map((d) => ({
+export const mockPipelineDeals: PipelineDeal[] = pipelineDealsRaw.map((d) => ({
   ...d,
   client: nameById[d.clientId] ?? d.clientId,
 }));
 
-export const mockMiniKanban = miniKanbanRaw.map((k) => ({
+export const mockMiniKanban: MiniKanbanItem[] = miniKanbanRaw.map((k) => ({
   ...k,
   client: shortName(k.clientId),
 }));
 
-export const mockInsights = insightsRaw.map((i) => ({
+export const mockInsights: AiInsight[] = insightsRaw.map((i) => ({
   ...i,
+  type: i.type as AiInsight["type"],
+  category: i.category as AiInsight["category"],
+  tier: i.tier as AiInsight["tier"],
   clientName: nameById[i.clientId] ?? i.clientId,
 }));
 
@@ -83,7 +82,7 @@ export const mockInsights = insightsRaw.map((i) => ({
  * record, so consumers — and `kycExpiry`, which does the arithmetic — behave
  * exactly as they will against a real backend that returns a date.
  */
-export const mockKYCData = kycDataRaw.map((k) => {
+export const mockKYCData: KycRecord[] = (kycDataRaw as KycRecordData[]).map((k) => {
   const now = new Date();
   // UTC midnight, matching how `kycExpiry` reads the date back out, so the
   // round-trip lands on exactly the offset authored here.
@@ -94,7 +93,6 @@ export const mockKYCData = kycDataRaw.map((k) => {
     ...k,
     nextReview: review.toISOString().slice(0, 10),
     client: nameById[k.clientId] ?? k.clientId,
-    kycStatus: k.kycStatus as KYCStatus,
   };
 });
 
@@ -116,24 +114,18 @@ function fillKycPlaceholders(text: string, clientId: string | null): string {
     .replace("{kycDaysUntilExpiry}", String(record.daysUntilExpiry));
 }
 
-export const mockComplianceAlerts = complianceAlertsRaw.map((a) => ({
+export const mockComplianceAlerts: ComplianceAlert[] = complianceAlertsRaw.map((a) => ({
   ...a,
   // "Unknown" entries have no clientId — fall back to the literal "client" field
   client: a.clientId ? (nameById[a.clientId] ?? a.clientId) : (a.client ?? "Unknown"),
   title: fillKycPlaceholders(a.title, a.clientId),
   message: fillKycPlaceholders(a.message, a.clientId),
-  type: a.type as ComplianceType,
+  type: a.type as ComplianceAlert["type"],
 }));
 
-export const mockHouseViewStrategies = houseViewStrategiesRaw as Array<
-  Omit<(typeof houseViewStrategiesRaw)[number], "convictionVariant"> & {
-    convictionVariant: ConvictionVariant;
-  }
->;
+export const mockHouseViewStrategies = houseViewStrategiesRaw as HouseViewStrategy[];
 
-export type AnalystItem = { id: string; name: string; title: string; photo: string };
-
-export const mockAnalysts: AnalystItem[] = [
+export const mockAnalysts: Analyst[] = [
   {
     id: "a01",
     name: "ธนกร ศิริวัฒน์",
@@ -179,56 +171,7 @@ export const mockAnalysts: AnalystItem[] = [
   },
 ];
 
-export const mockPerformanceData = performanceRaw as typeof performanceRaw & {
-  revenueYtd: { status: PerformanceStatus };
-  aumGrowth: { status: PerformanceStatus };
-  netNewMoney: { status: PerformanceStatus };
-  productPenetration: { status: PerformanceStatus };
-};
-
-// ── ClientDetail types (kept here for page imports) ───────────────────────────
-
-type AllocationSlice = { name: string; value: number; fill: string };
-type AllocationKpi = {
-  label: string;
-  value: string;
-  ytd: string;
-  ytdPositive: boolean;
-  warning?: string;
-};
-type AssetAllocationSlice = { label: string; percent: number; statusIcon: string };
-type AssetSummary = {
-  netValue: string;
-  changeAmount: string;
-  changePercent: string;
-  changePositive: boolean;
-  lineAvailable: string;
-  cash: string;
-  lastUpdatedDate: string;
-  lastUpdatedTime: string;
-  allocationSlices?: AssetAllocationSlice[];
-};
-type Holding = {
-  asset: string;
-  value: string;
-  pnl: string;
-  pnlPct: string;
-  positive: boolean;
-  pct: string;
-};
-type AIAlert = { title: string; message: string; primaryAction: string; secondaryAction: string };
-
-export type ClientDetail = {
-  assetSummary?: AssetSummary;
-  allocationData: AllocationSlice[];
-  allocationBreakdown: AllocationKpi[];
-  topHoldings: Holding[];
-  behavioralProfile: { label: string; value: string }[];
-  tasks: { id: string; done: boolean; task: string; urgent: boolean }[];
-  recentActivity: { label: string; description: string; date: string; dotColor: string }[];
-  aiHighPriority: AIAlert | null;
-  aiRiskAlert: { title: string; message: string; action: string } | null;
-};
+export const mockPerformanceData = performanceRaw as PerformanceData;
 
 export const mockClientDetails = clientDetailsRaw as Record<string, ClientDetail>;
 
@@ -240,6 +183,6 @@ export const notificationGroups = notificationsRaw as Array<{
     description: string;
     time: string;
     unread: boolean;
-    type: NotificationType;
+    type: "icon";
   }>;
 }>;

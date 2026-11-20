@@ -23,12 +23,9 @@ import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords } from "@/lib/client-utils";
 import { KycDetailPanel } from "./KycDetailPanel";
 import { useT } from "@/i18n/I18nProvider";
-import {
-  kycFilterOpts,
-  type KycRow,
-  type SortKey,
-  type SortDir,
-} from "@/features/compliance/lib/compliance-data";
+import { kycFilterOpts, type SortKey } from "@/features/compliance/lib/compliance-data";
+import type { KycRecord } from "@/types/compliance";
+import type { SortDir } from "@/types/table";
 
 export function KycTable() {
   const { isPrivate } = usePrivacy();
@@ -37,7 +34,7 @@ export function KycTable() {
   const [filter, setFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("none");
-  const [selectedRow, setSelectedRow] = useState<KycRow | null>(null);
+  const [selectedRow, setSelectedRow] = useState<KycRecord | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [chipsScrolled, setChipsScrolled] = useState(false);
 

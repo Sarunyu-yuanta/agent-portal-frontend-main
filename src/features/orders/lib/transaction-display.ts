@@ -8,9 +8,9 @@
  * two different orders.
  */
 
-import type { TransactionAsset, TransactionSide, TransactionStatus } from "@/types/domain";
 import type { Locale } from "@/i18n/config";
 import { formatDate, formatTime } from "@/i18n/format";
+import type { TransactionAsset, TransactionSide, TransactionStatus } from "@/types/transaction";
 
 /** Green and red, as the rest of the app colours a rise and a fall. */
 export const SIDE_CLASS: Record<TransactionSide, string> = {

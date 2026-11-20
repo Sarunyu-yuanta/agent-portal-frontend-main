@@ -15,7 +15,7 @@ import {
 } from "@/lib/client-utils";
 import { getClientSliceAmount } from "@/features/client-hub/lib/client-hub-data";
 import type { ColumnId, SortKey } from "@/features/client-hub/lib/types";
-import type { Client } from "@/types/domain";
+import type { Client } from "@/types/client";
 
 export type CustomerColumn = {
   id: ColumnId;

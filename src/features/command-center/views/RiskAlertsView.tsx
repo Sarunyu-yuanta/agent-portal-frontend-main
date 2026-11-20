@@ -11,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import type { RiskSeverity } from "@/types/domain";
 import {
   RiskAlertRowItem,
   RiskCategoryTabs,
@@ -28,6 +27,7 @@ import { useRiskAlertRows } from "@/features/command-center/hooks/use-risk-alert
 import { useRiskCta } from "@/features/command-center/hooks/use-risk-cta";
 import { ErrorState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
+import type { RiskSeverity } from "@/types/risk-alert";
 
 /**
  * Every risk finding across the book, filtered.

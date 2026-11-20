@@ -28,7 +28,7 @@ import {
   type RelatedDrRow,
   type RelatedFutureContract,
   type RelatedProductKind,
-  type RelatedProducts,
+  type StockRelatedProducts,
 } from "@/features/catalog/stock/lib/stock-product-detail-data";
 import type { ThaiStructuredProduct } from "@/features/catalog/structured-product/lib/thai-structured-data";
 import {
@@ -618,7 +618,7 @@ function RelatedProductPanel({
   related,
   kind,
 }: {
-  related: RelatedProducts;
+  related: StockRelatedProducts;
   kind: RelatedProductKind;
 }) {
   switch (kind) {
@@ -649,7 +649,7 @@ function RelatedProductPanel({
   }
 }
 
-export function StockRelatedProductTab({ related }: { related: RelatedProducts }) {
+export function StockRelatedProductTab({ related }: { related: StockRelatedProducts }) {
   const t = useT();
   const kinds = useMemo(() => relatedProductKinds(related), [related]);
   const pathname = useAppPathname();

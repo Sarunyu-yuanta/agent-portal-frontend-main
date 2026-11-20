@@ -79,7 +79,7 @@ argument ตัวที่ 3 คือค่าเริ่มต้นก่�
 ถ้าใส่ mock ตอน API ล่มจะเห็นข้อมูลปลอมแทนที่จะเห็น ErrorState — `useResource` poll ทุก 5 นาที
 และ timeout ที่ 8 วินาที (`src/hooks/use-api.ts`)
 
-target type อยู่ที่ `src/types/domain.ts`
+target type อยู่ที่ `src/types/*.ts` (แยกไฟล์ตาม domain)
 
 ### ฝั่งเขียน (stores)
 

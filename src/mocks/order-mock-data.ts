@@ -20,6 +20,13 @@
 
 import orderBooksRaw from "@/mocks/order-books.json";
 import orderRequirementsRaw from "@/mocks/order-requirements.json";
+import { mockClients } from "./mock-data";
+import { getCallLogs } from "./call-log-data";
+import { OTHER_DESK_CLIENT_NAMES } from "./client-profiles";
+import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
+import { offeredProductId } from "@/features/orders/lib/offered-products";
+import { STOCK_TOP_PICK } from "@/features/catalog/stock/lib/stock-data";
+import { getTopPerformers } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
 import type {
   Booking,
   EvidenceChannel,
@@ -29,14 +36,7 @@ import type {
   RequirementKey,
   RequirementRequest,
   RequirementStatus,
-} from "@/types/domain";
-import { mockClients } from "./mock-data";
-import { getCallLogs } from "./call-log-data";
-import { OTHER_DESK_CLIENT_NAMES } from "./client-profiles";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
-import { offeredProductId } from "@/features/orders/lib/offered-products";
-import { STOCK_TOP_PICK } from "@/features/catalog/stock/lib/stock-data";
-import { getTopPerformers } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
+} from "@/types/order";
 
 /**
  * Who every booking, request and submission is attributed to.

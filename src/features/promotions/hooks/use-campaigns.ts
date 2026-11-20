@@ -17,7 +17,7 @@
 import { useMemo } from "react";
 import { useStatic, type Resource } from "@/hooks/use-api";
 import { mockCampaigns } from "@/mocks/campaign-mock-data";
-import type { Campaign } from "@/types/domain";
+import type { Campaign } from "@/types/campaign";
 
 /** Every campaign, promotions and events alike, in authored order. */
 export function useCampaigns(): Resource<Campaign[]> {

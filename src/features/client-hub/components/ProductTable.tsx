@@ -12,9 +12,10 @@ import { TableSkeleton } from "@/components/ui/skeleton";
 import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
 import { useFlipRows } from "@/hooks/use-flip-rows";
 import { displayAssetLabel, formatThbAmount } from "@/lib/client-utils";
-import type { ProductSortKey, SortDir } from "@/features/client-hub/lib/types";
-import type { ProductRow } from "@/types/domain";
+import type { ProductSortKey } from "@/features/client-hub/lib/types";
 import { useT } from "@/i18n/I18nProvider";
+import type { ProductRow } from "@/types/portfolio";
+import type { SortDir } from "@/types/table";
 
 export function ProductTable({
   rows,

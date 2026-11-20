@@ -19,7 +19,7 @@
  * looked at*, on fixed days of that month, so paging the calendar always has
  * something to show. Holidays are the opposite: a real holiday is a real date,
  * and sliding Songkran into November to keep a demo busy would be a lie the
- * user could act on. They come from `src/data/market-holidays.json` as-is.
+ * user could act on. They come from `src/mocks/market-holidays.json` as-is.
  *
  * Everything is derived from the date passed in — never from `new Date()` —
  * so the server render and the client render agree and React has nothing to

@@ -1,8 +1,6 @@
-/** UI-only view types for the Client Hub page. Domain shapes live in @/types/domain. */
+/** UI-only view types for the Client Hub page. Domain shapes live in src/types. */
 
 export type ViewFilter = "customer" | "product" | "nine-box";
-
-export type SortDir = "none" | "asc" | "desc";
 
 export type SortKey =
   | "rowIndex"

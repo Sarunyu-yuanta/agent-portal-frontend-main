@@ -14,7 +14,6 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { useToasts } from "@/hooks/use-toasts";
-import type { Note } from "@/types/domain";
 import { CalendarLegend } from "./CalendarLegend";
 import { DayCell } from "./DayCell";
 import { MonthPicker } from "./MonthPicker";
@@ -43,6 +42,7 @@ import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { reminderAtFromDate } from "@/features/notes/lib/note-format";
 import { useLocale, useT } from "@/i18n/I18nProvider";
 import { weekdayNames } from "@/i18n/format";
+import type { Note } from "@/types/note";
 
 export function CalendarView({
   notes,

@@ -22,9 +22,10 @@ import { dayFromKey, dayOffset, todayDateKey } from "@/features/calendar/lib/cal
 import { groupDayItems, type DayItem } from "@/features/calendar/lib/day-items";
 import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals";
 import { CurrentAllocationSection, TopHoldingsSection } from "./ClientSections";
-import type { SortDir, HoldingsSortKey } from "@/features/client-profile/lib/client-detail-data";
-import type { ClientDetail } from "@/types/domain";
+import type { HoldingsSortKey } from "@/features/client-profile/lib/client-detail-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { ClientDetail } from "@/types/client";
+import type { SortDir } from "@/types/table";
 
 /** How far out the Reminders card looks — past this, a reminder only shows
  *  up once you open the full Reminders tab. */

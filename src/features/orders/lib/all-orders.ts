@@ -14,14 +14,6 @@
  * the same thing on every desk — see {@link StatusBucket}.
  */
 
-import type {
-  Booking,
-  ClientTransaction,
-  OrderBook,
-  ProposalLog,
-  TransactionAsset,
-  TransactionStatus,
-} from "@/types/domain";
 import { bookingModeForDesk, deskForId, type Desk } from "./bookable-products";
 import { dealStatus } from "./booking-status";
 import { bookingPhase, bookingPhaseSteps, ownBookings, type BookingPhase } from "./order-book";
@@ -30,6 +22,8 @@ import { offeredSymbol } from "./offered-products";
 import { PROPOSAL_CHANNEL_META } from "@/features/orders/components/proposal-channels";
 import { STATUS_TAG, formatQuantity } from "./transaction-display";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import type { Booking, OrderBook, ProposalLog } from "@/types/order";
+import type { ClientTransaction, TransactionAsset, TransactionStatus } from "@/types/transaction";
 
 /** The asset column, and the filter on it — the seven tabs, by their own names. */
 export type AllAsset =

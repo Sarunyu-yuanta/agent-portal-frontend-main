@@ -5,7 +5,7 @@
  *
  * ─── Backend handoff ─────────────────────────────────────────────────────────
  * Nothing here talks to a network today. Every dataset is JSON that ships in the
- * bundle (`src/data/*.json`, assembled in `@/lib/mock-data`), so each hook below
+ * bundle (`src/mocks/*.json`, assembled in `@/mocks/mock-data`), so each hook below
  * hands it straight back through {@link useStatic}.
  *
  * What the indirection buys is the swap: screens consume a {@link Resource},

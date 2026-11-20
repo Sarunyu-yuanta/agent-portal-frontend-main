@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import type { Note } from "@/types/domain";
 import { useStatic } from "@/hooks/use-api";
+import type { Note } from "@/types/note";
 
 /** Nothing is seeded today; a real feed would be fetching this list. */
 const SEED_NOTES: Note[] = [];

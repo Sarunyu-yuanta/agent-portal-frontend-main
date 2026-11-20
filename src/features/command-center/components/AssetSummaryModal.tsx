@@ -1,9 +1,9 @@
 "use client";
 
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
-import type { Client } from "@/types/domain";
 import { AssetSummaryPanel } from "./AssetSummaryPanel";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 export function AssetSummaryModal({
   open,

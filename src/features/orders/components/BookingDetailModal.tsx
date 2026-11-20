@@ -29,7 +29,6 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { getAccountIdentity } from "@/mocks/client-profiles";
 import { maskName } from "@/lib/mask-name";
-import type { Booking, OrderBook, RequirementItem } from "@/types/domain";
 import type { BookableProduct } from "@/features/orders/lib/bookable-products";
 import {
   ClientRow,
@@ -56,6 +55,7 @@ import { STATUS_CHIP } from "./OrderBookingModal";
 import type { BookingStatusTag } from "@/features/orders/lib/booking-status";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Booking, OrderBook, RequirementItem } from "@/types/order";
 
 /**
  * The disc, by the step the booking is at rather than by its deal status.

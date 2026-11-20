@@ -4,10 +4,10 @@ import { useRef, useState } from "react";
 import { Button, Toaster } from "@sarunyu/system-one";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { useToasts } from "@/hooks/use-toasts";
-import type { Note } from "@/types/domain";
 import { NoteDetailPane } from "./NoteDetailPane";
 import { NoteModalShell, NoteDeleteConfirmModal } from "./note-modal-shell";
 import { useT } from "@/i18n/I18nProvider";
+import type { Note } from "@/types/note";
 
 /**
  * The modal an existing note opens into wherever a reminder points at it —

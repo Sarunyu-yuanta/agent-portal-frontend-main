@@ -14,9 +14,9 @@ import { TierBadge } from "@/components/ui/tier-badge";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { CampaignMaterial } from "@/types/domain";
 import type { CampaignClientRow } from "@/features/promotions/lib/campaign-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { CampaignMaterial } from "@/types/campaign";
 
 /**
  * Pick who one piece of material goes to.

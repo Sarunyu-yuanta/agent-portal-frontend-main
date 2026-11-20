@@ -20,12 +20,12 @@ import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button, Toaster, type ToastStatus } from "@sarunyu/system-one";
 import { useToasts } from "@/hooks/use-toasts";
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
-import type { Booking } from "@/types/domain";
 import { ordersListHref, type BookableProduct } from "@/features/orders/lib/bookable-products";
 import { isBookingOpen } from "@/features/orders/lib/order-book";
 import { OrderBookingModal } from "@/features/orders/components/OrderBookingModal";
 import { useOrderBook } from "./use-order-books";
 import { useT } from "@/i18n/I18nProvider";
+import type { Booking } from "@/types/order";
 
 export function useQuotaBooking(options?: {
   /**

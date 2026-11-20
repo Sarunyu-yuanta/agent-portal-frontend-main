@@ -2,7 +2,6 @@
 
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { Tag } from "@sarunyu/system-one";
-import { type mockHouseViewStrategies } from "@/mocks/mock-data";
 import {
   CATEGORY_TAG_VARIANT,
   CATEGORY_ACCENT_COLOR,
@@ -10,10 +9,15 @@ import {
   getCategory,
 } from "@/features/insights/lib/house-view-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { HouseViewStrategy } from "@/types/research";
 
-type Strategy = (typeof mockHouseViewStrategies)[number];
-
-export function PlaybookCard({ strategy, noBorder }: { strategy: Strategy; noBorder?: boolean }) {
+export function PlaybookCard({
+  strategy,
+  noBorder,
+}: {
+  strategy: HouseViewStrategy;
+  noBorder?: boolean;
+}) {
   const cat = getCategory(strategy);
   const router = useLocalizedRouter();
   const t = useT();

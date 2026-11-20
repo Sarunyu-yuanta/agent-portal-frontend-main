@@ -19,8 +19,8 @@ import {
   PhoneIcon,
   type Icon,
 } from "@phosphor-icons/react";
-import type { EvidenceChannel, OrderEvidence } from "@/types/domain";
 import type { BookingMode } from "@/features/orders/lib/bookable-products";
+import type { EvidenceChannel, OrderEvidence } from "@/types/order";
 
 export const EVIDENCE_CHANNEL: Record<
   EvidenceChannel,

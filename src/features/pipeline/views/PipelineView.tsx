@@ -7,8 +7,9 @@ import { usePipelineDeals } from "@/hooks/use-api";
 import { ErrorState } from "@/components/ui/empty-state";
 import { StageAdvanceModal } from "@/features/pipeline/components/StageAdvanceModal";
 import { KanbanColumn } from "@/features/pipeline/components/KanbanColumn";
-import type { Deal, Stage } from "@/features/pipeline/lib/pipeline-data";
+import type { Stage } from "@/features/pipeline/lib/pipeline-data";
 import { useT } from "@/i18n/I18nProvider";
+import type { PipelineDeal } from "@/types/sales";
 
 export function PipelineView() {
   const {
@@ -21,13 +22,13 @@ export function PipelineView() {
   const p = t.pipeline;
   const [showModal, setShowModal] = useState(false);
   const [newProposal, setNewProposal] = useState({ clientName: "", productType: "", dealSize: "" });
-  const [deals, setDeals] = useState<Deal[]>(() => strapiDeals.map((d) => ({ ...d })));
+  const [deals, setDeals] = useState<PipelineDeal[]>(() => strapiDeals.map((d) => ({ ...d })));
   const [dealsSource, setDealsSource] = useState(strapiDeals);
   if (dealsSource !== strapiDeals) {
     setDealsSource(strapiDeals);
     setDeals(strapiDeals.map((d) => ({ ...d })));
   }
-  const [advancing, setAdvancing] = useState<{ deal: Deal; next: Stage } | null>(null);
+  const [advancing, setAdvancing] = useState<{ deal: PipelineDeal; next: Stage } | null>(null);
 
   const activeStages: Stage[] = ["Qualified", "Proposed", "Under Review", "Negotiation"];
   const closedStages: Stage[] = ["Closed Won", "Closed Lost"];

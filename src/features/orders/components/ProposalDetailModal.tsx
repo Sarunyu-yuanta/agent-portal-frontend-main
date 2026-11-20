@@ -30,7 +30,6 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { getAccountIdentity } from "@/mocks/client-profiles";
 import { maskName } from "@/lib/mask-name";
-import type { OrderBook, ProposalLog } from "@/types/domain";
 import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
 import type { BookableProduct } from "@/features/orders/lib/bookable-products";
 import {
@@ -53,6 +52,7 @@ import {
 } from "@/features/orders/lib/order-proposals";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { OrderBook, ProposalLog } from "@/types/order";
 
 /**
  * The disc, by what came of the offer.

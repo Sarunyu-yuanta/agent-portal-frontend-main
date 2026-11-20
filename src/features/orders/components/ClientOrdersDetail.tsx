@@ -44,7 +44,6 @@ import { getAccountIdentity } from "@/mocks/client-profiles";
 import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { Booking, Client, OrderBook } from "@/types/domain";
 import {
   checksAtBooking,
   dealStatus,
@@ -81,6 +80,8 @@ import { useOrderBook, useOrderBooks } from "@/features/orders/hooks/use-order-b
 import { useOrders } from "@/features/orders/store/orders-context";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { Booking, OrderBook } from "@/types/order";
 
 /** One product this client holds, with their own bookings on it. */
 type Holding = { book: OrderBook; bookings: Booking[] };

@@ -41,13 +41,6 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { TRANSACTION_CHANNELS } from "@/mocks/transaction-mock-data";
-import type {
-  ClientTransaction,
-  ProposalLog,
-  TransactionAsset,
-  TransactionSide,
-  TransactionStatus,
-} from "@/types/domain";
 import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
 import { formatLogTime } from "@/features/orders/lib/order-book";
 import { offeredSymbol } from "@/features/orders/lib/offered-products";
@@ -65,6 +58,13 @@ import {
 import { useTransactions } from "@/features/orders/hooks/use-transactions";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { ProposalLog } from "@/types/order";
+import type {
+  ClientTransaction,
+  TransactionAsset,
+  TransactionSide,
+  TransactionStatus,
+} from "@/types/transaction";
 
 const COLUMNS = 9;
 

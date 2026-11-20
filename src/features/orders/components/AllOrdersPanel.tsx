@@ -42,7 +42,6 @@ import { useToasts } from "@/hooks/use-toasts";
 import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import type { TransactionSide } from "@/types/domain";
 import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
 import {
   ALL_ASSETS,
@@ -70,6 +69,7 @@ import { useOrderBooks, useRosterReadiness } from "@/features/orders/hooks/use-o
 import { useTransactions } from "@/features/orders/hooks/use-transactions";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { TransactionSide } from "@/types/transaction";
 
 const COLUMNS = 6;
 const SIDES: TransactionSide[] = ["buy", "sell", "switch"];

@@ -584,7 +584,7 @@ export type RelatedDerivativeBundle = {
 };
 
 /** Related products for a stock quote. Missing/empty fields are omitted from chips. */
-export type RelatedProducts = {
+export type StockRelatedProducts = {
   dr?: RelatedDrBundle;
   derivative?: RelatedDerivativeBundle;
   structured?: StructuredProduct[];
@@ -598,7 +598,9 @@ function hasDr(dr?: RelatedDrBundle): boolean {
   return Boolean(dr && (dr.yuanta || dr.others.length > 0));
 }
 
-export function relatedProductKinds(related: RelatedProducts | undefined): RelatedProductKind[] {
+export function relatedProductKinds(
+  related: StockRelatedProducts | undefined,
+): RelatedProductKind[] {
   if (!related) return [];
   const kinds: RelatedProductKind[] = [];
   if (hasDr(related.dr)) kinds.push("dr");
@@ -752,7 +754,7 @@ const RELATED_DERIVATIVE: RelatedDerivativeBundle = {
 };
 
 /** BBL mock — every related category present so chips can be exercised. */
-const BBL_RELATED_PRODUCTS: RelatedProducts = {
+const BBL_RELATED_PRODUCTS: StockRelatedProducts = {
   dr: { yuanta: RELATED_DR_YUANTA, others: RELATED_DR_OTHERS },
   derivative: RELATED_DERIVATIVE,
   structured: TOP_PICKS.slice(0, 2),
@@ -771,7 +773,7 @@ const BBL_RELATED_PRODUCTS: RelatedProducts = {
  * - ADVANC: DR only
  * - others (including CPALL): Derivative only
  */
-export function getRelatedProducts(symbol: string): RelatedProducts {
+export function getRelatedProducts(symbol: string): StockRelatedProducts {
   const key = symbol.toUpperCase();
   if (key === "BBL") return BBL_RELATED_PRODUCTS;
   if (key === "ADVANC") {

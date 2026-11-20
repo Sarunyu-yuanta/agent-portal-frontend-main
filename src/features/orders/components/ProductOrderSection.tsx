@@ -57,7 +57,6 @@ import { getAccountIdentity } from "@/mocks/client-profiles";
 import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import type { Booking, RequirementItem, RequirementKey, RequirementStatus } from "@/types/domain";
 import { bookingModeFor, type BookableProduct } from "@/features/orders/lib/bookable-products";
 import { useOrderBook, useRosterReadiness } from "@/features/orders/hooks/use-order-books";
 import {
@@ -76,6 +75,7 @@ import {
   paymentStatus,
 } from "@/features/orders/lib/booking-status";
 import { useT } from "@/i18n/I18nProvider";
+import type { Booking, RequirementItem, RequirementKey, RequirementStatus } from "@/types/order";
 
 const PAGE_SIZE = 10;
 

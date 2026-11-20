@@ -33,7 +33,7 @@ import type {
   RiskAlertKind,
   RiskMetric,
   RiskSeverity,
-} from "@/types/domain";
+} from "@/types/risk-alert";
 
 /**
  * Which tab each kind sits under.

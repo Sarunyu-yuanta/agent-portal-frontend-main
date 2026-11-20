@@ -2,12 +2,12 @@
 
 import { CheckIcon, LinkSimpleIcon, MapPinIcon, VideoCameraIcon } from "@phosphor-icons/react";
 import { Tag } from "@sarunyu/system-one";
-import type { Campaign } from "@/types/domain";
 import { campaignDay } from "@/features/promotions/lib/campaign-data";
 import { DetailSectionGroup, DetailSubsection } from "./DetailSection";
 import { Disclaimer } from "./PromotionBody";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Campaign } from "@/types/campaign";
 
 /**
  * What happens on the day, who is speaking, and where.

@@ -7,7 +7,6 @@ import {
   BellIcon,
   IdentificationCardIcon,
 } from "@phosphor-icons/react";
-import type { Client, Note } from "@/types/domain";
 import { EmptyState } from "@/components/ui/empty-state";
 import { kycExpiry, kycExpiryLabel } from "@/features/client-profile/lib/client-detail-data";
 import { kycCheckpointTone } from "@/features/shell/hooks/use-kyc-notification-feed";
@@ -29,6 +28,8 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatDate } from "@/i18n/format";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
+import type { Note } from "@/types/note";
 
 /** How far either side of today this tab reaches — the same three months the
  *  mini calendar can point at. Notes ignore it (see `buildAllReminders`); it

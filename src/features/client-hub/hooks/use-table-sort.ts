@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { SortDir } from "@/features/client-hub/lib/types";
+import type { SortDir } from "@/types/table";
 
 /**
  * Sort state for one table, in the shape `TableHeaderCell` wants.

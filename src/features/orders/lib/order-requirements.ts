@@ -23,14 +23,14 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { mockClientRequirements } from "@/mocks/order-mock-data";
 import { bookingModeFor, type BookableProduct } from "./bookable-products";
+import type { Client } from "@/types/client";
 import type {
-  Client,
   ClientReadiness,
   RequirementItem,
   RequirementKey,
   RequirementRequest,
   RequirementStatus,
-} from "@/types/domain";
+} from "@/types/order";
 
 /**
  * What each requirement is called and where it is fixed.

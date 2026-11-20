@@ -1,4 +1,5 @@
-import { mockAnalysts, type AnalystItem } from "@/mocks/mock-data";
+import { mockAnalysts } from "@/mocks/mock-data";
+import type { Analyst } from "@/types/research";
 
 /**
  * The Research tab's mock feed — published reports and the analyst directory.
@@ -145,7 +146,7 @@ const MOCK_RESEARCH: ResearchItem[] = [
   },
 ];
 
-export type ResearchFeed = { reports: ResearchItem[]; analysts: AnalystItem[] };
+export type ResearchFeed = { reports: ResearchItem[]; analysts: Analyst[] };
 
 /** One object, built once, so the resource hands back a stable reference. */
 export const RESEARCH_FEED: ResearchFeed = { reports: MOCK_RESEARCH, analysts: mockAnalysts };

@@ -9,7 +9,6 @@ import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBrea
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useClients, useClientsResource } from "@/hooks/use-api";
 import { useRoboAdvisoryPlans } from "@/features/catalog/hooks/use-catalog";
-import type { Client } from "@/types/domain";
 import { usePageBreadcrumb } from "@/features/shell/lib/page-breadcrumbs";
 import {
   AdvisoryClientBar,
@@ -40,6 +39,7 @@ import { RoboAdvisoryPlanDetailModal } from "./RoboAdvisoryPlanDetailModal";
 import { RoboRiskLevel } from "./RoboRiskLevel";
 import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
 import { useT } from "@/i18n/I18nProvider";
+import type { Client } from "@/types/client";
 
 /** Hidden pending sign-off on the filter behavior — flip to true to re-enable. */
 const SHOW_ROBO_FILTER_BUTTON = false;
