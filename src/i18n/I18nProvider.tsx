@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { DEFAULT_LOCALE, type Locale } from "./config";
-import th, { type Dictionary } from "./dictionaries/th";
-import en from "./dictionaries/en";
+import th, { type Dictionary } from "@/i18n/dictionaries/th";
+import en from "@/i18n/dictionaries/en";
 import { createFormat, type Format } from "./format";
 
 /**

@@ -1,5 +1,5 @@
-import type th from "../th/dates";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/dates";
+import { plural } from "@/i18n/plural";
 
 const days = (n: number) => `${n} ${plural(n, { one: "day", other: "days" })}`;
 

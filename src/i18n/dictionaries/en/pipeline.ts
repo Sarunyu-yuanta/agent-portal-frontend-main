@@ -1,5 +1,5 @@
-import type th from "../th/pipeline";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/pipeline";
+import { plural } from "@/i18n/plural";
 
 const pipeline = {
   stage: {

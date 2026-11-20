@@ -2,11 +2,11 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { FixedIncomeDetail } from "../../../../client/[id]/FixedIncomeDetail";
-import { FixedIncomeDetailSkeleton } from "../../../../client/[id]/ProductDetailSkeletons";
-import { useFixedIncomeBond } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../../CatalogNotFound";
+import { FixedIncomeDetail } from "@/features/catalog/fixed-income/components/FixedIncomeDetail";
+import { FixedIncomeDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import { useFixedIncomeBond } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /** Loading lives with the lookup — see the note in `product/[id]/page.tsx`. */

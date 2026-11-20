@@ -2,15 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { MutualFundFilterResultsPage } from "../../../../client/[id]/MutualFundFilterResultsPage";
-import { getAllMutualFunds } from "../../../../client/[id]/mutual-fund-data";
+import { MutualFundFilterResultsPage } from "@/features/catalog/mutual-fund/components/MutualFundFilterResultsPage";
+import { getAllMutualFunds } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
 import {
   EMPTY_FILTER_STATE,
   type MutualFundFilterState,
-} from "../../../../client/[id]/MutualFundFilterPanel";
-import { MUTUAL_FUND_FILTER_STATE_KEY } from "../../../../client/[id]/MutualFundQuickActions";
+} from "@/features/catalog/mutual-fund/components/MutualFundFilterPanel";
+import { MUTUAL_FUND_FILTER_STATE_KEY } from "@/features/catalog/mutual-fund/components/MutualFundQuickActions";
 import { navRead } from "@/lib/nav-session";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useT } from "@/i18n/I18nProvider";
 
 function readStoredFilterState(): MutualFundFilterState {

@@ -1,9 +1,9 @@
 "use client";
 
-import { KpiBar } from "./KpiBar";
-import { AlertCards } from "./AlertCards";
-import { KycTable } from "./KycTable";
-import { AiGuide } from "./AiGuide";
+import { KpiBar } from "@/features/compliance/components/KpiBar";
+import { AlertCards } from "@/features/compliance/components/AlertCards";
+import { KycTable } from "@/features/compliance/components/KycTable";
+import { AiGuide } from "@/features/compliance/components/AiGuide";
 
 export default function CompliancePage() {
   return (

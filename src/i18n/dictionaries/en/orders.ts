@@ -1,5 +1,5 @@
-import type th from "../th/orders";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/orders";
+import { plural } from "@/i18n/plural";
 
 const words = {
   basket: {

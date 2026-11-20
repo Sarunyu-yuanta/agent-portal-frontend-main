@@ -1,7 +1,7 @@
 "use client";
 
-import { MutualFundInsightsPage } from "../../../client/[id]/MutualFundInsightsPage";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { MutualFundInsightsPage } from "@/features/catalog/mutual-fund/components/MutualFundInsightsPage";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 
 export default function MutualFundInsightsRoute() {
   const goBack = useSectionBack();

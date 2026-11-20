@@ -2,12 +2,12 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { FixedIncomeCompanyDetail } from "../../../../client/[id]/FixedIncomeCompanyDetail";
-import { FixedIncomeCompanyDetailSkeleton } from "../../../../client/[id]/ProductDetailSkeletons";
-import type { FixedIncomeBond } from "../../../../client/[id]/fixed-income-data";
-import { useFixedIncomeCompanyDetail } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../../CatalogNotFound";
+import { FixedIncomeCompanyDetail } from "@/features/catalog/fixed-income/components/FixedIncomeCompanyDetail";
+import { FixedIncomeCompanyDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import type { FixedIncomeBond } from "@/features/catalog/fixed-income/lib/fixed-income-data";
+import { useFixedIncomeCompanyDetail } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

@@ -20,14 +20,14 @@ import { localizePath } from "@/i18n/locale-path";
 import { Suspense, use } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { ORDER_BOOKING_ENABLED } from "@/lib/feature-flags";
-import { catalogListHref } from "@/lib/product-catalog-routes";
+import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
+import { catalogListHref } from "@/features/catalog/lib/product-catalog-routes";
 import { useClientsResource } from "@/hooks/use-api";
 import { ErrorState } from "@/components/ui/empty-state";
-import { OrdersPanelSkeleton } from "../../OrdersPanelSkeleton";
-import { CatalogNotFound } from "../../../product-catalog/CatalogNotFound";
-import { normalizeOrderTab } from "../../order-tabs";
-import { ClientOrdersDetail } from "./ClientOrdersDetail";
+import { OrdersPanelSkeleton } from "@/features/orders/components/OrdersPanelSkeleton";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
+import { normalizeOrderTab } from "@/features/orders/lib/order-tabs";
+import { ClientOrdersDetail } from "@/features/orders/components/ClientOrdersDetail";
 
 export default function ClientOrdersPage({ params }: { params: Promise<{ clientId: string }> }) {
   const locale = useLocale();

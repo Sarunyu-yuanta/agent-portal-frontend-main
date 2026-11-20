@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatDate, formatTime } from "@/i18n/format";
-import type { AssetHeroSummary } from "@/components/AssetSummarySection";
+import type { AssetHeroSummary } from "@/types/portfolio";
 
 export const LINE_AVAILABLE_RATIO = 320_000 / 9_400_000;
 export const LIABILITIES_MULTIPLIER = 0.0197;

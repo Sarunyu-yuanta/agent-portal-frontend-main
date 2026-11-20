@@ -2,11 +2,11 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { TopIdeaDetail } from "../../../client/[id]/TopIdeaDetail";
-import { TOP_IDEA_THEMES, type TopIdeaSector } from "../../../client/[id]/top-idea-data";
-import type { StructuredProduct } from "../../../client/[id]/structured-product-data";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { TopIdeaDetail } from "@/features/catalog/top-idea/components/TopIdeaDetail";
+import { TOP_IDEA_THEMES, type TopIdeaSector } from "@/features/catalog/top-idea/lib/top-idea-data";
+import type { StructuredProduct } from "@/features/catalog/structured-product/lib/structured-product-data";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /** A sector the catalog has a theme for — anything else is a stale or mistyped link. */

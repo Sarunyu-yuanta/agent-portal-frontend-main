@@ -1,5 +1,5 @@
-import type th from "../th/client";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/client";
+import { plural } from "@/i18n/plural";
 
 const clients = (n: number) => `${n} ${plural(n, { one: "client", other: "clients" })}`;
 

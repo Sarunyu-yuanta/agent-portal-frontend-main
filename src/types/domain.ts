@@ -13,9 +13,9 @@
  * and is the reference for designing those endpoints.
  */
 
-import type { mockClients, mockClientDetails } from "@/lib/mock-data";
-import type { AssetAllocationSlice, AssetHeroSummary } from "@/components/AssetSummarySection";
-import type { NotificationZone } from "@/app/[lang]/(dashboard)/notification-zones";
+import type { mockClients, mockClientDetails } from "@/mocks/mock-data";
+import type { AssetAllocationSlice, AssetHeroSummary } from "./portfolio";
+import type { NotificationZone } from "@/lib/notification-zones";
 
 /** A wealth-management client row as consumed by the UI. */
 export type Client = (typeof mockClients)[number];

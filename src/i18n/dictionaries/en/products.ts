@@ -1,6 +1,6 @@
 import { createElement, Fragment, type ReactNode } from "react";
-import type th from "../th/products";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/products";
+import { plural } from "@/i18n/plural";
 
 /** See `rich` in th/products.ts. */
 const rich = (...parts: ReactNode[]): ReactNode => createElement(Fragment, null, ...parts);

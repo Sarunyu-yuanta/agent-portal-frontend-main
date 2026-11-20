@@ -1,5 +1,5 @@
-import type th from "../th/planner";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/planner";
+import { plural } from "@/i18n/plural";
 
 const planner = {
   newReminder: "New reminder",

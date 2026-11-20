@@ -1,11 +1,11 @@
 "use client";
 
 import { use } from "react";
-import { StructuredProductDetail } from "../../../client/[id]/StructuredProductDetail";
-import { StructuredProductDetailSkeleton } from "../../../client/[id]/ProductDetailSkeletons";
-import { useStructuredProduct } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { StructuredProductDetail } from "@/features/catalog/structured-product/components/StructuredProductDetail";
+import { StructuredProductDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import { useStructuredProduct } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

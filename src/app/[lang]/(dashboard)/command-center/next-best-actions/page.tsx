@@ -4,14 +4,18 @@ import { useCallback, useMemo } from "react";
 import { Button, Card } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { useNBAActions } from "@/hooks/use-api";
-import { usePrivacy } from "@/contexts/privacy-context";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { usePrivacy } from "@/features/shell/store/privacy-context";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { useStoredIds } from "@/hooks/use-stored-ids";
-import { CardCount } from "../CardHeader";
-import { NbaPanel } from "../NbaPanel";
+import { CardCount } from "@/features/command-center/components/CardHeader";
+import { NbaPanel } from "@/features/command-center/components/NbaPanel";
 import { ErrorState } from "@/components/ui/empty-state";
-import { buildNbaRows, isNbaId, HIDDEN_NBA_IDS_PREF } from "../dashboard-data";
+import {
+  buildNbaRows,
+  isNbaId,
+  HIDDEN_NBA_IDS_PREF,
+} from "@/features/command-center/lib/dashboard-data";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

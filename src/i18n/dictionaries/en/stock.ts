@@ -1,5 +1,5 @@
-import type th from "../th/stock";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/stock";
+import { plural } from "@/i18n/plural";
 
 const stock = {
   latestUpdate: (stamp: string) => `Latest update: ${stamp}`,

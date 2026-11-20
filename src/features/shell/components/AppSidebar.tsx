@@ -1,0 +1,462 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { useT } from "@/i18n/I18nProvider";
+import { useAppPathname } from "@/i18n/navigation";
+import {
+  UsersIcon,
+  SquaresFourIcon,
+  SidebarSimpleIcon,
+  ChartBarIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  NotePencilIcon,
+  CalendarBlankIcon,
+  AlarmIcon,
+  GaugeIcon,
+  LayoutIcon,
+  MegaphoneIcon,
+  ClipboardTextIcon,
+  GraduationCapIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react";
+import { SidebarUserMenu } from "./SidebarUserMenu";
+import { usePrivacy } from "@/features/shell/store/privacy-context";
+import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
+import { IC_ROLE } from "@/features/auth/lib/current-ic";
+import {
+  CALENDAR_ENABLED,
+  IC_LEARNING_ENABLED,
+  NOTES_ENABLED,
+  ORDER_BOOKING_ENABLED,
+  PERFORMANCE_ENABLED,
+  PROMOTIONS_ENABLED,
+  YAA_TEAM_HEAD_ENABLED,
+} from "@/config/feature-flags";
+import {
+  activeSectionForPath,
+  forgetSection,
+  markSectionEntry,
+  navVisitSnapshot,
+  subscribeNavVisits,
+  type NavSectionKey,
+} from "@/features/shell/lib/nav-memory";
+
+/**
+ * What the firm puts in front of you: clients and research. Shared,
+ * read-mostly, and none of it authored here.
+ */
+const workspaceItems: NavItem[] = [
+  {
+    href: "/command-center",
+    section: "command-center",
+    label: "Command Center",
+    icon: LayoutIcon,
+    badge: null,
+  },
+  {
+    href: "/client-hub",
+    section: "client-hub",
+    label: "Client 360",
+    icon: UsersIcon,
+    badge: null,
+  },
+  {
+    href: "/insights",
+    section: "insights",
+    label: "Insights",
+    icon: ChartBarIcon,
+    badge: null,
+  },
+  ...(PROMOTIONS_ENABLED
+    ? [
+        {
+          href: "/promotions",
+          section: "promotions" as const,
+          label: "Promotion/Events",
+          icon: MegaphoneIcon,
+          badge: null,
+        },
+      ]
+    : []),
+];
+
+/**
+ * Selling: finding the product, then booking clients into it and following the
+ * order through. One flow in two places, so they sit together rather than
+ * among Workspace's read-only surfaces.
+ *
+ * Order Management is gated because the whole booking flow is (see
+ * `lib/feature-flags`); with the flag off the entry goes, `/orders` redirects
+ * to the catalogue, and the section is the catalogue alone.
+ */
+const salesItems: NavItem[] = [
+  {
+    href: "/product-catalog",
+    section: "product-catalog",
+    label: "Product Catalog",
+    icon: SquaresFourIcon,
+    badge: null,
+  },
+  ...(ORDER_BOOKING_ENABLED
+    ? [
+        {
+          href: "/orders",
+          section: "orders" as const,
+          label: "Order Management",
+          icon: ClipboardTextIcon,
+          badge: null,
+        },
+      ]
+    : []),
+];
+
+/**
+ * What grows the advisor's own book, rather than serving a client in front of
+ * them right now: targets to track, skills to build. Split from Workspace for
+ * that reason, not because the surfaces differ.
+ */
+const growthItems: NavItem[] = [
+  ...(PERFORMANCE_ENABLED
+    ? [
+        {
+          href: "/performance",
+          section: "performance" as const,
+          label: "Performance",
+          icon: GaugeIcon,
+          badge: null,
+        },
+      ]
+    : []),
+  ...(IC_LEARNING_ENABLED
+    ? [
+        {
+          href: "/ic-learning",
+          section: "ic-learning" as const,
+          label: "IC Learning",
+          icon: GraduationCapIcon,
+          badge: null,
+        },
+      ]
+    : []),
+  ...(YAA_TEAM_HEAD_ENABLED
+    ? [
+        {
+          href: "/yaa-team-head",
+          section: "yaa-team-head" as const,
+          label: "YAA/Team Head",
+          icon: UsersThreeIcon,
+          badge: null,
+        },
+      ]
+    : []),
+];
+
+/**
+ * What you write down and what you owe. Split from Workspace because it is the
+ * other kind of thing in this app — authored here, yours, and about what happens
+ * next rather than what is.
+ *
+ * The two entries are closer than neighbours: Calendar renders the reminders
+ * attached to notes, laid out by day instead of by list (see
+ * `app/(dashboard)/calendar/page.tsx`). One body of work, two views of it.
+ *
+ * Both are out of the current delivery phase (see `lib/feature-flags`), so the
+ * list is filtered rather than written out — with both off it comes back empty
+ * and the whole Planner section, label included, stops rendering.
+ */
+const plannerItems: NavItem[] = [
+  ...(NOTES_ENABLED
+    ? [
+        {
+          href: "/notes",
+          section: "notes" as const,
+          label: "Notes",
+          icon: NotePencilIcon,
+          badge: null,
+        },
+      ]
+    : []),
+  ...(CALENDAR_ENABLED
+    ? [
+        {
+          href: "/calendar",
+          section: "calendar" as const,
+          label: "Calendar",
+          icon: CalendarBlankIcon,
+          badge: null,
+        },
+        // The same reminders as the calendar, read as one list. Its own entry
+        // rather than a tab on Calendar so the month grid can own the whole
+        // screen.
+        {
+          href: "/reminders",
+          section: "reminders" as const,
+          label: "Reminders",
+          icon: AlarmIcon,
+          badge: null,
+        },
+      ]
+    : []),
+];
+
+type NavItem = {
+  href: string;
+  section: NavSectionKey;
+  label: string;
+  icon: React.ElementType;
+  badge: number | string | null;
+};
+
+// Fixed-width icon zone: collapsed sidebar = 50px, outer margin px-2 (8px each side),
+// inner zone = 34px. All icons/logos/avatars live inside this zone and never move.
+const ICON_ZONE = "w-[34px] flex items-center justify-center shrink-0";
+
+function NavSection({
+  label,
+  items,
+  collapsed,
+  onNavigate,
+}: {
+  label: string;
+  items: NavItem[];
+  collapsed: boolean;
+  onNavigate?: () => void;
+}) {
+  const pathname = useAppPathname();
+  const t = useT();
+  useSyncExternalStore(subscribeNavVisits, navVisitSnapshot, () => "");
+  const activeSection = activeSectionForPath(pathname);
+
+  /**
+   * A sidebar entry is a fixed destination: it always opens the section's
+   * default page, however the user last left it. Nothing is resumed — not the
+   * client they were reading, not the tab, filter or scroll offset — so the
+   * section is forgotten first and the plain `href` does the navigating.
+   *
+   * Clicking the section you're already in is the same gesture ("take me back
+   * to the list"), so it needs no special case.
+   */
+  const handleNavigate = (item: NavItem) => (e: React.MouseEvent) => {
+    onNavigate?.();
+    // Cmd/ctrl/shift-click is "open this href elsewhere" — leave it to the browser.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    forgetSection(item.section);
+    // Still a deliberate section entry: if `href` ever is a guest route, it
+    // must not read as a cross-section drill-in.
+    markSectionEntry(item.href);
+  };
+
+  // The sidebar keeps its original, compact type sizes; the rest of the app
+  // uses the larger scale in `globals.css`. They are written
+  // `text-[length:Npx]` because a plain `text-[11px]` is enlarged globally by
+  // `app/typography.css`. Same in `SidebarUserMenu`.
+  return (
+    <div className="mt-2 flex flex-col gap-0.5">
+      {/* Section label fades out when collapsed */}
+      <div className="flex h-7 items-end overflow-hidden px-4 pb-1">
+        <p
+          className={`text-[length:11px] font-semibold tracking-widest whitespace-nowrap text-slate-500 uppercase transition-all duration-300 ease-in-out ${
+            collapsed ? "-translate-x-1 opacity-0" : "translate-x-0 opacity-100"
+          }`}
+        >
+          {label}
+        </p>
+      </div>
+
+      {items.map((item) => {
+        const Icon = item.icon;
+        // `label` in the item list is the fallback; the dictionary wins.
+        const label = t.nav.items[item.section as keyof typeof t.nav.items] ?? item.label;
+        // Section-wide, so Client 360 stays lit on a Full Profile (/client/:id).
+        const isActive = activeSection === item.section;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block px-2 no-underline"
+            onClick={handleNavigate(item)}
+            title={label}
+          >
+            <div
+              className={`flex items-center gap-3 overflow-hidden rounded-lg py-2.5 transition-colors ${
+                isActive ? "bg-slate-700/60" : "hover:bg-slate-800"
+              }`}
+            >
+              {/* Icon zone — fixed width, never moves */}
+              <div className={ICON_ZONE}>
+                <Icon
+                  size={18}
+                  weight={isActive ? "fill" : "regular"}
+                  className={isActive ? "text-white" : "text-slate-400"}
+                />
+              </div>
+
+              {/* Text fades + collapses. max-width (not width:auto) so the collapse
+                  itself can be transitioned — CSS can't interpolate to/from "auto". */}
+              <span
+                className={`overflow-hidden text-[length:13.5px] leading-[18px] whitespace-nowrap transition-all duration-300 ease-in-out ${
+                  collapsed ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
+                } ${isActive ? "text-white" : "text-slate-300"} font-medium`}
+              >
+                {label}
+              </span>
+
+              {item.badge != null && (
+                <span
+                  className={`overflow-hidden rounded-full bg-slate-700 py-0.5 text-[length:11px] font-semibold whitespace-nowrap text-slate-300 tabular-nums transition-all duration-300 ease-in-out ${
+                    collapsed ? "max-w-0 p-0 opacity-0" : "max-w-[48px] px-2 opacity-100"
+                  }`}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+export function AppSidebar({
+  onClose,
+  collapsed = false,
+  onToggleCollapse,
+}: {
+  onClose?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
+  const { isPrivate, toggle } = usePrivacy();
+  const t = useT();
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden">
+      {/* Toggle button — icon zone keeps it still */}
+      {onToggleCollapse && (
+        <div className="flex shrink-0 px-2 pt-5 pb-1">
+          <div className={ICON_ZONE}>
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              title={collapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
+              className="cursor-pointer text-slate-400 transition-colors hover:text-slate-200"
+            >
+              <SidebarSimpleIcon size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Logo — the YA mark never moves or fades: the small icon sits in the
+          same icon zone the nav icons line up on and stays fully opaque in
+          both states. Expanded, the full lockup (`logo-ic-portal-white.svg`,
+          which carries the mark itself) is laid exactly over it with its own
+          mark clipped off, so only the "Yuanta Securities / IC PORTAL" text
+          fades in and out. Cross-fading two copies of the mark instead dims it
+          mid-transition, which reads as a flicker. */}
+      <div className="relative flex h-[62px] shrink-0 items-center px-2 py-4">
+        <div className={ICON_ZONE}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size icon, no responsive sizes needed */}
+          <img src="/brand/yuanta-icon-logo.svg" alt="Yuanta" className="h-8 w-auto" />
+        </div>
+        <div
+          aria-hidden={collapsed}
+          className={`absolute top-1/2 left-[9px] -translate-y-1/2 transition-opacity duration-300 ease-in-out ${
+            collapsed ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- small fixed-size wordmark, no responsive sizes needed */}
+          <img
+            src="/brand/logo-ic-portal-white.svg"
+            alt="Yuanta IC Portal"
+            className="h-8 w-auto max-w-none [clip-path:inset(0_0_0_34px)]"
+          />
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto">
+        <NavSection
+          label={t.nav.sections.workspace}
+          items={workspaceItems}
+          collapsed={collapsed}
+          onNavigate={onClose}
+        />
+        <NavSection
+          label={t.nav.sections.sales}
+          items={salesItems}
+          collapsed={collapsed}
+          onNavigate={onClose}
+        />
+        {plannerItems.length > 0 && (
+          <NavSection
+            label={t.nav.sections.planner}
+            items={plannerItems}
+            collapsed={collapsed}
+            onNavigate={onClose}
+          />
+        )}
+        {growthItems.length > 0 && (
+          <NavSection
+            label={t.nav.sections.growth}
+            items={growthItems}
+            collapsed={collapsed}
+            onNavigate={onClose}
+          />
+        )}
+      </nav>
+
+      {/* Privacy mode toggle */}
+      <div
+        className="mx-2 mb-2 shrink-0 rounded-lg transition-colors duration-200"
+        style={{
+          backgroundColor: isPrivate
+            ? "color-mix(in srgb, var(--primary-action) 25%, transparent)"
+            : "color-mix(in srgb, var(--fill-gray-700) 30%, transparent)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={toggle}
+          title={isPrivate ? t.nav.showClientNames : t.nav.hideClientNames}
+          className={`flex w-full cursor-pointer items-center gap-1.5 rounded-lg py-2.5 pr-2 transition-colors ${isPrivate ? "hover:bg-primary-action/20" : "hover:bg-slate-700/50"}`}
+        >
+          <div className={ICON_ZONE}>
+            {isPrivate ? (
+              <EyeSlashIcon size={16} className="text-primary-action shrink-0" />
+            ) : (
+              <EyeIcon size={16} className="shrink-0 text-slate-400" />
+            )}
+          </div>
+          <span
+            className={`overflow-hidden text-[length:13px] leading-normal whitespace-nowrap transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"} ${isPrivate ? "text-primary-action font-medium" : "text-slate-300"}`}
+          >
+            {t.nav.hideClientNames}
+          </span>
+          {/* Switch indicator */}
+          <div
+            className={`ml-auto shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${collapsed ? "max-w-0 opacity-0" : "max-w-[40px] opacity-100"}`}
+          >
+            <div
+              className={`relative h-4.5 w-8 rounded-full transition-colors duration-200 ${isPrivate ? "bg-primary-action" : "bg-slate-600"}`}
+            >
+              <div
+                className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? "translate-x-[14px]" : "translate-x-0.5"}`}
+              />
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* User profile — avatar in icon zone. Deliberately unpadded: the trigger
+          carries all of its own spacing so its hover highlight fills the footer
+          edge to edge, from the divider down to the foot of the rail. Any
+          padding here would show up as a dead margin around the highlight. */}
+      <div className="shrink-0 border-t border-slate-700/60">
+        <SidebarUserMenu name={NOTE_AUTHOR} role={IC_ROLE} initials="JD" collapsed={collapsed} />
+      </div>
+    </div>
+  );
+}

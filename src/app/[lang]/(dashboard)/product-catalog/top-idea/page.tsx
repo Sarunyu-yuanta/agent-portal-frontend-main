@@ -1,8 +1,8 @@
 "use client";
 
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { TopIdeaAllPage } from "../../client/[id]/TopIdeaAllPage";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { TopIdeaAllPage } from "@/features/catalog/top-idea/components/TopIdeaAllPage";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 
 export default function TopIdeaAllPageRoute() {
   const router = useLocalizedRouter();

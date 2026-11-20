@@ -1,17 +1,17 @@
 "use client";
 
 import { Suspense, use } from "react";
-import { MarketIndexDetail } from "../../../client/[id]/MarketIndexDetail";
-import { SetIndustrySectorDetail } from "../../../client/[id]/SetIndustrySectorDetail";
-import { StockProductDetail } from "../../../client/[id]/StockProductDetail";
+import { MarketIndexDetail } from "@/features/catalog/stock/components/MarketIndexDetail";
+import { SetIndustrySectorDetail } from "@/features/catalog/stock/components/SetIndustrySectorDetail";
+import { StockProductDetail } from "@/features/catalog/stock/components/StockProductDetail";
 import {
   useIndustrySectorPage,
   useMarketIndexPage,
   useStockProductDetail,
-} from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
+} from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useT } from "@/i18n/I18nProvider";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 
 const STOCK_STATIC_ROUTES = new Set(["dr", "etf"]);
 

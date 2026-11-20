@@ -1,6 +1,6 @@
 "use client";
 
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "./sheet";
 import { cn } from "@/lib/utils";
 
 /** Standard right-side drawer widths used across the dashboard. */

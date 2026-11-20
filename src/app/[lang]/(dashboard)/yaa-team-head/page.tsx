@@ -1,7 +1,7 @@
 "use client";
 
 import { UsersThreeIcon } from "@phosphor-icons/react";
-import { ComingSoonPage } from "../coming-soon-page";
+import { ComingSoonPage } from "@/features/shell/components/ComingSoonPage";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

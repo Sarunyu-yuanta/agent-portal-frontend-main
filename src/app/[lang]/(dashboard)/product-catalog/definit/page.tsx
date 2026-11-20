@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import { DefinitDetail } from "../../client/[id]/DefinitDetail";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { DefinitDetail } from "@/features/catalog/robo-advisory/components/DefinitDetail";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 
 export default function DefinitDetailPage() {
   return (

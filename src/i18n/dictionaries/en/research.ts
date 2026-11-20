@@ -1,5 +1,5 @@
-import type th from "../th/research";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/research";
+import { plural } from "@/i18n/plural";
 
 const research = {
   tabs: { houseView: "House View", research: "Research" },

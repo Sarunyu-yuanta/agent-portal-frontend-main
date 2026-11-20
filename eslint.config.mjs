@@ -2,12 +2,31 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
-/** Shared layers must never reach up into routes. */
-const NO_ROUTE_IMPORTS = {
-  group: ["@/app/*", "**/app/\\[lang\\]/*"],
-  message:
-    "Shared code must not import from route folders. Move the code into src/features or a shared layer.",
+/*
+ * Dependency direction (see docs/architecture.md):
+ *   app (routes) → features → components / hooks / lib / config / types / i18n
+ * Nothing imports a route file, and shared layers never import a feature.
+ */
+const NO_PARENT_IMPORTS = {
+  group: ["../*"],
+  message: "Use the @/ alias instead of climbing out of the folder.",
 };
+const NO_ROUTE_IMPORTS = {
+  group: ["@/app/*", "!@/app/*.css"],
+  message: "Route folders hold route files only. Import from src/features instead.",
+};
+const NO_FEATURE_IMPORTS = {
+  group: ["@/features/*"],
+  message: "Shared layers must not depend on a feature. Move the shared piece down a layer.",
+};
+const SHARED_LAYERS = [
+  "src/components/**",
+  "src/hooks/**",
+  "src/lib/**",
+  "src/types/**",
+  "src/i18n/**",
+  "src/config/**",
+];
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -34,12 +53,16 @@ const eslintConfig = defineConfig([
     files: ["src/**"],
     rules: {
       "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-restricted-imports": ["error", { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS] }],
     },
   },
   {
-    files: ["src/components/**", "src/hooks/**", "src/lib/**", "src/types/**", "src/i18n/**"],
+    files: SHARED_LAYERS,
     rules: {
-      "no-restricted-imports": ["warn", { patterns: [NO_ROUTE_IMPORTS] }],
+      "no-restricted-imports": [
+        "error",
+        { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS, NO_FEATURE_IMPORTS] },
+      ],
     },
   },
   globalIgnores([

@@ -1,4 +1,4 @@
-import type th from "../th/learning";
+import type th from "@/i18n/dictionaries/th/learning";
 
 const learning = {
   icLearning: {

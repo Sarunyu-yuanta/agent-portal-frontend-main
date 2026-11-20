@@ -1,4 +1,4 @@
-import type th from "../th/shell";
+import type th from "@/i18n/dictionaries/th/shell";
 
 const shell = {
   chipScroller: {

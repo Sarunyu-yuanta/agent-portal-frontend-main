@@ -4,7 +4,7 @@ The portal was built ahead of the delivery plan, so some finished features have
 been held back from a release. They are **switched off, not deleted** — every
 file is still in the repo, still compiles, and still type-checks.
 
-The switches live in one place: [`src/lib/feature-flags.ts`](../src/lib/feature-flags.ts).
+The switches live in one place: [`src/config/feature-flags.ts`](../src/config/feature-flags.ts).
 
 ## Where things stand — Phase 2
 
@@ -44,11 +44,11 @@ Growth entries off, the Growth heading in the sidebar stops rendering too.
 
 - `/notes` — the Notes hub.
 - The floating "New note" button, bottom-right on desktop
-  ([`layout.tsx`](<../src/app/(dashboard)/layout.tsx>)).
+  ([`layout.tsx`](<../src/app/[lang]/(dashboard)/layout.tsx>)).
 - Client 360 → Full Profile → the **Notes** tab, and `?tab=notes`
-  ([`client/[id]/page.tsx`](<../src/app/(dashboard)/client/[id]/page.tsx>)).
+  ([`ClientProfileView.tsx`](../src/features/client-profile/views/ClientProfileView.tsx)).
 - The **Notes** shortcut tile and its dialog in the Client 360 side panel
-  ([`ClientDetailPanel.tsx`](<../src/app/(dashboard)/client-hub/ClientDetailPanel.tsx>)).
+  ([`ClientDetailPanel.tsx`](../src/features/client-hub/components/ClientDetailPanel.tsx)).
 
 **`CALENDAR_ENABLED`**
 
@@ -63,7 +63,7 @@ Growth entries off, the Growth heading in the sidebar stops rendering too.
   The bell itself stays as long as `KYC_ALERTS_ENABLED` is on.
 - Client 360 → Full Profile → the **Reminders** tab, and `?tab=reminders`.
 - The **Reminders** card on that profile's Overview tab
-  ([`OverviewTab.tsx`](<../src/app/(dashboard)/client/[id]/OverviewTab.tsx>)).
+  ([`OverviewTab.tsx`](../src/features/client-profile/components/OverviewTab.tsx)).
 - The **Reminder** shortcut tile and its dialog in the Client 360 side panel.
 
 **`CALL_LOG_ENABLED`**
@@ -99,4 +99,4 @@ accounts for. The flag file spells out the details.
 
 ## Turning a feature on or off
 
-Flip the flag in `src/lib/feature-flags.ts`. Nothing else to wire up.
+Flip the flag in `src/config/feature-flags.ts`. Nothing else to wire up.

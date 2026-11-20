@@ -2,12 +2,12 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { GlobalBondDetail } from "../../../client/[id]/GlobalBondDetail";
-import { GlobalBondDetailSkeleton } from "../../../client/[id]/ProductDetailSkeletons";
-import type { GlobalBondIssuerId } from "../../../client/[id]/global-bond-data";
-import { useGlobalBondIssuer } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { GlobalBondDetail } from "@/features/catalog/global-bond/components/GlobalBondDetail";
+import { GlobalBondDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import type { GlobalBondIssuerId } from "@/features/catalog/global-bond/lib/global-bond-data";
+import { useGlobalBondIssuer } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

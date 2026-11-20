@@ -2,10 +2,10 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { MutualFundThemeDetailPage } from "../../../../client/[id]/MutualFundThemeDetailPage";
-import { findMutualFundThemeId } from "../../../../client/[id]/mutual-fund-data";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../../CatalogNotFound";
+import { MutualFundThemeDetailPage } from "@/features/catalog/mutual-fund/components/MutualFundThemeDetailPage";
+import { findMutualFundThemeId } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundThemeDetailRoute({

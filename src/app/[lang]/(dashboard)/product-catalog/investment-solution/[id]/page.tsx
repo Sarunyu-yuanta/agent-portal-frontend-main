@@ -2,12 +2,12 @@
 
 import { use } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { InvestmentSolutionDetail } from "../../../client/[id]/InvestmentSolutionDetail";
-import { InvestmentSolutionDetailSkeleton } from "../../../client/[id]/ProductDetailSkeletons";
-import { CatalogNotFound } from "../../CatalogNotFound";
-import type { StructuredProduct } from "../../../client/[id]/structured-product-data";
-import { useInvestmentSolution } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { InvestmentSolutionDetail } from "@/features/catalog/robo-advisory/components/InvestmentSolutionDetail";
+import { InvestmentSolutionDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
+import type { StructuredProduct } from "@/features/catalog/structured-product/lib/structured-product-data";
+import { useInvestmentSolution } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useT } from "@/i18n/I18nProvider";
 
 /**

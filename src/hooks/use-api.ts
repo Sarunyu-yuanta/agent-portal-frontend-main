@@ -18,10 +18,10 @@
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { getCallLogs, type CallLogEntry } from "@/data/call-log-data";
-import { getClientProfile, type ClientProfile } from "@/data/client-profiles";
-import { DEFAULT_ASSET_ACCOUNTS, type AssetAccountItem } from "@/data/asset-account-details";
-import { mockClients, mockNBAActions, mockPipelineDeals, mockMiniKanban } from "@/lib/mock-data";
+import { getCallLogs, type CallLogEntry } from "@/mocks/call-log-data";
+import { getClientProfile, type ClientProfile } from "@/mocks/client-profiles";
+import { DEFAULT_ASSET_ACCOUNTS, type AssetAccountItem } from "@/mocks/asset-account-details";
+import { mockClients, mockNBAActions, mockPipelineDeals, mockMiniKanban } from "@/mocks/mock-data";
 
 /**
  * What every screen in this app reads data through: the value, whether it is

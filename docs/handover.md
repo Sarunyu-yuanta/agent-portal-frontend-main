@@ -65,14 +65,14 @@ type Resource<T> = {
 
 ### ฝั่งอ่าน (read hooks)
 
-| ไฟล์                            | hook ข้อมูล | ครอบคลุม                                                                              |
-| ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
-| `src/hooks/use-api.ts`         | 8         | ลูกค้า, profile, call log, บัญชีสินทรัพย์, NBA, Pipeline, Mini Kanban                       |
-| `src/hooks/use-catalog.ts`     | ~32       | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit) + Insights / Research |
-| `src/hooks/use-risk-alerts.ts` | 2         | Risk & Compliance alerts                                                             |
-| `src/hooks/use-campaigns.ts`   | 2         | Promotion / Events                                                                   |
-| `orders/use-order-books.ts`    | 9         | Order book (อ่านจาก `OrdersProvider`)                                                 |
-| `orders/use-transactions.ts`   | 1         | รายการซื้อขาย Stock / TFEX / MF                                                        |
+| ไฟล์                                                    | hook ข้อมูล | ครอบคลุม                                                                              |
+| ------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `src/hooks/use-api.ts`                                 | 8         | ลูกค้า, profile, call log, บัญชีสินทรัพย์, NBA, Pipeline, Mini Kanban                       |
+| `src/features/catalog/hooks/use-catalog.ts`            | ~32       | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit) + Insights / Research |
+| `src/features/command-center/hooks/use-risk-alerts.ts` | 2         | Risk & Compliance alerts                                                             |
+| `src/features/promotions/hooks/use-campaigns.ts`       | 2         | Promotion / Events                                                                   |
+| `orders/use-order-books.ts`                            | 9         | Order book (อ่านจาก `OrdersProvider`)                                                 |
+| `orders/use-transactions.ts`                           | 1         | รายการซื้อขาย Stock / TFEX / MF                                                        |
 
 เปลี่ยน body จาก `useStatic(mock)` เป็น `useResource(label, fetcher, mock)`
 argument ตัวที่ 3 คือค่าเริ่มต้นก่อนข้อมูลมา **ให้ใส่ค่าว่าง (`[]`, `null`) ไม่ใช่ mock** —
@@ -128,7 +128,7 @@ plYtdPct  = 12.4        (percent)      → formatPlYtdPct() → "+12.4%"
 `clients.json` ที่เดียว) ต้องตัดสินใจว่า API embed ชื่อมาให้ หรือ frontend join เอง
 
 **IC ที่ล็อกอินอยู่เป็นค่าคงที่** — ชื่อ ตำแหน่ง และทีม/สาขา (`BGN1A01`) อยู่ใน
-`src/lib/current-ic.ts` หน้า `/login` กดแล้วเข้า `/client-hub` (ตามภาษาที่เลือก) เลย ไม่มีการตรวจสิทธิ์
+`src/features/auth/lib/current-ic.ts` หน้า `/login` กดแล้วเข้า `/client-hub` (ตามภาษาที่เลือก) เลย ไม่มีการตรวจสิทธิ์
 ต่อ backend แล้วทั้งสามค่าต้องมาจาก session
 
 **Notes เป็น React state ล้วน** — optimistic create + map `localId → serverId`
@@ -137,7 +137,7 @@ plYtdPct  = 12.4        (percent)      → formatPlYtdPct() → "+12.4%"
 
 ## Feature flags
 
-`src/lib/feature-flags.ts` — โค้ดยังอยู่ครบ เปลี่ยน `true`/`false` ได้เลย
+`src/config/feature-flags.ts` — โค้ดยังอยู่ครบ เปลี่ยน `true`/`false` ได้เลย
 
 | Flag                    | สถานะ   | ปิดแล้วหายอะไร                                           |
 | ----------------------- | ------- | ------------------------------------------------------ |
@@ -170,7 +170,7 @@ Reminders แสดงเป็นรายการ ทั้งคู่อย
 
 ## ⚠️ Order booking — ฟีเจอร์หลักที่ "เขียน"
 
-การจองคำสั่งซื้อสร้างข้อมูลใหม่ — เก็บใน React state (`src/contexts/orders-context.tsx`)
+การจองคำสั่งซื้อสร้างข้อมูลใหม่ — เก็บใน React state (`src/features/orders/store/orders-context.tsx`)
 และมี **สาม timer ที่จำลองระบบภายนอก** ต้องถอดออกตอนต่อ backend จริง
 
 | ค่าคงที่                              | จำลองอะไร                                    | ของจริงคือ                      |

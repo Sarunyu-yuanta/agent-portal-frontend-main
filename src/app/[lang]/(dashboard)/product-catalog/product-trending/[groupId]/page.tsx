@@ -6,18 +6,18 @@ import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import {
   ProductTrendingAllTable,
   ProductTrendingAllTableSkeleton,
-} from "../../../client/[id]/ProductTrendingAllTable";
-import { useProductTrendingGroups } from "@/hooks/use-catalog";
-import { useTrendingSelect } from "../../../client/[id]/ProductTrendingTab";
+} from "@/features/catalog/product-trending/components/ProductTrendingAllTable";
+import { useProductTrendingGroups } from "@/features/catalog/hooks/use-catalog";
+import { useTrendingSelect } from "@/features/catalog/product-trending/components/ProductTrendingTab";
 import {
   DEFAULT_TRENDING_SORT,
   normalizeTrendingSort,
   trendingUpdatedAt,
   TRENDING_SORT_PARAM,
-} from "../../../client/[id]/product-trending-data";
+} from "@/features/catalog/product-trending/lib/product-trending-data";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 export default function ProductTrendingGroupPage({

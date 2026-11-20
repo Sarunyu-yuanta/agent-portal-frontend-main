@@ -6,10 +6,10 @@ import { localizePath } from "@/i18n/locale-path";
 import { Suspense } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useClients } from "@/hooks/use-api";
-import { useNotes } from "@/contexts/notes-context";
-import { CALENDAR_ENABLED } from "@/lib/feature-flags";
-import { CalendarView } from "./CalendarView";
-import { CalendarPageSkeleton } from "./CalendarPageSkeleton";
+import { useNotes } from "@/features/notes/store/notes-context";
+import { CALENDAR_ENABLED } from "@/config/feature-flags";
+import { CalendarView } from "@/features/calendar/components/CalendarView";
+import { CalendarPageSkeleton } from "@/features/calendar/components/CalendarPageSkeleton";
 
 /**
  * Month calendar of every note carrying a reminder — the same data as the

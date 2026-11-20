@@ -1,5 +1,5 @@
-import type { Dictionary } from "../th";
-import { plural } from "../../plural";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+import { plural } from "@/i18n/plural";
 import orders from "./orders";
 import dates from "./dates";
 import fund from "./fund";

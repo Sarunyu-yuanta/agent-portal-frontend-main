@@ -2,13 +2,13 @@
 
 import { use, useMemo } from "react";
 import { useLocalizedRouter } from "@/i18n/navigation";
-import { MutualFundFilterResultsPage } from "../../../../../client/[id]/MutualFundFilterResultsPage";
+import { MutualFundFilterResultsPage } from "@/features/catalog/mutual-fund/components/MutualFundFilterResultsPage";
 import {
   findTaxSavingFundType,
   getTaxSavingFunds,
-} from "../../../../../client/[id]/mutual-fund-data";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../../../CatalogNotFound";
+} from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 export default function MutualFundTaxPlanningResultsRoute({

@@ -1,11 +1,11 @@
 "use client";
 
 import { use } from "react";
-import { ThaiStructuredProductDetail } from "../../../client/[id]/ThaiStructuredProductDetail";
-import { ThaiStructuredProductDetailSkeleton } from "../../../client/[id]/ProductDetailSkeletons";
-import { useThaiStructuredProduct } from "@/hooks/use-catalog";
-import { useSectionBack } from "@/hooks/use-section-back";
-import { CatalogNotFound } from "../../CatalogNotFound";
+import { ThaiStructuredProductDetail } from "@/features/catalog/structured-product/components/ThaiStructuredProductDetail";
+import { ThaiStructuredProductDetailSkeleton } from "@/features/catalog/components/ProductDetailSkeletons";
+import { useThaiStructuredProduct } from "@/features/catalog/hooks/use-catalog";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
+import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { useT } from "@/i18n/I18nProvider";
 
 /** Loading lives with the lookup — see the note in `product/[id]/page.tsx`. */

@@ -3,14 +3,14 @@
 ฟีเจอร์เดียวที่ **เขียนข้อมูล** ในพอร์ทัลนี้ (ที่เหลืออ่านอย่างเดียว) — ยังเป็น mock
 ทั้งหมด ไม่มี endpoint ไม่มี `fetch`
 
-เปิด/ปิดที่ `ORDER_BOOKING_ENABLED` ใน [`src/lib/feature-flags.ts`](../src/lib/feature-flags.ts)
+เปิด/ปิดที่ `ORDER_BOOKING_ENABLED` ใน [`src/config/feature-flags.ts`](../src/config/feature-flags.ts)
 ปิดแล้วหน้าสินค้ากลับไปเป็นลิงก์ "สร้างคำสั่งซื้อ" ภายนอกเหมือนเดิม และ `/orders` redirect
 ไป `/product-catalog`
 
 ## ขอบเขต — แท็บตามสินทรัพย์ สามแบบ
 
 `/orders` แบ่งเป็นแท็บตามสินทรัพย์ (ลำดับเดียวกับ Product Catalog) — ดู
-[`orders/order-tabs.ts`](<../src/app/(dashboard)/orders/order-tabs.ts>) แต่ละแท็บเป็นหนึ่งในสามแบบ:
+[`orders/order-tabs.ts`](../src/features/orders/lib/order-tabs.ts) แต่ละแท็บเป็นหนึ่งในสามแบบ:
 
 | แบบ              | แท็บ                                | flow                                                                   |
 | ---------------- | ---------------------------------- | ---------------------------------------------------------------------- |
@@ -29,7 +29,7 @@
 | **Fixed Income**      | quota  | `/product-catalog/fixed-income/bond/:id`  | `fi-` + bond id (`fi-mqdc482b-0`) — จองได้เฉพาะหุ้นกู้ที่ `action: "invest"` |
 | **Global Bond**       | quota  | `/product-catalog/global-bond/:issuer`    | `gb-` + bond row ของ issuer (`gb-m1`)                                 |
 
-เพิ่มโต๊ะทีหลัง = แก้ [`orders/bookable-products.ts`](<../src/app/(dashboard)/orders/bookable-products.ts>)
+เพิ่มโต๊ะทีหลัง = แก้ [`orders/bookable-products.ts`](../src/features/orders/lib/bookable-products.ts)
 (id prefix, `findBookableProduct`, `bookingModeFor`) + ติดปุ่มที่หน้าสินค้าของโต๊ะนั้น +
 เพิ่มแท็บใน `order-tabs.ts`
 
@@ -54,15 +54,15 @@
 
 ### แบบ transactions
 
-ข้อมูลเป็น mock ทั้งหมดใน [`src/lib/transaction-mock-data.ts`](../src/lib/transaction-mock-data.ts)
+ข้อมูลเป็น mock ทั้งหมดใน [`src/mocks/transaction-mock-data.ts`](../src/mocks/transaction-mock-data.ts)
 (สร้างแบบ deterministic จากสินค้าใน catalogue + ลูกค้า mock) อ่านผ่าน
 `useTransactions(asset)` — ต่อ backend แก้ที่ hook นั้นที่เดียว
 
-กดที่แถวเปิด [`TransactionDetailModal`](<../src/app/(dashboard)/orders/TransactionDetailModal.tsx>)
+กดที่แถวเปิด [`TransactionDetailModal`](../src/features/orders/components/TransactionDetailModal.tsx)
 — วางแบบใบเสร็จ: วงกลมสถานะ + หัวเรื่องว่าเกิดอะไรขึ้น แล้วเป็นแถว label ซ้าย/ค่าขวา
 คั่นด้วยเส้นประ จบที่ยอดรวม อ่านอย่างเดียวทั้งหมด กดได้สองที่คือแถวลูกค้า (ไป `/client/:id`)
 กับเลขที่รายการ (คัดลอก) label สี และรูปแบบตัวเลขใช้ร่วมกับตารางผ่าน
-[`transaction-display.ts`](<../src/app/(dashboard)/orders/transaction-display.ts>)
+[`transaction-display.ts`](../src/features/orders/lib/transaction-display.ts)
 
 ---
 
@@ -95,7 +95,7 @@ Product Catalog → สินค้า (Global / Thai Structured)
 ### ขั้นของลูกค้าหนึ่งรายต่อสินค้าหนึ่งตัว
 
 ชิปเหนือตารางในหน้า book คือ 4 ขั้นนี้ตามลำดับที่มันเกิดจริง
-([`bookingPhase`](<../src/app/(dashboard)/orders/order-book.ts>)):
+([`bookingPhase`](../src/features/orders/lib/order-book.ts)):
 
 | ขั้น                | หมายถึง                                        | ข้อมูลที่อยู่เบื้องหลัง                              |
 | ----------------- | --------------------------------------------- | ------------------------------------------- |
@@ -109,17 +109,17 @@ Offer ที่ลูกค้าจองแล้วจะหายจาก�
 ดู `assembleOrderBook`
 
 ส่ง Offer ได้จากปุ่ม "ส่ง Offer" เหนือตาราง — เลือกลูกค้าได้หลายรายพร้อมกัน
-([`SendOfferModal`](<../src/app/(dashboard)/orders/SendOfferModal.tsx>)) ลูกค้าที่ยังขาด
+([`SendProposalDialog`](../src/features/orders/components/SendProposalDialog.tsx)) ลูกค้าที่ยังขาด
 เอกสารก็ส่งได้ (แถวบอกว่าขาดกี่รายการ) เพราะการถามว่าสนใจไหมไม่ต้องรอเอกสาร —
 ด่านเอกสารอยู่ที่ฟอร์มจองซื้อ กดแถว Offer เปิด
-[`OfferDetailModal`](<../src/app/(dashboard)/orders/OfferDetailModal.tsx>) ซึ่งมีปุ่มเดียว
+[`ProposalDetailModal`](../src/features/orders/components/ProposalDetailModal.tsx) ซึ่งมีปุ่มเดียว
 คือบันทึกว่าลูกค้าปฏิเสธ
 
 ### ไม่มีขั้น "ตรวจสอบวงเงิน"
 
 วงเงินถูกตัดสินตอนกรอกจำนวนในฟอร์มจอง — เกินเงินสดคงเหลือของลูกค้าเมื่อไหร่ ช่อง
 Notional Amount ขึ้น error และปุ่ม "จองซื้อ" กดไม่ได้ (`amountCheck` ใน
-[`OrderBookingModal.tsx`](<../src/app/(dashboard)/orders/OrderBookingModal.tsx>)) **ทุก
+[`OrderBookingModal.tsx`](../src/features/orders/components/OrderBookingModal.tsx)) **ทุก
 รายการจองที่มีอยู่จึงผ่านวงเงินแล้วเสมอ** ไม่มีอะไรหลังจากนั้นต้องถามอีก
 
 ของเดิมเคยเป็น `Booking.credit` (`pending`/`sufficient`/`insufficient`) ที่ระบบหลังบ้าน
@@ -129,14 +129,14 @@ Notional Amount ขึ้น error และปุ่ม "จองซื้อ"
 
 ผลพลอยได้: **Payment Status กับ Email Pre-Confirmation มีค่าตั้งแต่จองเสร็จ** — จองแล้ว
 = "กันเงินแล้ว" และอีเมลยืนยันล่วงหน้า "ส่งแล้ว" (ดู `paymentStatus` / `emailStatus` ใน
-[`booking-status.ts`](<../src/app/(dashboard)/orders/booking-status.ts>)) ไม่มี "ยังไม่…"
+[`booking-status.ts`](../src/features/orders/lib/booking-status.ts)) ไม่มี "ยังไม่…"
 สำหรับรายการที่ยังอยู่อีกแล้ว
 
 ---
 
 ## การตรวจสอบความพร้อมลูกค้า
 
-[`orders/order-requirements.ts`](<../src/app/(dashboard)/orders/order-requirements.ts>)
+[`orders/order-requirements.ts`](../src/features/orders/lib/order-requirements.ts)
 
 **4 ข้อ** ตามฟอร์มจริง มาจากสองที่ แต่ฟอร์มไม่แยกให้ IC เห็น
 
@@ -254,7 +254,7 @@ caret เปิดเมนู 3 ช่องทาง (SMS / LINE / นัด�
 
 ## ⚠️ สามจุดที่ต้องเปลี่ยนตอนต่อ backend
 
-ทั้งสามอยู่ใน [`src/contexts/orders-context.tsx`](../src/contexts/orders-context.tsx)
+ทั้งสามอยู่ใน [`src/features/orders/store/orders-context.tsx`](../src/features/orders/store/orders-context.tsx)
 และมีคอมเมนต์กำกับไว้ที่ตัวมันเอง
 
 | ค่าคงที่                              | จำลองอะไร                                                       | ของจริงคือ                         |
@@ -276,13 +276,13 @@ Voice AI ต่ออยู่ แค่บันทึก log ที่ใช�
 
 | ไฟล์                                               | หน้าที่                                             |
 | ------------------------------------------------- | ------------------------------------------------ |
-| `src/data/order-requirements.json`                | สถานะแบบฟอร์มรายลูกค้า                              |
-| `src/data/order-books.json`                       | การจอง / คำสั่งซื้อ / คำขอข้อมูล ตั้งต้น                  |
-| `src/lib/order-mock-data.ts`                      | ประทับเวลาจาก `daysAgo` + join ชื่อลูกค้า             |
-| `src/contexts/orders-context.tsx`                 | store (เขียนได้) — mount ใน dashboard layout       |
+| `src/mocks/order-requirements.json`               | สถานะแบบฟอร์มรายลูกค้า                              |
+| `src/mocks/order-books.json`                      | การจอง / คำสั่งซื้อ / คำขอข้อมูล ตั้งต้น                  |
+| `src/mocks/order-mock-data.ts`                    | ประทับเวลาจาก `daysAgo` + join ชื่อลูกค้า             |
+| `src/features/orders/store/orders-context.tsx`    | store (เขียนได้) — mount ใน dashboard layout       |
 | `orders/bookable-products.ts`                     | **ขอบเขต** — โต๊ะไหนจองได้ และ id → สินค้า           |
 | `orders/order-requirements.ts`                    | ตรรกะ 4 ข้อ + ลิงก์ที่ใช้แก้แต่ละข้อ                      |
-| `src/lib/current-ic.ts`                           | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม                   |
+| `src/features/auth/lib/current-ic.ts`             | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม                   |
 | `orders/order-book.ts`                            | ประกอบสินค้า + การจอง เป็น `OrderBook` + log        |
 | `orders/use-order-books.ts`                       | hooks ฝั่งอ่าน คืน `Resource<T>`                     |
 | `orders/OrderBookingModal.tsx`                    | flow 2 ขั้น (เลือกลูกค้า → สถานะ + จำนวนเงินในหน้าเดียว) |

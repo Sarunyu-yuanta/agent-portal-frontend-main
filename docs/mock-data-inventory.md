@@ -20,12 +20,12 @@ Scope note: this doc is the ground truth of what data exists; the API design is 
 
 ## 1. Core dashboard data
 
-Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a sibling `src/lib/*-mock-data.ts`). Target types live in `src/types/domain.ts`.
+Raw JSON in `src/data/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a sibling `src/lib/*-mock-data.ts`). Target types live in `src/types/domain.ts`.
 
 ### 1.1 Clients
 
 - **What**: A book-of-business row — one wealth-management client's tier, AUM, cash-idle %, YTD P&L, AI score, status, risk profile.
-- **Lives in**: `src/data/clients.json` (raw) + `src/lib/mock-data.ts` (`mockClients`)
+- **Lives in**: `src/mocks/clients.json` (raw) + `src/mocks/mock-data.ts` (`mockClients`)
 - **Shape**:
   ```
   { id: string, name: string, tier: string, membershipTier: string,
@@ -41,7 +41,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.2 NBA (Next-Best-Action) Actions
 
 - **What**: An AI-drafted outreach recommendation for one client (insight, draft message, suggested action, revenue impact).
-- **Lives in**: `src/data/nba-actions.json` + `mock-data.ts` (`mockNBAActions`)
+- **Lives in**: `src/mocks/nba-actions.json` + `mock-data.ts` (`mockNBAActions`)
 - **Shape**: `{ id, clientId, tier, priority, priorityVariant: "red"|"yellow"|"blue", insight, aiDraft, action, revenueImpact }` (all strings)
 - **Records**: 4 actions — only for clients `110001`, `110002`, `110004`, `110005`
 - **Used in**: `useNBAActions()` — Command Center, `/command-center/next-best-actions`
@@ -49,7 +49,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.3 Pipeline Deals
 
 - **What**: One active sales opportunity in an RM's pipeline for a client.
-- **Lives in**: `src/data/pipeline-deals.json` + `mock-data.ts` (`mockPipelineDeals`)
+- **Lives in**: `src/mocks/pipeline-deals.json` + `mock-data.ts` (`mockPipelineDeals`)
 - **Shape**: `{ id, clientId, product, dealSize: string, probability: number, stage: string, daysInStage: number, stalled: boolean }`
 - **Records**: 10 deals across 7 clients
 - **Used in**: `usePipelineDeals()` — Pipeline board
@@ -57,7 +57,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.4 Mini Kanban
 
 - **What**: A condensed deal card for the Command Center's mini-kanban widget.
-- **Lives in**: `src/data/mini-kanban.json` + `mock-data.ts` (`mockMiniKanban`)
+- **Lives in**: `src/mocks/mini-kanban.json` + `mock-data.ts` (`mockMiniKanban`)
 - **Shape**: `{ id, clientId, dealName, dealSize: string, stage: string }`
 - **Records**: 4 items
 - **Used in**: `useMiniKanban()` — Command Center
@@ -65,7 +65,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.5 Insights (AI feed)
 
 - **What**: An AI-generated insight about a client — product match, risk alert, engagement drop, portfolio note — with a confidence score.
-- **Lives in**: `src/data/insights.json` + `mock-data.ts` (`mockInsights`)
+- **Lives in**: `src/mocks/insights.json` + `mock-data.ts` (`mockInsights`)
 - **Shape**: `{ id, type: string, clientId, tier, insight: string, confidence: number, revenueImpact: string, category: string }`
 - **Records**: 8 (one per client)
 - **Used in**: ⚠️ **no hook** — imported directly by `ai-insights/page.tsx` and `ai-insights/insight-config.ts`. Give it a hook before wiring an endpoint.
@@ -73,7 +73,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.6 Compliance Alerts
 
 - **What**: A compliance/KYC exception needing action — blocked trade, sanctions match, missing docs, expiring KYC.
-- **Lives in**: `src/data/compliance-alerts.json` + `mock-data.ts` (`mockComplianceAlerts`)
+- **Lives in**: `src/mocks/compliance-alerts.json` + `mock-data.ts` (`mockComplianceAlerts`)
 - **Shape**: `{ id, type: "critical"|"warning", title, clientId: string|null, client: string|null, message, action1: string, action2: string|null }`
 - **Records**: 4 (the sanctions-match record has `clientId: null`)
 - **Used in**: ⚠️ **no hook** — `compliance/compliance-data.ts`, `AlertCards.tsx`, `KycDetailPanel.tsx`
@@ -81,7 +81,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.7 KYC Data
 
 - **What**: A client's KYC/risk-review record — risk rating, KYC status, next review date, days until expiry.
-- **Lives in**: `src/data/kyc-data.json` + `mock-data.ts` (`mockKYCData`)
+- **Lives in**: `src/mocks/kyc-data.json` + `mock-data.ts` (`mockKYCData`)
 - **Shape**: `{ id, clientId, riskRating: string, kycStatus: "success"|"error"|"hold"|"processing", nextReview: string (date), daysUntilExpiry: number }` — the raw JSON stores only the `daysUntilExpiry` offset; `nextReview` is stamped from it at import. The real API should send `nextReview` (ISO day) and let the UI derive the countdown.
 - **Records**: 7 — **client `110008` has no KYC record at all**
 - **Used in**: ⚠️ **no hook**, and the widest reach of any dataset — Compliance page, Client Hub, Client 360 (KYC countdown), the header bell's KYC rows, order readiness (`order-requirements.ts`), and the campaign and risk seeds. One dataset, many readers: wire it once, through a hook, before any of them.
@@ -89,7 +89,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.7a Order Requirements (per-client)
 
 - **What**: The two stored halves of the booking gate — whether a client has declared their wealth, and whether they have acknowledged the product class.
-- **Lives in**: `src/data/order-requirements.json` + `src/lib/order-mock-data.ts` (`mockClientRequirements`)
+- **Lives in**: `src/mocks/order-requirements.json` + `src/mocks/order-mock-data.ts` (`mockClientRequirements`)
 - **Shape**: `{ clientId: string, wealth: RequirementStatus, acknowledge: RequirementStatus }` where status is `"passed"|"pending"|"expired"|"missing"|"failed"`
 - **Records**: 8 (one per client), spread across every status so each state is demonstrable
 - **Note**: the booking form checks **four** things; the other two (`kyc`, `risk-profile`) are **deliberately absent here** — both are derived from the KYC record and the client's risk rating, and storing them would be how the two start disagreeing.
@@ -98,7 +98,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.7b Order Books (bookings, submissions, proposals, requirement requests)
 
 - **What**: Orders an IC has booked for clients against one product, the orders sent downstream, the offers sent to clients, and the requests sent to clients to go and complete their forms.
-- **Lives in**: `src/data/order-books.json` + `src/lib/order-mock-data.ts` (`seedBookings`, `seedSubmissions`, `seedProposals`, `seedOfferedProposals`, `seedRequirementRequests`) — then held and mutated in `src/contexts/orders-context.tsx` (§5.2)
+- **Lives in**: `src/mocks/order-books.json` + `src/mocks/order-mock-data.ts` (`seedBookings`, `seedSubmissions`, `seedProposals`, `seedOfferedProposals`, `seedRequirementRequests`) — then held and mutated in `src/features/orders/store/orders-context.tsx` (§5.2)
 - **Shape**:
   ```
   books: [{ productId,
@@ -114,14 +114,14 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.7c Transactions (Stock · TFEX · Mutual Fund)
 
 - **What**: A client's buy/sell transactions through the trading platforms — read-only, shown on Order Management's transaction tabs.
-- **Lives in**: `src/lib/transaction-mock-data.ts` — **generated**, no JSON. A fixed-seed sequence over the catalogue's products and the mock clients, so every symbol and name on screen is one the rest of the app knows.
+- **Lives in**: `src/mocks/transaction-mock-data.ts` — **generated**, no JSON. A fixed-seed sequence over the catalogue's products and the mock clients, so every symbol and name on screen is one the rest of the app knows.
 - **Shape**: `ClientTransaction` in `src/types/domain.ts`
 - **Used in**: `useTransactions(asset)` in `orders/use-transactions.ts` — the only reader; nothing imports the mock file directly.
 
 ### 1.8 House View Strategies
 
 - **What**: A CIO research/strategy pitch — hot issue, buy-list entry, asset-performance recap — with conviction level and matched-client count.
-- **Lives in**: `src/data/house-view-strategies.json` + `mock-data.ts` (`mockHouseViewStrategies`)
+- **Lives in**: `src/mocks/house-view-strategies.json` + `mock-data.ts` (`mockHouseViewStrategies`)
 - **Shape**: `{ id, name, conviction: "High"|"Medium"|"Low", convictionVariant: "green"|"yellow"|"red", targetAllocation: string, pitchHook: string, products: string[], matchedClients: number, assetClass: string, category: string, period: "monthly"|"weekly", periodLabel: string }`
 - **Records**: 30, spanning weekly/monthly periods
 - **Used in**: `useInsightStrategies()` / `useInsightStrategy(id)` in `use-catalog.ts` — `/insights`, `/insights/[id]`. Also read directly by `command-center/dashboard-data.ts` (house view → product joins) and `page-breadcrumbs.ts`.
@@ -129,7 +129,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.9 Performance Data
 
 - **What**: An RM's book-level scorecard — YTD revenue vs. target, AUM growth, net-new-money, product penetration — plus income-by-product breakdown and an AI action plan.
-- **Lives in**: `src/data/performance.json` + `mock-data.ts` (`mockPerformanceData`)
+- **Lives in**: `src/mocks/performance.json` + `mock-data.ts` (`mockPerformanceData`)
 - **Shape**: single object with 4 metric sub-objects `{ value: string, target: string, progress: number, status: "Lagging"|"On Track" }`, `overallGrade: string`, `incomeByProduct: {product, revenue: number, target: number}[]` (5 rows), `aiActionPlan: string[]` (4 items)
 - **Records**: 1 singleton
 - **Used in**: nothing visible — `/performance` renders a Coming-soon placeholder. `KpiRow` / `MainColumn` / `DarkSidebar` read this data but are not mounted. Not needed this phase.
@@ -137,7 +137,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.10 Client Details (per-client 360 record)
 
 - **What**: The deep-dive data behind a client's Overview tab — net asset value, allocation pie, top holdings, behavioral profile, open tasks, recent activity timeline, AI priority/risk alert callouts.
-- **Lives in**: `src/data/client-details.json` + `mock-data.ts` (`mockClientDetails`; `ClientDetail` and its parts are typed there and re-exported from `types/domain.ts`)
+- **Lives in**: `src/mocks/client-details.json` + `mock-data.ts` (`mockClientDetails`; `ClientDetail` and its parts are typed there and re-exported from `types/domain.ts`)
 - **Shape**: keyed `Record<clientId, ClientDetail>`; `assetSummary` is optional per record; `aiHighPriority`/`aiRiskAlert` nullable
 - **Records**: 8 (keys `"110001"`–`"110008"`)
 - **Used in**: Client 360 Overview tab, `ClientAssetSidebarContent.tsx`, Client Hub
@@ -145,14 +145,14 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.11 Notifications — unreferenced
 
 - **What**: A notification-bell feed item grouped by day.
-- **Lives in**: `src/data/notifications.json` + `mock-data.ts` (`notificationGroups`)
+- **Lives in**: `src/mocks/notifications.json` + `mock-data.ts` (`notificationGroups`)
 - **Records**: 2 groups, 4 items
 - **Used in**: **nothing.** The header bell in `layout.tsx` builds its own `notificationGroups` from live feeds — KYC expiries, reminders, and order events (`orders/use-order-notification-feed.tsx`). The export in `mock-data.ts` has no importer. Don't build an endpoint for this shape.
 
 ### 1.12 Analysts
 
 - **What**: Research analyst directory entries (name, title, photo).
-- **Lives in**: hardcoded in `src/lib/mock-data.ts` (`mockAnalysts`) — **no JSON file**
+- **Lives in**: hardcoded in `src/mocks/mock-data.ts` (`mockAnalysts`) — **no JSON file**
 - **Shape**: `{ id: string, name: string, title: string, photo: string }`
 - **Records**: 8
 - **Used in**: bundled with research reports as `RESEARCH_FEED` in `insights/research-data.ts` → `useResearch()`; also `insights/[id]/InsightDetail.tsx`
@@ -160,11 +160,11 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 1.13 Risk & Compliance Alerts
 
 - **What**: A rule-based finding on a client's account — margin call, force sell, overdue settlement, concentration, expired suitability, price band, wash trade — with a due date, metrics and a recommended action.
-- **Lives in**: `src/data/risk-alerts.json` + `src/lib/risk-mock-data.ts` (`mockRiskAlerts`)
+- **Lives in**: `src/mocks/risk-alerts.json` + `src/mocks/risk-mock-data.ts` (`mockRiskAlerts`)
 - **Shape**: `RiskAlert` in `types/domain.ts`. Raw: `{ id, kind, severity, ruleCode, clientId, accountLabel, title, message, metrics, recommendedAction, contactAllowed, contactNote, dismissible, detectedMinutesAgo, dueOffset }`
 - **Records**: 12 across 10 kinds
 - **Note**: two offsets in two units on purpose — `dueOffset` in **days** (a deadline is a date), `detectedMinutesAgo` in **minutes** (a detection is a span). The real API sends `dueDate` and a detection timestamp; `daysLeft` is computed client-side.
-- **Used in**: `useRiskAlertsResource()` / `useRiskAlert(id)` in `src/hooks/use-risk-alerts.ts` — Command Center risk panel, `/command-center/risk-alerts`
+- **Used in**: `useRiskAlertsResource()` / `useRiskAlert(id)` in `src/features/command-center/hooks/use-risk-alerts.ts` — Command Center risk panel, `/command-center/risk-alerts`
 
 ---
 
@@ -175,7 +175,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 2.1 Call Log Entries
 
 - **What**: A phone-call history entry for a client — date, direction, duration, summary.
-- **Lives in**: `src/data/call-log-data.ts` (`CallLogEntry` type, `CALL_LOG_DATA` map, `getCallLogs()` helper, `DEFAULT_LOGS` fallback)
+- **Lives in**: `src/mocks/call-log-data.ts` (`CallLogEntry` type, `CALL_LOG_DATA` map, `getCallLogs()` helper, `DEFAULT_LOGS` fallback)
 - **Shape**: `{ id, date: string, time: string, duration: string, direction: "inbound"|"outbound", summary: string }`
 - **Records**: 5 clients have explicit logs (13 entries total); the other 3 fall back to 4 shared `DEFAULT_LOGS` entries
 - **Used in**: `useClientCallLogs(clientId)` — Client 360 Call Log tab, Client Hub quick view. ⚠️ The Command Center call-log panel bypasses the hook: `command-center/call-log-feed.ts` reads `CALL_LOG_DATA` directly (to skip the `DEFAULT_LOGS` fallback), so give it its own hook when wiring an endpoint.
@@ -183,7 +183,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 2.2 Client Profiles
 
 - **What**: A client's personal/demographic record — phone, email, birthday, address, occupation, family members, risk profile, referral source.
-- **Lives in**: `src/data/client-profiles.ts` (`ClientProfile` type, `PROFILES` map, `DEFAULT_PROFILE` fallback, `getClientProfile()`)
+- **Lives in**: `src/mocks/client-profiles.ts` (`ClientProfile` type, `PROFILES` map, `DEFAULT_PROFILE` fallback, `getClientProfile()`)
 - **Shape**: `{ phone, email, lineId?, birthday, age: number, nationality, address, occupation, company, riskProfile, relationshipSince, referredBy?, familyMembers?: {relation, name}[] }`
 - **Records**: 8 profiles + 1 default fallback
 - **Used in**: `useClientProfile(clientId)` — KYC tab. ⚠️ Holder contact cards (`calendar/HolderContact.tsx`, used by Calendar, Reminders, KYC alerts, risk alerts) and the order screens call `getClientProfile()` directly, bypassing the hook.
@@ -191,7 +191,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 2.3 Liabilities Detail
 
 - **What**: A client's liabilities breakdown (debt, payables, receivables, short positions) as categories + line items, scaled proportionally from a client's total liabilities figure.
-- **Lives in**: `src/data/liabilities-details.ts` (`BASE_CATEGORIES`/`BASE_SUB_ITEMS`/`BASE_TOTAL` template + `getLiabilitiesDetail(totalAmount, lastUpdated)` generator)
+- **Lives in**: `src/mocks/liabilities-details.ts` (`BASE_CATEGORIES`/`BASE_SUB_ITEMS`/`BASE_TOTAL` template + `getLiabilitiesDetail(totalAmount, lastUpdated)` generator)
 - **Shape**: `{ categories: { id, label, percent: number, color: string, subItems: {label, amount: string}[] }[], lastUpdated: string }`
 - **Records**: not record-based — 1 template (4 categories, 7 sub-items) rescaled at call time
 - **Used in**: Client asset sidebar, Liabilities detail modal
@@ -199,7 +199,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 2.4 Asset Account Details / Holdings
 
 - **What**: A client's brokerage sub-accounts (Cash, Global, Margin, Derivative, Fixed Income…) and, per account, the individual holdings with quantity, cost, market value.
-- **Lives in**: `src/data/asset-account-details.ts` (`DEFAULT_ASSET_ACCOUNTS`; `ASSET_ACCOUNT_DETAILS` keyed by account number; `ASSET_PRODUCT_DETAILS` keyed by asset-class label; `computePosition()` derives avg cost/current price)
+- **Lives in**: `src/mocks/asset-account-details.ts` (`DEFAULT_ASSET_ACCOUNTS`; `ASSET_ACCOUNT_DETAILS` keyed by account number; `ASSET_PRODUCT_DETAILS` keyed by asset-class label; `computePosition()` derives avg cost/current price)
 - **Shape**: `AssetAccountItem = { name, accountNo, value: string, changeAmount?, changePercent?, changePositive?, avgYield?, statusIcon }`; `HoldingItem = { id, symbol, fullName, value, changeAmount, changePercent, changePositive, collateral?, quantity?, position? }`
 - **Records**: 7 default accounts — **the same 7 for every client** (`useClientAssetAccounts` ignores its `clientId`); 7 account numbers with detail; 6 asset-class buckets
 - **Used in**: `useClientAssetAccounts(clientId)`, `AssetAccountCard`, `AssetAccountDetailModal`, `HoldingDetailContent`
@@ -207,7 +207,7 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 ### 2.5 Product Sub-Data
 
 - **What**: For one asset class (e.g. "หุ้นไทย"), the specific instruments held across the book, with client count and total THB invested.
-- **Lives in**: `src/data/product-sub-data.ts` (`SubProduct` type, `PRODUCT_SUB_DATA` map)
+- **Lives in**: `src/mocks/product-sub-data.ts` (`SubProduct` type, `PRODUCT_SUB_DATA` map)
 - **Shape**: `{ id, name, ticker?, clientCount: number, totalAmountThb: number }`
 - **Records**: 7 asset-class buckets, ~33 rows (cash bucket intentionally empty)
 - **Used in**: `client-hub/ProductDetailDrawer.tsx`
@@ -216,12 +216,12 @@ Raw JSON in `src/data/*.json`, reshaped/typed by `src/lib/mock-data.ts` (or a si
 
 ## 3. Product catalog data
 
-Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/app/(dashboard)/client/[id]/`. Every dataset here is read through `src/hooks/use-catalog.ts`.
+Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/app/[lang]/(dashboard)/client/[id]/`. Every dataset here is read through `src/features/catalog/hooks/use-catalog.ts`.
 
 ### 3.1 Investment Solutions
 
 - **What**: A pre-packaged investment-solution tier (Secure Income / Balanced Growth / High Conviction).
-- **Lives in**: `src/data/investment-solutions.json` + `investment-solution-data.ts` (adds UI-only gradient/layout constants)
+- **Lives in**: `src/mocks/investment-solutions.json` + `investment-solution-data.ts` (adds UI-only gradient/layout constants)
 - **Shape**: raw `{ id, name, desc, couponRange: string, tenor: string, heroImage, showCoupon: boolean }`
 - **Records**: 3
 - **Used in**: `useInvestmentSolution(id)`
@@ -229,7 +229,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 ### 3.2 Top Ideas (sector themes)
 
 - **What**: Sector "hot theme" tiles on the catalogue home strip and "all" grid.
-- **Lives in**: `src/data/top-ideas.json` + `top-idea-data.ts`
+- **Lives in**: `src/mocks/top-ideas.json` + `top-idea-data.ts`
 - **Shape**: `meta: {maxCoupon, updatedAt, updatedAtMobile}`, `sectors: {id, theme, subtitle}[]`, `homeStrip: string[]`, `allGrid: string[]` (sector ids, with repeats)
 - **Records**: 5 sectors
 - **Used in**: `useTopIdeas()`, `useTopIdeaProducts(sector)`
@@ -237,7 +237,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 ### 3.3 Structured Products (Global)
 
 - **What**: A structured note/FCN offer — underlying basket, coupon, KO/strike/KI barriers, tenor, notional size.
-- **Lives in**: `src/data/structured-products.json` + `structured-product-data.ts`
+- **Lives in**: `src/mocks/structured-products.json` + `structured-product-data.ts`
 - **Shape**: `StructuredProduct = { id, underlying, coupon: string, tenor, ko, strike, ki, tags: string[], logos: string[], offerDate, couponPeriod, detailTenor, productName, productType, currency, minInvestment, updatedAt, requestNotionalSize?, confirmedRequest?, issuer?, underlyingNames?, underlyingSectors? }`
 - **Records**: 20 distinct raw records (topPicks 3 + products 7 + allProductsBase 5 + topIdeaDetailBase 5). ⚠️ `meta.allCount: 328` is display-only — larger lists are synthesized by **cloning** base records under new ids.
 - **Used in**: `useStructuredProducts()`, `useStructuredProduct(id)`; bookable (basket desk) — see `order-booking.md`
@@ -252,7 +252,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 ### 3.4 Global (Overseas) Bonds
 
 - **What**: A US/global corporate-bond issuer (Apple, Microsoft, Meta, Amazon, Coca-Cola, Amex, Nvidia, Walmart) and its bond lines — ISIN, coupon, price, yield, duration.
-- **Lives in**: `src/data/global-bonds.json` + `global-bond-data.ts`
+- **Lives in**: `src/mocks/global-bonds.json` + `global-bond-data.ts`
 - **Shape**: `GlobalBondIssuer` / `GlobalBondRow` / `DetailRecommendedCard`
 - **Records**: 8 issuers, 5 top-pick rows, 15 seed rows. ⚠️ `meta.allOverseasBondsCount: 100` is display-only — the 15 seed rows are **cycled** into 100 (`ALL_OVERSEAS_BONDS`). `GLOBAL_BOND_ISSUERS` is a `Record` keyed by id, not a collection.
 - **Used in**: `useOverseasBonds()`, `useGlobalBondIssuer(id)`; bookable (quota desk, `gb-` ids)
@@ -260,7 +260,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 ### 3.5 Fixed Income (Thai bonds)
 
 - **What**: A Thai corporate bond offering (primary or secondary market) — coupon, YTM, tenor, rating, subscription window — plus the issuing company profile.
-- **Lives in**: `src/data/fixed-income.json` + `fixed-income-data.ts`
+- **Lives in**: `src/mocks/fixed-income.json` + `fixed-income-data.ts`
 - **Shape**: `FixedIncomeBond` / `FixedIncomeCompany`
 - **Records**: 14 primary-market bonds, 2 secondary-market, 3 company records (`companyOrder` lists 8 tickers — `resolveFixedIncomeCompany` **synthesizes** the missing 5 from their bonds)
 - **Used in**: `useFixedIncomeBonds()`, `useFixedIncomeBond(id)`, `useFixedIncomeCompanyDetail(id)`; bookable (quota desk, `fi-` ids, only bonds with `action: "invest"`)
@@ -268,7 +268,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 ### 3.6 Mutual Funds
 
 - **What**: The fund universe by category, top performers, fund insights, themed collections, per-fund detail and NAV history, tax-planning tools.
-- **Lives in**: `src/data/mutual-funds.json` + `src/data/mutual-fund-nav-history.json` + `mutual-fund-data.ts`
+- **Lives in**: `src/mocks/mutual-funds.json` + `src/mocks/mutual-fund-nav-history.json` + `mutual-fund-data.ts`
 - **Shape**: `MutualFund` / `MutualFundDetail` / `MutualFundTheme` (in `mutual-fund-data.ts`)
 - **Records**: 11 categories, top performers for 3 categories, 8 insights, 5 themes — but **only 1 fund has a full detail record and NAV history** (`mf-ugisfx-n`)
 - **Used in**: `useMutualFundCatalog()`, `useMutualFund(id)`, `useMutualFundUniverse()`, `useMutualFundInsights(page)`, `useMutualFundTheme(id)`
@@ -297,16 +297,16 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 
 These never made it into `src/data/` — they're inline arrays/objects living next to the screen that renders them.
 
-| #   | What                                                                                                                          | Lives in                                                                                                                                                                        | Records                                                                                                                                                                                                                                  |
-| --- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 4.1 | Calendar market feeds — SET corporate actions (XD/XW/XT/…), the desk's own dated events, and the Thai market holiday calendar | `calendar/mock-market-feed.ts` (`marketFeed(anchorMonth)`, `holidaysByDay(viewDate)`); contract types in `calendar/market-feed.ts`; holidays in `src/data/market-holidays.json` | 26 corporate actions + 6 events **per month**, generated into whichever month is viewed. Holidays are stored dates — 15 fixed-date entries for any year, per-year lunar entries for 2026/2027, plus computed substitution days. See 4.1a |
-| 4.2 | Performance page: gap-to-target tiles, AI action steps                                                                        | `performance/performance-data.ts` (`GAP_ITEMS`, `AI_STEPS`)                                                                                                                     | 3 gap items, 3 AI steps                                                                                                                                                                                                                  |
-| 4.3 | Insights: category styling, per-strategy rationale, per-insight detail                                                        | `insights/house-view-data.ts` (`CATEGORY_TAG_VARIANT`, `CATEGORY_ACCENT_COLOR`, `STRATEGY_DETAIL`, `INSIGHT_DETAIL`)                                                            | rationale and detail keyed by strategy/insight id                                                                                                                                                                                        |
-| 4.4 | Important compliance forms checklist (Wealth Declaration, FATCA/CRS, W-8BEN, Suitability Test, …)                             | `client/[id]/client-detail-data.ts` (`IMPORTANT_FORMS`)                                                                                                                         | 6 forms — **the same 6 for every client**                                                                                                                                                                                                |
-| 4.5 | Pipeline stage-advance checklist                                                                                              | `pipeline/pipeline-data.ts` (`ADVANCE_CHECKLIST`)                                                                                                                               | 4 stages × 3 items                                                                                                                                                                                                                       |
-| 4.6 | Compliance page KPI tiles + alert timestamps                                                                                  | `compliance/KpiBar.tsx` (values hardcoded, e.g. `"2"` critical), `compliance/AlertCards.tsx` (`ALERT_TIMESTAMPS`)                                                               | 4 KPI tiles, 4 timestamps — **not computed from §1.6 / §1.7**                                                                                                                                                                            |
-| 4.7 | Research: category taxonomy, landing tiles, report list                                                                       | `insights/Research.tsx` (`RESEARCH_CATS`, `RESEARCH_LANDING_TILES`); reports in `insights/research-data.ts` (`MOCK_RESEARCH`)                                                   | every report links to the same placeholder PDF, `/mock-reports/sample-report.pdf`                                                                                                                                                        |
-| 4.8 | AI Insights page: KPI tiles, AI summary card (model updated, avg confidence), model-stat breakdown, tab counts                | `ai-insights/page.tsx` (inline)                                                                                                                                                 | 4 KPI tiles, 4 stat rows, 5 tabs — **hardcoded, not computed from §1.5**                                                                                                                                                                 |
+| #   | What                                                                                                                          | Lives in                                                                                                                                                                         | Records                                                                                                                                                                                                                                  |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4.1 | Calendar market feeds — SET corporate actions (XD/XW/XT/…), the desk's own dated events, and the Thai market holiday calendar | `calendar/mock-market-feed.ts` (`marketFeed(anchorMonth)`, `holidaysByDay(viewDate)`); contract types in `calendar/market-feed.ts`; holidays in `src/mocks/market-holidays.json` | 26 corporate actions + 6 events **per month**, generated into whichever month is viewed. Holidays are stored dates — 15 fixed-date entries for any year, per-year lunar entries for 2026/2027, plus computed substitution days. See 4.1a |
+| 4.2 | Performance page: gap-to-target tiles, AI action steps                                                                        | `performance/performance-data.ts` (`GAP_ITEMS`, `AI_STEPS`)                                                                                                                      | 3 gap items, 3 AI steps                                                                                                                                                                                                                  |
+| 4.3 | Insights: category styling, per-strategy rationale, per-insight detail                                                        | `insights/house-view-data.ts` (`CATEGORY_TAG_VARIANT`, `CATEGORY_ACCENT_COLOR`, `STRATEGY_DETAIL`, `INSIGHT_DETAIL`)                                                             | rationale and detail keyed by strategy/insight id                                                                                                                                                                                        |
+| 4.4 | Important compliance forms checklist (Wealth Declaration, FATCA/CRS, W-8BEN, Suitability Test, …)                             | `client/[id]/client-detail-data.ts` (`IMPORTANT_FORMS`)                                                                                                                          | 6 forms — **the same 6 for every client**                                                                                                                                                                                                |
+| 4.5 | Pipeline stage-advance checklist                                                                                              | `pipeline/pipeline-data.ts` (`ADVANCE_CHECKLIST`)                                                                                                                                | 4 stages × 3 items                                                                                                                                                                                                                       |
+| 4.6 | Compliance page KPI tiles + alert timestamps                                                                                  | `compliance/KpiBar.tsx` (values hardcoded, e.g. `"2"` critical), `compliance/AlertCards.tsx` (`ALERT_TIMESTAMPS`)                                                                | 4 KPI tiles, 4 timestamps — **not computed from §1.6 / §1.7**                                                                                                                                                                            |
+| 4.7 | Research: category taxonomy, landing tiles, report list                                                                       | `insights/Research.tsx` (`RESEARCH_CATS`, `RESEARCH_LANDING_TILES`); reports in `insights/research-data.ts` (`MOCK_RESEARCH`)                                                    | every report links to the same placeholder PDF, `/mock-reports/sample-report.pdf`                                                                                                                                                        |
+| 4.8 | AI Insights page: KPI tiles, AI summary card (model updated, avg confidence), model-stat breakdown, tab counts                | `ai-insights/page.tsx` (inline)                                                                                                                                                  | 4 KPI tiles, 4 stat rows, 5 tabs — **hardcoded, not computed from §1.5**                                                                                                                                                                 |
 
 The Command Center itself mocks nothing new: `command-center/dashboard-data.ts` derives everything from datasets above (KYC, reminders, risk alerts, NBA, house views, advisory accounts).
 
@@ -335,7 +335,7 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 ### 5.1 Notes (and the reminders hung on them)
 
 - **What**: A free-text note an RM/IC writes, optionally tagged to clients, with an optional reminder date. `/calendar` and `/reminders` are both views of the notes that carry a reminder.
-- **Lives in**: `NotesProvider` / `useNotes()` in `src/contexts/notes-context.tsx`
+- **Lives in**: `NotesProvider` / `useNotes()` in `src/features/notes/store/notes-context.tsx`
 - **Shape**: `Note` in `src/types/domain.ts`:
   ```
   { id: string, clientIds: string[],
@@ -349,19 +349,19 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 
 ### 5.2 Orders
 
-- **Lives in**: `OrdersProvider` in `src/contexts/orders-context.tsx`, seeded from §1.7a / §1.7b
+- **Lives in**: `OrdersProvider` in `src/features/orders/store/orders-context.tsx`, seeded from §1.7a / §1.7b
 - **Mutators**: `placeOrder`, `cancelBooking`, order submission, `sendRequirementRequest`, `sendProposal`
 - **⚠️ Three timers stand in for external systems** (`REQUIREMENT_TURNAROUND_MS`, `BACKOFFICE_PICKUP_MS`, `SUBMISSION_TURNAROUND_MS`). Full detail in [`order-booking.md`](order-booking.md).
 
 ### 5.3 Campaigns (Promotion / Events)
 
 - **What**: Promotions and events an IC invites clients to — eligibility conditions, approved share materials, per-client invite status, RSVPs, and the share log.
-- **Lives in**: `src/data/campaigns.json` + `src/lib/campaign-mock-data.ts` (`mockCampaigns`, `seedCampaignClients`, `seedRsvps`, `seedShareLogs`) — held and mutated in `src/contexts/campaigns-context.tsx`
+- **Lives in**: `src/mocks/campaigns.json` + `src/mocks/campaign-mock-data.ts` (`mockCampaigns`, `seedCampaignClients`, `seedRsvps`, `seedShareLogs`) — held and mutated in `src/features/promotions/store/campaigns-context.tsx`
 - **Shape**: `Campaign` in `types/domain.ts`. Raw: `{ id, type: "promotion"|"event", title, summary, description, cover, featured, products, segments, startOffset, endOffset, conditions, terms, disclaimer, materials, clients }`
 - **Records**: 15 campaigns — 10 promotions, 5 events. Dates are offsets from today, like the order seeds.
 - **Mutators**: `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus` — only `shareMaterial` has a UI caller. Event invites ("ชวนลูกค้า") also go through `shareMaterial`, not `registerClients`, so they don't check or reserve seats. The other three are store-only today.
 - **Rules the endpoint must enforce** (the store enforces them today; a disabled button is not a control): only an approved material can be shared; a closed campaign takes no shares; every share writes a `ShareLog`, which is append-only — it is the compliance record.
-- **Used in**: `useCampaigns()` / `useCampaign(id)` in `src/hooks/use-campaigns.ts` — `/promotions`, `/promotions/[id]` (sidebar link hidden by `PROMOTIONS_ENABLED`)
+- **Used in**: `useCampaigns()` / `useCampaign(id)` in `src/features/promotions/hooks/use-campaigns.ts` — `/promotions`, `/promotions/[id]` (sidebar link hidden by `PROMOTIONS_ENABLED`)
 
 ---
 
@@ -374,4 +374,4 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 - **Client names are joined at import time**, from `clients.json`, in every dataset that carries a `clientId`. Decide whether the API embeds names or the frontend joins them.
 - **Client id format is consistently the 6-digit string** (`"110001"`–`"110008"`).
 - Several JSON files carry a `meta.updatedAt`-style timestamp that is static display text (Fixed Income, Global Bonds, Structured Products, Top Ideas) — the real API needs an actual "last synced" value.
-- **Hardcoded business constants** that belong on the product or in the session: `USD_THB = 36.5`, bond quotas, `THAI_MIN_TICKET` / `THAI_NOTIONAL` (see `order-booking.md`), and the signed-in IC's name/role/team in `src/lib/current-ic.ts`.
+- **Hardcoded business constants** that belong on the product or in the session: `USD_THB = 36.5`, bond quotas, `THAI_MIN_TICKET` / `THAI_NOTIONAL` (see `order-booking.md`), and the signed-in IC's name/role/team in `src/features/auth/lib/current-ic.ts`.

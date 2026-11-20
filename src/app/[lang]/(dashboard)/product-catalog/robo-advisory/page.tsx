@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import { RoboAdvisoryDetail } from "../../client/[id]/RoboAdvisoryDetail";
-import { useSectionBack } from "@/hooks/use-section-back";
+import { RoboAdvisoryDetail } from "@/features/catalog/robo-advisory/components/RoboAdvisoryDetail";
+import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 
 export default function RoboAdvisoryDetailPage() {
   return (

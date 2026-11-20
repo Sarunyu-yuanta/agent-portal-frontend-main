@@ -1,0 +1,279 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { Pagination } from "@sarunyu/system-one";
+import {
+  HEADER_TEXT_CLS,
+  PAGE_SIZE_OPTIONS,
+  SCROLLABLE_TABLE_BODY_CLS,
+  TABLE_CARD_STYLE,
+  cellBorderStyle,
+  headerBorderStyle,
+} from "@/features/catalog/fixed-income/components/fixed-income-shared";
+import {
+  THAI_STRUCTURED_PRODUCTS,
+  thaiBookableId,
+} from "@/features/catalog/structured-product/lib/thai-structured-data";
+import { HourglassMediumIcon } from "@phosphor-icons/react";
+import { useOpenProducts, useProcessingProductIds } from "@/features/orders/hooks/use-order-books";
+import type { ThaiStructuredProduct } from "@/features/catalog/structured-product/lib/thai-structured-data";
+import { CatalogSectionEmpty } from "@/features/catalog/components/ProductCatalogEmpty";
+import { useT } from "@/i18n/I18nProvider";
+
+const MIN_WIDTH = "min-w-[1290px]";
+
+/** Sticky first column — paints over scrolled content and reveals an edge
+ *  shadow once the card body has scrolled horizontally (`data-scrolled`). */
+const STICKY_COL =
+  "sticky left-0 z-[1] bg-white group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]";
+
+type ColDef = {
+  key: keyof ThaiStructuredProduct;
+  label: string;
+  width: string;
+  /** Extra flex-alignment class, e.g. "justify-end" / "justify-center". */
+  align: string;
+  /** First column: pinned left. */
+  sticky?: boolean;
+  /** Emphasised value column (bold + accent blue), e.g. coupon. */
+  accent?: boolean;
+};
+
+const COLS: ColDef[] = [
+  { key: "theme", label: "Investment Theme", width: "w-[160px]", align: "", sticky: true },
+  { key: "product", label: "Product", width: "w-[90px]", align: "" },
+  { key: "ccy", label: "Ccy", width: "w-[70px]", align: "justify-center" },
+  { key: "bbg1", label: "BBG Code 1", width: "w-[110px]", align: "" },
+  { key: "bbg2", label: "BBG Code 2", width: "w-[110px]", align: "" },
+  { key: "bbg3", label: "BBG Code 3", width: "w-[110px]", align: "" },
+  {
+    key: "couponPa",
+    label: "Coupon p.a. (%)",
+    width: "w-[130px]",
+    align: "justify-end",
+    accent: true,
+  },
+  { key: "koType", label: "KO Type", width: "w-[110px]", align: "" },
+  { key: "koBarrier", label: "KO Barrier (%)", width: "w-[120px]", align: "justify-end" },
+  { key: "strike", label: "Strike (%)", width: "w-[100px]", align: "justify-end" },
+  { key: "kiBarrier", label: "KI Barrier", width: "w-[100px]", align: "justify-end" },
+  { key: "tenor", label: "Tenor (m)", width: "w-[90px]", align: "justify-end" },
+];
+
+function TableHeader() {
+  return (
+    <div className={`flex h-11 shrink-0 items-stretch ${MIN_WIDTH} bg-white`}>
+      {COLS.map((col, i) => (
+        <div
+          key={col.key}
+          className={`flex ${col.width} shrink-0 items-center ${col.align} px-3 ${col.sticky ? STICKY_COL : ""}`}
+          style={headerBorderStyle(i === COLS.length - 1 ? { right: false } : undefined)}
+        >
+          <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{col.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TableRow({
+  row,
+  isLast,
+  onRowClick,
+  href,
+}: {
+  row: ThaiStructuredProduct;
+  isLast: boolean;
+  onRowClick?: (row: ThaiStructuredProduct) => void;
+  href?: string;
+}) {
+  const t = useT();
+  const border = cellBorderStyle({ bottom: !isLast });
+  const processing = useProcessingProductIds().has(thaiBookableId(row.theme));
+  const interactive = Boolean(onRowClick || href);
+  const hoverHandlers = interactive
+    ? {
+        onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+          const el = e.currentTarget;
+          el.style.backgroundColor = "#f9fafb";
+          (el.firstElementChild as HTMLElement).style.backgroundColor = "#f9fafb";
+        },
+        onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+          const el = e.currentTarget;
+          el.style.backgroundColor = "";
+          (el.firstElementChild as HTMLElement).style.backgroundColor = "";
+        },
+      }
+    : {};
+  const className = `flex items-stretch shrink-0 ${MIN_WIDTH} bg-white ${interactive ? "cursor-pointer" : ""}`;
+  const cells = COLS.map((col) => (
+    <div
+      key={col.key}
+      className={`flex ${col.width} shrink-0 items-center ${col.align} px-3 py-3.5 ${col.sticky ? STICKY_COL : ""}`}
+      style={border}
+    >
+      <span
+        className={`text-sm ${col.sticky || col.accent ? "font-bold" : ""}leading-[24px] ${col.accent ? "text-[#0a6ee7]" : "text-[#101828]"} whitespace-nowrap`}
+      >
+        {row[col.key]}
+        {/* Same tag the global desk's cards carry — under the theme, the one
+            column always on screen. */}
+        {col.key === "theme" && processing && (
+          <span className="mt-0.5 flex w-fit items-center gap-0.5 rounded bg-[#eff6ff] px-1 py-0.5 text-micro leading-[18px] font-normal text-[#101828]">
+            <HourglassMediumIcon size={12} weight="fill" color="#2b7fff" />
+            {t.products.common.processingOrder}
+          </span>
+        )}
+      </span>
+    </div>
+  ));
+
+  if (href) {
+    return (
+      <Link href={href} className={`${className} text-inherit no-underline`} {...hoverHandlers}>
+        {cells}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      role={onRowClick ? "button" : undefined}
+      tabIndex={onRowClick ? 0 : undefined}
+      onClick={() => onRowClick?.(row)}
+      onKeyDown={
+        onRowClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onRowClick(row);
+              }
+            }
+          : undefined
+      }
+      className={className}
+      {...hoverHandlers}
+    >
+      {cells}
+    </div>
+  );
+}
+
+export function ThaiStructuredProductTable({
+  onRowClick,
+  products: allProducts = THAI_STRUCTURED_PRODUCTS,
+  getRowHref,
+}: {
+  onRowClick?: (row: ThaiStructuredProduct) => void;
+  products?: ThaiStructuredProduct[];
+  getRowHref?: (row: ThaiStructuredProduct) => string;
+} = {}) {
+  const t = useT();
+  // A theme whose order has gone out is no longer offered; the rows behind it
+  // move up, and the page count follows.
+  const products = useOpenProducts(allProducts, (p) => thaiBookableId(p.theme));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const headerScrollRef = useRef<HTMLDivElement>(null);
+  const bodyScrollRef = useRef<HTMLDivElement>(null);
+  const tableCardRef = useRef<HTMLDivElement>(null);
+
+  const total = products.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = products.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div
+        ref={tableCardRef}
+        className="group/card w-full rounded-xl bg-white"
+        style={TABLE_CARD_STYLE}
+      >
+        {/* Sticky header */}
+        <div
+          ref={headerScrollRef}
+          className="sticky top-[60px] z-20 overflow-x-hidden rounded-t-xl bg-white"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <TableHeader />
+        </div>
+
+        {/* Scrollable body */}
+        <div
+          ref={bodyScrollRef}
+          className={SCROLLABLE_TABLE_BODY_CLS}
+          onScroll={() => {
+            const body = bodyScrollRef.current;
+            const header = headerScrollRef.current;
+            if (header && body) header.scrollLeft = body.scrollLeft;
+            if (tableCardRef.current)
+              tableCardRef.current.dataset.scrolled = String((body?.scrollLeft ?? 0) > 0);
+          }}
+        >
+          {total === 0 ? (
+            // Every theme booked out, or none offered — nothing to page through.
+            <CatalogSectionEmpty title={t.products.states.noOpenProducts} />
+          ) : (
+            <div className={`flex flex-col ${MIN_WIDTH}`}>
+              {paged.map((row, i) => (
+                <TableRow
+                  key={row.theme}
+                  row={row}
+                  isLast={i === paged.length - 1}
+                  onRowClick={onRowClick}
+                  href={getRowHref?.(row)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pagination — hidden with no rows, as on GlobalBondAllPage */}
+      {total > 0 && (
+        <div className="flex flex-wrap-reverse items-center justify-end gap-3">
+          <div className="flex items-center gap-2">
+            <p className="text-label whitespace-nowrap text-muted-foreground">
+              {t.products.pagination.perPage}
+            </p>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="focus:ring-primary-action cursor-pointer rounded-md border border-border bg-background px-2 py-1 text-label text-foreground focus:ring-1 focus:outline-none"
+            >
+              {PAGE_SIZE_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-3">
+            <p className="text-label text-muted-foreground">
+              {t.products.pagination.showing(
+                {
+                  from: (safePage - 1) * pageSize + 1,
+                  to: Math.min(safePage * pageSize, total),
+                  total,
+                },
+                (n) => (
+                  <span className="font-medium text-foreground">{n}</span>
+                ),
+              )}
+            </p>
+            <Pagination
+              totalPages={totalPages}
+              currentPage={safePage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

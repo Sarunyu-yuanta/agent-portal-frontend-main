@@ -1,4 +1,4 @@
-import type th from "../th/compliance";
+import type th from "@/i18n/dictionaries/th/compliance";
 
 const compliance = {
   kpi: {

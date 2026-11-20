@@ -1,0 +1,127 @@
+"use client";
+
+import { Suspense, useState, useEffect, useRef } from "react";
+import { SearchInput } from "@sarunyu/system-one";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedRouter } from "@/i18n/navigation";
+import {
+  ProductCatalogTab,
+  type CatalogNavigation,
+} from "@/features/catalog/components/ProductCatalogTab";
+import {
+  advisoryDetailHref,
+  catalogListHref,
+  CATALOG_PATH,
+  normalizeProductCategory,
+} from "@/features/catalog/lib/product-catalog-routes";
+import { trendingGroupHref } from "@/features/catalog/product-trending/lib/product-trending-data";
+import { useSetHeaderSlot } from "@/features/shell/components/header-slot-context";
+import { useScrollThreshold } from "@/features/catalog/hooks/use-scroll-threshold";
+import { rememberCatalogList } from "@/features/shell/lib/nav-memory";
+import { setQueryState, withQuery } from "@/lib/query-state";
+import { useProductCatalogLoading } from "@/features/catalog/hooks/use-catalog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n/I18nProvider";
+
+export function ProductCatalogView() {
+  return (
+    <Suspense fallback={null}>
+      <ProductCatalogPageInner />
+    </Suspense>
+  );
+}
+
+function ProductCatalogPageInner() {
+  const t = useT();
+  const [searchValue, setSearchValue] = useState("");
+  // The header search bar lives up in the dashboard chrome, but the overlay it
+  // opens belongs to the catalog below — so both the open state and the anchor
+  // element are owned here and handed down.
+  const [searchOpen, setSearchOpen] = useState(false);
+  const headerSearchWrapRef = useRef<HTMLDivElement>(null);
+  const scrolled = useScrollThreshold();
+  const setHeaderSlot = useSetHeaderSlot();
+  const router = useLocalizedRouter();
+  const searchParams = useSearchParams();
+  const isLoading = useProductCatalogLoading();
+
+  // The category tab lives in the URL, so browser back/forward, a refresh and
+  // sidebar re-entry all land on the tab the user actually had open.
+  const category = normalizeProductCategory(searchParams.get("category"));
+  // Keeps the rest of the query (a tab's own view state, e.g. Stock's
+  // `?market=`) on the remembered list URL, so a detail page's back button
+  // restores the tab *as the user left it*, not just which tab it was.
+  const listUrl = withQuery(CATALOG_PATH, searchParams, { category });
+
+  useEffect(() => {
+    rememberCatalogList(listUrl);
+  }, [listUrl]);
+
+  useEffect(() => {
+    if (scrolled && isLoading) {
+      // Same footprint as the `sm` search bar, nothing to type into yet.
+      setHeaderSlot(<Skeleton className="h-9 w-full rounded-lg" />);
+    } else if (scrolled) {
+      setHeaderSlot(
+        <div ref={headerSearchWrapRef} className="w-full" onFocus={() => setSearchOpen(true)}>
+          <SearchInput
+            value={searchValue}
+            onChange={setSearchValue}
+            placeholder={t.products.catalog.searchPlaceholder}
+            size="sm"
+            className="w-full"
+          />
+        </div>,
+      );
+    } else {
+      setHeaderSlot(null);
+    }
+    return () => setHeaderSlot(null);
+  }, [scrolled, isLoading, searchValue, setSearchValue, setHeaderSlot, t]);
+
+  const navigation: CatalogNavigation = {
+    onProductSelect: (p) => router.push(`/product-catalog/product/${p.id}`),
+    onAllProductsView: () => router.push("/product-catalog/product"),
+    onTopIdeaSelect: (sector) =>
+      router.push(`/product-catalog/top-idea/${encodeURIComponent(sector)}`),
+    onAllTopIdeasView: () => router.push("/product-catalog/top-idea"),
+    onInvestmentSolutionSelect: (id) => router.push(`/product-catalog/investment-solution/${id}`),
+    onFixedIncomeBondSelect: (bond) => router.push(`/product-catalog/fixed-income/bond/${bond.id}`),
+    onGlobalBondIssuerSelect: (id) => router.push(`/product-catalog/global-bond/${id}`),
+    onAllGlobalBondsView: () => router.push("/product-catalog/global-bond"),
+    onThaiProductSelect: (p) =>
+      router.push(`/product-catalog/thai-structured/${encodeURIComponent(p.theme)}`),
+    onMutualFundSelect: (fundId) =>
+      router.push(`/product-catalog/mutual-fund/${encodeURIComponent(fundId)}`),
+    onMutualFundTopPerformersSeeAll: (groupId) =>
+      router.push(`/product-catalog/mutual-fund/top-performers/${encodeURIComponent(groupId)}`),
+    onMutualFundInsightsSeeAll: () => router.push("/product-catalog/mutual-fund/insights"),
+    onMutualFundThemeSeeAll: (themeId) =>
+      router.push(`/product-catalog/mutual-fund/themes/${encodeURIComponent(themeId)}`),
+    onRoboAdvisorySelect: (clientId) =>
+      router.push(advisoryDetailHref("/product-catalog/robo-advisory", clientId)),
+    onDefinitSelect: (clientId) =>
+      router.push(advisoryDetailHref("/product-catalog/definit", clientId)),
+    onTrendingSeeAll: (groupId, sort) => router.push(trendingGroupHref(groupId, sort)),
+  };
+
+  return (
+    <ProductCatalogTab
+      searchValue={searchValue}
+      onSearchChange={setSearchValue}
+      searchOpen={searchOpen}
+      onSearchOpenChange={setSearchOpen}
+      searchAnchorRef={headerSearchWrapRef}
+      activeCategory={category}
+      onCategoryChange={(id) =>
+        // Deliberately drops the rest of the query rather than merging it: a
+        // tab's own view state (Stock's `?market=`) belongs to the visit the
+        // user set it in. It comes back when they drill into something and
+        // press back — not when they leave via the tab bar and wander in again,
+        // which starts the tab at its default.
+        setQueryState(catalogListHref(id), "push")
+      }
+      navigation={navigation}
+    />
+  );
+}

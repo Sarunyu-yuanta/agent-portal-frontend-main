@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type th from "../th/commandCenter";
-import { plural } from "../../plural";
+import type th from "@/i18n/dictionaries/th/commandCenter";
+import { plural } from "@/i18n/plural";
 
 const items = (n: number) => plural(n, { one: "item", other: "items" });
 

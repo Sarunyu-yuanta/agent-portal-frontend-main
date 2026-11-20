@@ -4,36 +4,36 @@ import { Suspense, useMemo, useState } from "react";
 import { useAppPathname, useLocalizedRouter } from "@/i18n/navigation";
 import { NavHeaderIconButton, type NotificationItem } from "@sarunyu/system-one";
 import { ListIcon } from "@phosphor-icons/react";
-import { AppSidebar } from "@/components/layout/AppSidebar";
-import { NotificationBell } from "@/components/layout/NotificationBell";
+import { AppSidebar } from "@/features/shell/components/AppSidebar";
+import { NotificationBell } from "@/features/shell/components/NotificationBell";
 import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
-import { notificationStamp, pastBucket, PAST_BUCKETS } from "./notification-zones";
+import { notificationStamp, pastBucket, PAST_BUCKETS } from "@/lib/notification-zones";
 import { FadeIn } from "@/components/ui/fade-in";
-import { NavStateMemory } from "@/components/layout/NavStateMemory";
+import { NavStateMemory } from "@/features/shell/components/NavStateMemory";
 import { Sheet, SheetContent, SheetOverlay } from "@/components/ui/sheet";
-import { HeaderSlotProvider, useHeaderSlot } from "./header-slot-context";
-import { PrivacyProvider } from "@/contexts/privacy-context";
-import { NotesProvider, useNotes } from "@/contexts/notes-context";
-import { OrdersProvider, useOrders } from "@/contexts/orders-context";
-import { CampaignsProvider } from "@/contexts/campaigns-context";
+import { HeaderSlotProvider, useHeaderSlot } from "@/features/shell/components/header-slot-context";
+import { PrivacyProvider } from "@/features/shell/store/privacy-context";
+import { NotesProvider, useNotes } from "@/features/notes/store/notes-context";
+import { OrdersProvider, useOrders } from "@/features/orders/store/orders-context";
+import { CampaignsProvider } from "@/features/promotions/store/campaigns-context";
 import {
   KYC_ALERTS_ENABLED,
   NOTES_ENABLED,
   ORDER_BOOKING_ENABLED,
   REMINDERS_ENABLED,
-} from "@/lib/feature-flags";
+} from "@/config/feature-flags";
 import { useClientsResource } from "@/hooks/use-api";
-import { ResponsiveBreadcrumb } from "@/components/layout/ResponsiveBreadcrumb";
-import { FloatingNoteButton } from "./notes/FloatingNoteButton";
-import { usePageChrome } from "./page-chrome";
-import { useNotificationFeed } from "./calendar/use-notification-feed";
-import { useKycNotificationFeed } from "./use-kyc-notification-feed";
-import { useOrderNotificationFeed } from "./orders/use-order-notification-feed";
+import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBreadcrumb";
+import { FloatingNoteButton } from "@/features/notes/components/FloatingNoteButton";
+import { usePageChrome } from "@/features/shell/lib/page-chrome";
+import { useNotificationFeed } from "@/features/calendar/hooks/use-notification-feed";
+import { useKycNotificationFeed } from "@/features/shell/hooks/use-kyc-notification-feed";
+import { useOrderNotificationFeed } from "@/features/orders/hooks/use-order-notification-feed";
 import {
   OrderSubmissionDetailModal,
   type OrderSubmissionRef,
-} from "./orders/OrderSubmissionDetailModal";
-import { useDayItemModals } from "./calendar/use-day-item-modals";
+} from "@/features/orders/components/OrderSubmissionDetailModal";
+import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 

@@ -1,0 +1,71 @@
+"use client";
+
+import { useMemo } from "react";
+import { LocaleLink as Link } from "@/i18n/navigation";
+import { Avatar } from "@sarunyu/system-one";
+import { CaretRightIcon } from "@phosphor-icons/react";
+import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
+import { usePrivacy } from "@/features/shell/store/privacy-context";
+import { formatAumThb, getInitials } from "@/lib/client-utils";
+import { maskName } from "@/lib/mask-name";
+import type { Client } from "@/types/domain";
+import { useT } from "@/i18n/I18nProvider";
+
+export function ClientListModal({
+  open,
+  clients,
+  onClose,
+}: {
+  open: boolean;
+  clients: Client[];
+  onClose: () => void;
+}) {
+  const { isPrivate } = usePrivacy();
+  const t = useT();
+
+  const sorted = useMemo(() => [...clients].sort((a, b) => b.aum - a.aum), [clients]);
+
+  return (
+    <ResponsiveBottomSheetModal
+      open={open}
+      onClose={onClose}
+      title={t.commandCenter.clientList.title}
+      titleId="dashboard-client-list"
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        {sorted.length === 0 ? (
+          <p className="py-6 text-center text-body-sm text-muted-foreground">
+            {t.commandCenter.clientList.empty}
+          </p>
+        ) : (
+          <div className="divide-y divide-black/[0.05] overflow-hidden rounded-xl bg-[var(--bg-default-secondary)]">
+            {sorted.map((client) => {
+              const name = maskName(client.name, isPrivate);
+              return (
+                <Link
+                  key={client.id}
+                  href={`/client/${client.id}`}
+                  onClick={onClose}
+                  className="flex items-center gap-3 p-3 no-underline transition-colors hover:bg-[var(--fill-p1-100)]"
+                >
+                  <Avatar type="text" initials={getInitials(name)} size="m" />
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <p className="truncate text-body font-bold text-foreground">{name}</p>
+                    <p className="truncate text-meta text-muted-foreground">{client.tier}</p>
+                  </div>
+                  <span className="shrink-0 text-label font-bold text-foreground tabular-nums">
+                    {formatAumThb(client.aum)}
+                  </span>
+                  <CaretRightIcon
+                    size={16}
+                    className="shrink-0 text-[var(--text-default-placeholder)]"
+                  />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </ResponsiveBottomSheetModal>
+  );
+}

@@ -1,0 +1,302 @@
+"use client";
+
+import { useState } from "react";
+import { AvatarStack } from "@sarunyu/system-one";
+import { getInitial } from "@/lib/client-utils";
+import { type mockClients } from "@/mocks/mock-data";
+import { useT } from "@/i18n/I18nProvider";
+import type { Dictionary } from "@/i18n/dictionaries/th";
+
+type Client = (typeof mockClients)[number];
+
+function formatTotalAum(clients: Client[]): string | null {
+  if (clients.length === 0) return null;
+  const total = clients.reduce((sum, c) => sum + c.aum, 0);
+  if (total >= 1_000_000_000) return `฿${(total / 1_000_000_000).toFixed(1).replace(/\.0$/, "")}B`;
+  if (total >= 1_000_000) return `฿${Math.round(total / 1_000_000)}M`;
+  return `฿${Math.round(total / 1000)}K`;
+}
+
+function getAumTier(aumThb: number): 0 | 1 | 2 {
+  const m = aumThb / 1_000_000;
+  if (m > 500) return 0;
+  if (m >= 150) return 1;
+  return 2;
+}
+
+function getAiTier(score: number): 0 | 1 | 2 {
+  if (score > 87) return 2;
+  if (score >= 75) return 1;
+  return 0;
+}
+
+/** A cell's id — its name is `t.client.nineBox.cells[id]`. */
+export type NineBoxCellId = keyof Dictionary["client"]["nineBox"]["cells"];
+/** A tier's id — its name is `t.client.nineBox.tiers[id]`. */
+export type NineBoxTierId = keyof Dictionary["client"]["nineBox"]["tiers"];
+
+const CELLS: { id: NineBoxCellId; heat: 1 | 2 | 3 | 4 | 5 }[][] = [
+  [
+    { id: "protect", heat: 3 },
+    { id: "nurture", heat: 4 },
+    { id: "prioritize", heat: 5 },
+  ],
+  [
+    { id: "reEngage", heat: 2 },
+    { id: "develop", heat: 3 },
+    { id: "grow", heat: 4 },
+  ],
+  [
+    { id: "monitor", heat: 1 },
+    { id: "activate", heat: 2 },
+    { id: "risingStars", heat: 3 },
+  ],
+];
+
+export const NINE_BOX_HEAT_STYLES: Record<
+  number,
+  { bg: string; chipBg: string; dot: string; count: string }
+> = {
+  5: {
+    bg: "bg-emerald-100 hover:bg-emerald-200/60",
+    chipBg: "bg-emerald-100",
+    dot: "bg-emerald-500",
+    count: "text-emerald-700",
+  },
+  4: {
+    bg: "bg-blue-100 hover:bg-blue-200/60",
+    chipBg: "bg-blue-100",
+    dot: "bg-blue-500",
+    count: "text-blue-700",
+  },
+  3: {
+    bg: "bg-sky-50 hover:bg-sky-100/70",
+    chipBg: "bg-sky-50",
+    dot: "bg-sky-400",
+    count: "text-sky-700",
+  },
+  2: {
+    bg: "bg-amber-50 hover:bg-amber-100/60",
+    chipBg: "bg-amber-50",
+    dot: "bg-amber-400",
+    count: "text-amber-600",
+  },
+  1: {
+    bg: "bg-gray-100 hover:bg-gray-200/60",
+    chipBg: "bg-gray-100",
+    dot: "bg-gray-400",
+    count: "text-gray-500",
+  },
+};
+
+const AUM_ROWS: { tier: NineBoxTierId; sub: string; color: string; activeColor: string }[] = [
+  { tier: "high", sub: "> ฿500M", color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
+  {
+    tier: "medium",
+    sub: "฿150M–500M",
+    color: "var(--fill-p1-600)",
+    activeColor: "var(--fill-p1-700)",
+  },
+  { tier: "low", sub: "< ฿150M", color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
+];
+
+const AI_COLS: { tier: NineBoxTierId; sub: string; color: string; activeColor: string }[] = [
+  { tier: "low", sub: "< 75", color: "var(--fill-p1-400)", activeColor: "var(--fill-p1-600)" },
+  { tier: "medium", sub: "75–87", color: "var(--fill-p1-600)", activeColor: "var(--fill-p1-700)" },
+  { tier: "high", sub: "> 87", color: "var(--fill-p1-800)", activeColor: "var(--fill-p1-900)" },
+];
+
+export function getNineBoxCell(client: Client): {
+  id: NineBoxCellId;
+  heat: 1 | 2 | 3 | 4 | 5;
+  aumTier: NineBoxTierId;
+  aiTier: NineBoxTierId;
+} {
+  const row = getAumTier(client.aum);
+  const col = getAiTier(client.aiScore);
+  const cell = CELLS[row][col];
+  return { id: cell.id, heat: cell.heat, aumTier: AUM_ROWS[row].tier, aiTier: AI_COLS[col].tier };
+}
+
+export function NineBoxCellPill({ client }: { client: Parameters<typeof getNineBoxCell>[0] }) {
+  const t = useT();
+  const cell = getNineBoxCell(client);
+  const style = NINE_BOX_HEAT_STYLES[cell.heat];
+  return (
+    <div
+      className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2 py-0.5 ${style.chipBg}`}
+    >
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
+      <span className="type-caption text-foreground">{t.client.nineBox.cells[cell.id]}</span>
+    </div>
+  );
+}
+
+export type NineBoxCellInfo = {
+  id: NineBoxCellId;
+  heat: 1 | 2 | 3 | 4 | 5;
+  aumTier: NineBoxTierId;
+  aiTier: NineBoxTierId;
+  clients: Client[];
+};
+
+function ClientAvatarStack({ clients }: { clients: Client[] }) {
+  if (clients.length === 0) return null;
+  return (
+    <AvatarStack
+      items={clients.map((c) => ({ type: "text" as const, initials: getInitial(c.name) }))}
+      size="medium"
+      max={4}
+    />
+  );
+}
+
+const CELL_H = 130;
+
+export function NineBoxTab({
+  clients,
+  onCellOpen,
+}: {
+  clients: Client[];
+  onCellOpen: (info: NineBoxCellInfo) => void;
+}) {
+  const grid: Client[][][] = Array.from({ length: 3 }, () =>
+    Array.from({ length: 3 }, () => [] as Client[]),
+  );
+  clients.forEach((c) => {
+    grid[getAumTier(c.aum)][getAiTier(c.aiScore)].push(c);
+  });
+
+  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
+  const t = useT();
+  const nb = t.client.nineBox;
+
+  return (
+    <div className="mx-auto flex w-full max-w-2xl gap-3">
+      {/* ── Y-axis ──────────────────────────────────── */}
+      <div className="flex shrink-0 items-stretch gap-1.5 self-start">
+        {/* "AUM" rotated title */}
+        <div className="flex items-center justify-center">
+          <span
+            className="text-meta font-bold tracking-wider text-slate-500 select-none"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            AUM
+          </span>
+        </div>
+
+        {/* Vertical chips — one per tier, same gaps as grid */}
+        <div className="flex w-7 shrink-0 flex-col gap-[1px] overflow-hidden rounded-xl">
+          {AUM_ROWS.map((r, i) => (
+            <div
+              key={r.tier}
+              className="flex flex-1 items-center justify-center transition-all duration-150"
+              style={{
+                minHeight: CELL_H,
+                background: hoveredCell?.row === i ? r.activeColor : r.color,
+                opacity: hoveredCell && hoveredCell.row !== i ? 0.15 : 1,
+              }}
+            >
+              <span
+                className="text-micro leading-none font-black tracking-[0.15em] text-white uppercase select-none"
+                style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+              >
+                {nb.tiers[r.tier]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Grid + X-axis ───────────────────────────── */}
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {/* 3×3 grid */}
+        <div
+          className="grid grid-cols-3 grid-rows-3 gap-[1px] overflow-hidden rounded-xl border border-[rgba(0,0,0,0.08)]"
+          style={{ backgroundColor: "rgba(0,0,0,0.06)" }}
+        >
+          {[0, 1, 2].map((row) =>
+            [0, 1, 2].map((col) => {
+              const cell = CELLS[row][col];
+              const style = NINE_BOX_HEAT_STYLES[cell.heat];
+              const cellClients = grid[row][col];
+              return (
+                <button
+                  key={`${row}-${col}`}
+                  type="button"
+                  onClick={() =>
+                    onCellOpen({
+                      id: cell.id,
+                      heat: cell.heat,
+                      aumTier: AUM_ROWS[row].tier,
+                      aiTier: AI_COLS[col].tier,
+                      clients: cellClients,
+                    })
+                  }
+                  onMouseEnter={() => setHoveredCell({ row, col })}
+                  onMouseLeave={() => setHoveredCell(null)}
+                  className={`flex cursor-pointer flex-col justify-between p-3.5 text-left transition-all duration-150 ${style.bg}`}
+                  style={{
+                    minHeight: CELL_H,
+                    opacity:
+                      hoveredCell && (hoveredCell.row !== row || hoveredCell.col !== col)
+                        ? 0.25
+                        : 1,
+                  }}
+                >
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <span className={`size-2 shrink-0 rounded-full ${style.dot}`} />
+                    <p className="truncate text-label leading-[20px] font-semibold text-foreground">
+                      {nb.cells[cell.id]}
+                    </p>
+                  </div>
+                  <div>
+                    <p className={`text-3xl leading-none font-bold tracking-tight ${style.count}`}>
+                      {cellClients.length}
+                    </p>
+                    {(() => {
+                      const totalAum = formatTotalAum(cellClients);
+                      return totalAum ? (
+                        <p className="mt-1 text-body-sm leading-none text-muted-foreground">
+                          {totalAum}
+                        </p>
+                      ) : null;
+                    })()}
+                  </div>
+                  <div className="flex h-7 items-center">
+                    <ClientAvatarStack clients={cellClients} />
+                  </div>
+                </button>
+              );
+            }),
+          )}
+        </div>
+
+        {/* Horizontal chips — one per AI tier, same gaps as grid */}
+        <div className="flex h-7 gap-[1px] overflow-hidden rounded-xl">
+          {AI_COLS.map(({ tier, color, activeColor }, i) => (
+            <div
+              key={tier}
+              className="flex flex-1 items-center justify-center transition-all duration-150"
+              style={{
+                background: hoveredCell?.col === i ? activeColor : color,
+                opacity: hoveredCell && hoveredCell.col !== i ? 0.15 : 1,
+              }}
+            >
+              <span className="text-micro leading-none font-black tracking-[0.15em] text-white uppercase select-none">
+                {nb.tiers[tier]}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* "AI Score" title */}
+        <div className="flex justify-center">
+          <span className="text-meta font-bold tracking-wider text-slate-500 select-none">
+            AI Score
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}

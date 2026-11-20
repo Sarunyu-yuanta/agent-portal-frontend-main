@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import "../globals.css";
+import "@/app/globals.css";
 import "@sarunyu/system-one/styles.css";
 // After the design system's stylesheet, always — it overrides that sheet's sizes.
-import "../typography.css";
+import "@/app/typography.css";
 import { Noto_Sans_Thai } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { hasLocale, LOCALES } from "@/i18n/config";
