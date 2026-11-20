@@ -1,57 +1,29 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { useLocalizedRouter } from "@/i18n/navigation";
-import { CircleNotchIcon } from "@phosphor-icons/react";
-import { TabGroup, SearchInput, Pagination, Toaster } from "@sarunyu/system-one";
+import { Suspense, useState } from "react";
+import { TabGroup, Pagination, Toaster } from "@sarunyu/system-one";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { DetailDrawer } from "@/components/ui/detail-drawer";
-import { setQueryState } from "@/lib/query-state";
-import { recordVisit } from "@/features/shell/lib/nav-memory";
-import { useStoredIds } from "@/hooks/use-stored-ids";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useToasts } from "@/hooks/use-toasts";
 import { FadeIn } from "@/components/ui/fade-in";
 import { NineBoxTab, type NineBoxCellInfo } from "@/features/client-hub/components/NineBoxTab";
 import { ColumnVisibilityMenu } from "@/features/client-hub/components/ColumnVisibilityMenu";
 import { CUSTOMER_COLUMNS } from "@/features/client-hub/components/columns";
-import {
-  getSortValue,
-  getProductSortValue,
-  buildProductRows,
-} from "@/features/client-hub/lib/client-hub-data";
-import { compareBy, useTableSort } from "@/features/client-hub/hooks/use-table-sort";
+import { DebouncedSearchField } from "@/features/client-hub/components/DebouncedSearchField";
 import { ClientSummaryCards } from "@/features/client-hub/components/ClientSummaryCards";
 import { CustomerTable } from "@/features/client-hub/components/CustomerTable";
 import { ProductTable } from "@/features/client-hub/components/ProductTable";
 import { ProductDetailDrawer } from "@/features/client-hub/components/ProductDetailDrawer";
 import { NineBoxCellDrawer } from "@/features/client-hub/components/NineBoxCellDrawer";
 import { ClientDetailPanel } from "@/features/client-hub/components/ClientDetailPanel";
-import type {
-  ColumnId,
-  ProductSortKey,
-  SortKey,
-  ViewFilter,
-} from "@/features/client-hub/lib/types";
+import { useClientHubFilters } from "@/features/client-hub/hooks/use-client-hub-filters";
+import { useClientQuickView } from "@/features/client-hub/hooks/use-client-quick-view";
+import type { ViewFilter } from "@/features/client-hub/lib/types";
 import { useT } from "@/i18n/I18nProvider";
-import type { Client } from "@/types/client";
 import type { ProductRow } from "@/types/portfolio";
 import { useClientsResource } from "@/features/clients/hooks/use-clients";
 import { useHasLoaded } from "@/lib/api/resource";
 import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
-import { pageCount, pageSlice } from "@/lib/pagination";
-import { ROUTES, clientPath } from "@/lib/routes";
-
-/**
- * The Columns menu is remembered as the set of *hidden* columns, not visible
- * ones: an empty preference then means "show everything", which is both the
- * default and what a column added later should do for someone who set their
- * preference before it existed.
- */
-const HIDDEN_COLUMNS_PREF = "client-hub:hidden-columns";
-const isColumnId = (id: string) => CUSTOMER_COLUMNS.some((c) => c.id === id);
 
 /**
  * Whether a press landed on a client row in the customer table — the one kind
@@ -64,47 +36,6 @@ function isClientRowPress(event: Event): boolean {
   return target instanceof Element && target.closest("[data-client-row]") !== null;
 }
 
-/**
- * A `SearchInput` paired with the spinner that marks "typed, not yet applied" —
- * i.e. `value` has moved on but the debounced value the list actually filters
- * on hasn't caught up yet.
- */
-function DebouncedSearchField({
-  className,
-  inputClassName,
-  placeholder,
-  value,
-  debouncedValue,
-  onChange,
-  onClear,
-}: {
-  className: string;
-  inputClassName?: string;
-  placeholder: string;
-  value: string;
-  debouncedValue: string;
-  onChange: (value: string) => void;
-  onClear: () => void;
-}) {
-  return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <div className="min-w-0 flex-1">
-        <SearchInput
-          size="sm"
-          className={inputClassName}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onClear={onClear}
-        />
-      </div>
-      {value !== debouncedValue && (
-        <CircleNotchIcon size={16} className="shrink-0 animate-spin text-muted-foreground" />
-      )}
-    </div>
-  );
-}
-
 export function ClientHubView() {
   return (
     <Suspense fallback={null}>
@@ -114,205 +45,46 @@ export function ClientHubView() {
 }
 
 function ClientHubPageInner() {
-  const router = useLocalizedRouter();
   const t = useT();
-  const searchParams = useSearchParams();
   const { data: clients, isLoading, error } = useClientsResource();
   const hasLoaded = useHasLoaded(isLoading);
   const { isPrivate } = usePrivacy();
 
-  // Customer view
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebouncedValue(search, 300);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [viewFilter, setViewFilter] = useState<ViewFilter>("customer");
-  const [hiddenColumns, setHiddenColumns] = useStoredIds<ColumnId>(HIDDEN_COLUMNS_PREF, isColumnId);
-  const visibleColumns = useMemo(
-    () => new Set(CUSTOMER_COLUMNS.filter((c) => !hiddenColumns.has(c.id)).map((c) => c.id)),
-    [hiddenColumns],
-  );
+  const {
+    search,
+    setSearch,
+    debouncedSearch,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    viewFilter,
+    setViewFilter,
+    setHiddenColumns,
+    visibleColumns,
+    productSearch,
+    setProductSearch,
+    debouncedProductSearch,
+    toggleColumn,
+    tableWidth,
+    customerSort,
+    productSort,
+    sorted,
+    originalIndexMap,
+    totalPages,
+    safePage,
+    paged,
+    productIndexMap,
+    filteredProductRows,
+  } = useClientHubFilters(clients);
 
-  // Product view
-  const [productSearch, setProductSearch] = useState("");
-  const debouncedProductSearch = useDebouncedValue(productSearch, 300);
-
-  // Client quick view — URL-owned (`?client=110001`) so refresh, browser back
-  // and a shared link all land on the same open panel. The one place that
-  // *doesn't* reconstruct it is a return from that client's Full Profile: see
-  // `goToProfile`, which clears the param out of the entry it leaves behind.
-  const clientParam = searchParams.get("client");
-  const selectedClient = (clientParam && clients.find((c) => c.id === clientParam)) || null;
-  const drawerOpen = !!selectedClient;
-  // The drawer animates out after the param is gone — keep the last client
-  // around so it slides away with content instead of collapsing to blank.
-  const [panelClient, setPanelClient] = useState<Client | null>(selectedClient);
-  if (selectedClient && selectedClient !== panelClient) setPanelClient(selectedClient);
-  // Only rewind history if we're the ones who pushed the panel onto it —
-  // arriving straight on `?client=…` must not bounce out of the app.
-  const pushedPanelRef = useRef(false);
-
-  // A `?client=` that matches no one (a stale link, a client since removed)
-  // used to open nothing and say nothing. Once the list has loaded, drop the
-  // param and say why, rather than leave a URL that silently does nothing.
-  // Not while loading (the list is still empty) and not on a failed load
-  // (the client may well exist — the table shows the error instead).
-  const { toasts, addToast, removeToast } = useToasts();
-  const unknownClientParam =
-    !isLoading && !error && clientParam && !selectedClient ? clientParam : null;
-  useEffect(() => {
-    if (!unknownClientParam) return;
-    setQueryState(ROUTES.clientHub, "replace");
-    addToast({ status: "warning", message: t.client.hub.clientParamNotFound });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per bad id
-  }, [unknownClientParam]);
+  const { drawerOpen, panelClient, toasts, removeToast, openClient, closeClient, goToProfile } =
+    useClientQuickView({ clients, isLoading, error });
 
   // Drawers
   const [selectedProduct, setSelectedProduct] = useState<ProductRow | null>(null);
   const [productDrawerOpen, setProductDrawerOpen] = useState(false);
   const [nineBoxCell, setNineBoxCell] = useState<NineBoxCellInfo | null>(null);
   const [nineBoxDrawerOpen, setNineBoxDrawerOpen] = useState(false);
-
-  const toggleColumn = (id: ColumnId) => {
-    if (CUSTOMER_COLUMNS.find((c) => c.id === id)?.required) return;
-    const next = new Set(hiddenColumns);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setHiddenColumns(next);
-  };
-
-  const tableWidth = useMemo(() => {
-    const NO_COL_WIDTH = 60;
-    return (
-      NO_COL_WIDTH +
-      CUSTOMER_COLUMNS.reduce((sum, c) => sum + (visibleColumns.has(c.id) ? c.width : 0), 0)
-    );
-  }, [visibleColumns]);
-
-  // Sorting moves rows across pages, so start again from the first one.
-  const customerSort = useTableSort<SortKey>(() => setCurrentPage(1));
-  const productSort = useTableSort<ProductSortKey>();
-
-  const sorted = useMemo(() => {
-    let list = clients;
-
-    if (debouncedSearch.trim()) {
-      const q = debouncedSearch.toLowerCase();
-      list = list.filter(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          c.tier.toLowerCase().includes(q) ||
-          c.riskProfile.toLowerCase().includes(q),
-      );
-    }
-
-    const { key, dir } = customerSort;
-    if (key && dir !== "none") {
-      const origIdx = key === "rowIndex" ? new Map(clients.map((c, i) => [c.id, i])) : null;
-      list = [...list].sort((a, b) =>
-        compareBy(
-          origIdx ? (origIdx.get(a.id) ?? 0) : getSortValue(a, key),
-          origIdx ? (origIdx.get(b.id) ?? 0) : getSortValue(b, key),
-          dir,
-        ),
-      );
-    }
-
-    return list;
-  }, [debouncedSearch, customerSort, clients]);
-
-  const originalIndexMap = useMemo(() => new Map(clients.map((c, i) => [c.id, i + 1])), [clients]);
-
-  const totalPages = pageCount(sorted.length, pageSize);
-  const safePage = Math.min(currentPage, totalPages);
-  const paged = pageSlice(sorted, safePage, pageSize);
-
-  const productRows = useMemo(() => buildProductRows(clients), [clients]);
-
-  /** Row numbers from the unsorted list, so "No." identifies a product, not a position. */
-  const productIndexMap = useMemo(
-    () => new Map(productRows.map((r, i) => [r.label, i + 1])),
-    [productRows],
-  );
-
-  const filteredProductRows = useMemo(() => {
-    const q = debouncedProductSearch.trim().toLowerCase();
-    let list = q ? productRows.filter((r) => r.label.toLowerCase().includes(q)) : productRows;
-
-    const { key, dir } = productSort;
-    if (key && dir !== "none") {
-      const valueOf = (r: ProductRow) =>
-        key === "rowIndex" ? (productIndexMap.get(r.label) ?? 0) : getProductSortValue(r, key, t);
-      list = [...list].sort((a, b) => compareBy(valueOf(a), valueOf(b), dir));
-    }
-
-    return list;
-  }, [productRows, debouncedProductSearch, productSort, productIndexMap, t]);
-
-  function openClient(client: Client) {
-    const href = `/client-hub?client=${encodeURIComponent(client.id)}`;
-    // Row-to-row within an already-open panel swaps the view rather than
-    // stacking history entries the user would have to unwind one by one.
-    if (drawerOpen) {
-      setQueryState(href, "replace");
-    } else {
-      pushedPanelRef.current = true;
-      setQueryState(href, "push");
-    }
-  }
-
-  function closeClient() {
-    // Back only rewinds the entry we added; landing directly on `?client=…`
-    // (refresh, shared link, session restore) must not bounce out of the app.
-    if (pushedPanelRef.current) {
-      pushedPanelRef.current = false;
-      router.back();
-    } else {
-      setQueryState(ROUTES.clientHub, "replace");
-    }
-  }
-
-  /**
-   * Leaves for a client's Full Profile — and makes sure the entry we leave
-   * behind doesn't hold `?client=…`, so coming back lands on the list with
-   * nothing over it. The profile is the deeper view of the same client the
-   * panel was previewing; finding the preview still stacked on top of the list
-   * on the way back is just something to dismiss.
-   */
-  const goToProfile = (clientId: string, tab?: string) => {
-    const href = tab ? clientPath(clientId, tab) : clientPath(clientId);
-
-    if (clientParam) {
-      // Two things remember the panel, and both have to forget it — browser
-      // back reads the history entry, while the profile's own "Client 360"
-      // breadcrumb (and the sidebar entry, coming from another section) reads
-      // the section trail. Clearing only the first left the breadcrumb still
-      // pointing at `?client=…`.
-      //
-      // Both writes are synchronous — `setQueryState` is `history.replaceState`
-      // and `recordVisit` is a `sessionStorage` write — so they land before the
-      // navigation below instead of racing `NavStateMemory`'s effect, which may
-      // never run for a URL we leave in the same tick. `recordVisit` is
-      // idempotent, so it doesn't matter if that effect fires anyway.
-      setQueryState(ROUTES.clientHub, "replace");
-      recordVisit(ROUTES.clientHub, ROUTES.clientHub);
-    }
-
-    if (pushedPanelRef.current) {
-      // We pushed the panel's entry, so spend it on the profile rather than
-      // stacking on top: back then goes to the `/client-hub` entry from before
-      // the panel opened. Replacing is also what keeps the strip above from
-      // leaving two identical `/client-hub` entries to click through.
-      pushedPanelRef.current = false;
-      router.replace(href);
-    } else {
-      // The param came from the URL the user arrived on (a refresh with the
-      // panel open, a pasted link), so there's no earlier entry to fall back to
-      // — the same case `closeClient` guards. The stripped entry above becomes
-      // the way back instead.
-      router.push(href);
-    }
-  };
 
   return (
     <>
