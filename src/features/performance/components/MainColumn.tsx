@@ -12,14 +12,15 @@ import {
   ArrowsLeftRightIcon,
   LightningIcon,
 } from "@phosphor-icons/react";
-import { mockPerformanceData } from "@/mocks/mock-data";
+import { usePerformance } from "@/features/performance/hooks/use-performance";
 import { PRODUCT_COLORS } from "@/features/performance/lib/performance-data";
 import { useT } from "@/i18n/I18nProvider";
 
 export function IncomeTracker() {
   const t = useT();
-  const total = mockPerformanceData.incomeByProduct.reduce((s, d) => s + d.revenue, 0);
-  const maxRevenue = Math.max(...mockPerformanceData.incomeByProduct.map((d) => d.revenue));
+  const incomeByProduct = usePerformance().data?.incomeByProduct ?? [];
+  const total = incomeByProduct.reduce((s, d) => s + d.revenue, 0);
+  const maxRevenue = Math.max(...incomeByProduct.map((d) => d.revenue));
 
   return (
     <Card variant="default">
@@ -47,7 +48,7 @@ export function IncomeTracker() {
             {t.performance.income.byProduct}
           </p>
           <div className="mt-1 flex flex-col gap-2.5">
-            {mockPerformanceData.incomeByProduct.map((d) => (
+            {incomeByProduct.map((d) => (
               <div key={d.product} className="flex flex-col gap-1">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">

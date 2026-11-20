@@ -6,7 +6,6 @@ import { useLocalizedRouter } from "@/i18n/navigation";
 import { CircleNotchIcon } from "@phosphor-icons/react";
 import { TabGroup, SearchInput, Pagination, Toaster } from "@sarunyu/system-one";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
-import { useClientsResource, useHasLoaded } from "@/hooks/use-api";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { DetailDrawer } from "@/components/ui/detail-drawer";
 import { setQueryState } from "@/lib/query-state";
@@ -39,6 +38,8 @@ import type {
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
 import type { ProductRow } from "@/types/portfolio";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
+import { useHasLoaded } from "@/lib/api/resource";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 

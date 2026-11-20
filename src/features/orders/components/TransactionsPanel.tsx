@@ -40,7 +40,7 @@ import { TableRowsSkeleton } from "@/components/ui/skeleton";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import { TRANSACTION_CHANNELS } from "@/mocks/transaction-mock-data";
+import { TRANSACTION_CHANNELS } from "@/features/orders/lib/transaction-channels";
 import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
 import { formatLogTime } from "@/features/orders/lib/order-book";
 import { offeredSymbol } from "@/features/orders/lib/offered-products";

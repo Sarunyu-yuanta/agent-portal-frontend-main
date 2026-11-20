@@ -101,3 +101,35 @@ export type ClientDetail = {
   aiHighPriority: AiPriorityAlert | null;
   aiRiskAlert: AiRiskAlert | null;
 };
+
+// ── Client profile (KYC tab, order forms) ───────────────────────────────────
+
+export type ClientProfile = {
+  /**
+   * The trading account the client books orders under.
+   *
+   * Not the client id: one client can hold more than one account, and the
+   * booking modal prints the account the order is actually placed on. Mocked
+   * here as the client id plus a two-digit account suffix, which is the shape
+   * the real numbers take.
+   */
+  accountNo: string;
+  /** The client's name in Thai — what Order Management prints as "Full Name (TH)". */
+  nameTh: string;
+  phone: string;
+  email: string;
+  lineId?: string;
+  birthday: string;
+  age: number;
+  nationality: string;
+  address: string;
+  occupation: string;
+  company: string;
+  riskProfile: string;
+  relationshipSince: string;
+  referredBy?: string;
+  familyMembers?: { relation: string; name: string }[];
+};
+
+/** The account number and Thai name printed on order documents. */
+export type AccountIdentity = { accountNo: string; nameTh: string };

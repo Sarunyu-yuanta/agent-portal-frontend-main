@@ -25,7 +25,7 @@
  *
  * Every mutator is `async` and every call site awaits it, so pointing them at
  * real endpoints is a change in this file alone. `isLoading` is in the contract
- * and comes from `useStatic` over the seed, the same seam every other
+ * and comes from `staticResource` over the seed, the same seam every other
  * dataset uses — the screens already render skeletons against it.
  */
 
@@ -48,8 +48,7 @@ import {
   seedOfferedProposals,
   seedRequirementRequests,
   seedSubmissions,
-} from "@/mocks/order-mock-data";
-import { useStatic } from "@/hooks/use-api";
+} from "@/features/orders/api/orders.api";
 import { bookingModeForId, findBookableProduct } from "@/features/orders/lib/bookable-products";
 import { orderTargetFor } from "@/features/orders/lib/order-book";
 import { evidenceComplete, evidenceRequired } from "@/features/orders/components/order-evidence";
@@ -63,6 +62,7 @@ import type {
   RequirementKey,
   RequirementRequest,
 } from "@/types/order";
+import { staticResource } from "@/lib/api/resource";
 
 /**
  * How long a client takes to go and fill their forms in, in the mock.
@@ -109,7 +109,7 @@ type OrdersContextValue = {
   requirementRequests: RequirementRequest[];
   /** Append-only, newest last — every offer that has gone out. */
   proposals: ProposalLog[];
-  /** The order records haven't arrived — sourced from `useStatic` over the seed. */
+  /** The order records haven't arrived — sourced from `staticResource` over the seed. */
   isLoading: boolean;
   /** The first load of the order records failed; screens show `ErrorState`. */
   error: Error | null;
@@ -185,7 +185,7 @@ const localId = (prefix: string) => `${prefix}-local-${++localSeq}`;
 export function OrdersProvider({ children }: { children: ReactNode }) {
   // The seed is what a real feed would be fetching; its loading state is the
   // context's, so every order screen and the bell wait on the same thing.
-  const { isLoading, error, retry } = useStatic(seedBookings);
+  const { isLoading, error, retry } = staticResource(seedBookings);
   const [bookings, setBookings] = useState<Booking[]>(seedBookings);
   const [submissions, setSubmissions] = useState<OrderSubmission[]>(seedSubmissions);
   const [requirementRequests, setRequirementRequests] =

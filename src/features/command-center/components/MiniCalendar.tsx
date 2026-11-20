@@ -5,7 +5,6 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { BottomSheet, Button, Toaster } from "@sarunyu/system-one";
 import { CaretLeftIcon, CaretRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { useNotes } from "@/features/notes/store/notes-context";
-import { useClients } from "@/hooks/use-api";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useToasts } from "@/hooks/use-toasts";
 import {
@@ -20,13 +19,14 @@ import {
   ReminderPreviewRow,
   RemindersPreviewEmpty,
 } from "@/features/calendar/components/reminder-preview";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { NoteDetailPane } from "@/features/notes/components/NoteDetailPane";
 import { NoteModalShell } from "@/features/notes/components/note-modal-shell";
 import { reminderAtFromDate } from "@/features/notes/lib/note-format";
 import type { DatedReminder } from "@/features/command-center/lib/dashboard-data";
 import { formatDate, weekdayNames } from "@/i18n/format";
 import { useLocale, useT } from "@/i18n/I18nProvider";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 /**
  * The month, small.
  *
@@ -51,6 +51,7 @@ export function MiniCalendar({
   /** `+1` / `-1`, relative to the month on screen. */
   onMonthChange: (delta: number) => void;
 }) {
+  const currentIc = useCurrentIc();
   const locale = useLocale();
   const t = useT();
   const weeks = weeksOf(monthGrid(viewDate));
@@ -79,12 +80,12 @@ export function MiniCalendar({
       id: "__draft__",
       title: null,
       body: "",
-      author: NOTE_AUTHOR,
+      author: currentIc.name,
       createdAt: draftCreatedAt,
       updatedAt: draftCreatedAt,
       ...draftAttrs,
     }),
-    [draftAttrs, draftCreatedAt],
+    [draftAttrs, draftCreatedAt, currentIc.name],
   );
 
   const openCreate = (day: Date) => {
@@ -105,7 +106,7 @@ export function MiniCalendar({
         clientIds: draftAttrs.clientIds,
         title: values.title.trim() || null,
         body: values.body,
-        author: NOTE_AUTHOR,
+        author: currentIc.name,
         reminderAt: draftAttrs.reminderAt,
         reminderDone: draftAttrs.reminderDone,
       });

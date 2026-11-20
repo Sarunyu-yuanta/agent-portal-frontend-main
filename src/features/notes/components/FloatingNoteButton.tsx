@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useAppPathname } from "@/i18n/navigation";
 import { Button, Popover } from "@sarunyu/system-one";
 import { NotePencilIcon } from "@phosphor-icons/react";
-import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { useT } from "@/i18n/I18nProvider";
 import { NoteComposer, draftHasContent, emptyDraft, type ComposerDraft } from "./NoteComposer";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 const CLIENT_PAGE = /^\/client\/([^/]+)/;
 
@@ -35,6 +35,7 @@ const CLIENT_PAGE = /^\/client\/([^/]+)/;
  * does to you.
  */
 export function FloatingNoteButton() {
+  const currentIc = useCurrentIc();
   const t = useT();
   const pathname = useAppPathname();
   const clients = useClients();
@@ -79,7 +80,7 @@ export function FloatingNoteButton() {
         clientIds: draft.clientIds,
         title: draft.title.trim() || null,
         body: draft.body.trim(),
-        author: NOTE_AUTHOR,
+        author: currentIc.name,
         reminderAt: draft.reminderAt,
         reminderDone: false,
       });

@@ -188,7 +188,7 @@ export function MutualFundThemeDetailPage({
           activeTabId={themeId}
           onTabSelect={setThemeId}
           hero={
-            isLoading ? (
+            isLoading || !theme ? (
               <MutualFundTabbedListHeroSkeleton />
             ) : (
               <MutualFundThemeHero themeId={themeId} theme={theme} />

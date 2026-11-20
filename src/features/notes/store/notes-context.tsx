@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import { useStatic } from "@/hooks/use-api";
 import type { Note } from "@/types/note";
+import { staticResource } from "@/lib/api/resource";
 
 /** Nothing is seeded today; a real feed would be fetching this list. */
 const SEED_NOTES: Note[] = [];
@@ -13,7 +13,7 @@ export type NoteDraft = Omit<Note, "id" | "createdAt" | "updatedAt">;
 type NotesContextValue = {
   notes: Note[];
   /**
-   * The seed list hasn't arrived — from `useStatic` over the seed, the same
+   * The seed list hasn't arrived — from `staticResource` over the seed, the same
    * seam every other dataset uses. Every notes screen renders a skeleton
    * against it, so a real endpoint needs no screen changes.
    */
@@ -68,7 +68,7 @@ let localIdSeq = 0;
  * single caller.
  */
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const { isLoading, error, retry } = useStatic(SEED_NOTES);
+  const { isLoading, error, retry } = staticResource(SEED_NOTES);
   const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
 
   const addNote = useCallback(async (draft: NoteDraft, presetLocalId?: string) => {

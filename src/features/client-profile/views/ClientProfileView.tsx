@@ -9,12 +9,6 @@ import { ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import { ErrorState, NotFoundState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 import {
-  useClientAssetAccounts,
-  useClientCallLogs,
-  useClientProfile,
-  useClientsResource,
-} from "@/hooks/use-api";
-import {
   ClientProfileSkeleton,
   DetailCardsSkeleton,
 } from "@/features/client-profile/components/ClientProfileSkeleton";
@@ -29,7 +23,6 @@ import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBrea
 import { TierBadge } from "@/components/ui/tier-badge";
 import { ContactChips } from "@/features/calendar/components/HolderContact";
 import { LiabilitiesDetailModal } from "@/features/portfolio/components/LiabilitiesDetailModal";
-import type { LiabilitiesDetail } from "@/mocks/liabilities-details";
 import {
   clientDetailById,
   kycExpiryLabel,
@@ -46,6 +39,13 @@ import { OverviewTab } from "@/features/client-profile/components/OverviewTab";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
 import type { SortDir } from "@/types/table";
+import type { LiabilitiesDetail } from "@/types/portfolio";
+import {
+  useClientAssetAccounts,
+  useClientCallLogs,
+  useClientProfile,
+  useClientsResource,
+} from "@/features/clients/hooks/use-clients";
 
 export function ClientProfileView({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -418,7 +418,6 @@ function ClientProfile({ id, client, clients }: { id: string; client: Client; cl
       {liabilitiesData && (
         <LiabilitiesDetailModal
           open={liabilitiesOpen}
-          totalAmount={liabilitiesData.amount}
           detail={liabilitiesData.detail}
           onClose={() => setLiabilitiesOpen(false)}
         />

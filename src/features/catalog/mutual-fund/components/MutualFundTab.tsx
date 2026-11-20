@@ -27,6 +27,9 @@ export function MutualFundTab({
   const [groupId, setGroupId] = useState<MobileFundGroupId>("all");
   const funds = getMobileGroupFunds(groupId);
 
+  // Rendered under the catalog page's own loading gate; nothing to show until the catalog arrives.
+  if (!data) return null;
+
   const topPerformers = (
     <MutualFundTopPerformersSection
       groupId={groupId}

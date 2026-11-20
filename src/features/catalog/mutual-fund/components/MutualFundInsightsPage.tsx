@@ -24,7 +24,7 @@ export function MutualFundInsightsPage({ onBack }: { onBack: () => void }) {
     }
   }, [currentPage]);
 
-  if (isLoading) return <MutualFundInsightsPageSkeleton />;
+  if (isLoading || !insights) return <MutualFundInsightsPageSkeleton />;
 
   const { items, totalPages } = insights;
 

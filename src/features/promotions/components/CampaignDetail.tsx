@@ -15,7 +15,6 @@ import {
 import { Button, Tag, Toaster } from "@sarunyu/system-one";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useToasts } from "@/hooks/use-toasts";
-import { useClients } from "@/hooks/use-api";
 import { useCampaign } from "@/features/promotions/hooks/use-campaigns";
 import {
   CampaignRuleError,
@@ -41,6 +40,7 @@ import { EventBody } from "./EventBody";
 import { PromotionBody } from "./PromotionBody";
 import { ShareDialog } from "./ShareDialog";
 import { useLocale } from "@/i18n/I18nProvider";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * One campaign, in full.

@@ -5,7 +5,6 @@ import { localizePath } from "@/i18n/locale-path";
 
 import { useMemo } from "react";
 import { redirect } from "next/navigation";
-import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { CALENDAR_ENABLED } from "@/config/feature-flags";
@@ -14,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { todayDateKey } from "@/features/calendar/lib/calendar-grid";
 import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals";
 import { CalendarRemindersTab } from "@/features/calendar/components/CalendarRemindersTab";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * Every reminder as one list — the same set the Calendar lays out by day. The

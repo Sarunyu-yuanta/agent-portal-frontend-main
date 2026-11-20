@@ -7,11 +7,9 @@ import { useLocalizedRouter } from "@/i18n/navigation";
 import { Button, Toaster } from "@sarunyu/system-one";
 import { NotePencilIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
-import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { setQueryState, withQuery } from "@/lib/query-state";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { NotesGallery } from "@/features/notes/components/NotesGallery";
 import { NoteDetailPane } from "@/features/notes/components/NoteDetailPane";
 import {
@@ -20,6 +18,8 @@ import {
 } from "@/features/notes/components/note-modal-shell";
 import { useT } from "@/i18n/I18nProvider";
 import type { Note } from "@/types/note";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 /**
  * Notes tab on a client's Full Profile — a wall of cards rather than the Notes
@@ -31,6 +31,7 @@ import type { Note } from "@/types/note";
  * note you're after — which cards do better than rows.
  */
 export function ClientNotesTab({ clientId }: { clientId: string }) {
+  const currentIc = useCurrentIc();
   const router = useLocalizedRouter();
   const t = useT();
   const searchParams = useSearchParams();
@@ -64,12 +65,12 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
       id: "__draft__",
       title: null,
       body: "",
-      author: NOTE_AUTHOR,
+      author: currentIc.name,
       createdAt: draftCreatedAt,
       updatedAt: draftCreatedAt,
       ...draftAttrs,
     }),
-    [draftAttrs, draftCreatedAt],
+    [draftAttrs, draftCreatedAt, currentIc.name],
   );
 
   // --- Edit flow: existing note opened via URL param ---
@@ -177,7 +178,7 @@ export function ClientNotesTab({ clientId }: { clientId: string }) {
           clientIds: draftAttrs.clientIds,
           title: values.title.trim() || null,
           body: values.body,
-          author: NOTE_AUTHOR,
+          author: currentIc.name,
           reminderAt: draftAttrs.reminderAt,
           reminderDone: draftAttrs.reminderDone,
         });

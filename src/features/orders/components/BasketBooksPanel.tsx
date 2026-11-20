@@ -24,7 +24,6 @@ import { Button, Chip, SearchInput } from "@sarunyu/system-one";
 import { LocaleLink as Link } from "@/i18n/navigation";
 import { EmptyState } from "@/components/ui/empty-state";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { getAccountIdentity } from "@/mocks/client-profiles";
 import { FadeIn } from "@/components/ui/fade-in";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
@@ -32,11 +31,12 @@ import { OrderRecordsTable } from "./OrderRecordsTable";
 import { CreateOrderButton } from "./CreateOrderButton";
 import { bookingPhaseSteps, ownBookings } from "@/features/orders/lib/order-book";
 import { hasOwnWorkAt } from "@/features/orders/lib/order-proposals";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { useOrderBooks } from "@/features/orders/hooks/use-order-books";
 import { bookingModeForDesk, type Desk } from "@/features/orders/lib/bookable-products";
 import { useT } from "@/i18n/I18nProvider";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 export function BasketBooksPanel({
   desk,
@@ -53,6 +53,8 @@ export function BasketBooksPanel({
   /** Where the empty state sends the IC to start a booking — the desk's catalogue tab. */
   catalogHref: string;
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const t = useT();
   const pathname = useAppPathname();
   const searchParams = useSearchParams();
@@ -85,13 +87,14 @@ export function BasketBooksPanel({
     // the table groups by, so the two cannot disagree about whether a desk is
     // empty. See `hasOwnWorkAt`.
     const ofType = books.filter(
-      (book) => book.desk === desk && hasOwnWorkAt(book, IC_NAME, step_, proposals, clientId),
+      (book) =>
+        book.desk === desk && hasOwnWorkAt(book, currentIc.name, step_, proposals, clientId),
     );
     const query = search.trim().toLowerCase();
     if (!query) return ofType;
     return ofType.filter((book) =>
       [
-        ...ownBookings(book, IC_NAME).flatMap((b) => [
+        ...ownBookings(book, currentIc.name).flatMap((b) => [
           b.clientId,
           maskName(b.clientName, isPrivate),
           getAccountIdentity(b.clientId).accountNo,
@@ -102,7 +105,17 @@ export function BasketBooksPanel({
         ...book.submissions.map((s) => s.backendRef),
       ].some((text) => text.toLowerCase().includes(query)),
     );
-  }, [books, desk, search, isPrivate, step_, proposals, clientId]);
+  }, [
+    books,
+    desk,
+    search,
+    isPrivate,
+    step_,
+    proposals,
+    clientId,
+    getAccountIdentity,
+    currentIc.name,
+  ]);
 
   if (isLoading) return <OrdersPanelSkeleton withCreate />;
 

@@ -23,7 +23,7 @@ import orderRequirementsRaw from "@/mocks/order-requirements.json";
 import { mockClients } from "./mock-data";
 import { getCallLogs } from "./call-log-data";
 import { OTHER_DESK_CLIENT_NAMES } from "./client-profiles";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
+import { MOCK_CURRENT_IC } from "@/mocks/session";
 import { offeredProductId } from "@/features/orders/lib/offered-products";
 import { STOCK_TOP_PICK } from "@/features/catalog/stock/lib/stock-data";
 import { getTopPerformers } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
@@ -46,7 +46,7 @@ import type {
  * names for them is how a log line and a note end up crediting different
  * people for the same afternoon.
  */
-export const ORDER_ACTOR = NOTE_AUTHOR;
+export const ORDER_ACTOR = MOCK_CURRENT_IC.name;
 
 /**
  * Who an order names as its sender when nobody here sent it.

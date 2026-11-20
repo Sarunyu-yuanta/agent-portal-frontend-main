@@ -28,7 +28,6 @@ import { Tag } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { getAccountIdentity } from "@/mocks/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import { PROPOSAL_CHANNEL_META } from "./proposal-channels";
 import type { BookableProduct } from "@/features/orders/lib/bookable-products";
@@ -53,6 +52,7 @@ import {
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { OrderBook, ProposalLog } from "@/types/order";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 
 /**
  * The disc, by what came of the offer.
@@ -106,6 +106,7 @@ function Body({
   book: OrderBook;
   product: BookableProduct;
 }) {
+  const getAccountIdentity = useAccountIdentity();
   const locale = useLocale();
   const t = useT();
   const { isPrivate } = usePrivacy();

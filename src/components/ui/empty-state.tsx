@@ -6,8 +6,8 @@ import {
   MagnifyingGlassIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react";
-import type { Resource } from "@/hooks/use-api";
 import { useT } from "@/i18n/I18nProvider";
+import type { Resource } from "@/lib/api/resource";
 
 /**
  * The four "not the data you came for" states, and the order a screen checks

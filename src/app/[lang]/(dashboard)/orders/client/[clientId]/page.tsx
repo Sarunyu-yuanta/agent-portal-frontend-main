@@ -22,12 +22,12 @@ import { redirect, useSearchParams } from "next/navigation";
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
 import { catalogListHref } from "@/features/catalog/lib/product-catalog-routes";
-import { useClientsResource } from "@/hooks/use-api";
 import { ErrorState } from "@/components/ui/empty-state";
 import { OrdersPanelSkeleton } from "@/features/orders/components/OrdersPanelSkeleton";
 import { CatalogNotFound } from "@/features/catalog/components/CatalogNotFound";
 import { normalizeOrderTab } from "@/features/orders/lib/order-tabs";
 import { ClientOrdersDetail } from "@/features/orders/components/ClientOrdersDetail";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
 
 export default function ClientOrdersPage({ params }: { params: Promise<{ clientId: string }> }) {
   const locale = useLocale();

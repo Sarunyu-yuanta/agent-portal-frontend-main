@@ -7,7 +7,6 @@ import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
 import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBreadcrumb";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { useClients, useClientsResource } from "@/hooks/use-api";
 import { useRoboAdvisoryPlans } from "@/features/catalog/hooks/use-catalog";
 import { usePageBreadcrumb } from "@/features/shell/lib/page-breadcrumbs";
 import {
@@ -40,6 +39,7 @@ import { RoboRiskLevel } from "./RoboRiskLevel";
 import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
+import { useClients, useClientsResource } from "@/features/clients/hooks/use-clients";
 
 /** Hidden pending sign-off on the filter behavior — flip to true to re-enable. */
 const SHOW_ROBO_FILTER_BUTTON = false;

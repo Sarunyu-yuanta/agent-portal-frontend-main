@@ -19,7 +19,6 @@
 import { CheckIcon, CircleHalfIcon, ClockIcon, XIcon } from "@phosphor-icons/react";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { getAccountIdentity } from "@/mocks/client-profiles";
 import { maskName } from "@/lib/mask-name";
 import {
   ClientRow,
@@ -42,6 +41,7 @@ import {
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { ClientTransaction, TransactionStatus } from "@/types/transaction";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
 
 /** The disc's glyph — the verdict, before a word of it is read. */
 const STATUS_GLYPH: Record<TransactionStatus, React.ReactNode> = {
@@ -77,6 +77,7 @@ export function TransactionDetailModal({
 }
 
 function Body({ t }: { t: ClientTransaction }) {
+  const getAccountIdentity = useAccountIdentity();
   const locale = useLocale();
   const dict = useT();
   const { isPrivate } = usePrivacy();

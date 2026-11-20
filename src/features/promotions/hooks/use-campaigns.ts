@@ -3,25 +3,22 @@
 /**
  * The read side of Promotions & Events.
  *
- * Same seam as `@/hooks/use-api` and `@/hooks/use-catalog`: the fixtures ship
- * in the bundle, so these hand them back through {@link useStatic}, and the
- * list page already renders its skeleton against the `isLoading` that comes
- * out. Giving campaigns a real endpoint is a change in this file.
- *
  * The *write* side — who has been sent what, who is registered — is
- * `@/contexts/campaigns-context`, for the reason `OrdersProvider` exists: a
- * share sent from a detail page has to move the KPI strip on the list without
- * either screen remounting.
+ * `store/campaigns-context`, so a share sent from a detail page moves the KPI
+ * strip on the list without either screen remounting.
  */
 
 import { useMemo } from "react";
-import { useStatic, type Resource } from "@/hooks/use-api";
-import { mockCampaigns } from "@/mocks/campaign-mock-data";
+import { useEndpoint } from "@/lib/api/endpoint";
+import type { Resource } from "@/lib/api/resource";
 import type { Campaign } from "@/types/campaign";
+import { campaignsEndpoint } from "@/features/promotions/api/promotions.api";
+
+const NONE: Campaign[] = [];
 
 /** Every campaign, promotions and events alike, in authored order. */
 export function useCampaigns(): Resource<Campaign[]> {
-  return useStatic(mockCampaigns);
+  return useEndpoint(campaignsEndpoint, [], { fallback: NONE });
 }
 
 /** One campaign. `undefined` once loaded means the id isn't a campaign. */

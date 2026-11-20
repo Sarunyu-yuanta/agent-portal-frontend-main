@@ -9,7 +9,7 @@ import {
   UploadSimpleIcon,
   CalendarPlusIcon,
 } from "@phosphor-icons/react";
-import { mockComplianceAlerts } from "@/mocks/mock-data";
+import { useComplianceAlerts } from "@/features/compliance/hooks/use-compliance-alerts";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords } from "@/lib/client-utils";
@@ -24,6 +24,7 @@ export function KycDetailPanel({
   onClose: () => void;
 }) {
   const { isPrivate } = usePrivacy();
+  const { data: complianceAlerts } = useComplianceAlerts();
   const t = useT();
   const d = t.compliance.detail;
   const ratingLabel = t.compliance.riskRating[row.riskRating] ?? row.riskRating;
@@ -55,7 +56,7 @@ export function KycDetailPanel({
     },
   ];
 
-  const relatedAlerts = mockComplianceAlerts.filter((a) => a.client === row.client);
+  const relatedAlerts = complianceAlerts.filter((a) => a.client === row.client);
 
   return (
     <div className="flex h-full flex-col">

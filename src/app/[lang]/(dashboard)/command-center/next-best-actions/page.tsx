@@ -3,7 +3,6 @@
 import { useCallback, useMemo } from "react";
 import { Button, Card } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
-import { useNBAActions } from "@/hooks/use-api";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
@@ -17,6 +16,7 @@ import {
   HIDDEN_NBA_IDS_PREF,
 } from "@/features/command-center/lib/dashboard-data";
 import { useT } from "@/i18n/I18nProvider";
+import { useNBAActions } from "@/features/command-center/hooks/use-nba-actions";
 
 /**
  * Every open suggestion, not the Dashboard card's shortlist.

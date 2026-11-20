@@ -35,3 +35,81 @@ export type ProductRow = {
   avgAllocationPct: number;
   holders: ProductHolder[];
 };
+
+// ── Accounts and holdings ────────────────────────────────────────────────────
+
+export type AssetAccountItem = {
+  name: string;
+  accountNo: string;
+  value: string;
+  changeAmount?: string;
+  changePercent?: string;
+  changePositive?: boolean;
+  avgYield?: string;
+  statusIcon: string;
+};
+
+export type PositionField = {
+  /** Its label is `t.client.assets.position[id]`. */
+  id: "avgCost" | "currentPrice" | "costAmount" | "marketValue" | "quantity";
+  value: string;
+};
+
+export type PositionSummary = {
+  fields: PositionField[];
+};
+
+export type HoldingItem = {
+  id: string;
+  symbol: string;
+  fullName: string;
+  value: string;
+  changeAmount: string;
+  changePercent: string;
+  changePositive: boolean;
+  collateral?: boolean;
+  /** Units held. Combined with value/changeAmount to derive average cost, current price, etc. */
+  quantity?: number;
+  position?: PositionSummary;
+};
+
+export type HoldingSection = {
+  title: string;
+  items: HoldingItem[];
+};
+
+export type AssetAccountDetail = {
+  viewByLabel: string;
+  sections: HoldingSection[];
+};
+
+// ── Liabilities ──────────────────────────────────────────────────────────────
+
+export type LiabilitySubItem = {
+  label: string;
+  amount: string;
+};
+
+export type LiabilityCategory = {
+  id: string;
+  label: string;
+  percent: number;
+  /** Outstanding amount in this category, formatted. */
+  amount: string;
+  color: string;
+  subItems: LiabilitySubItem[];
+};
+
+export type LiabilitiesDetail = {
+  categories: LiabilityCategory[];
+  lastUpdated: string;
+};
+
+/** A product inside an asset class, aggregated across the IC's clients. */
+export type SubProduct = {
+  id: string;
+  name: string;
+  ticker?: string;
+  clientCount: number;
+  totalAmountThb: number;
+};

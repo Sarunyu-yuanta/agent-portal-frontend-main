@@ -3,14 +3,12 @@
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@sarunyu/system-one";
-import { useClientsResource } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { ErrorState } from "@/components/ui/empty-state";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useStoredIds } from "@/hooks/use-stored-ids";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { useStickyRailTop } from "@/hooks/use-sticky-rail";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { getClientTotals } from "@/features/client-hub/lib/client-hub-data";
 import { formatAumThb } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
@@ -49,6 +47,8 @@ import { useLocale, useT } from "@/i18n/I18nProvider";
 import { GreetingCard } from "@/features/command-center/components/GreetingCard";
 import { parseTimePreview } from "@/features/command-center/lib/time-of-day-sky";
 import type { RiskSeverity } from "@/types/risk-alert";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 /**
  * The page an IC opens first.
@@ -95,6 +95,7 @@ const DASHBOARD_RAIL_CSS = `
 `;
 
 function DashboardPageInner() {
+  const currentIc = useCurrentIc();
   const locale = useLocale();
   const t = useT();
   const searchParams = useSearchParams();
@@ -273,7 +274,7 @@ function DashboardPageInner() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch xl:gap-5">
               <div className="flex min-h-[96px] min-w-0 flex-[8] flex-col">
                 <GreetingCard
-                  name={NOTE_AUTHOR.split(" ")[0]}
+                  name={currentIc.name.split(" ")[0]}
                   today={today}
                   minutes={todayPreview}
                 />

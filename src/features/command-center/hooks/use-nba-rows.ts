@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useNBAActions } from "@/hooks/use-api";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useStoredIds } from "@/hooks/use-stored-ids";
 import {
@@ -10,6 +9,7 @@ import {
   HIDDEN_NBA_IDS_PREF,
   type NbaRow,
 } from "@/features/command-center/lib/dashboard-data";
+import { useNBAActions } from "@/features/command-center/hooks/use-nba-actions";
 
 /**
  * The AI's suggested next moves, ranked, with the dismissed ones gone.

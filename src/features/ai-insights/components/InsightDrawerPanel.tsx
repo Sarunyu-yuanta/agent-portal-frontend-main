@@ -10,7 +10,7 @@ import {
   SparkleIcon,
   UserIcon,
 } from "@phosphor-icons/react";
-import { mockClientDetails, mockClients } from "@/mocks/mock-data";
+import { useClientDetails, useClients } from "@/features/clients/hooks/use-clients";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitialsFromWords, formatAumThb, formatPlYtdPct } from "@/lib/client-utils";
@@ -25,8 +25,10 @@ export function InsightDrawerPanel({ insight }: { insight: AiInsight }) {
   const d = ai.drawer;
   const maskedName = maskName(insight.clientName, isPrivate);
   const config = CATEGORY_CONFIG[insight.type as keyof typeof CATEGORY_CONFIG];
-  const client = mockClients.find((c) => c.id === insight.clientId);
-  const detail = client ? mockClientDetails[client.id] : null;
+  const clients = useClients();
+  const details = useClientDetails().data;
+  const client = clients.find((c) => c.id === insight.clientId);
+  const detail = client ? details[client.id] : null;
 
   const tierVariant = client?.tier === "UHNW" ? ("blue" as const) : ("gray" as const);
   const tagVariant = config?.tagVariant ?? "gray";

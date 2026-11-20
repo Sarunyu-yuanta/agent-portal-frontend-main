@@ -10,11 +10,11 @@ import { useSlideOver, SlideOverPanel } from "@/components/ui/slide-over";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { getInitials, formatThbAmount } from "@/lib/client-utils";
-import { PRODUCT_SUB_DATA, type SubProduct } from "@/mocks/product-sub-data";
 import { ClientDetailPanel } from "./ClientDetailPanel";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
 import type { ProductRow } from "@/types/portfolio";
+import { useAssetClassProducts } from "@/features/clients/hooks/use-clients";
 
 /** Content of the product drawer: stats, holdings/clients tabs, and a pushed
  * client detail overlay. Owns its own tab/expand/push state so remounting on a
@@ -31,7 +31,7 @@ export function ProductDetailDrawer({
   const t = useT();
   const d = t.client.productDrawer;
   const { isPrivate } = usePrivacy();
-  const subProducts: SubProduct[] = PRODUCT_SUB_DATA[product.label] ?? [];
+  const { data: subProducts } = useAssetClassProducts(product.label);
   const hasSub = subProducts.length > 0;
   const [tab, setTab] = useState<"sub" | "clients">(hasSub ? "sub" : "clients");
   const [expandedSubIds, setExpandedSubIds] = useState<Set<string>>(new Set());

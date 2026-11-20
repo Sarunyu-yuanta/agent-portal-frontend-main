@@ -38,11 +38,11 @@ import { groupDayItems, type DayItem } from "@/features/calendar/lib/day-items";
 import { ACTION_KINDS } from "./market-taxonomy";
 import { holidaysByDay } from "@/features/calendar/lib/mock-market-feed";
 import { NoteDetailPane } from "@/features/notes/components/NoteDetailPane";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
 import { reminderAtFromDate } from "@/features/notes/lib/note-format";
 import { useLocale, useT } from "@/i18n/I18nProvider";
 import { weekdayNames } from "@/i18n/format";
 import type { Note } from "@/types/note";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 export function CalendarView({
   notes,
@@ -51,6 +51,7 @@ export function CalendarView({
   notes: Note[];
   clients: { id: string; name: string }[];
 }) {
+  const currentIc = useCurrentIc();
   const locale = useLocale();
   const t = useT();
   const { addNote, editNote, removeNote } = useNotes();
@@ -91,12 +92,12 @@ export function CalendarView({
       id: "__draft__",
       title: null,
       body: "",
-      author: NOTE_AUTHOR,
+      author: currentIc.name,
       createdAt: draftCreatedAt,
       updatedAt: draftCreatedAt,
       ...draftAttrs,
     }),
-    [draftAttrs, draftCreatedAt],
+    [draftAttrs, draftCreatedAt, currentIc.name],
   );
 
   const handleNewReminder = (day: Date) => {
@@ -115,7 +116,7 @@ export function CalendarView({
         clientIds: draftAttrs.clientIds,
         title: values.title.trim() || null,
         body: values.body,
-        author: NOTE_AUTHOR,
+        author: currentIc.name,
         reminderAt: draftAttrs.reminderAt,
         reminderDone: draftAttrs.reminderDone,
       });

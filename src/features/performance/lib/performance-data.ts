@@ -2,7 +2,7 @@
  * Performance page static data and helpers.
  *
  * ─── Backend handoff ─────────────────────────────────────────────────────────
- * KPI metrics come from `mockPerformanceData` (@/mocks/mock-data). `GAP_ITEMS`
+ * KPI metrics come from `usePerformance` (`../api/performance.api`). `GAP_ITEMS`
  * and `AI_STEPS` (the gap-analysis figures and AI action plan) are hard-coded
  * and should be returned by the backend.
  */

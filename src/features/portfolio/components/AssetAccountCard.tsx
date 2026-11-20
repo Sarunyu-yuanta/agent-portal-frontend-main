@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { CaretDownIcon, CaretRightIcon, XIcon } from "@phosphor-icons/react";
 import { ProfitLossBadge } from "@/components/ui/finance-ui";
-import {
-  getAssetAccountDetail,
-  getAssetProductDetail,
-  type AssetAccountItem,
-} from "@/mocks/asset-account-details";
+import { useHoldingDetail } from "@/features/clients/hooks/use-clients";
 import { AssetHoldingAccordion } from "./AssetHoldingRow";
 import { displayAssetLabel } from "@/lib/client-utils";
 import { useT } from "@/i18n/I18nProvider";
+import type { AssetAccountItem } from "@/types/portfolio";
 
 export type AssetListViewMode = "product" | "account";
 
@@ -38,11 +35,7 @@ export function AssetAccountCard({
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggleOpen = onToggle ?? (() => setInternalOpen((p) => !p));
-  const detail = accordion
-    ? viewMode === "account"
-      ? getAssetAccountDetail(account.accountNo)
-      : getAssetProductDetail(account.name)
-    : null;
+  const detail = useHoldingDetail(viewMode, accordion ? account : null);
 
   return (
     <div

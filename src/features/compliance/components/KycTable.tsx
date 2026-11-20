@@ -15,7 +15,7 @@ import {
   TableCell,
 } from "@sarunyu/system-one";
 import { DownloadSimpleIcon, ClockIcon } from "@phosphor-icons/react";
-import { mockKYCData } from "@/mocks/mock-data";
+import { useKycRecords } from "@/features/clients/hooks/use-clients";
 import { DetailDrawer } from "@/components/ui/detail-drawer";
 import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
@@ -29,6 +29,7 @@ import type { SortDir } from "@/types/table";
 
 export function KycTable() {
   const { isPrivate } = usePrivacy();
+  const { data: kycRecords } = useKycRecords();
   const t = useT();
   const tt = t.compliance.table;
   const [filter, setFilter] = useState("");
@@ -45,7 +46,7 @@ export function KycTable() {
 
   const dirFor = (key: SortKey): SortDir => (sortKey === key ? sortDir : "none");
 
-  const filtered = filter ? mockKYCData.filter((r) => r.kycStatus === filter) : mockKYCData;
+  const filtered = filter ? kycRecords.filter((r) => r.kycStatus === filter) : kycRecords;
 
   const rows = [...filtered].sort((a, b) => {
     if (!sortKey || sortDir === "none") return 0;
@@ -214,7 +215,7 @@ export function KycTable() {
             </TableBody>
           </Table>
           {isEmpty &&
-            (mockKYCData.length === 0 ? (
+            (kycRecords.length === 0 ? (
               <TableEmptyOverlay variant="empty" title={tt.empty} />
             ) : (
               <TableEmptyOverlay

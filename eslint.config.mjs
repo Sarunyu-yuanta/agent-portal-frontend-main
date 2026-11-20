@@ -19,6 +19,11 @@ const NO_FEATURE_IMPORTS = {
   group: ["@/features/*"],
   message: "Shared layers must not depend on a feature. Move the shared piece down a layer.",
 };
+const NO_MOCK_IMPORTS = {
+  group: ["@/mocks/*"],
+  message:
+    "Read data through an endpoint (src/features/<feature>/api) and its hook, never from src/mocks directly.",
+};
 const SHARED_LAYERS = [
   "src/components/**",
   "src/hooks/**",
@@ -27,6 +32,31 @@ const SHARED_LAYERS = [
   "src/i18n/**",
   "src/config/**",
 ];
+/**
+ * Where bundled mock data may be read: endpoint modules, and the mocks themselves.
+ *
+ * LEGACY_MOCK_READERS still shape mock data synchronously instead of going
+ * through an endpoint. Do not add to this list — move each file's reads behind
+ * an endpoint and delete its entry (tracked in docs/architecture.md).
+ */
+const LEGACY_MOCK_READERS = [
+  "src/features/calendar/lib/mock-market-feed.ts",
+  "src/features/catalog/fixed-income/lib/fixed-income-data.ts",
+  "src/features/catalog/global-bond/lib/global-bond-data.ts",
+  "src/features/catalog/mutual-fund/lib/mutual-fund-data.ts",
+  "src/features/catalog/robo-advisory/lib/investment-solution-data.ts",
+  "src/features/catalog/structured-product/lib/structured-product-data.ts",
+  "src/features/catalog/top-idea/lib/top-idea-data.ts",
+  "src/features/client-hub/lib/client-hub-data.ts",
+  "src/features/client-profile/lib/client-detail-data.ts",
+  "src/features/command-center/lib/call-log-feed.ts",
+  "src/features/command-center/lib/dashboard-data.ts",
+  "src/features/insights/lib/research-data.ts",
+  "src/features/orders/lib/order-book.ts",
+  "src/features/orders/lib/order-requirements.ts",
+  "src/features/shell/lib/page-breadcrumbs.ts",
+];
+const MOCK_READERS = ["src/mocks/**", "src/features/*/api/**", ...LEGACY_MOCK_READERS];
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -53,7 +83,10 @@ const eslintConfig = defineConfig([
     files: ["src/**"],
     rules: {
       "no-console": ["warn", { allow: ["warn", "error"] }],
-      "no-restricted-imports": ["error", { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS] }],
+      "no-restricted-imports": [
+        "error",
+        { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS, NO_MOCK_IMPORTS] },
+      ],
     },
   },
   {
@@ -61,8 +94,14 @@ const eslintConfig = defineConfig([
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS, NO_FEATURE_IMPORTS] },
+        { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS, NO_FEATURE_IMPORTS, NO_MOCK_IMPORTS] },
       ],
+    },
+  },
+  {
+    files: MOCK_READERS,
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [NO_PARENT_IMPORTS, NO_ROUTE_IMPORTS] }],
     },
   },
   globalIgnores([

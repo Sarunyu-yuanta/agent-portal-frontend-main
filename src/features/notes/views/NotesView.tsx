@@ -5,11 +5,11 @@ import { localizePath } from "@/i18n/locale-path";
 
 import { Suspense } from "react";
 import { redirect, useSearchParams } from "next/navigation";
-import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { NOTES_ENABLED } from "@/config/feature-flags";
 import { NotesSplitView } from "@/features/notes/components/NotesSplitView";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * The full note history — every note the RM has written, client-linked or

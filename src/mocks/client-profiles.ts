@@ -1,29 +1,4 @@
-export type ClientProfile = {
-  /**
-   * The trading account the client books orders under.
-   *
-   * Not the client id: one client can hold more than one account, and the
-   * booking modal prints the account the order is actually placed on. Mocked
-   * here as the client id plus a two-digit account suffix, which is the shape
-   * the real numbers take.
-   */
-  accountNo: string;
-  /** The client's name in Thai — what Order Management prints as "Full Name (TH)". */
-  nameTh: string;
-  phone: string;
-  email: string;
-  lineId?: string;
-  birthday: string;
-  age: number;
-  nationality: string;
-  address: string;
-  occupation: string;
-  company: string;
-  riskProfile: string;
-  relationshipSince: string;
-  referredBy?: string;
-  familyMembers?: { relation: string; name: string }[];
-};
+import type { AccountIdentity, ClientProfile } from "@/types/client";
 
 const PROFILES: Record<string, ClientProfile> = {
   "110001": {
@@ -214,9 +189,19 @@ export function getClientProfile(clientId: string): ClientProfile | undefined {
  * desk's client, whose bookings share a basket with this IC's, because a
  * shared book prints that much of them and no more. "—" when neither has it.
  */
-export function getAccountIdentity(clientId: string): { accountNo: string; nameTh: string } {
+export function getAccountIdentity(clientId: string): AccountIdentity {
   const own = PROFILES[clientId];
   if (own) return { accountNo: own.accountNo, nameTh: own.nameTh };
   const other = OTHER_DESK_PROFILES[clientId];
   return { accountNo: other?.accountNo ?? "—", nameTh: other?.nameTh ?? "—" };
+}
+
+/** Every account identity this IC's screens may print, keyed by client id. */
+export function getAccountIdentities(): Record<string, AccountIdentity> {
+  const directory: Record<string, AccountIdentity> = {};
+  for (const [id, other] of Object.entries(OTHER_DESK_PROFILES)) directory[id] = other;
+  for (const [id, own] of Object.entries(PROFILES)) {
+    directory[id] = { accountNo: own.accountNo, nameTh: own.nameTh };
+  }
+  return directory;
 }

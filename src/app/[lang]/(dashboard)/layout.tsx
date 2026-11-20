@@ -22,7 +22,6 @@ import {
   ORDER_BOOKING_ENABLED,
   REMINDERS_ENABLED,
 } from "@/config/feature-flags";
-import { useClientsResource } from "@/hooks/use-api";
 import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBreadcrumb";
 import { FloatingNoteButton } from "@/features/notes/components/FloatingNoteButton";
 import { usePageChrome } from "@/features/shell/lib/page-chrome";
@@ -36,6 +35,7 @@ import {
 import { useDayItemModals } from "@/features/calendar/hooks/use-day-item-modals";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const locale = useLocale();

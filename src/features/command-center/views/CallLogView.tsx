@@ -20,18 +20,18 @@ import {
   PhoneIncomingIcon,
   PhoneOutgoingIcon,
 } from "@phosphor-icons/react";
-import { useClientsResource } from "@/hooks/use-api";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { useScrollTopOnChange } from "@/hooks/use-scroll-top";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { relativeCallDate } from "@/mocks/call-log-data";
 import { CardCount } from "@/features/command-center/components/CardHeader";
 import { CallDetailModal } from "@/features/command-center/components/CallLogPanel";
 import { buildCallLog, type CallLogRow } from "@/features/command-center/lib/call-log-feed";
 import { useT } from "@/i18n/I18nProvider";
+import { relativeCallDate } from "@/features/clients/lib/call-log-format";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
 
 /**
  * Every logged call across the book, in full.

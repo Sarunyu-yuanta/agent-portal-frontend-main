@@ -11,7 +11,7 @@ import { formatDate } from "@/i18n/format";
  */
 
 import { mockClients, mockClientDetails, mockKYCData } from "@/mocks/mock-data";
-import type { CallLogEntry } from "@/mocks/call-log-data";
+import type { CallLogEntry } from "@/types/call-log";
 
 /** Per-client detail keyed by client id, aligned with the client roster. */
 export const clientDetailById = Object.fromEntries(

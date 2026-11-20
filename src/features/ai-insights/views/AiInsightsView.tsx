@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, Chip, Tag, TabGroup } from "@sarunyu/system-one";
 import { BrainIcon, SparkleIcon } from "@phosphor-icons/react";
-import { mockInsights } from "@/mocks/mock-data";
+import { useAiInsights } from "@/features/ai-insights/hooks/use-ai-insights";
 import { DetailDrawer } from "@/components/ui/detail-drawer";
 import { InsightRow } from "@/features/ai-insights/components/InsightRow";
 import { InsightDrawerPanel } from "@/features/ai-insights/components/InsightDrawerPanel";
@@ -147,15 +147,16 @@ export function AiInsightsView() {
   const [sortBy, setSortBy] = useState<SortOption>("priority");
   const [selectedInsightId, setSelectedInsightId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { data: insights } = useAiInsights();
 
   function handleSelectInsight(id: string) {
     setSelectedInsightId(id);
     setDrawerOpen(true);
   }
 
-  const selectedInsight = mockInsights.find((i) => i.id === selectedInsightId);
+  const selectedInsight = insights.find((i) => i.id === selectedInsightId);
 
-  const filteredInsights = mockInsights.filter((insight) => {
+  const filteredInsights = insights.filter((insight) => {
     if (activeTab === "all") return true;
     return insight.type === TAB_TYPE_FILTER[activeTab];
   });

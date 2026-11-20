@@ -23,8 +23,6 @@ import {
 } from "@phosphor-icons/react";
 import { SidebarUserMenu } from "./SidebarUserMenu";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
-import { IC_ROLE } from "@/features/auth/lib/current-ic";
 import {
   CALENDAR_ENABLED,
   IC_LEARNING_ENABLED,
@@ -42,6 +40,7 @@ import {
   subscribeNavVisits,
   type NavSectionKey,
 } from "@/features/shell/lib/nav-memory";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 /**
  * What the firm puts in front of you: clients and research. Shared,
@@ -329,6 +328,7 @@ export function AppSidebar({
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }) {
+  const currentIc = useCurrentIc();
   const { isPrivate, toggle } = usePrivacy();
   const t = useT();
   return (
@@ -455,7 +455,12 @@ export function AppSidebar({
           edge to edge, from the divider down to the foot of the rail. Any
           padding here would show up as a dead margin around the highlight. */}
       <div className="shrink-0 border-t border-slate-700/60">
-        <SidebarUserMenu name={NOTE_AUTHOR} role={IC_ROLE} initials="JD" collapsed={collapsed} />
+        <SidebarUserMenu
+          name={currentIc.name}
+          role={currentIc.role}
+          initials={currentIc.initials}
+          collapsed={collapsed}
+        />
       </div>
     </div>
   );

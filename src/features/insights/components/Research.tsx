@@ -24,11 +24,15 @@ import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { FadeIn } from "@/components/ui/fade-in";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Analyst } from "@/types/research";
-import { useResearch } from "@/features/catalog/hooks/use-catalog";
-import { useHasLoaded } from "@/hooks/use-api";
+import type { ResearchItem } from "@/features/insights/lib/research-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import { useHasLoaded } from "@/lib/api/resource";
+import { useResearch } from "@/features/insights/hooks/use-insights";
+
+const NO_REPORTS: ResearchItem[] = [];
+const NO_ANALYSTS: Analyst[] = [];
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -203,8 +207,10 @@ export function Research() {
 
   const { data: feed, isLoading } = useResearch();
   const hasLoaded = useHasLoaded(isLoading);
+  const reports = feed?.reports ?? NO_REPORTS;
+  const analysts = feed?.analysts ?? NO_ANALYSTS;
 
-  const filtered = feed.reports.filter((item) => {
+  const filtered = reports.filter((item) => {
     const catOk =
       activeCategory === null ||
       activeCategory === ALL_RESEARCH ||
@@ -319,11 +325,11 @@ export function Research() {
           {subTab === "analyst" ? (
             <div className="hide-scrollbar flex-1 overflow-y-auto p-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {feed.analysts.map((analyst) => (
+                {analysts.map((analyst) => (
                   <AnalystCard key={analyst.id} analyst={analyst} />
                 ))}
               </div>
-              {feed.analysts.length === 0 && (
+              {analysts.length === 0 && (
                 <EmptyState
                   size="compact"
                   icon={<UsersIcon size={32} className="text-[var(--text-default-placeholder)]" />}

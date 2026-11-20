@@ -42,7 +42,6 @@ import { SlideSteps } from "@/components/ui/slide-steps";
 import { TierBadge } from "@/components/ui/tier-badge";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { useClients } from "@/hooks/use-api";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import {
@@ -59,6 +58,7 @@ import {
 } from "@/features/orders/lib/order-proposals";
 import { useT } from "@/i18n/I18nProvider";
 import type { OrderBook, ProposalChannel } from "@/types/order";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * What a Proposal can be about — any product the IC can put in front of a

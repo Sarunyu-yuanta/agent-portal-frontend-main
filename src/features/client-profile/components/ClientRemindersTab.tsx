@@ -11,7 +11,6 @@ import {
   TableHeaderCell,
   TableCell,
 } from "@sarunyu/system-one";
-import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { CompactList } from "@/components/ui/compact-list";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -38,6 +37,7 @@ import { formatDayOnly } from "@/features/notes/lib/note-format";
 import { snippet } from "@/features/notes/lib/notes-grouping";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * What the desktop table's Status column reads off, in the order it matters

@@ -45,7 +45,7 @@ export function StockCrossSellDetail({
 
   useCatalogDetailScrollTop([kind]);
 
-  if (isLoading) return <StockCrossSellDetailSkeleton />;
+  if (isLoading || !config) return <StockCrossSellDetailSkeleton />;
 
   // Keyed so the filter state below is seeded from this kind's loaded config,
   // not from whatever was on hand before it arrived.

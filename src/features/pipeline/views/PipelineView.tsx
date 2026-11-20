@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Card, Tag, Button, Modal, Input, Dropdown, DropdownMultiple } from "@sarunyu/system-one";
 import { PlusIcon } from "@phosphor-icons/react";
-import { usePipelineDeals } from "@/hooks/use-api";
 import { ErrorState } from "@/components/ui/empty-state";
 import { StageAdvanceModal } from "@/features/pipeline/components/StageAdvanceModal";
 import { KanbanColumn } from "@/features/pipeline/components/KanbanColumn";
 import type { Stage } from "@/features/pipeline/lib/pipeline-data";
 import { useT } from "@/i18n/I18nProvider";
 import type { PipelineDeal } from "@/types/sales";
+import { usePipelineDeals } from "@/features/pipeline/hooks/use-pipeline-deals";
 
 export function PipelineView() {
   const {

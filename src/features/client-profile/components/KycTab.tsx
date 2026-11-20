@@ -22,7 +22,7 @@ import {
   WarningIcon,
   AlarmIcon,
 } from "@phosphor-icons/react";
-import { type getClientProfile } from "@/mocks/client-profiles";
+import type { ClientProfile } from "@/types/client";
 import {
   IMPORTANT_FORMS,
   formatKycDate,
@@ -45,7 +45,7 @@ export function KycTab({
   profile,
 }: {
   client: Client;
-  profile: ReturnType<typeof getClientProfile>;
+  profile: ClientProfile | undefined;
 }) {
   const locale = useLocale();
   const t = useT();

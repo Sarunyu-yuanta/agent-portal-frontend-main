@@ -7,7 +7,6 @@ import { Button } from "@sarunyu/system-one";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { ResponsiveBreadcrumb } from "@/features/shell/components/ResponsiveBreadcrumb";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { useClients, useClientsResource } from "@/hooks/use-api";
 import { useDefinitPlans } from "@/features/catalog/hooks/use-catalog";
 import { usePageBreadcrumb } from "@/features/shell/lib/page-breadcrumbs";
 import {
@@ -34,6 +33,7 @@ import { RoboRiskLevel } from "./RoboRiskLevel";
 import { AdvisoryPlansEmpty } from "./AdvisoryPlansEmpty";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
+import { useClients, useClientsResource } from "@/features/clients/hooks/use-clients";
 
 const DEFINIT_PROVIDER = "Definit x Yuanta";
 /** Figma 34315:85739 — DSS has 3 list items; DGS reserves empty 3rd row height. */

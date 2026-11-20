@@ -5,14 +5,14 @@ import { CaretDownIcon, CaretUpIcon, WalletIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tag, useIsMobile } from "@sarunyu/system-one";
 import { ProfitLossBadge, DashedDivider, StatCardRow } from "@/components/ui/finance-ui";
+import { displayAssetLabel, formatThbDecimal, parseAmount } from "@/lib/client-utils";
+import { useT } from "@/i18n/I18nProvider";
 import type {
   AssetAccountDetail,
   HoldingItem,
   HoldingSection,
   PositionSummary,
-} from "@/mocks/asset-account-details";
-import { displayAssetLabel, formatThbDecimal, parseAmount } from "@/lib/client-utils";
-import { useT } from "@/i18n/I18nProvider";
+} from "@/types/portfolio";
 
 function HoldingSummary({ sections }: { sections: HoldingSection[] }) {
   const t = useT();

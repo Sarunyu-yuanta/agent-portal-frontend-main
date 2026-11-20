@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { useAppPathname } from "@/i18n/navigation";
 import { Avatar, Button, Toaster } from "@sarunyu/system-one";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { useClientsResource } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
@@ -18,6 +17,7 @@ import {
 } from "@/features/catalog/robo-advisory/lib/portfolio-advisory-client";
 import { AdvisoryAccountTag } from "./portfolio-advisory-ui";
 import { useT } from "@/i18n/I18nProvider";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
 
 /**
  * Keeps the client a Portfolio Advisory page is being read for in `?clientId`,

@@ -24,13 +24,7 @@ import type {
   TransactionSide,
   TransactionStatus,
 } from "@/types/transaction";
-
-/** The platforms a client can trade each asset through. */
-export const TRANSACTION_CHANNELS: Record<TransactionAsset, string[]> = {
-  stock: ["Yuanta Pro", "Streaming", "Click2Win", "Mobile App", "Agent Portal"],
-  tfex: ["Yuanta Pro", "Streaming", "Agent Portal"],
-  "mutual-fund": ["Yuanta Fund Online", "Mobile App", "Agent Portal"],
-};
+import { TRANSACTION_CHANNELS } from "@/features/orders/lib/transaction-channels";
 
 const ROWS_PER_ASSET = 40;
 const DAYS_BACK = 14;

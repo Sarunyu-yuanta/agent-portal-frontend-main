@@ -88,7 +88,6 @@ import {
   GlobalBondDetailSkeleton,
 } from "./ProductDetailSkeletons";
 import { Skeleton, TabsSkeleton } from "@/components/ui/skeleton";
-import { useHasLoaded } from "@/hooks/use-api";
 import type { StructuredProduct } from "@/features/catalog/structured-product/lib/structured-product-data";
 import {
   getInvestmentSolution,
@@ -103,6 +102,7 @@ import {
 import { pageZoom } from "@/lib/page-zoom";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
+import { useHasLoaded } from "@/lib/api/resource";
 
 const SEARCH_MODAL_PADDING = 12;
 const MAX_SEARCH_RESULTS = 20;

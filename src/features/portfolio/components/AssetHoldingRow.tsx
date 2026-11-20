@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import { ProfitLossBadge } from "@/components/ui/finance-ui";
-import type { AssetAccountDetail, HoldingItem } from "@/mocks/asset-account-details";
 import { displayAssetLabel } from "@/lib/client-utils";
 import { useT } from "@/i18n/I18nProvider";
+import type { AssetAccountDetail, HoldingItem } from "@/types/portfolio";
 
 function HoldingItemRow({
   item,

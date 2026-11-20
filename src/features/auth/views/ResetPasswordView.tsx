@@ -7,25 +7,9 @@ import { Alert, Button, Input } from "@sarunyu/system-one";
 import { EyeIcon, EyeSlashIcon, CheckCircleIcon, LinkBreakIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { useT } from "@/i18n/I18nProvider";
+import { ResetLinkError, resetPassword } from "@/features/auth/api/auth.api";
 
 const MIN_PASSWORD_LENGTH = 8;
-
-/**
- * Stands in for setting the new password, which has no backend yet. The real
- * one verifies `token` and rejects with a {@link ResetLinkError} when the link
- * is expired or already used.
- */
-function resetPassword(_token: string, _password: string): Promise<void> {
-  return Promise.resolve();
-}
-
-/** The link can't be used — expired, already used, or not a real token. */
-class ResetLinkError extends Error {
-  constructor() {
-    super("reset link invalid");
-    this.name = "ResetLinkError";
-  }
-}
 
 /**
  * Reached via the reset link emailed from `/forgot-password`, which carries a

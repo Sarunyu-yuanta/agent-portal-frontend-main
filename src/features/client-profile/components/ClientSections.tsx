@@ -14,11 +14,12 @@ import {
   PhoneIncomingIcon,
   PhoneOutgoingIcon,
 } from "@phosphor-icons/react";
-import { relativeCallDate, type CallLogEntry } from "@/mocks/call-log-data";
 import { AllocationDonutWithTiles } from "@/components/charts/AllocationDonut";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useT } from "@/i18n/I18nProvider";
 import type { SortDir } from "@/types/table";
+import type { CallLogEntry } from "@/types/call-log";
+import { relativeCallDate } from "@/features/clients/lib/call-log-format";
 
 export function CurrentAllocationSection({
   slices,

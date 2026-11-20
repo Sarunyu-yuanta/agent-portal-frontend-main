@@ -8,34 +8,7 @@ import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { AuthPendingScreen } from "@/features/auth/components/AuthPendingScreen";
 import { useT } from "@/i18n/I18nProvider";
-
-/** How long the stand-in credential check below pretends to take. */
-const MOCK_AUTH_DELAY_MS = 2000;
-
-/**
- * Stands in for the credential check that has no backend yet, so the pending
- * splash gets a realistic dwell instead of flashing past.
- *
- * Deliberately shaped as a promise rather than a bare `setTimeout`, so the
- * delay is how long *this* mock happens to take and not a deadline the splash
- * is tied to: swap the body for the real request and a slow backend simply
- * keeps the splash up for as long as it needs, no other change required.
- */
-function signIn(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, MOCK_AUTH_DELAY_MS));
-}
-
-/**
- * Why a sign-in was refused. The real `signIn` should reject with one of these
- * so the form can say something useful; anything else is treated as the
- * connection failing.
- */
-class SignInError extends Error {
-  constructor(readonly reason: "credentials" | "locked") {
-    super(reason);
-    this.name = "SignInError";
-  }
-}
+import { SignInError, signIn, type Credentials } from "@/features/auth/api/auth.api";
 
 /**
  * No auth backend exists yet, so submitting goes straight to the home page
@@ -51,7 +24,9 @@ export function LoginView() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  // The credentials being checked; `null` while the form is idle.
+  const [submitted, setSubmitted] = useState<Credentials | null>(null);
+  const isAuthenticating = submitted !== null;
   const [isPending, startTransition] = useTransition();
   // Why the last attempt failed. Cleared as soon as either field changes, so
   // the message never sits under credentials it no longer describes.
@@ -60,7 +35,7 @@ export function LoginView() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setIsAuthenticating(true);
+    setSubmitted({ identifier, password });
   }
 
   // Awaited in an effect rather than in the handler so an unmount mid-request
@@ -68,10 +43,10 @@ export function LoginView() {
   // Nothing here races the wait: the splash stays up until `signIn` settles,
   // however long that takes.
   useEffect(() => {
-    if (!isAuthenticating) return;
+    if (!submitted) return;
     let cancelled = false;
 
-    signIn()
+    signIn(submitted)
       .then(() => {
         if (cancelled) return;
         startTransition(() => {
@@ -83,13 +58,13 @@ export function LoginView() {
       .catch((err: unknown) => {
         if (cancelled) return;
         setError(err instanceof SignInError ? t.auth.errors[err.reason] : t.auth.errors.network);
-        setIsAuthenticating(false);
+        setSubmitted(null);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticating, router, t]);
+  }, [submitted, router, t]);
 
   return (
     <AuthShell>

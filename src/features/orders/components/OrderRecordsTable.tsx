@@ -53,11 +53,8 @@ import {
 import { TableRowsSkeleton } from "@/components/ui/skeleton";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
 import { TABLE_EMPTY_MIN_HEIGHT, TableEmptyOverlay } from "@/components/ui/empty-state";
-import { getAccountIdentity } from "@/mocks/client-profiles";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { maskName } from "@/lib/mask-name";
 import {
   USD_THB,
@@ -89,6 +86,9 @@ import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Booking, OrderBook, ProposalLog } from "@/types/order";
 import type { SortDir } from "@/types/table";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 const COLUMNS = 5;
 const PAGE_SIZE = 12;
@@ -131,6 +131,7 @@ function buildRows(
   isPrivate: boolean,
   step: OrderStepFilter,
   proposals: ProposalLog[],
+  icName: string,
 ): OrderRow[] {
   const rows: OrderRow[] = [];
 
@@ -138,7 +139,7 @@ function buildRows(
     // `offered` is not a booking phase and `ownBookings` cannot filter by it —
     // at that step no booking qualifies, and only the offers below do.
     if (step !== "offered") {
-      for (const booking of ownBookings(book, IC_NAME, step)) {
+      for (const booking of ownBookings(book, icName, step)) {
         rows.push({
           id: booking.id,
           at: booking.createdAt,
@@ -153,7 +154,7 @@ function buildRows(
     // under "ทั้งหมด" and "ส่ง Proposal แล้ว": every other chip names a phase a
     // booking is at, and an offer is at none of them.
     if (step === null || step === "offered") {
-      for (const offer of openOffersFor(proposals, book, IC_NAME)) {
+      for (const offer of openOffersFor(proposals, book, icName)) {
         rows.push({
           id: offer.id,
           at: offer.sentAt,
@@ -230,6 +231,8 @@ export function OrderRecordsTable({
   step: OrderStepFilter;
   isLoading?: boolean;
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const locale = useLocale();
   const t = useT();
   const { isPrivate } = usePrivacy();
@@ -303,7 +306,7 @@ export function OrderRecordsTable({
   const flashRowRef = useRef<HTMLTableRowElement | null>(null);
 
   const rows = useMemo(() => {
-    const all = buildRows(books, isPrivate, step, proposals);
+    const all = buildRows(books, isPrivate, step, proposals, currentIc.name);
     const built = clientId ? all.filter((r) => r.clientId === clientId) : all;
     if (sort.dir === "none") return built;
     const sign = sort.dir === "asc" ? 1 : -1;
@@ -312,7 +315,7 @@ export function OrderRecordsTable({
       const bv = sortValue(b, sort.key);
       return sign * (av < bv ? -1 : av > bv ? 1 : 0);
     });
-  }, [books, isPrivate, step, proposals, sort, clientId]);
+  }, [books, isPrivate, step, proposals, sort, clientId, currentIc.name]);
 
   // Land on the page holding the order's first row — once, as soon as the rows
   // are there. Adjusted during render rather than in an effect, so the first

@@ -8,6 +8,7 @@ import { Noto_Sans_Thai } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { hasLocale, LOCALES } from "@/i18n/config";
 import { I18nProvider } from "@/i18n/I18nProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 const notoSansThai = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
@@ -39,7 +40,9 @@ export default async function RootLayout({
   return (
     <html lang={lang} className={cn("h-full", "font-sans", notoSansThai.variable)}>
       <body className="h-full bg-background antialiased">
-        <I18nProvider locale={lang}>{children}</I18nProvider>
+        <I18nProvider locale={lang}>
+          <QueryProvider>{children}</QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

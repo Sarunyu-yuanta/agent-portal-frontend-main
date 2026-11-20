@@ -6,8 +6,6 @@ import { TabGroup } from "@sarunyu/system-one";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { navRead, navWrite } from "@/lib/nav-session";
 import { INSIGHTS_FILTER_KEY } from "@/features/shell/lib/nav-memory";
-import { useInsightStrategies, useResearch } from "@/features/catalog/hooks/use-catalog";
-import { useHasLoaded } from "@/hooks/use-api";
 import { TabsSkeleton } from "@/components/ui/skeleton";
 import { FadeIn } from "@/components/ui/fade-in";
 import {
@@ -22,6 +20,8 @@ import {
 import { AIRecommendCard } from "@/features/insights/components/AIRecommendCard";
 import { Research } from "@/features/insights/components/Research";
 import { useT } from "@/i18n/I18nProvider";
+import { useHasLoaded } from "@/lib/api/resource";
+import { useInsightStrategies, useResearch } from "@/features/insights/hooks/use-insights";
 
 /** The Insights tab's "playbooks + sidebar" two-column split. */
 function InsightsLayout({ children }: { children: React.ReactNode }) {

@@ -795,7 +795,7 @@ export function StockTab() {
   // bring the user back to US Market after they drill into a product.
   const marketId = normalizeMarketId(searchParams.get(MARKET_PARAM));
   const { data: catalog, isLoading } = useMarketCatalog(marketId);
-  if (isLoading) return <StockTabSkeleton />;
+  if (isLoading || !catalog) return <StockTabSkeleton />;
   return (
     <div className="flex w-full flex-col">
       <MarketWatchlistRow

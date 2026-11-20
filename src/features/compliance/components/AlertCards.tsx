@@ -3,7 +3,7 @@
 import { Tag, Button } from "@sarunyu/system-one";
 import { ShieldCheckIcon, WarningCircleIcon, XCircleIcon } from "@phosphor-icons/react";
 import { EmptyState } from "@/components/ui/empty-state";
-import { mockComplianceAlerts } from "@/mocks/mock-data";
+import { useComplianceAlerts } from "@/features/compliance/hooks/use-compliance-alerts";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { maskName } from "@/lib/mask-name";
 import { useT } from "@/i18n/I18nProvider";
@@ -30,6 +30,7 @@ const ALERT_HOURS_AGO: (number | null)[] = [2, 3, 5, null];
 
 export function AlertCards() {
   const { isPrivate } = usePrivacy();
+  const { data: alerts } = useComplianceAlerts();
   const t = useT();
   const timestamp = (i: number) => {
     const h = ALERT_HOURS_AGO[i];
@@ -41,25 +42,25 @@ export function AlertCards() {
         {/* Section header — inside the card */}
         <div className="flex items-center justify-between gap-2 border-b border-border px-5 py-4">
           <p className="type-subtitle-1 text-foreground">{t.compliance.alerts.title}</p>
-          {mockComplianceAlerts.length > 0 && (
+          {alerts.length > 0 && (
             <Tag text={t.compliance.alerts.openCount(4)} variant="red" size="small" />
           )}
         </div>
-        {mockComplianceAlerts.length === 0 && (
+        {alerts.length === 0 && (
           <EmptyState
             size="compact"
             icon={<ShieldCheckIcon size={32} className="text-[var(--text-default-placeholder)]" />}
             title={t.compliance.alerts.empty}
           />
         )}
-        {mockComplianceAlerts.map((alert, i) => {
+        {alerts.map((alert, i) => {
           const meta = ALERT_META[alert.type as keyof typeof ALERT_META] ?? ALERT_META.warning;
           const severityLabel =
             t.compliance.alerts.severity[alert.type === "critical" ? "critical" : "warning"];
           const Icon = meta.Icon;
           const isPrimary =
             alert.action1 === "Escalate to Compliance" || alert.action1 === "Maintain Block";
-          const isLast = i === mockComplianceAlerts.length - 1;
+          const isLast = i === alerts.length - 1;
 
           return (
             <div

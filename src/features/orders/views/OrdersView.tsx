@@ -19,7 +19,6 @@ import { TabGroup } from "@sarunyu/system-one";
 import { FadeIn } from "@/components/ui/fade-in";
 import { TabsSkeleton } from "@/components/ui/skeleton";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { useHasLoaded } from "@/hooks/use-api";
 import { useTransactions } from "@/features/orders/hooks/use-transactions";
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
 import { catalogListHref } from "@/features/catalog/lib/product-catalog-routes";
@@ -30,6 +29,7 @@ import { TransactionsPanel } from "@/features/orders/components/TransactionsPane
 import { AllOrdersPanel } from "@/features/orders/components/AllOrdersPanel";
 import { DEFAULT_ORDER_TAB, ORDER_TABS, normalizeOrderTab } from "@/features/orders/lib/order-tabs";
 import { useT } from "@/i18n/I18nProvider";
+import { useHasLoaded } from "@/lib/api/resource";
 
 export function OrdersView() {
   const locale = useLocale();

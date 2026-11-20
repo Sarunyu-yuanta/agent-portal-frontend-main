@@ -5,9 +5,9 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { AdvisoryClientPickerModal } from "./AdvisoryClientPickerModal";
 import type { AdvisoryService } from "@/features/catalog/robo-advisory/lib/portfolio-advisory-client";
 import { ROBO_ASSETS } from "@/features/catalog/robo-advisory/lib/robo-advisory-assets";
-import { useClientsResource } from "@/hooks/use-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/i18n/I18nProvider";
+import { useClientsResource } from "@/features/clients/hooks/use-clients";
 
 const HOVER_TRANSITION = "duration-500 ease-in-out";
 

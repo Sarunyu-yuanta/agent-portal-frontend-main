@@ -33,11 +33,11 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import {
   CAMPAIGN_ACTOR,
-  mockCampaigns,
   seedCampaignClients,
   seedRsvps,
   seedShareLogs,
-} from "@/mocks/campaign-mock-data";
+} from "@/features/promotions/api/promotions.api";
+import { useCampaigns } from "@/features/promotions/hooks/use-campaigns";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import type {
   CampaignClient,
@@ -145,6 +145,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
   const [campaignClients, setCampaignClients] = useState<CampaignClient[]>(seedCampaignClients);
   const [rsvps, setRsvps] = useState<CampaignRsvp[]>(seedRsvps);
   const [shareLogs, setShareLogs] = useState<ShareLog[]>(seedShareLogs);
+  const { data: campaigns } = useCampaigns();
 
   /**
    * Seats held against this campaign right now.
@@ -154,7 +155,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
    */
   const seatsLeft = useCallback(
     (campaignId: string) => {
-      const campaign = mockCampaigns.find((c) => c.id === campaignId);
+      const campaign = campaigns.find((c) => c.id === campaignId);
       if (campaign?.seatsLeftSeed === undefined) return null;
       const seededHolders = seedRsvps.filter((r) => r.campaignId === campaignId).length;
       const holders = rsvps.filter((r) => r.campaignId === campaignId).length;
@@ -162,12 +163,12 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
       // seats taken *since* come off it.
       return Math.max(0, campaign.seatsLeftSeed - (holders - seededHolders));
     },
-    [rsvps],
+    [campaigns, rsvps],
   );
 
   const shareMaterial = useCallback<CampaignsContextValue["shareMaterial"]>(
     async ({ campaignId, clientIds, materialId }) => {
-      const campaign = mockCampaigns.find((c) => c.id === campaignId);
+      const campaign = campaigns.find((c) => c.id === campaignId);
       const material = campaign?.materials.find((m) => m.id === materialId);
       if (!material) {
         throw new CampaignRuleError(
@@ -228,7 +229,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
       setShareLogs((prev) => [...prev, ...written]);
       return written;
     },
-    [campaignClients],
+    [campaignClients, campaigns],
   );
 
   const setClientStatus = useCallback<CampaignsContextValue["setClientStatus"]>(

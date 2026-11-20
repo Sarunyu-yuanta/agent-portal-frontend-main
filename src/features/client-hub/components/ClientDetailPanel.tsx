@@ -11,10 +11,8 @@ import {
   BellIcon,
   ArrowLeftIcon,
 } from "@phosphor-icons/react";
-import { getCallLogs, relativeCallDate, type CallLogEntry } from "@/mocks/call-log-data";
 import { ClientRemindersTab } from "@/features/client-profile/components/ClientRemindersTab";
 import { kycExpiryLabel } from "@/features/client-profile/lib/client-detail-data";
-import { useClients } from "@/hooks/use-api";
 import { useNotes } from "@/features/notes/store/notes-context";
 import { ErrorState } from "@/components/ui/empty-state";
 import { useNoteEditModal } from "@/features/calendar/hooks/use-note-edit-modal";
@@ -33,16 +31,18 @@ import {
 } from "@/features/portfolio/components/ClientAssetSidebarContent";
 import { HoldingDetailContent } from "@/features/portfolio/components/HoldingDetailContent";
 import { LiabilitiesDetailContent } from "@/features/portfolio/components/LiabilitiesDetailModal";
-import type { LiabilitiesDetail } from "@/mocks/liabilities-details";
 import { TierBadge } from "@/components/ui/tier-badge";
-import {
-  getAssetAccountDetail,
-  getAssetProductDetail,
-  type AssetAccountItem,
-} from "@/mocks/asset-account-details";
 import { useLocale } from "@/i18n/I18nProvider";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
+import type { CallLogEntry } from "@/types/call-log";
+import type { AssetAccountItem, LiabilitiesDetail } from "@/types/portfolio";
+import { relativeCallDate } from "@/features/clients/lib/call-log-format";
+import {
+  useClientCallLogs,
+  useClients,
+  useHoldingDetail,
+} from "@/features/clients/hooks/use-clients";
 
 export function ClientDetailPanel({
   client,
@@ -71,7 +71,7 @@ export function ClientDetailPanel({
   const [callLogOpen, setCallLogOpen] = useState(false);
   const [remindersOpen, setRemindersOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
-  const callLogs = getCallLogs(client.id);
+  const { data: callLogs } = useClientCallLogs(client.id);
   const kycLine = kycExpiryLabel(client.id, t, locale);
   const clients = useClients();
   const { notes, isLoading: notesLoading, error: notesError, retry: retryNotes } = useNotes();
@@ -93,11 +93,10 @@ export function ClientDetailPanel({
     scrollRef.current?.scrollTo({ top: 0 });
   }, [client.id]);
 
-  const holdingDetail = detail.data
-    ? detail.data.viewMode === "account"
-      ? getAssetAccountDetail(detail.data.item.accountNo)
-      : getAssetProductDetail(detail.data.item.name)
-    : null;
+  const holdingDetail = useHoldingDetail(
+    detail.data?.viewMode ?? "account",
+    detail.data?.item ?? null,
+  );
 
   const detailTitle = holdingDetail?.viewByLabel.replace(/^view by /i, "") ?? "";
 
@@ -426,10 +425,7 @@ export function ClientDetailPanel({
             </div>
             <div className="hide-scrollbar min-h-0 flex-1 overflow-y-auto">
               <div className="flex flex-col gap-4 p-4">
-                <LiabilitiesDetailContent
-                  totalAmount={liabilities.data.amount}
-                  detail={liabilities.data.detail}
-                />
+                <LiabilitiesDetailContent detail={liabilities.data.detail} />
               </div>
             </div>
           </SlideOverPanel>

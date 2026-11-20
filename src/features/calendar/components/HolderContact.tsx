@@ -16,8 +16,8 @@ import {
 } from "@phosphor-icons/react";
 import { getInitial } from "@/lib/client-utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { getClientProfile } from "@/mocks/client-profiles";
 import { useT } from "@/i18n/I18nProvider";
+import { useClientProfile } from "@/features/clients/hooks/use-clients";
 
 /** How long the tick stays after a copy. Long enough to be seen if you glanced
  * away, short enough that the row is back to normal before you need it again. */
@@ -55,7 +55,7 @@ export function ContactChips({
   scrollerRef?: React.Ref<HTMLDivElement>;
 }) {
   const t = useT();
-  const profile = getClientProfile(clientId);
+  const { data: profile } = useClientProfile(clientId);
   if (!profile) {
     return (
       <p className={`type-caption text-muted-foreground ${className ?? ""}`}>
@@ -192,7 +192,7 @@ function CopyField({ icon, label, value }: { icon: ReactNode; label: string; val
  */
 export function ContactFields({ clientId }: { clientId: string }) {
   const t = useT();
-  const profile = getClientProfile(clientId);
+  const { data: profile } = useClientProfile(clientId);
   // No profile on file: say so rather than offering a number to call.
   if (!profile) {
     return (

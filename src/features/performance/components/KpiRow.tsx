@@ -1,21 +1,23 @@
 "use client";
 
 import { Card, Tag } from "@sarunyu/system-one";
-import { mockPerformanceData } from "@/mocks/mock-data";
+import { usePerformance } from "@/features/performance/hooks/use-performance";
 import { statusVariant } from "@/features/performance/lib/performance-data";
 import { useT } from "@/i18n/I18nProvider";
 
 export function KpiRow() {
   const t = useT();
   const k = t.performance.kpi;
+  const performance = usePerformance().data;
+  if (!performance) return null;
   const metrics = [
-    { id: "revenueYtd", label: k.revenueYtd, ...mockPerformanceData.revenueYtd },
-    { id: "aumGrowth", label: k.aumGrowth, ...mockPerformanceData.aumGrowth },
-    { id: "netNewMoney", label: k.netNewMoney, ...mockPerformanceData.netNewMoney },
+    { id: "revenueYtd", label: k.revenueYtd, ...performance.revenueYtd },
+    { id: "aumGrowth", label: k.aumGrowth, ...performance.aumGrowth },
+    { id: "netNewMoney", label: k.netNewMoney, ...performance.netNewMoney },
     {
       id: "productPenetration",
       label: k.productPenetration,
-      ...mockPerformanceData.productPenetration,
+      ...performance.productPenetration,
     },
   ];
   return (

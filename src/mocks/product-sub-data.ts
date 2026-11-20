@@ -1,10 +1,4 @@
-export type SubProduct = {
-  id: string;
-  name: string;
-  ticker?: string;
-  clientCount: number;
-  totalAmountThb: number;
-};
+import type { SubProduct } from "@/types/portfolio";
 
 export const PRODUCT_SUB_DATA: Record<string, SubProduct[]> = {
   หุ้นไทย: [

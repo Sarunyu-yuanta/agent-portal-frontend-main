@@ -9,7 +9,6 @@ import {
   FunnelSimpleIcon,
   XIcon,
 } from "@phosphor-icons/react";
-import { mockHouseViewStrategies } from "@/mocks/mock-data";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { FadeIn } from "@/components/ui/fade-in";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -18,6 +17,7 @@ import { PlaybookCardCompact } from "./PlaybookCardCompact";
 import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import type { HouseViewStrategy } from "@/types/research";
+import { useInsightStrategies } from "@/features/insights/hooks/use-insights";
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
@@ -132,7 +132,7 @@ export function StrategyPlaybooks({
   const [modalGroup, setModalGroup] = useState<ModalGroup>(null);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const all = mockHouseViewStrategies;
+  const { data: all } = useInsightStrategies();
   const filtered = filter === "All" ? all : all.filter((s) => s.category === filter);
   const isFiltered = filter !== "All";
   const groups = groupByPeriodLabel(filtered);

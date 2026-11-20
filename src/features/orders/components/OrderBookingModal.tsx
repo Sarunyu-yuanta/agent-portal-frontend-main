@@ -48,11 +48,7 @@ import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sh
 import { SLIDE_MS, SlideSteps } from "@/components/ui/slide-steps";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { useClients, useClientsResource } from "@/hooks/use-api";
 import { EmptyState, ErrorState } from "@/components/ui/empty-state";
-import { getAccountIdentity } from "@/mocks/client-profiles";
-import { getCallLogs } from "@/mocks/call-log-data";
-import { IC_NAME, IC_TEAM } from "@/features/auth/lib/current-ic";
 import { formatThbAmount, getInitial, parseAmount } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import { bookingModeFor, type BookableProduct } from "@/features/orders/lib/bookable-products";
@@ -101,6 +97,9 @@ import type {
   RequirementKey,
   RequirementStatus,
 } from "@/types/order";
+import { useClients, useClientsResource } from "@/features/clients/hooks/use-clients";
+import { useAccountIdentity, useClientCallLogs } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 /**
  * Steps that come before the client list, in the same modal — Order
@@ -357,6 +356,8 @@ function BookingForm({
   onNotice: (message: string, status: ToastStatus) => void;
   onBooked?: (booking: Booking) => void;
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const t = useT();
   const clients = useClients();
   const { isPrivate } = usePrivacy();
@@ -546,8 +547,8 @@ function BookingForm({
                         which desk. None of it is a decision — putting it after
                         the checks made the reader step over a block of facts to
                         reach the amount. */}
-                    <ReadOnlyField label={t.orders.field.icName} value={IC_NAME} />
-                    <ReadOnlyField label={t.orders.field.icTeam} value={IC_TEAM} />
+                    <ReadOnlyField label={t.orders.field.icName} value={currentIc.name} />
+                    <ReadOnlyField label={t.orders.field.icTeam} value={currentIc.team} />
                   </div>
 
                   {/* The checks keep the receipt's rows — four grey cards made
@@ -1665,7 +1666,7 @@ function EvidenceSection({
   };
   useEffect(() => stopUpload, []);
   const chosen = channel ? EVIDENCE_CHANNEL[channel] : null;
-  const calls = useMemo(() => getCallLogs(clientId), [clientId]);
+  const { data: calls } = useClientCallLogs(clientId);
   const byLog = channel === "call" && callSource === "call-log";
 
   const clearProof = () => {
@@ -1996,6 +1997,8 @@ function BookingSummary({
   evidence: OrderEvidence | null;
   cashAvailable: number;
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const t = useT();
   const { isPrivate } = usePrivacy();
   const { data: book } = useOrderBook(product.id);
@@ -2046,7 +2049,7 @@ function BookingSummary({
           label={t.orders.field.accountNo}
           value={getAccountIdentity(client.id).accountNo}
         />
-        <SheetRow label={t.orders.field.ic} value={`${IC_NAME} · ${IC_TEAM}`} />
+        <SheetRow label={t.orders.field.ic} value={`${currentIc.name} · ${currentIc.team}`} />
       </SheetBlock>
 
       {evidence && channel && (

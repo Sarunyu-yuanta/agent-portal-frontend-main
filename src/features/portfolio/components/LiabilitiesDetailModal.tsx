@@ -7,9 +7,8 @@ import { useIsMobile } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { DashedDivider } from "@/components/ui/finance-ui";
 import { AllocationDonut } from "@/components/charts/AllocationDonut";
-import type { LiabilitiesDetail, LiabilityCategory } from "@/mocks/liabilities-details";
-import { getCategoryAmount } from "@/mocks/liabilities-details";
 import { useT } from "@/i18n/I18nProvider";
+import type { LiabilitiesDetail, LiabilityCategory } from "@/types/portfolio";
 
 /**
  * Same donut as the allocation cards — it was a `conic-gradient` with a white
@@ -53,17 +52,15 @@ function LiabilitiesLegendItem({ category }: { category: LiabilityCategory }) {
 
 function LiabilityCategoryCard({
   category,
-  totalAmount,
   expanded,
   onToggle,
 }: {
   category: LiabilityCategory;
-  totalAmount: string;
   expanded: boolean;
   onToggle: () => void;
 }) {
   const t = useT();
-  const amount = getCategoryAmount(totalAmount, category.percent);
+  const amount = category.amount;
 
   const headerRow = (
     <>
@@ -139,13 +136,7 @@ function LiabilityCategoryCard({
   );
 }
 
-export function LiabilitiesDetailContent({
-  totalAmount,
-  detail,
-}: {
-  totalAmount: string;
-  detail: LiabilitiesDetail;
-}) {
+export function LiabilitiesDetailContent({ detail }: { detail: LiabilitiesDetail }) {
   const t = useT();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["debt"]));
   const allExpanded =
@@ -212,7 +203,6 @@ export function LiabilitiesDetailContent({
           <LiabilityCategoryCard
             key={category.id}
             category={category}
-            totalAmount={totalAmount}
             expanded={expandedIds.has(category.id)}
             onToggle={() => toggleId(category.id)}
           />
@@ -228,12 +218,10 @@ export function LiabilitiesDetailContent({
 
 export function LiabilitiesDetailModal({
   open,
-  totalAmount,
   detail,
   onClose,
 }: {
   open: boolean;
-  totalAmount: string;
   detail: LiabilitiesDetail;
   onClose: () => void;
 }) {
@@ -251,7 +239,7 @@ export function LiabilitiesDetailModal({
     >
       <div className="min-h-0 flex-1 overflow-y-auto pt-4 pb-6">
         <div className={`flex flex-col gap-6 ${isMobile ? "px-2" : "px-6"}`}>
-          <LiabilitiesDetailContent totalAmount={totalAmount} detail={detail} />
+          <LiabilitiesDetailContent detail={detail} />
         </div>
       </div>
     </ResponsiveBottomSheetModal>

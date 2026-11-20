@@ -19,10 +19,10 @@ import {
   UsersThreeIcon,
   type Icon as PhosphorIcon,
 } from "@phosphor-icons/react";
-import { useClients } from "@/hooks/use-api";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { usePageBreadcrumb, type Crumb } from "./page-breadcrumbs";
 import { useT } from "@/i18n/I18nProvider";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /**
  * Everything the dashboard shell needs to know about the page inside it, all

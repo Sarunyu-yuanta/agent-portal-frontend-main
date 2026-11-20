@@ -6,18 +6,9 @@ import { Alert, Button, Input } from "@sarunyu/system-one";
 import { CheckCircleIcon } from "@phosphor-icons/react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { useT } from "@/i18n/I18nProvider";
+import { requestPasswordReset } from "@/features/auth/api/auth.api";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Stands in for the reset-link request, which has no backend yet. The real
- * one should answer the same way whether or not the email is on file (the
- * confirmation copy is worded for that) and reject only when the request
- * itself fails.
- */
-function requestPasswordReset(_email: string): Promise<void> {
-  return Promise.resolve();
-}
 
 /** No auth backend exists yet — submitting just flips to the confirmation state. */
 export function ForgotPasswordView() {

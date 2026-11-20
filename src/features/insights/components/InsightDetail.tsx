@@ -3,7 +3,6 @@
 import { useLocalizedRouter } from "@/i18n/navigation";
 import { Tag, Button } from "@sarunyu/system-one";
 import { SparkleIcon, ArrowLeftIcon, FilePdfIcon } from "@phosphor-icons/react";
-import { mockHouseViewStrategies, mockAnalysts } from "@/mocks/mock-data";
 import {
   CATEGORY_TAG_VARIANT,
   getCategory,
@@ -12,14 +11,20 @@ import {
 import { RelatedProductsCard } from "./RelatedProductsCard";
 import { PlaybookCardCompact } from "./PlaybookCardCompact";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
-import { useInsightStrategy } from "@/features/catalog/hooks/use-catalog";
 import { findMutualFundInsightByDetailId } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
 import { InsightDetailSkeleton } from "./InsightDetailSkeleton";
 import { useT } from "@/i18n/I18nProvider";
 import { NotFoundState } from "@/components/ui/empty-state";
+import {
+  useAnalysts,
+  useInsightStrategies,
+  useInsightStrategy,
+} from "@/features/insights/hooks/use-insights";
 
 export function InsightDetail({ id }: { id: string }) {
   const { data: strategy, isLoading } = useInsightStrategy(id);
+  const { data: allStrategies } = useInsightStrategies();
+  const { data: analysts } = useAnalysts();
   // Called before the early return below — a missing strategy must not skip a hook.
   const goBack = useSectionBack();
   const router = useLocalizedRouter();
@@ -57,7 +62,7 @@ export function InsightDetail({ id }: { id: string }) {
   // aggregate) keep seeing every other strategy from the same period, same
   // as before.
   const isMutualFundInsight = findMutualFundInsightByDetailId(strategy.id) !== undefined;
-  const related = mockHouseViewStrategies.filter(
+  const related = allStrategies.filter(
     (s) =>
       s.periodLabel === strategy.periodLabel &&
       s.id !== strategy.id &&
@@ -120,7 +125,7 @@ export function InsightDetail({ id }: { id: string }) {
     <div className="flex flex-col gap-4">
       <h2 className="type-subtitle-1 font-bold text-foreground">{d.analysedBy}</h2>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-1">
-        {mockAnalysts.slice(0, 3).map((analyst) => (
+        {analysts.slice(0, 3).map((analyst) => (
           <div key={analyst.id} className="flex min-w-0 items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element -- small fixed-size headshot, no responsive sizes needed */}
             <img

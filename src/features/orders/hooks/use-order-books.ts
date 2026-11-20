@@ -15,7 +15,6 @@
 
 import { useMemo } from "react";
 import { useOrders } from "@/features/orders/store/orders-context";
-import type { Resource } from "@/hooks/use-api";
 import { assembleOrderBook, isBookClosed } from "@/features/orders/lib/order-book";
 import { useT } from "@/i18n/I18nProvider";
 import { clientReadiness } from "@/features/orders/lib/order-requirements";
@@ -26,6 +25,7 @@ import {
 } from "@/features/orders/lib/bookable-products";
 import type { Client } from "@/types/client";
 import type { ClientReadiness, OrderBook, RequirementRequest } from "@/types/order";
+import type { Resource } from "@/lib/api/resource";
 
 /** One product's book, or `null` when the id resolves to no product. */
 export function useOrderBook(productId: string): Resource<OrderBook | null> {

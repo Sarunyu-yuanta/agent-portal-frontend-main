@@ -52,9 +52,6 @@ import {
 import { EmptyState, ErrorState } from "@/components/ui/empty-state";
 import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { useClients } from "@/hooks/use-api";
-import { getAccountIdentity } from "@/mocks/client-profiles";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import { bookingModeFor, type BookableProduct } from "@/features/orders/lib/bookable-products";
@@ -76,6 +73,9 @@ import {
 } from "@/features/orders/lib/booking-status";
 import { useT } from "@/i18n/I18nProvider";
 import type { Booking, RequirementItem, RequirementKey, RequirementStatus } from "@/types/order";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 const PAGE_SIZE = 10;
 
@@ -158,6 +158,8 @@ export function ProductOrderSection({
   /** Where the table sits — see the module note. */
   variant?: "product" | "book";
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const t = useT();
   // Seen once is seen: leaving this tab — for Detail, or another page — clears
   // the highlight, so coming back shows an ordinary row rather than replaying
@@ -201,7 +203,10 @@ export function ProductOrderSection({
   }, []);
 
   // Only the signed-in IC's bookings — see the module note.
-  const own = useMemo(() => (book ? ownBookings(book, IC_NAME) : []), [book]);
+  const own = useMemo(
+    () => (book ? ownBookings(book, currentIc.name) : []),
+    [book, currentIc.name],
+  );
 
   const rows = useMemo(() => {
     if (!book) return [] as OrderRow[];
@@ -220,7 +225,7 @@ export function ProductOrderSection({
         getAccountIdentity(clientId).accountNo.includes(query)
       );
     });
-  }, [book, own, phase, search, isPrivate]);
+  }, [book, own, phase, search, isPrivate, getAccountIdentity]);
 
   /**
    * Every other IC's bookings, folded into one nameless line under the table —
@@ -231,7 +236,7 @@ export function ProductOrderSection({
   const others = useMemo(() => {
     if (!book || search.trim()) return null;
     const inPhase = book.allBookings.filter(
-      (b) => b.createdBy !== IC_NAME && (!phase || bookingPhase(b, book) === phase),
+      (b) => b.createdBy !== currentIc.name && (!phase || bookingPhase(b, book) === phase),
     );
     if (inPhase.length === 0) return null;
     // Cancelled amounts only count on the cancelled chip — anywhere else they
@@ -239,7 +244,7 @@ export function ProductOrderSection({
     const counted =
       phase === "cancelled" ? inPhase : inPhase.filter((b) => b.status !== "cancelled");
     return { count: inPhase.length, amount: counted.reduce((sum, b) => sum + b.amount, 0) };
-  }, [book, phase, search]);
+  }, [book, phase, search, currentIc.name]);
 
   // Each state says what it is: this used to `return null` for all three,
   // leaving a blank tab under the tab bar.
@@ -269,10 +274,10 @@ export function ProductOrderSection({
   // there is no "round being filled" to narrow the notional to.
   const notional = book.bookings.reduce((sum, b) => sum + b.amount, 0);
   const notionalIc = book.bookings
-    .filter((b) => b.createdBy === IC_NAME)
+    .filter((b) => b.createdBy === currentIc.name)
     .reduce((sum, b) => sum + b.amount, 0);
   const confirmedIc = book.bookings
-    .filter((b) => b.createdBy === IC_NAME && sentIds.has(b.id))
+    .filter((b) => b.createdBy === currentIc.name && sentIds.has(b.id))
     .reduce((sum, b) => sum + b.amount, 0);
 
   const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });

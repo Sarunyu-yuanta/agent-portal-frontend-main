@@ -27,7 +27,7 @@
 
 import campaignsRaw from "@/mocks/campaigns.json";
 import { mockClients } from "./mock-data";
-import { NOTE_AUTHOR } from "@/features/notes/lib/note-constants";
+import { MOCK_CURRENT_IC } from "@/mocks/session";
 import type {
   Campaign,
   CampaignClient,
@@ -44,7 +44,7 @@ import type {
 } from "@/types/campaign";
 
 /** Whoever is signed in — the `sentBy` on every ShareLog this session writes. */
-export const CAMPAIGN_ACTOR = NOTE_AUTHOR;
+export const CAMPAIGN_ACTOR = MOCK_CURRENT_IC.name;
 
 type RawCampaign = (typeof campaignsRaw)[number];
 type RawClientRow = RawCampaign["clients"][number];

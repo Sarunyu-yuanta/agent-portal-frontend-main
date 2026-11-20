@@ -1,6 +1,7 @@
-import { CALL_LOG_DATA, type CallLogEntry } from "@/mocks/call-log-data";
+import { CALL_LOG_DATA } from "@/mocks/call-log-data";
 import { maskName } from "@/lib/mask-name";
 import type { Client } from "@/types/client";
+import type { CallLogEntry } from "@/types/call-log";
 
 /**
  * Every logged call across the whole book, newest first.

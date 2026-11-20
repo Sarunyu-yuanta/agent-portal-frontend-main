@@ -15,19 +15,20 @@
  */
 
 import { ORDER_BOOKING_ENABLED } from "@/config/feature-flags";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { useOrderBook } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 const money = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 export function DealProgress({ productId }: { productId: string }) {
+  const currentIc = useCurrentIc();
   const t = useT();
   const { data: book } = useOrderBook(productId);
   if (!ORDER_BOOKING_ENABLED || !book) return null;
 
   const mine = book.bookings
-    .filter((b) => b.createdBy === IC_NAME)
+    .filter((b) => b.createdBy === currentIc.name)
     .reduce((sum, b) => sum + b.amount, 0);
   const used =
     book.mode === "basket" ? book.bookings.reduce((sum, b) => sum + b.amount, 0) : book.quotaUsed;

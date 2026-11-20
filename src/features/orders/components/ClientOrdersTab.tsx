@@ -18,7 +18,6 @@ import { TabGroup } from "@sarunyu/system-one";
 import { FadeIn } from "@/components/ui/fade-in";
 import { TabsSkeleton } from "@/components/ui/skeleton";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { useHasLoaded } from "@/hooks/use-api";
 import { useTransactions } from "@/features/orders/hooks/use-transactions";
 import { catalogListHref } from "@/features/catalog/lib/product-catalog-routes";
 import { setQueryState, withQuery } from "@/lib/query-state";
@@ -28,6 +27,7 @@ import { QuotaBooksPanel } from "./QuotaBooksPanel";
 import { TransactionsPanel } from "./TransactionsPanel";
 import { DEFAULT_ORDER_TAB, ORDER_TABS, normalizeOrderTab } from "@/features/orders/lib/order-tabs";
 import { useT } from "@/i18n/I18nProvider";
+import { useHasLoaded } from "@/lib/api/resource";
 
 export function ClientOrdersTab({ clientId }: { clientId: string }) {
   const t = useT();

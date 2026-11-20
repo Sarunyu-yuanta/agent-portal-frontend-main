@@ -6,7 +6,6 @@ import { CheckCircleIcon, CircleIcon, MagnifyingGlassIcon, UsersIcon } from "@ph
 import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { useClients } from "@/hooks/use-api";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import {
@@ -17,6 +16,7 @@ import {
 import { AdvisoryAccountTag } from "./portfolio-advisory-ui";
 import { useT } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 const SERVICE_TITLE: Record<AdvisoryService, string> = {
   robo: "Robo Advisory",

@@ -8,7 +8,6 @@ import {
   ReminderPreviewRow,
   RemindersPreviewEmpty,
 } from "@/features/calendar/components/reminder-preview";
-import { useClients } from "@/hooks/use-api";
 import { useStickyRailTop } from "@/hooks/use-sticky-rail";
 import {
   NBA_MESSAGE_CLIENT,
@@ -26,6 +25,7 @@ import type { HoldingsSortKey } from "@/features/client-profile/lib/client-detai
 import { useT } from "@/i18n/I18nProvider";
 import type { ClientDetail } from "@/types/client";
 import type { SortDir } from "@/types/table";
+import { useClients } from "@/features/clients/hooks/use-clients";
 
 /** How far out the Reminders card looks — past this, a reminder only shows
  *  up once you open the full Reminders tab. */

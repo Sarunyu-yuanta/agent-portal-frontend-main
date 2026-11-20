@@ -40,8 +40,6 @@ import { EmptyState, ErrorState } from "@/components/ui/empty-state";
 import { OrdersPanelSkeleton } from "./OrdersPanelSkeleton";
 import { useSectionBack } from "@/features/shell/hooks/use-section-back";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
-import { getAccountIdentity } from "@/mocks/client-profiles";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { getInitial } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import {
@@ -82,6 +80,8 @@ import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { Client } from "@/types/client";
 import type { Booking, OrderBook } from "@/types/order";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 /** One product this client holds, with their own bookings on it. */
 type Holding = { book: OrderBook; bookings: Booking[] };
@@ -98,6 +98,8 @@ export function ClientOrdersDetail({
   tabId: string;
   catalogHref: string;
 }) {
+  const currentIc = useCurrentIc();
+  const getAccountIdentity = useAccountIdentity();
   const locale = useLocale();
   const t = useT();
   const { isPrivate } = usePrivacy();
@@ -137,12 +139,12 @@ export function ClientOrdersDetail({
           // This IC's bookings for this client — the rest of the book is other
           // ICs' clients, the same filter the list applies.
           bookings: book.allBookings.filter(
-            (b) => b.clientId === client.id && b.createdBy === IC_NAME,
+            (b) => b.clientId === client.id && b.createdBy === currentIc.name,
           ),
         }))
         .filter((h) => h.bookings.length > 0)
         .sort((a, b) => b.book.productName.localeCompare(a.book.productName)),
-    [books, desk, client.id],
+    [books, desk, client.id, currentIc.name],
   );
 
   /** Their money on this desk, per currency — see `OrderRecordsTable`. */

@@ -36,10 +36,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
-import { getAccountIdentity } from "@/mocks/client-profiles";
-import { useClients } from "@/hooks/use-api";
 import { useToasts } from "@/hooks/use-toasts";
-import { IC_NAME } from "@/features/auth/lib/current-ic";
 import { maskName } from "@/lib/mask-name";
 import { setQueryState, withQuery } from "@/lib/query-state";
 import { PAGE_SIZE_OPTIONS } from "@/features/catalog/fixed-income/components/fixed-income-shared";
@@ -70,6 +67,9 @@ import { useTransactions } from "@/features/orders/hooks/use-transactions";
 import { useT } from "@/i18n/I18nProvider";
 import { useLocale } from "@/i18n/I18nProvider";
 import type { TransactionSide } from "@/types/transaction";
+import { useClients } from "@/features/clients/hooks/use-clients";
+import { useAccountIdentity } from "@/features/clients/hooks/use-clients";
+import { useCurrentIc } from "@/features/auth/hooks/use-current-ic";
 
 const COLUMNS = 6;
 const SIDES: TransactionSide[] = ["buy", "sell", "switch"];
@@ -87,6 +87,7 @@ const FALLBACK_PRODUCT = {
  *   else is as on Order Management; "สร้าง Order" books for this client.
  */
 export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
+  const currentIc = useCurrentIc();
   const t = useT();
   const pathname = useAppPathname();
   const searchParams = useSearchParams();
@@ -131,10 +132,10 @@ export function AllOrdersPanel({ clientId }: { clientId?: string } = {}) {
         trades: { stock: stock.data, tfex: tfex.data, "mutual-fund": fund.data },
         books,
         proposals,
-        icName: IC_NAME,
+        icName: currentIc.name,
         dict: t,
       }),
-    [stock.data, tfex.data, fund.data, books, proposals, t],
+    [stock.data, tfex.data, fund.data, books, proposals, t, currentIc.name],
   );
 
   const query = search.trim().toLowerCase();
@@ -429,6 +430,7 @@ function Row({
   showClient: boolean;
   onOpen?: () => void;
 }) {
+  const getAccountIdentity = useAccountIdentity();
   const locale = useLocale();
   const t = useT();
   const name = maskName(row.clientName, isPrivate);

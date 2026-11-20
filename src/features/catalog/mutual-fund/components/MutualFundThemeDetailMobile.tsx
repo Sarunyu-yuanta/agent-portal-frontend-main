@@ -112,8 +112,8 @@ export function MutualFundThemeDetailMobile({
   onFundSelect,
 }: {
   themeId: MutualFundThemeId;
-  /** The active theme, read by the page through `useMutualFundTheme`. */
-  theme: MutualFundTheme;
+  /** The active theme, read by the page through `useMutualFundTheme`; `null` until it loads. */
+  theme: MutualFundTheme | null;
   /** While the active theme loads, the back header and theme tabs stay live; everything below is skeleton. */
   isLoading?: boolean;
   /** First load of the page (fund universe): the theme tabs are skeleton too. */
@@ -167,7 +167,7 @@ export function MutualFundThemeDetailMobile({
       ) : (
         <MobileThemeTabs activeId={themeId} onSelect={onThemeChange} />
       )}
-      {isLoading || isPageLoading ? (
+      {isLoading || isPageLoading || !theme ? (
         <MutualFundTabbedListMobileBodySkeleton />
       ) : (
         <>

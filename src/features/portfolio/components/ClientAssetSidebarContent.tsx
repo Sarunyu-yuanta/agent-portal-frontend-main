@@ -10,16 +10,19 @@ import {
   LastUpdated,
   LiabilitiesBar,
 } from "./AssetSummarySection";
-import type { AssetAllocationSlice, AssetHeroSummary } from "@/types/portfolio";
+import type {
+  AssetAccountItem,
+  AssetAllocationSlice,
+  AssetHeroSummary,
+  LiabilitiesDetail,
+} from "@/types/portfolio";
 import { HoldingDetailContent } from "./HoldingDetailContent";
 import {
-  DEFAULT_ASSET_ACCOUNTS,
-  getAssetAccountDetail,
-  getAssetProductDetail,
-  type AssetAccountItem,
-} from "@/mocks/asset-account-details";
-import { getLiabilitiesDetail } from "@/mocks/liabilities-details";
-import { mockClientDetails } from "@/mocks/mock-data";
+  useClientAssetAccounts,
+  useClientDetails,
+  useHoldingDetail,
+  useLiabilities,
+} from "@/features/clients/hooks/use-clients";
 import {
   ASSET_CLASS,
   buildHeroSummaryFromClient,
@@ -105,7 +108,7 @@ export function ClientAssetSidebarContent({
   heroSummary,
   liabilities,
   allocationSlices = ALLOCATION_SLICES,
-  assetAccounts = DEFAULT_ASSET_ACCOUNTS,
+  assetAccounts: assetAccountsProp,
   accordionCards,
   onItemClick,
   onLiabilitiesOpen,
@@ -118,7 +121,7 @@ export function ClientAssetSidebarContent({
   assetAccounts?: AssetAccountItem[];
   accordionCards?: boolean;
   onItemClick?: (item: AssetAccountItem, viewMode: AssetListViewMode) => void;
-  onLiabilitiesOpen?: (amount: string, detail: ReturnType<typeof getLiabilitiesDetail>) => void;
+  onLiabilitiesOpen?: (amount: string, detail: LiabilitiesDetail) => void;
 }) {
   const locale = useLocale();
   const t = useT();
@@ -127,7 +130,9 @@ export function ClientAssetSidebarContent({
   // Desktop list+detail layout (accordionCards): key of the row whose detail
   // is shown in the side panel, or null to show the summary there instead.
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const detail = mockClientDetails[clientId];
+  const detail = useClientDetails().data[clientId];
+  const fetchedAccounts = useClientAssetAccounts(clientId).data;
+  const assetAccounts = assetAccountsProp ?? fetchedAccounts;
   const summary = heroSummary ?? detail?.assetSummary ?? buildHeroSummaryFromClient(client, locale);
 
   const liabilitiesAmount = liabilities ?? formatLiabilitiesStr(client.aum);
@@ -135,7 +140,10 @@ export function ClientAssetSidebarContent({
   const slices = detail?.assetSummary?.allocationSlices ?? allocationSlices;
 
   const lastUpdatedLabel = `${summary.lastUpdatedDate} - ${summary.lastUpdatedTime}`;
-  const liabilitiesDetail = getLiabilitiesDetail(liabilitiesAmount, lastUpdatedLabel);
+  const liabilitiesDetail = useLiabilities(liabilitiesAmount, lastUpdatedLabel);
+  const openLiabilities = () => {
+    if (liabilitiesDetail) onLiabilitiesOpen?.(liabilitiesAmount, liabilitiesDetail);
+  };
 
   const listItems =
     viewMode === "account" ? assetAccounts : buildProductItems(summary.netValue, slices);
@@ -167,25 +175,18 @@ export function ClientAssetSidebarContent({
     />
   );
 
-  if (accordionCards) {
-    const selectedIndex = cardKeys.findIndex((k) => k === selectedKey);
-    const selectedItem = selectedIndex >= 0 ? listItems[selectedIndex] : null;
-    const selectedDetail = selectedItem
-      ? viewMode === "account"
-        ? getAssetAccountDetail(selectedItem.accountNo)
-        : getAssetProductDetail(selectedItem.name)
-      : null;
+  const selectedIndex = cardKeys.findIndex((k) => k === selectedKey);
+  const selectedItem = accordionCards && selectedIndex >= 0 ? listItems[selectedIndex] : null;
+  const selectedDetail = useHoldingDetail(viewMode, selectedItem);
 
+  if (accordionCards) {
     return (
       <div className="w-full">
         {/* Mobile / tablet — stacked, tap-to-expand-inline (no room for a side panel) */}
         <div className="flex flex-col gap-6 lg:hidden">
           <div className="flex flex-col gap-2">
             <HeroCard summary={summary} />
-            <LiabilitiesBar
-              amount={liabilitiesAmount}
-              onClick={() => onLiabilitiesOpen?.(liabilitiesAmount, liabilitiesDetail)}
-            />
+            <LiabilitiesBar amount={liabilitiesAmount} onClick={openLiabilities} />
             <LastUpdated summary={summary} />
           </div>
 
@@ -264,10 +265,7 @@ export function ClientAssetSidebarContent({
 
           <div className="sticky top-24 flex flex-col gap-2">
             <HeroCard summary={summary} />
-            <LiabilitiesBar
-              amount={liabilitiesAmount}
-              onClick={() => onLiabilitiesOpen?.(liabilitiesAmount, liabilitiesDetail)}
-            />
+            <LiabilitiesBar amount={liabilitiesAmount} onClick={openLiabilities} />
             <LastUpdated summary={summary} />
             {selectedItem && selectedDetail && (
               <div
@@ -291,10 +289,7 @@ export function ClientAssetSidebarContent({
       <div className="bg-gradient-to-b from-white to-[#f3f4f6]">
         <div className="flex w-full flex-col items-center gap-2 p-4">
           <HeroCard summary={summary} />
-          <LiabilitiesBar
-            amount={liabilitiesAmount}
-            onClick={() => onLiabilitiesOpen?.(liabilitiesAmount, liabilitiesDetail)}
-          />
+          <LiabilitiesBar amount={liabilitiesAmount} onClick={openLiabilities} />
           <LastUpdated summary={summary} />
         </div>
       </div>

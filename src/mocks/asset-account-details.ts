@@ -1,15 +1,11 @@
 import { formatThbDecimal, parseAmount } from "@/lib/client-utils";
-
-export type AssetAccountItem = {
-  name: string;
-  accountNo: string;
-  value: string;
-  changeAmount?: string;
-  changePercent?: string;
-  changePositive?: boolean;
-  avgYield?: string;
-  statusIcon: string;
-};
+import type {
+  AssetAccountDetail,
+  AssetAccountItem,
+  HoldingItem,
+  HoldingSection,
+  PositionSummary,
+} from "@/types/portfolio";
 
 export const DEFAULT_ASSET_ACCOUNTS: AssetAccountItem[] = [
   {
@@ -74,40 +70,6 @@ export const DEFAULT_ASSET_ACCOUNTS: AssetAccountItem[] = [
     statusIcon: "/asset-allocation/status-6.svg",
   },
 ];
-
-export type PositionField = {
-  /** Its label is `t.client.assets.position[id]`. */
-  id: "avgCost" | "currentPrice" | "costAmount" | "marketValue" | "quantity";
-  value: string;
-};
-
-export type PositionSummary = {
-  fields: PositionField[];
-};
-
-export type HoldingItem = {
-  id: string;
-  symbol: string;
-  fullName: string;
-  value: string;
-  changeAmount: string;
-  changePercent: string;
-  changePositive: boolean;
-  collateral?: boolean;
-  /** Units held. Combined with value/changeAmount to derive average cost, current price, etc. */
-  quantity?: number;
-  position?: PositionSummary;
-};
-
-export type HoldingSection = {
-  title: string;
-  items: HoldingItem[];
-};
-
-export type AssetAccountDetail = {
-  viewByLabel: string;
-  sections: HoldingSection[];
-};
 
 const THAI_STOCK_SECTION: HoldingSection = {
   title: "หุ้นไทย",

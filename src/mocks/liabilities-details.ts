@@ -1,24 +1,7 @@
 import { parseAmount } from "@/lib/client-utils";
+import type { LiabilitiesDetail, LiabilityCategory, LiabilitySubItem } from "@/types/portfolio";
 
-export type LiabilitySubItem = {
-  label: string;
-  amount: string;
-};
-
-export type LiabilityCategory = {
-  id: string;
-  label: string;
-  percent: number;
-  color: string;
-  subItems: LiabilitySubItem[];
-};
-
-export type LiabilitiesDetail = {
-  categories: LiabilityCategory[];
-  lastUpdated: string;
-};
-
-const BASE_CATEGORIES: Omit<LiabilityCategory, "subItems">[] = [
+const BASE_CATEGORIES: Omit<LiabilityCategory, "subItems" | "amount">[] = [
   { id: "debt", label: "ภาระหนี้", percent: 42, color: "#8B1538" },
   { id: "payable", label: "ยอดค้างจ่าย", percent: 28, color: "#E11D48" },
   { id: "receivable", label: "ยอดค้างรับ", percent: 20, color: "#0A6EE7" },
@@ -82,6 +65,7 @@ export function getLiabilitiesDetail(totalAmount: string, lastUpdated: string): 
 
     return {
       ...category,
+      amount: formatAmount(categoryTotal),
       subItems: scaleSubItems(BASE_SUB_ITEMS[category.id], categoryTotal),
     };
   });
@@ -90,9 +74,4 @@ export function getLiabilitiesDetail(totalAmount: string, lastUpdated: string): 
     categories,
     lastUpdated,
   };
-}
-
-export function getCategoryAmount(totalAmount: string, percent: number): string {
-  const total = parseAmount(totalAmount) || BASE_TOTAL;
-  return formatAmount(Math.round(total * (percent / 100)));
 }
