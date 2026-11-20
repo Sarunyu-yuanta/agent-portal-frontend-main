@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint && npm run test",
+    "check:bundle": "node scripts/check-client-bundle.mjs",
     "prepare": "husky",
     "logos": "node scripts/generate-underlying-logos.mjs",
     "covers": "node scripts/generate-campaign-covers.mjs",
