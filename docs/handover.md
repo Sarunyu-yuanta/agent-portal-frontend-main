@@ -7,10 +7,11 @@ Design system: `@sarunyu/system-one`
 
 ## สถานะ
 
-**Frontend ล้วน ยังไม่มี Backend** — ไม่มี `fetch`, ไม่มี API route และไม่อ่าน env var เลยสักตัว
+**Frontend ล้วน ยังไม่มี Backend** — ทุก endpoint ตอบจาก mock ในบันเดิล (`NEXT_PUBLIC_API_MODE=mock`)
+แต่ชั้นต่อ API พร้อมแล้ว: HTTP client, TanStack Query, env config — ดู [docs/architecture.md](architecture.md)
 มี `src/proxy.ts` (ชื่อใหม่ของ middleware ใน Next 16) ตัวเดียว ใช้แค่เลือกภาษา — ดู [ภาษา (TH / EN)](#ภาษา-th--en)
 
-ข้อมูลทั้งหมด: `src/data/*.json` → `lib/*-mock-data.ts` → hooks / stores → หน้าจอ
+ข้อมูลทั้งหมด: `src/mocks/*` → endpoint (`src/features/<feature>/api/*.api.ts`) → hook → หน้าจอ
 
 **Phase 2** — ทุกฟีเจอร์ที่เคยถูกปิดใน Phase 1 (Notes, Calendar, Reminders, Call log)
 เปิดกลับมาแล้ว ส่วนเมนูกลุ่ม Growth ยังซ่อนจาก sidebar ดู [Feature flags](#feature-flags)
@@ -23,7 +24,7 @@ Design system: `@sarunyu/system-one`
 ```
 IC / RM  →  IC Portal (repo นี้)  →  BFF / API (ยังไม่มี ต้องสร้าง)  →  ระบบหลังบ้าน
                  │
-                 └─ วันนี้อ่านจาก src/data/*.json แทน
+                 └─ วันนี้ตอบจาก src/mocks แทน (ทีละ endpoint)
 ```
 
 ระบบหลังบ้านที่ Portal ต้องได้ข้อมูล แบ่งเป็น 6 กลุ่ม
@@ -45,60 +46,75 @@ IC / RM  →  IC Portal (repo นี้)  →  BFF / API (ยังไม่ม�
 
 ## ชั้นข้อมูล
 
-หน้าจอไม่อ่าน JSON ตรง ๆ แต่อ่านผ่าน hook ที่คืน
+หน้าจออ่านข้อมูลผ่าน hook ที่คืน `Resource<T>` (`src/lib/api/resource.ts`)
 
 ```ts
 type Resource<T> = {
   data: T;
   isLoading: boolean;
-  error: Error | null; // โหลดไม่สำเร็จ
+  error: Error | null; // โหลดครั้งแรกไม่สำเร็จ
   isStale: boolean; // มีข้อมูลเก่าอยู่ แต่รอบล่าสุดดึงไม่สำเร็จ
   retry: () => void;
 };
 ```
 
 **ทุกหน้ามี Skeleton, ErrorState และ empty / not-found state เตรียมไว้แล้ว ผูกกับ field เหล่านี้**
-ตอนนี้ `isLoading` เป็น `false` และ `error` เป็น `null` ตลอด เพราะข้อมูลอยู่ในบันเดิล —
-พอต่อ API จริงทุก state จะทำงานเองโดยไม่ต้องแก้ component ดู [สถานะของหน้าจอ](#สถานะของหน้าจอ-loading--error--empty--not-found)
+ในโหมด mock ข้อมูลพร้อมตั้งแต่ frame แรก (`isLoading` = `false`) — พอต่อ API จริง state ต่าง ๆ
+ทำงานเองโดยไม่ต้องแก้ component ดู [สถานะของหน้าจอ](#สถานะของหน้าจอ-loading--error--empty--not-found)
 
-## ต่อ API — แก้เฉพาะไฟล์ใน seam
+## ต่อ API — เพิ่ม `http` ให้ endpoint ทีละตัว
 
-### ฝั่งอ่าน (read hooks)
+รายละเอียดเต็มอยู่ใน [docs/architecture.md](architecture.md) สรุปสั้น ๆ:
 
-| ไฟล์                                                    | hook ข้อมูล | ครอบคลุม                                                                              |
-| ------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------ |
-| `src/hooks/use-api.ts`                                 | 8         | ลูกค้า, profile, call log, บัญชีสินทรัพย์, NBA, Pipeline, Mini Kanban                       |
-| `src/features/catalog/hooks/use-catalog.ts`            | ~32       | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit) + Insights / Research |
-| `src/features/command-center/hooks/use-risk-alerts.ts` | 2         | Risk & Compliance alerts                                                             |
-| `src/features/promotions/hooks/use-campaigns.ts`       | 2         | Promotion / Events                                                                   |
-| `orders/use-order-books.ts`                            | 9         | Order book (อ่านจาก `OrdersProvider`)                                                 |
-| `orders/use-transactions.ts`                           | 1         | รายการซื้อขาย Stock / TFEX / MF                                                        |
+1. ตั้ง `.env.local` — `NEXT_PUBLIC_API_MODE=http` และ `NEXT_PUBLIC_API_BASE_URL=...` (ดู `.env.example`)
+2. เปิดไฟล์ endpoint ของ feature นั้น เช่น `src/features/clients/api/clients.api.ts` แล้วเพิ่ม `http`:
 
-เปลี่ยน body จาก `useStatic(mock)` เป็น `useResource(label, fetcher, mock)`
-argument ตัวที่ 3 คือค่าเริ่มต้นก่อนข้อมูลมา **ให้ใส่ค่าว่าง (`[]`, `null`) ไม่ใช่ mock** —
-ถ้าใส่ mock ตอน API ล่มจะเห็นข้อมูลปลอมแทนที่จะเห็น ErrorState — `useResource` poll ทุก 5 นาที
-และ timeout ที่ 8 วินาที (`src/hooks/use-api.ts`)
+```ts
+export const clientsEndpoint = defineEndpoint("clients", {
+  mock: () => mockClients,
+  http: (signal) => apiFetch("/clients", { schema: clientListSchema, signal }),
+});
+```
+
+endpoint ที่ยังไม่มี `http` จะตอบจาก mock ต่อไปแม้อยู่ในโหมด `http` — ต่อทีละตัวได้
+**hook และหน้าจอไม่ต้องแก้** ค่า `fallback` ที่ hook ส่งให้ `useEndpoint` เป็นค่าว่าง (`[]`, `null`) เสมอ
+ไม่ใช่ mock — API ล่มต้องเห็น ErrorState ไม่ใช่ข้อมูลปลอม
+
+### ฝั่งอ่าน (endpoint ตาม feature)
+
+| ไฟล์                                                     | ครอบคลุม                                                                     |
+| ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/features/clients/api/clients.api.ts`               | ลูกค้า, Client 360 detail, KYC, profile, call log, บัญชี/holdings, หนี้สิน, เลขบัญชี |
+| `src/features/catalog/api/catalog.api.ts`               | Product Catalog ทั้งหมด (SP, bond, หุ้นกู้, กองทุน, หุ้น, Robo/Definit)              |
+| `src/features/insights/api/insights.api.ts`             | House View, นักวิเคราะห์, Research                                             |
+| `src/features/command-center/api/command-center.api.ts` | NBA, Risk & Compliance alerts                                               |
+| `src/features/compliance/api/compliance.api.ts`         | Compliance alerts                                                           |
+| `src/features/promotions/api/promotions.api.ts`         | Promotion / Events (+ seed ของ store)                                       |
+| `src/features/orders/api/*.api.ts`                      | รายการซื้อขาย Stock / TFEX / MF (+ seed ของ `OrdersProvider`)                 |
+| `src/features/auth/api/*.api.ts`                        | IC ที่ล็อกอินอยู่ (`useCurrentIc`), sign-in / reset password                      |
+| `ai-insights`, `pipeline`, `performance` (`api/`)       | หน้าต้นแบบที่ยังไม่อยู่ใน sidebar                                                   |
 
 target type อยู่ที่ `src/types/*.ts` (แยกไฟล์ตาม domain)
 
 ### ฝั่งเขียน (stores)
 
 mutator ทุกตัวเป็น `async` และทุกที่เรียกใช้ `await` อยู่แล้ว — ต่อ endpoint จริงแก้ในไฟล์ store ไฟล์เดียว
+(คำสั่งแบบไม่มี state เช่น sign-in ใช้ `defineMutation` ใน `src/lib/api/mutation.ts`)
 
-| Store                            | mutators                                                                        | หมายเหตุ                                    |
-| -------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------ |
-| `contexts/orders-context.tsx`    | `placeOrder`, `cancelBooking`, submit, `sendRequirementRequest`, `sendProposal` | มี **timer จำลองระบบภายนอก 3 ตัว** — ดูด้านล่าง |
-| `contexts/notes-context.tsx`     | `addNote`, `editNote`, `removeNote`                                             | React state ล้วน — reload แล้วหาย            |
-| `contexts/campaigns-context.tsx` | `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus`          | กฎ 3 ข้อในไฟล์ต้องบังคับที่ server ด้วย            |
+| Store                                                 | mutators                                                                        | หมายเหตุ                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------ |
+| `src/features/orders/store/orders-context.tsx`        | `placeOrder`, `cancelBooking`, submit, `sendRequirementRequest`, `sendProposal` | มี **timer จำลองระบบภายนอก 3 ตัว** — ดูด้านล่าง |
+| `src/features/notes/store/notes-context.tsx`          | `addNote`, `editNote`, `removeNote`                                             | React state ล้วน — reload แล้วหาย            |
+| `src/features/promotions/store/campaigns-context.tsx` | `shareMaterial`, `setClientStatus`, `registerClients`, `setRsvpStatus`          | กฎ 3 ข้อในไฟล์ต้องบังคับที่ server ด้วย            |
 
 ## ⚠️ ต้องรู้ก่อนออกแบบ API
 
 **API จะส่ง shape แบบไหนมาก็ได้** — mock ในโปรเจกต์เป็นแค่ตัวอย่างว่าอยากได้ข้อมูลอะไร
 ไม่ใช่ข้อกำหนดว่า response ต้องหน้าตาแบบนี้
 
-จุดที่รับความต่างคือ **`fetcher`** ที่ส่งเข้า `useResource` — จะ `snake_case`, ซ้อนหลายชั้น,
-ชื่อ field ไม่ตรง, หน่วยต่างกัน ก็เขียน map เข้า type ใน `types/domain.ts` ในฟังก์ชันเดียว
-**หน้าจอไม่ต้องแก้เลย** (ถ้าต้องการตรวจ response ตอน runtime ให้ validate ใน fetcher เดียวกันนี้)
+จุดที่รับความต่างคือ **`http` ของ endpoint** — จะ `snake_case`, ซ้อนหลายชั้น,
+ชื่อ field ไม่ตรง, หน่วยต่างกัน ก็ map เข้า type ใน `src/types/*.ts` ในฟังก์ชันนั้นที่เดียว
+**หน้าจอไม่ต้องแก้เลย** ตรวจ response ตอน runtime ด้วย zod ผ่าน option `schema` ของ `apiFetch`
 
 ตัวเลขใน `clients.json` เป็นค่าดิบ ไม่ใช่ข้อความจัดรูปแล้ว — จัดรูปตอน render:
 
@@ -123,17 +139,19 @@ plYtdPct  = 12.4        (percent)      → formatPlYtdPct() → "+12.4%"
 - `resolveFixedIncomeCompany` — สังเคราะห์บริษัทจากรายการหุ้นกู้เมื่อไม่มี record
 - Structured products — `meta.allCount: 328` ใช้แสดงผลเท่านั้น ข้อมูลจริงมี 20 รายการ ที่เหลือ clone
 
-**`clientId` → ชื่อลูกค้า join ที่ import time** ใน `lib/mock-data.ts`
+**`clientId` → ชื่อลูกค้า join ที่ import time** ใน `src/mocks/mock-data.ts`
 (NBA, Pipeline, Insights, KYC, Compliance alerts, Order books — ชื่อลูกค้าอยู่ใน
 `clients.json` ที่เดียว) ต้องตัดสินใจว่า API embed ชื่อมาให้ หรือ frontend join เอง
 
-**IC ที่ล็อกอินอยู่เป็นค่าคงที่** — ชื่อ ตำแหน่ง และทีม/สาขา (`BGN1A01`) อยู่ใน
-`src/features/auth/lib/current-ic.ts` หน้า `/login` กดแล้วเข้า `/client-hub` (ตามภาษาที่เลือก) เลย ไม่มีการตรวจสิทธิ์
-ต่อ backend แล้วทั้งสามค่าต้องมาจาก session
+**IC ที่ล็อกอินอยู่มาจาก `useCurrentIc()`** — ตอนนี้ endpoint `currentIcEndpoint`
+(`src/features/auth/api/session.api.ts`) ตอบจาก `src/mocks/session.ts`
+หน้า `/login` เรียก `signIn` (stand-in หน่วง 2 วินาที) แล้วเข้า `/` เลย ไม่มีการตรวจสิทธิ์
+ต่อ backend: เพิ่ม `http` ให้ `currentIcEndpoint` และ `signIn`, ตั้ง token ผ่าน `setAuthHeaderProvider`
+(`src/lib/api/http.ts`) และเพิ่ม route guard ใน `src/proxy.ts`
 
 **Notes เป็น React state ล้วน** — optimistic create + map `localId → serverId`
 ที่รองรับ async ถูกถอดออกแล้ว ถ้าต้องการกู้ได้จาก
-`git show d2c4623:src/contexts/notes-context.tsx`
+`git show d2c4623:src/contexts/notes-context.tsx` (path ก่อนย้ายโครงสร้าง)
 
 ## Feature flags
 
@@ -189,7 +207,7 @@ Reminders แสดงเป็นรายการ ทั้งคู่อย
 
 ## Promotion / Events
 
-เก็บใน `contexts/campaigns-context.tsx` (React state, seed จาก `lib/campaign-mock-data.ts`)
+เก็บใน `src/features/promotions/store/campaigns-context.tsx` (React state, seed จาก `src/mocks/campaign-mock-data.ts`)
 ลิงก์ใน sidebar ถูกซ่อนด้วย `PROMOTIONS_ENABLED` แต่ provider mount อยู่ใน layout เสมอ
 กฎที่ต้องบังคับฝั่ง server ด้วยเมื่อต่อ backend:
 
@@ -302,18 +320,22 @@ isLoading → error → not-found → empty → data
 ไม่ถือ skeleton ให้ route page ถือแทน ห้ามใช้ timer หรือ flag จำลอง loading
 
 **View state อยู่ใน URL ไม่ใช่ `useState`** — dashboard layout ไม่ remount ตอนเปลี่ยนหน้า
-`useState` จะหาย (`lib/query-state.ts`, `lib/nav-memory.ts`)
+`useState` จะหาย (`src/lib/query-state.ts`, `src/features/shell/lib/nav-memory.ts`)
 
-**Column filter ของ Client 360 จำถาวร** ผ่าน `lib/preferences.ts` (localStorage)
+**Column filter ของ Client 360 จำถาวร** ผ่าน `src/lib/preferences.ts` (localStorage)
 filter อื่นรีเซ็ตทุก refresh โดยตั้งใจ
 
 **รูป** — ไฟล์ใหญ่ใช้ `next/image`, ไอคอน SVG ใช้ `<img>` เพราะ image optimizer
 ไม่รับ SVG (ตอบ 400) ทุกจุดที่เป็น `<img>` มีคอมเมนต์บอกเหตุผลไว้
 
+โครงสร้างโฟลเดอร์, กฎ import, styling token และ coding convention ดู
+[`architecture.md`](architecture.md) และ [`../CONTRIBUTING.md`](../CONTRIBUTING.md)
+
 ## เอกสารอื่น
 
 | ไฟล์                                                  | เนื้อหา                                                            |
 | ---------------------------------------------------- | ---------------------------------------------------------------- |
+| [`architecture.md`](architecture.md)                 | **โครงสร้างโค้ด ชั้นข้อมูล และวิธีต่อ API** — อ่านคู่กับไฟล์นี้                  |
 | [`api-by-page.md`](api-by-page.md)                   | **แต่ละหน้า แต่ละส่วน ต้องการข้อมูลอะไรจาก API** — เริ่มที่นี่ถ้าจะออกแบบ API  |
 | [`mock-data-inventory.md`](mock-data-inventory.md)   | รายการข้อมูลทุกชุด — **ใช้อ้างอิงตอนออกแบบ API**                        |
 | [`order-booking.md`](order-booking.md)               | ฟีเจอร์จองคำสั่งซื้อ และจุดที่ต้องต่อ backend                               |

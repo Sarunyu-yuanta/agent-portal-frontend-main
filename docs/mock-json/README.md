@@ -2,11 +2,11 @@
 
 Every mock data domain from [`../mock-data-inventory.md`](../mock-data-inventory.md), as plain JSON files, for reference.
 
-Synced with the code on **2026-11-17**. 23 files are byte-for-byte copies of `src/data/*.json`. The other 15 don't exist as JSON anywhere in the codebase — they're hardcoded in `.ts`/`.tsx` files and were extracted here by running those modules, so everything is in one place. Where a file's content is scaled, synthesized or computed at runtime rather than stored as-is, that's called out below.
+Synced with the code on **2026-11-17**. 23 files are byte-for-byte copies of `src/mocks/*.json`. The other 15 don't exist as JSON anywhere in the codebase — they're hardcoded in `.ts`/`.tsx` files and were extracted here by running those modules, so everything is in one place. Where a file's content is scaled, synthesized or computed at runtime rather than stored as-is, that's called out below.
 
-**This folder is a snapshot.** `src/data/` is the source of truth; if the two ever disagree, the code wins. To refresh: copy `src/data/*.json` over the first table's files, and re-extract the second table's from the source modules listed.
+**This folder is a snapshot.** `src/mocks/` is the source of truth; if the two ever disagree, the code wins. To refresh: copy `src/mocks/*.json` over the first table's files, and re-extract the second table's from the source modules listed.
 
-## Copied verbatim from `src/data/`
+## Copied verbatim from `src/mocks/`
 
 | File | Doc section | Notes |
 |---|---|---|
@@ -38,12 +38,12 @@ Synced with the code on **2026-11-17**. 23 files are byte-for-byte copies of `sr
 
 | File | Doc section | Source |
 |---|---|---|
-| `analysts.json` | 1.12 | `mockAnalysts` in `src/lib/mock-data.ts` |
-| `call-log.json` | 2.1 | `src/data/call-log-data.ts` — keyed by clientId; a client with no entry falls back to the `"default"` key |
-| `client-profiles.json` | 2.2 | `src/data/client-profiles.ts` (via `getClientProfile`) — includes `accountNo` and `nameTh`; `"default"` is the fallback profile |
-| `liabilities-template.json` | 2.3 | `src/data/liabilities-details.ts` — **not per-client data**: one template rescaled at render time to a client's total liabilities |
-| `asset-account-details.json` | 2.4 | `src/data/asset-account-details.ts` — `defaultAssetAccounts` is **the same list for every client**; `assetAccountDetails` keyed by account number, `assetProductDetails` by asset-class label. The derived `position` block (avg cost, current price) is omitted |
-| `product-sub-data.json` | 2.5 | `src/data/product-sub-data.ts` — keyed by asset-class label; cash has no entry |
+| `analysts.json` | 1.12 | `mockAnalysts` in `src/mocks/mock-data.ts` |
+| `call-log.json` | 2.1 | `src/mocks/call-log-data.ts` — keyed by clientId; a client with no entry falls back to the `"default"` key |
+| `client-profiles.json` | 2.2 | `src/mocks/client-profiles.ts` (via `getClientProfile`) — includes `accountNo` and `nameTh`; `"default"` is the fallback profile |
+| `liabilities-template.json` | 2.3 | `src/mocks/liabilities-details.ts` — **not per-client data**: one template rescaled at render time to a client's total liabilities |
+| `asset-account-details.json` | 2.4 | `src/mocks/asset-account-details.ts` — `defaultAssetAccounts` is **the same list for every client**; `assetAccountDetails` keyed by account number, `assetProductDetails` by asset-class label. The derived `position` block (avg cost, current price) is omitted |
+| `product-sub-data.json` | 2.5 | `src/mocks/product-sub-data.ts` — keyed by asset-class label; cash has no entry |
 | `calendar-market-feed.json` | 4.1 | `marketFeed()` in `calendar/mock-market-feed.ts` — **one month's output (September 2026), not stored data**. `XC` and `quarterly-briefing` are deliberately unknown codes, to prove the fallback path |
 | `performance-page-extras.json` | 4.2 | `performance/performance-data.ts` (`GAP_ITEMS`, `AI_STEPS`) — colour fields dropped |
 | `house-view-extras.json` | 4.3 | `insights/house-view-data.ts` — `strategyDetail` keyed by strategy id, `insightDetail` by insight id |
@@ -56,6 +56,6 @@ Synced with the code on **2026-11-17**. 23 files are byte-for-byte copies of `sr
 
 ## Not here
 
-- **Transactions** (1.7c) — generated deterministically in `src/lib/transaction-mock-data.ts`; nothing stored to copy.
+- **Transactions** (1.7c) — generated deterministically in `src/mocks/transaction-mock-data.ts`; nothing stored to copy.
 - **Thai structured, stocks / ETF / DR, Robo-Advisory / Definit, product trending** (3.3a, 3.7–3.9) — inline TS under `client/[id]/`, not yet extracted.
 - `command-center.json` was removed: its source (`command-center-data.ts`) no longer exists. The Command Center now derives everything from the datasets above.

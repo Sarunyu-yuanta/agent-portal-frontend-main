@@ -268,7 +268,7 @@ Voice AI ต่ออยู่ แค่บันทึก log ที่ใช�
 
 ทุก mutator เป็น `async` และทุกที่เรียกใช้ `await` อยู่แล้ว — เปลี่ยนเป็น endpoint จริง
 แก้ไฟล์นี้ไฟล์เดียว `isLoading` อยู่ใน contract และเป็น `false` ตลอด ด้วยเหตุผลเดียวกับ
-`useStatic` คือหน้าจอผูก skeleton ไว้กับมันแล้ว
+`staticResource` คือหน้าจอผูก skeleton ไว้กับมันแล้ว
 
 ---
 
@@ -282,7 +282,7 @@ Voice AI ต่ออยู่ แค่บันทึก log ที่ใช�
 | `src/features/orders/store/orders-context.tsx`    | store (เขียนได้) — mount ใน dashboard layout       |
 | `orders/bookable-products.ts`                     | **ขอบเขต** — โต๊ะไหนจองได้ และ id → สินค้า           |
 | `orders/order-requirements.ts`                    | ตรรกะ 4 ข้อ + ลิงก์ที่ใช้แก้แต่ละข้อ                      |
-| `src/features/auth/lib/current-ic.ts`             | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม                   |
+| `src/features/auth/hooks/use-current-ic.ts`       | IC ที่ล็อกอินอยู่ — ชื่อ / ตำแหน่ง / ทีม                   |
 | `orders/order-book.ts`                            | ประกอบสินค้า + การจอง เป็น `OrderBook` + log        |
 | `orders/use-order-books.ts`                       | hooks ฝั่งอ่าน คืน `Resource<T>`                     |
 | `orders/OrderBookingModal.tsx`                    | flow 2 ขั้น (เลือกลูกค้า → สถานะ + จำนวนเงินในหน้าเดียว) |

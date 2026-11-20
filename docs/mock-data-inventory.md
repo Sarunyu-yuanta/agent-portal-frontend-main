@@ -6,7 +6,7 @@ Scope note: this doc is the ground truth of what data exists; the API design is 
 
 **How screens read this data**: never directly. Every dataset reaches a screen through a hook that returns `Resource<T> = { data, isLoading }` (see [`handover.md`](handover.md) → "ต่อ API"), or through one of the three writable stores in §5. Each entry's **Used in** line names that hook where one exists.
 
-**Prefer plain JSON?** [`mock-json/`](mock-json/) holds every dataset as a standalone `.json` file — copies of `src/data/*.json` plus the inline TS data extracted to JSON. See [`mock-json/README.md`](mock-json/README.md). It is a **snapshot** (last synced 2026-11-17): when it and `src/data/` disagree, `src/data/` wins.
+**Prefer plain JSON?** [`mock-json/`](mock-json/) holds every dataset as a standalone `.json` file — copies of `src/mocks/*.json` plus the inline TS data extracted to JSON. See [`mock-json/README.md`](mock-json/README.md). It is a **snapshot** (last synced 2026-11-17): when it and `src/mocks/` disagree, `src/mocks/` wins.
 
 ## How to read each entry
 
@@ -36,7 +36,7 @@ Raw JSON in `src/mocks/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a
   ```
   Numbers are raw values, formatted at render (`formatAumThb`, `formatPlYtdPct`). `lastContact` is the one display string left — nothing reads it this phase; see [`phase-scope.md`](phase-scope.md).
 - **Records**: 8 clients (ids `110001`–`110008`)
-- **Used in**: `useClients()` / `useClientsResource()` in `src/hooks/use-api.ts` — everywhere client info shows up. Every other dataset joins its `clientId` to a name from this file.
+- **Used in**: `useClients()` / `useClientsResource()` in `src/features/clients/hooks/use-clients.ts` — everywhere client info shows up. Every other dataset joins its `clientId` to a name from this file.
 
 ### 1.2 NBA (Next-Best-Action) Actions
 
@@ -170,7 +170,7 @@ Raw JSON in `src/mocks/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a
 
 ## 2. Client 360 ancillary data
 
-`.ts` generator files in `src/data/` — not raw JSON, but functions/lookup maps that produce the data.
+`.ts` generator files in `src/mocks/` — not raw JSON, but functions/lookup maps that produce the data.
 
 ### 2.1 Call Log Entries
 
@@ -216,7 +216,7 @@ Raw JSON in `src/mocks/*.json`, reshaped/typed by `src/mocks/mock-data.ts` (or a
 
 ## 3. Product catalog data
 
-Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/app/[lang]/(dashboard)/client/[id]/`. Every dataset here is read through `src/features/catalog/hooks/use-catalog.ts`.
+Raw JSON in `src/mocks/` (where one exists) plus a shaping `.ts` file under `src/features/catalog/<product>/lib/`. Every dataset here is served by an endpoint in `src/features/catalog/api/catalog.api.ts` and read through `src/features/catalog/hooks/use-catalog.ts`.
 
 ### 3.1 Investment Solutions
 
@@ -295,7 +295,7 @@ Raw JSON in `src/data/` (where one exists) plus a shaping `.ts` file under `src/
 
 ## 4. Mock data embedded directly in page/component files
 
-These never made it into `src/data/` — they're inline arrays/objects living next to the screen that renders them.
+These never made it into `src/mocks/` — they're inline arrays/objects living next to the screen that renders them.
 
 | #   | What                                                                                                                          | Lives in                                                                                                                                                                         | Records                                                                                                                                                                                                                                  |
 | --- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -344,7 +344,7 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
     reminderAt: string|null, reminderDone: boolean }
   ```
 - **Records**: **0 seeded** (`SEED_NOTES = []`)
-- **Mutators**: `addNote`, `editNote`, `removeNote`. `isLoading` comes from `useStatic(SEED_NOTES)` — the same seam as the read hooks.
+- **Mutators**: `addNote`, `editNote`, `removeNote`. `isLoading` comes from `staticResource(SEED_NOTES)`.
 - **History**: this once ran against a mock `/api/mock/*` route with an in-process store. The optimistic-create + `localId → serverId` machinery that route needed was removed with it; recover it from `git show d2c4623:src/contexts/notes-context.tsx` if the real API needs it.
 
 ### 5.2 Orders
@@ -367,11 +367,11 @@ Everything above is read-only. Three stores hold data the IC creates at runtime.
 
 ## Gotchas worth knowing before building the real API
 
-- **Nothing is wired to a backend.** Every dataset is bundled. Most already sit behind a `Resource` hook, so the swap is `useStatic(mock)` → `useResource(label, fetcher, mock)` in the hook. The exceptions with **no hook yet** are Insights (§1.5), Compliance Alerts (§1.6), KYC (§1.7), Performance (§1.9) and the inline data in §4.
+- **Nothing is wired to a backend.** Every dataset is bundled. Every screen reads through an endpoint (`src/features/*/api`), so wiring one is adding its `http` implementation — see `docs/architecture.md` §4. Still outside endpoints: the inline data in §4 and the files listed in `LEGACY_MOCK_READERS` (`eslint.config.mjs`).
 - **Displayed "total count" fields don't reflect real record counts**: Structured Products (`meta.allCount: 328` vs. 20 real records) and Global Bonds (`meta.allOverseasBondsCount: 100` vs. 15 seed rows). Build an endpoint that returns the real inventory.
 - **Some "per-client" data isn't per-client**: `IMPORTANT_FORMS` shows the same 6 forms for everyone, and `useClientAssetAccounts` returns the same 7 accounts whatever `clientId` it gets.
 - **Some data is synthesized, not modelled**: `ALL_OVERSEAS_BONDS`, `resolveFixedIncomeCompany`, the liabilities template, transactions (§1.7c). Model these properly before designing their endpoints.
 - **Client names are joined at import time**, from `clients.json`, in every dataset that carries a `clientId`. Decide whether the API embeds names or the frontend joins them.
 - **Client id format is consistently the 6-digit string** (`"110001"`–`"110008"`).
 - Several JSON files carry a `meta.updatedAt`-style timestamp that is static display text (Fixed Income, Global Bonds, Structured Products, Top Ideas) — the real API needs an actual "last synced" value.
-- **Hardcoded business constants** that belong on the product or in the session: `USD_THB = 36.5`, bond quotas, `THAI_MIN_TICKET` / `THAI_NOTIONAL` (see `order-booking.md`), and the signed-in IC's name/role/team in `src/features/auth/lib/current-ic.ts`.
+- **Hardcoded business constants** that belong on the product or in the session: `USD_THB = 36.5`, bond quotas, `THAI_MIN_TICKET` / `THAI_NOTIONAL` (see `order-booking.md`), and the signed-in IC (`src/mocks/session.ts`, read through `useCurrentIc()`).
