@@ -5,7 +5,13 @@ import { ClientAvatarStack } from "@/components/ui/client-avatar-stack";
 import { dayLabel, weekdayLabel, type DayRelation } from "@/features/calendar/lib/calendar-grid";
 import { splitDayItems, type ActionGroup, type DayItem } from "@/features/calendar/lib/day-items";
 import type { MarketHoliday } from "@/features/calendar/lib/market-feed";
-import { actionKindName, actionPalette, HOLIDAY_PALETTE, HolidayIcon } from "./market-taxonomy";
+import {
+  actionKindName,
+  actionKindTag,
+  actionPalette,
+  HOLIDAY_PALETTE,
+  HolidayIcon,
+} from "./market-taxonomy";
 import { SourceBadgeIcon } from "./source-badge";
 import { snippet } from "@/features/notes/lib/notes-grouping";
 import { useLocale, useT } from "@/i18n/I18nProvider";
@@ -54,6 +60,7 @@ function ActionGroupCard({
 }) {
   const t = useT();
   const palette = actionPalette(group.kind);
+  const tag = actionKindTag(group.kind);
 
   return (
     <div className="flex overflow-hidden rounded-lg border border-black/10 bg-card">
@@ -72,11 +79,14 @@ function ActionGroupCard({
             exchange's name for it goes in the tooltip — "XD" is the label
             everyone here works in, and spelling it out on the card would push
             the chips, which are the point, onto a third line. */}
+        {/* A product event has no code everyone already reads, so its glyph
+            comes with its name — "วันจ่ายดอกเบี้ย" — rather than standing alone. */}
         <span
-          className="type-caption font-semibold text-foreground"
+          className="type-caption flex items-center gap-1 font-semibold text-foreground [&>svg]:size-3.5"
           title={actionKindName(group.kind, t)}
         >
-          {group.kind}
+          {tag}
+          {typeof tag !== "string" && actionKindName(group.kind, t)}
         </span>
         <div className="flex flex-wrap gap-1.5">
           {group.items.map((item) => {

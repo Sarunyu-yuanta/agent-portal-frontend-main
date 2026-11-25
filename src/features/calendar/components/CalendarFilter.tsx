@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { Button, Checkbox, Popover } from "@sarunyu/system-one";
 import { CaretDownIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
-import type { DayItem, DayItemSource } from "@/features/calendar/lib/day-items";
+import type { DayItem } from "@/features/calendar/lib/day-items";
 import {
+  actionKindAssetClass,
   actionKindName,
   actionKindRank,
   actionKindShortName,
+  actionKindTag,
   actionPalette,
+  assetClassName,
+  assetClassRank,
   eventCategory,
 } from "./market-taxonomy";
 import { KeyPill } from "./CalendarLegend";
@@ -28,10 +32,10 @@ import { useT } from "@/i18n/I18nProvider";
  * back on restores whichever codes were individually ticked.
  */
 export type CalendarFilterState = {
-  /** `DayItemSource` values, plus `"holiday"` — which is a layer but not a row.
-   *  See the note on `DayItemSource` in `day-items`. */
+  /** Asset classes ("equity", "fixed-income", …), `"event"`, `"note"`, and
+   *  `"holiday"` — which is a layer but not a row. See `DayItemSource`. */
   hiddenLayers: ReadonlySet<string>;
-  /** SET corporate-action codes. */
+  /** Corporate-action codes — SET X-codes and product event kinds. */
   hiddenKinds: ReadonlySet<string>;
   /** Market-event categories. */
   hiddenCategories: ReadonlySet<string>;
@@ -43,34 +47,35 @@ export const SHOW_EVERYTHING: CalendarFilterState = {
   hiddenCategories: new Set(),
 };
 
-export type CalendarLayerKey = DayItemSource | "holiday";
+/** An asset class ("equity", "fixed-income", …) or one of the three layers
+ *  that aren't about a product. */
+export type CalendarLayerKey = string;
 
 /**
- * The layers, in the order the menu lists them.
+ * The layers after the asset classes, in the order the menu lists them.
  *
- * Ordered by how much of the grid each one usually fills rather than
- * alphabetically or by source: a reader reaching for this control is almost
- * always trying to quieten the corporate actions, which arrive dozens a month,
- * and their own reminders are the last thing they would switch off.
+ * The asset classes lead — one layer each, so a reader can tell at a glance
+ * how many kinds of market date there are and switch off a whole product
+ * type. Ordered by how much of the grid each one usually fills: a reader
+ * reaching for this control is almost always trying to quieten the X-dates,
+ * which arrive dozens a month, and their own reminders are the last thing they
+ * would switch off.
  *
- * Four names and nothing else. An earlier pass gave each one a line of
- * explanatory caption and the two single-colour layers a swatch, which made a
- * four-item menu eight lines tall and put two loose dots in a column where
- * nothing else had one. The names carry it; the colours are decoded by the
- * codes inside the two layers that have them.
+ * Names and nothing else. An earlier pass gave each one a line of explanatory
+ * caption and the single-colour layers a swatch, which doubled the menu's
+ * height and put loose dots in a column where nothing else had one. The names
+ * carry it; the colours are decoded by the codes inside the layers that have
+ * them.
  */
-const LAYERS: { key: CalendarLayerKey }[] = [
-  { key: "corporate-action" },
-  { key: "event" },
-  { key: "holiday" },
-  { key: "note" },
-];
+const TRAILING_LAYERS = ["event", "holiday", "note"] as const;
 
 /** Does this row survive the filter? Applied before the grid so a hidden row
  *  isn't counted by a cell's "+N more" either. */
 export function itemVisible(item: DayItem, filter: CalendarFilterState): boolean {
+  if (item.source === "corporate-action") {
+    return !filter.hiddenLayers.has(item.assetClass) && !filter.hiddenKinds.has(item.kind);
+  }
   if (filter.hiddenLayers.has(item.source)) return false;
-  if (item.source === "corporate-action") return !filter.hiddenKinds.has(item.kind);
   if (item.source === "event") return !filter.hiddenCategories.has(item.kind);
   return true;
 }
@@ -85,7 +90,9 @@ export function holidaysVisible(filter: CalendarFilterState): boolean {
  *  arithmetic. */
 export function hiddenCount(filter: CalendarFilterState): number {
   let n = filter.hiddenLayers.size;
-  if (!filter.hiddenLayers.has("corporate-action")) n += filter.hiddenKinds.size;
+  for (const kind of filter.hiddenKinds) {
+    if (!filter.hiddenLayers.has(actionKindAssetClass(kind))) n += 1;
+  }
   if (!filter.hiddenLayers.has("event")) n += filter.hiddenCategories.size;
   return n;
 }
@@ -147,26 +154,27 @@ function ChildRow({
  *
  * ## Collapsed by default
  *
- * Eleven SET codes plus four event categories is nineteen rows, which turned
- * the panel into a scroller taller than most of the calendar behind it. The
- * four layers are the decision people actually come here to make; the codes
- * inside one are a refinement, so each layer opens on demand and the panel
- * opens at four lines.
+ * Twenty-odd codes plus the event categories is a panel taller than most of the
+ * calendar behind it. The layers — one per asset class, then events, holidays
+ * and reminders — are the decision people actually come here to make; the
+ * codes inside one are a refinement, so each layer opens on demand and the
+ * panel opens at one line per layer.
  *
- * `kinds` and `categories` are the union of what the taxonomy knows and what
- * the feed actually sent this month, so a code nobody has designed for is still
- * something you can switch off. Passed in rather than read here because only
- * the caller holds the month.
+ * `kindsByClass` and `categories` are the union of what the taxonomy knows and
+ * what the feed actually sent this month, so a code nobody has designed for is
+ * still something you can switch off. Passed in rather than read here because
+ * only the caller holds the month.
  */
 export function CalendarFilterMenu({
   state,
-  kinds,
+  kindsByClass,
   categories,
   onChange,
 }: {
   state: CalendarFilterState;
-  /** SET codes to offer, unsorted — this component ranks them. */
-  kinds: string[];
+  /** Corporate-action codes to offer, keyed by asset class, unsorted — this
+   *  component ranks both. */
+  kindsByClass: ReadonlyMap<string, string[]>;
   /** Event categories to offer, unsorted. */
   categories: string[];
   onChange: (next: CalendarFilterState) => void;
@@ -176,30 +184,40 @@ export function CalendarFilterMenu({
   /** Which layers are showing their codes. Starts empty — see the note above. */
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
 
-  const sortedKinds = [...kinds].sort(
-    (a, b) => actionKindRank(a) - actionKindRank(b) || a.localeCompare(b),
+  const assetClasses = [...kindsByClass.keys()].sort(
+    (a, b) => assetClassRank(a) - assetClassRank(b) || a.localeCompare(b),
   );
+  const layers: CalendarLayerKey[] = [...assetClasses, ...TRAILING_LAYERS];
+  const layerName = (key: CalendarLayerKey): string =>
+    kindsByClass.has(key)
+      ? assetClassName(key, t)
+      : t.planner.calendar.filter.layers[key as (typeof TRAILING_LAYERS)[number]];
+
   const sortedCategories = [...categories].sort((a, b) =>
     eventCategory(a, t).label.localeCompare(eventCategory(b, t).label),
   );
 
-  const childrenOf = (key: CalendarLayerKey) =>
-    key === "corporate-action"
+  const childrenOf = (key: CalendarLayerKey) => {
+    const kinds = kindsByClass.get(key);
+    if (kinds) {
+      return {
+        all: [...kinds].sort((a, b) => actionKindRank(a) - actionKindRank(b) || a.localeCompare(b)),
+        hiddenSet: state.hiddenKinds,
+        field: "hiddenKinds" as const,
+      };
+    }
+    return key === "event"
       ? {
-          all: sortedKinds,
-          hiddenSet: state.hiddenKinds,
-          field: "hiddenKinds" as const,
+          all: sortedCategories,
+          hiddenSet: state.hiddenCategories,
+          field: "hiddenCategories" as const,
         }
-      : key === "event"
-        ? {
-            all: sortedCategories,
-            hiddenSet: state.hiddenCategories,
-            field: "hiddenCategories" as const,
-          }
-        : null;
+      : null;
+  };
 
   /**
-   * Turning a layer back on also clears whatever was unticked inside it.
+   * Turning a layer back on also clears whatever was unticked inside it — only
+   * its own codes, so re-enabling one asset class leaves another's alone.
    *
    * The alternative — restoring the old per-code state — sounds more
    * considerate and isn't: the box you just ticked says "Company events" and
@@ -211,7 +229,13 @@ export function CalendarFilterMenu({
     onChange({
       ...state,
       hiddenLayers: toggle(state.hiddenLayers, key, !shown),
-      ...(shown && child ? { [child.field]: new Set<string>() } : {}),
+      ...(shown && child
+        ? {
+            [child.field]: new Set(
+              [...child.hiddenSet].filter((code) => !child.all.includes(code)),
+            ),
+          }
+        : {}),
     });
   };
 
@@ -228,16 +252,16 @@ export function CalendarFilterMenu({
     // the same 8px — a panel padded on top of padded rows ends up with a band
     // under the final row that reads as a gap nobody put there.
     <div className="flex w-[352px] max-w-[calc(var(--vw)*100-2rem)] flex-col overflow-x-hidden">
-      {LAYERS.map((layer) => {
-        const layerLabel = t.planner.calendar.filter.layers[layer.key];
-        const layerShown = !state.hiddenLayers.has(layer.key);
-        const child = childrenOf(layer.key);
+      {layers.map((key) => {
+        const layerLabel = layerName(key);
+        const layerShown = !state.hiddenLayers.has(key);
+        const child = childrenOf(key);
         const hiddenHere = child ? child.all.filter((c) => child.hiddenSet.has(c)).length : 0;
-        const isOpen = expanded.has(layer.key);
+        const isOpen = expanded.has(key);
 
         return (
           <div
-            key={layer.key}
+            key={key}
             className="flex flex-col gap-1.5 border-b border-border/60 px-3 py-2 last:border-b-0"
           >
             <div className="flex items-center gap-2">
@@ -248,7 +272,7 @@ export function CalendarFilterMenu({
                   // grid is showing every company event when it is showing
                   // eight of eleven.
                   checked={layerShown ? (hiddenHere > 0 ? "indeterminate" : true) : false}
-                  onChange={(next) => setLayer(layer.key, next)}
+                  onChange={(next) => setLayer(key, next)}
                   label={
                     <span className="type-body-2 font-medium text-foreground">{layerLabel}</span>
                   }
@@ -265,8 +289,8 @@ export function CalendarFilterMenu({
                   onClick={() =>
                     setExpanded((current) => {
                       const next = new Set(current);
-                      if (next.has(layer.key)) next.delete(layer.key);
-                      else next.add(layer.key);
+                      if (next.has(key)) next.delete(key);
+                      else next.add(key);
                       return next;
                     })
                   }
@@ -303,13 +327,17 @@ export function CalendarFilterMenu({
                   layerShown ? "" : "pointer-events-none opacity-40"
                 }`}
               >
-                {layer.key === "corporate-action"
-                  ? sortedKinds.map((kind) => {
+                {child.field === "hiddenKinds"
+                  ? child.all.map((kind) => {
                       const palette = actionPalette(kind);
                       return (
                         <ChildRow
                           key={kind}
-                          tag={kind}
+                          tag={
+                            <span className="flex items-center [&>svg]:size-3">
+                              {actionKindTag(kind)}
+                            </span>
+                          }
                           tagStyle={{
                             backgroundColor: palette.tint,
                             color: palette.text,

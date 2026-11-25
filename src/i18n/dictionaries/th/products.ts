@@ -39,6 +39,7 @@ const products = {
     relatedDocuments: "เอกสารที่เกี่ยวข้อง",
     topPick: "Top Pick",
     factsheet: "Factsheet",
+    termSheet: "Term Sheet",
     scrollTabsLeft: "เลื่อนแท็บไปทางซ้าย",
     scrollTabsRight: "เลื่อนแท็บไปทางขวา",
     /** The Detail / Order tabs on a product's detail page. */

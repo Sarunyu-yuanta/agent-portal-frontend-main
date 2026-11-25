@@ -246,7 +246,7 @@ function TableHeader() {
   const t = useT();
   const cols = t.products.fixedIncome.columns;
   return (
-    <div className="flex h-11 min-w-[1440px] shrink-0 items-stretch bg-white">
+    <div className="flex h-14 min-w-[1508px] shrink-0 items-stretch bg-white">
       <div
         className="sticky left-0 z-[1] flex w-[160px] shrink-0 items-center bg-white px-3 group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]"
         style={headerBorderStyle()}
@@ -259,13 +259,13 @@ function TableHeader() {
       <div className="flex w-[136px] items-center justify-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
       </div>
-      <div className="flex w-[120px] items-center justify-center px-3" style={headerBorderStyle()}>
+      <div className="flex w-[168px] items-center justify-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponPeriod}</span>
       </div>
       <div className="flex w-32 items-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.tenor}</span>
       </div>
-      <div className="flex w-[120px] items-center px-3" style={headerBorderStyle()}>
+      <div className="flex w-32 items-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
       </div>
       <div className="flex w-[212px] shrink-0 flex-col overflow-hidden" style={headerBorderStyle()}>
@@ -293,7 +293,7 @@ function TableHeader() {
       <div className="flex w-[140px] items-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.offerType}</span>
       </div>
-      <div className="flex min-w-[140px] flex-1 items-center px-3" style={headerBorderStyle()}>
+      <div className="flex min-w-[152px] flex-1 items-center px-3" style={headerBorderStyle()}>
         <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.expectedOpen}</span>
       </div>
       <div
@@ -329,7 +329,7 @@ function BondTableRow({
           onSelect(bond);
         }
       }}
-      className="group flex min-w-[1440px] shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-neutral-50"
+      className="group flex min-w-[1508px] shrink-0 cursor-pointer items-stretch bg-white transition-colors hover:bg-neutral-50"
     >
       <div
         className="sticky left-0 z-[1] flex w-[160px] shrink-0 items-center gap-2 bg-white px-3 py-3.5 transition-colors group-hover:bg-neutral-50 group-data-[scrolled=true]/card:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)]"
@@ -357,7 +357,7 @@ function BondTableRow({
           {bond.ytm}
         </span>
       </div>
-      <div className="flex w-[120px] items-center justify-center px-3 py-3.5" style={border()}>
+      <div className="flex w-[168px] items-center justify-center px-3 py-3.5" style={border()}>
         <span className="text-sm leading-[24px] whitespace-nowrap text-neutral-900">
           {bond.couponPeriod}
         </span>
@@ -367,7 +367,7 @@ function BondTableRow({
           {bond.tenor}
         </span>
       </div>
-      <div className="flex w-[120px] items-center px-3 py-3.5" style={border()}>
+      <div className="flex w-32 items-center px-3 py-3.5" style={border()}>
         <span className="text-sm leading-[24px] text-neutral-900">{bond.maturity}</span>
       </div>
       <div className="flex w-[106px] items-center justify-center px-3 py-3.5" style={border()}>
@@ -386,7 +386,7 @@ function BondTableRow({
       <div className="flex w-[140px] items-center px-3 py-3.5" style={border()}>
         <OfferTypeTag offerType={bond.offerType} />
       </div>
-      <div className="flex min-w-[140px] flex-1 items-center px-3 py-3.5" style={border()}>
+      <div className="flex min-w-[152px] flex-1 items-center px-3 py-3.5" style={border()}>
         <span className="text-sm leading-[24px] text-neutral-900">{bond.subscriptionPeriod}</span>
       </div>
       <div className="flex w-[92px] items-center justify-center px-3 py-[11px]" style={border()}>
@@ -562,7 +562,7 @@ export function FixedIncomeTab({
           }}
         >
           {emptyState ?? (
-            <div className="flex min-w-[1440px] flex-col">
+            <div className="flex min-w-[1508px] flex-col">
               {pagedBonds.map((bond, i) => (
                 <BondTableRow
                   key={bond.id}

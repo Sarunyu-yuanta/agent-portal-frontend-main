@@ -123,7 +123,7 @@ export function ProductCatalogCategoryBody({
                 onInvestmentSolutionSelect={nav.onInvestmentSolutionSelect}
                 bgImage="/products/structured-product/thai-structure-bg.webp"
               />
-              <TopPickSection onProductSelect={nav.onProductSelect} />
+              <TopPickSection onProductSelect={nav.onProductSelect} productName="Thai FCN" />
 
               {/* ── Thai FCN Table ─────────────────────────────────────────────────── */}
               <div

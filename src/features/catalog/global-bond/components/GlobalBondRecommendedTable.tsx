@@ -46,9 +46,10 @@ export function GlobalBondRecommendedTable({
     >
       <div className="overflow-x-auto">
         <div className="flex items-stretch">
-          {/* Issuer */}
-          <div className="flex w-[296px] shrink-0 flex-col">
-            <div className="flex h-11 items-center px-4" style={headerBorderStyle()}>
+          {/* Issuer, Coupon Rate and Maturity split the width the fixed rating and
+              yield columns leave, equally, each down to its own minimum */}
+          <div className="flex min-w-[272px] flex-1 flex-col">
+            <div className="flex h-14 items-center px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.issuer}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
@@ -65,8 +66,8 @@ export function GlobalBondRecommendedTable({
             ))}
           </div>
           {/* Coupon Rate */}
-          <div className="flex w-[120px] shrink-0 flex-col">
-            <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
+          <div className="flex min-w-[168px] flex-1 flex-col">
+            <div className="flex h-14 items-center justify-center px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.couponRate}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
@@ -82,8 +83,8 @@ export function GlobalBondRecommendedTable({
             ))}
           </div>
           {/* Maturity */}
-          <div className="flex min-w-[100px] flex-1 flex-col">
-            <div className="flex h-11 items-center justify-center px-4" style={headerBorderStyle()}>
+          <div className="flex min-w-[160px] flex-1 flex-col">
+            <div className="flex h-14 items-center justify-center px-4" style={headerBorderStyle()}>
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.maturity}</span>
             </div>
             {RECOMMENDED_ISSUER_ROWS.map((row, i) => (
@@ -99,8 +100,8 @@ export function GlobalBondRecommendedTable({
             ))}
           </div>
           {/* Credit Rating — nested header */}
-          <div className="flex w-[210px] shrink-0 flex-col">
-            <div className="flex h-11 flex-col overflow-hidden" style={headerBorderStyle()}>
+          <div className="flex w-[240px] shrink-0 flex-col">
+            <div className="flex h-14 flex-col overflow-hidden" style={headerBorderStyle()}>
               <div
                 className="flex flex-1 items-center justify-center px-4"
                 style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}
@@ -109,18 +110,18 @@ export function GlobalBondRecommendedTable({
               </div>
               <div className="flex flex-1 items-stretch">
                 <div
-                  className="flex flex-1 items-center justify-center px-4"
+                  className="flex min-w-0 flex-1 items-center justify-center px-2"
                   style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
                 >
                   <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>S&P</span>
                 </div>
                 <div
-                  className="flex flex-1 items-center justify-center px-4"
+                  className="flex min-w-0 flex-1 items-center justify-center px-2"
                   style={{ borderRight: `1px solid ${BORDER_COLOR}` }}
                 >
                   <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Moody&apos;s</span>
                 </div>
-                <div className="flex flex-1 items-center justify-center px-4">
+                <div className="flex min-w-0 flex-1 items-center justify-center px-2">
                   <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>Fitch</span>
                 </div>
               </div>
@@ -152,7 +153,7 @@ export function GlobalBondRecommendedTable({
           {/* Yield */}
           <div className="flex shrink-0 flex-col">
             <div
-              className="flex h-11 items-center justify-center px-4"
+              className="flex h-14 items-center justify-center px-4"
               style={headerBorderStyle({ right: false })}
             >
               <span className={`${HEADER_TEXT_CLS} whitespace-nowrap`}>{cols.estimatedYield}</span>

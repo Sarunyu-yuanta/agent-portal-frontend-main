@@ -206,8 +206,14 @@ function useStructuredShelf(): { topPicks: StructuredProduct[]; grid: Structured
 /** Top Pick section — the first three open products on the shelf. */
 export function TopPickSection({
   onProductSelect,
+  productName,
 }: {
   onProductSelect: (product: StructuredProduct) => void;
+  /** Captions every card with this structure name instead of the product's
+   *  own. A stopgap for the Thai tab, which shows the global shelf until Thai
+   *  top picks have a feed of their own: there the cards read "Thai FCN".
+   *  Display only — the product handed to `onProductSelect` is unchanged. */
+  productName?: string;
 }) {
   const t = useT();
   const { topPicks } = useStructuredShelf();
@@ -240,7 +246,12 @@ export function TopPickSection({
         ) : (
           <div className="grid w-full shrink-0 grid-cols-1 gap-4 md:flex md:flex-col lg:grid lg:grid-cols-3">
             {topPicks.map((p) => (
-              <StructuredProductCard key={p.id} {...p} onClick={() => onProductSelect(p)} />
+              <StructuredProductCard
+                key={p.id}
+                {...p}
+                productName={productName ?? p.productName}
+                onClick={() => onProductSelect(p)}
+              />
             ))}
           </div>
         )}

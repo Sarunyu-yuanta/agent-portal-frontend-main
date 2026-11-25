@@ -22,7 +22,7 @@ import { useT } from "@/i18n/I18nProvider";
 import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import { pageCount, pageSlice } from "@/lib/pagination";
 
-const MIN_WIDTH = "min-w-[1290px]";
+const MIN_WIDTH = "min-w-[1310px]";
 
 /** Sticky first column — paints over scrolled content and reveals an edge
  *  shadow once the card body has scrolled horizontally (`data-scrolled`). */
@@ -43,7 +43,7 @@ type ColDef = {
 
 const COLS: ColDef[] = [
   { key: "theme", label: "Investment Theme", width: "w-[160px]", align: "", sticky: true },
-  { key: "product", label: "Product", width: "w-[90px]", align: "" },
+  { key: "product", label: "Product", width: "w-[110px]", align: "" },
   { key: "ccy", label: "Ccy", width: "w-[70px]", align: "justify-center" },
   { key: "bbg1", label: "BBG Code 1", width: "w-[110px]", align: "" },
   { key: "bbg2", label: "BBG Code 2", width: "w-[110px]", align: "" },

@@ -9,7 +9,7 @@ import { useT } from "@/i18n/I18nProvider";
 
 type CardProduct = Pick<
   StructuredProduct,
-  "underlying" | "coupon" | "tenor" | "ko" | "strike" | "ki" | "tags" | "logos"
+  "underlying" | "productName" | "coupon" | "tenor" | "ko" | "strike" | "ki" | "tags" | "logos"
 > & {
   /** Read for the order's state — most call sites spread the product, so it comes along. */
   id?: string;
@@ -50,9 +50,10 @@ function LogoRow({
           </div>
         ))}
       </div>
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex min-w-0 shrink-0 items-center gap-1">
+        {processing && <ProcessingTag />}
         {/* "ใกล้เต็ม" stops being true once the order has gone out — the
-            card's status band says what replaced it. */}
+            processing tag says what replaced it. */}
         {!processing && tags.includes(STRUCTURED_TAG.almostFull) && (
           <div
             className="flex shrink-0 items-center gap-0.5 overflow-hidden rounded px-1 py-0.5"
@@ -81,32 +82,47 @@ function LogoRow({
 }
 
 /**
- * "กำลังดำเนินการสั่งซื้อ", as a band across the card's top edge.
+ * "กำลังดำเนินการสั่งซื้อ" — the order on this product is with the back office.
  *
- * A band rather than another chip beside "ใกล้เต็ม" and "รับประกันเงินต้น":
- * those describe the product, this describes the order on it, and as a chip it
- * read as one more feature of the note. Absolutely placed so every layout —
- * stacked or the tablet's row — takes it the same way; the card makes room for
- * it with its top padding.
+ * Sits in the logo row beside "รับประกันเงินต้น" (it used to be a band across
+ * the card's top edge, which made the card 28px taller than its neighbours).
+ * Those chips describe the product; this one describes the order on it, so it
+ * is drawn as a status, not as one more chip: a solid primary pill with white,
+ * medium-weight text, against their square, pale, neutral-text chips.
  */
-function ProcessingBand() {
+function ProcessingTag() {
   const t = useT();
   return (
-    <div className="absolute inset-x-0 top-0 flex h-7 items-center justify-center gap-1 bg-[#eff6ff] text-label leading-[20px] font-medium text-brand-600">
-      <HourglassMediumIcon size={14} weight="fill" />
-      {t.products.common.processingOrder}
+    <div
+      className="flex min-w-0 items-center gap-1 overflow-hidden rounded-full px-2 py-0.5 text-white"
+      style={{ backgroundColor: "var(--primary-action)" }}
+    >
+      <HourglassMediumIcon size={14} weight="fill" className="shrink-0" />
+      <p className="truncate text-micro leading-[18px] font-medium">
+        {t.products.common.processingOrder}
+      </p>
     </div>
   );
 }
 
-function UnderlyingCouponRow({ underlying, coupon }: { underlying: string; coupon: string }) {
+/** The underlying, captioned with the note's structure ("Global FCN",
+ *  "Sharkfin", "Twin-Win" …) — the feed's `productName` — beside the coupon. */
+function UnderlyingCouponRow({
+  underlying,
+  productName,
+  coupon,
+}: {
+  underlying: string;
+  productName: string;
+  coupon: string;
+}) {
   return (
     <div className="flex w-full shrink-0 items-center gap-2">
       <div className="flex min-w-0 flex-1 flex-col">
         <p className="w-full truncate text-title-sm leading-[28px] font-bold text-neutral-900">
           {underlying}
         </p>
-        <p className="text-label leading-[20px] text-neutral-500">Underlying</p>
+        <p className="w-full truncate text-label leading-[20px] text-neutral-500">{productName}</p>
       </div>
       <div className="flex shrink-0 flex-col items-end whitespace-nowrap">
         <p className="text-title-sm leading-[28px] font-bold text-neutral-900">{coupon}</p>
@@ -157,6 +173,7 @@ const CARD_HOVER = "cursor-pointer transition-colors hover:bg-neutral-50!";
 
 export function StructuredProductCard({
   underlying,
+  productName,
   coupon,
   tenor,
   ko,
@@ -170,10 +187,6 @@ export function StructuredProductCard({
   id,
 }: CardProduct & { onClick?: () => void; href?: string; variant?: "catalog" | "grid" }) {
   const processing = useProcessingProductIds().has(id ?? "");
-  // Room for the band: its 28px on top of the card's own 20px. Every card is
-  // `self-start` so only the one carrying the band grows — a grid would
-  // otherwise stretch its neighbours in the row to match.
-  const bandPad = processing ? "pt-12" : "";
   const stats = [
     { label: "Tenor", value: tenor },
     { label: "KO", value: ko },
@@ -210,13 +223,12 @@ export function StructuredProductCard({
   const card = isGrid ? (
     <div
       {...interactiveProps}
-      className={`flex flex-col items-center gap-3 overflow-hidden p-5 ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
+      className={`relative flex w-full flex-col items-center gap-3 self-start overflow-hidden rounded-[12px] bg-white p-5 ${interactiveProps.className ?? ""}`}
       style={cardStyle}
     >
-      {processing && <ProcessingBand />}
       <div className="flex w-full flex-col items-start gap-2">
         <LogoRow logos={logos} tags={tags} processing={processing} />
-        <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
+        <UnderlyingCouponRow underlying={underlying} productName={productName} coupon={coupon} />
       </div>
       <StatsGrid stats={stats} className="w-full py-2" />
     </div>
@@ -225,13 +237,12 @@ export function StructuredProductCard({
       {/* Mobile — vertical stack */}
       <div
         {...interactiveProps}
-        className={`flex flex-col items-center gap-3 overflow-hidden p-5 md:hidden ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
+        className={`relative flex w-full flex-col items-center gap-3 self-start overflow-hidden rounded-[12px] bg-white p-5 md:hidden ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
-        {processing && <ProcessingBand />}
         <div className="flex w-full flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
-          <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
+          <UnderlyingCouponRow underlying={underlying} productName={productName} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
       </div>
@@ -239,13 +250,12 @@ export function StructuredProductCard({
       {/* Tablet — horizontal */}
       <div
         {...interactiveProps}
-        className={`hidden md:flex lg:hidden ${processing ? "h-[148px]" : "h-[120px]"} box-border items-start gap-4 overflow-hidden p-5 ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
+        className={`relative box-border hidden h-[120px] w-full items-start gap-4 self-start overflow-hidden rounded-[12px] bg-white p-5 md:flex lg:hidden ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
-        {processing && <ProcessingBand />}
         <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
-          <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
+          <UnderlyingCouponRow underlying={underlying} productName={productName} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="h-full min-w-0 flex-1 py-3" layout="tablet" />
       </div>
@@ -253,13 +263,12 @@ export function StructuredProductCard({
       {/* Desktop — vertical grid card */}
       <div
         {...interactiveProps}
-        className={`hidden flex-col items-center gap-3 overflow-hidden p-5 lg:flex ${bandPad} relative w-full self-start rounded-[12px] bg-white ${interactiveProps.className ?? ""}`}
+        className={`relative hidden w-full flex-col items-center gap-3 self-start overflow-hidden rounded-[12px] bg-white p-5 lg:flex ${interactiveProps.className ?? ""}`}
         style={cardStyle}
       >
-        {processing && <ProcessingBand />}
         <div className="flex w-full flex-col items-start gap-2">
           <LogoRow logos={logos} tags={tags} processing={processing} />
-          <UnderlyingCouponRow underlying={underlying} coupon={coupon} />
+          <UnderlyingCouponRow underlying={underlying} productName={productName} coupon={coupon} />
         </div>
         <StatsGrid stats={stats} className="w-full py-2" />
       </div>

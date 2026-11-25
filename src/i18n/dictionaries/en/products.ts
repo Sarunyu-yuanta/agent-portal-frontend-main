@@ -38,6 +38,7 @@ const products = {
     relatedDocuments: "Related documents",
     topPick: "Top Pick",
     factsheet: "Factsheet",
+    termSheet: "Term Sheet",
     scrollTabsLeft: "Scroll tabs left",
     scrollTabsRight: "Scroll tabs right",
     detailTabs: { detail: "Detail", orders: "Order" },

@@ -79,6 +79,7 @@ export function AlertOverlay({
       symbol={record.symbol}
       companyName={record.symbolName || record.symbol}
       rows={record.facts}
+      href={record.href}
       onClose={onClose}
     />
   );

@@ -33,7 +33,30 @@ const planner = {
       name: "ไม่ได้รับสิทธิจองซื้อหุ้นเพิ่มทุนที่โอนสิทธิได้",
       short: "สิทธิจองซื้อหุ้นเพิ่มทุนที่โอนสิทธิได้",
     },
+    // Product events — not SET codes, so no exchange abbreviation to print;
+    // the pill shows an icon instead (see `market-taxonomy`).
+    "FI-COUPON": { name: "วันจ่ายดอกเบี้ย", short: "วันจ่ายดอกเบี้ย" },
+    "FI-MATURITY": { name: "วันครบกำหนดไถ่ถอน", short: "วันครบกำหนดไถ่ถอน" },
+    "FI-TRADE-CLOSE": { name: "วันปิดการซื้อขาย", short: "วันปิดการซื้อขาย" },
+    "SN-SUB-CLOSE": { name: "วันปิดรับจอง", short: "วันปิดรับจอง" },
+    "SN-COUPON": { name: "วันจ่าย Coupon", short: "วันจ่าย Coupon" },
+    "SN-KO-OBS": { name: "วันสังเกตการณ์ KO", short: "วันสังเกตการณ์ KO" },
+    "SN-MATURITY": { name: "วันครบกำหนดอายุ", short: "วันครบกำหนดอายุ" },
+    "MF-IPO-CLOSE": { name: "วันปิดเสนอขาย IPO", short: "วันปิดเสนอขาย IPO" },
+    "MF-DIVIDEND": { name: "วันจ่ายปันผลกองทุน", short: "วันจ่ายปันผลกองทุน" },
   } as Record<string, { name: string; short: string }>,
+
+  /**
+   * Which product a market item is about. Equity carries the SET X-codes;
+   * the others carry the product's own dates. Groups the Calendar's filter and
+   * legend. A class missing here prints as its own slug.
+   */
+  assetClasses: {
+    equity: "หุ้น",
+    "fixed-income": "ตราสารหนี้",
+    "structured-note": "Structured Note",
+    "mutual-fund": "กองทุนรวม",
+  } as Record<string, string>,
 
   /** Desk event categories. A category missing here is title-cased from its slug. */
   eventCategories: {
@@ -64,10 +87,19 @@ const planner = {
       holiday: "วันหยุดตลาด",
       note: "โน้ต / การเตือนของคุณ",
       doneNote: "เตือนที่ทำแล้ว",
+      /** Row headings — the legend is grouped by what the item is about. */
+      title: "คำอธิบายสี",
+      showAll: "ดูทั้งหมด",
+      hide: "ซ่อน",
+      groups: { event: "กิจกรรม", other: "อื่น ๆ" },
+      groupLabel: (group: string) => `คำอธิบายสี · ${group}`,
     },
     filter: {
       layers: {
-        "corporate-action": "เหตุการณ์บริษัท",
+        equity: "หุ้น",
+        "fixed-income": "ตราสารหนี้",
+        "structured-note": "Structured Note",
+        "mutual-fund": "กองทุนรวม",
         event: "กิจกรรม",
         holiday: "วันหยุด",
         note: "การเตือน",
@@ -98,6 +130,7 @@ const planner = {
       recordLabel: (kindName: string, symbol: string) => `รายละเอียด ${kindName} ของ ${symbol}`,
       noHolders: "ยังไม่มีลูกค้าในรายการนี้",
       noDetails: "ยังไม่มีรายละเอียดจากตลาดหลักทรัพย์",
+      viewProduct: "ดูรายละเอียดสินค้า",
     },
     contact: {
       none: "ไม่มีข้อมูลติดต่อ",

@@ -2,10 +2,10 @@
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import type { Note } from "@/types/note";
-import { staticResource } from "@/lib/api/resource";
+import { useEndpoint } from "@/lib/api/endpoint";
+import { seedNotesEndpoint } from "@/features/notes/api/notes.api";
 
-/** Nothing is seeded today; a real feed would be fetching this list. */
-const SEED_NOTES: Note[] = [];
+const NO_NOTES: Note[] = [];
 
 /** Everything the caller supplies for a new note; id and timestamps are set here. */
 export type NoteDraft = Omit<Note, "id" | "createdAt" | "updatedAt">;
@@ -13,8 +13,8 @@ export type NoteDraft = Omit<Note, "id" | "createdAt" | "updatedAt">;
 type NotesContextValue = {
   notes: Note[];
   /**
-   * The seed list hasn't arrived — from `staticResource` over the seed, the same
-   * seam every other dataset uses. Every notes screen renders a skeleton
+   * The seed list hasn't arrived — from `seedNotesEndpoint`, the same seam
+   * every other dataset uses. Every notes screen renders a skeleton
    * against it, so a real endpoint needs no screen changes.
    */
   isLoading: boolean;
@@ -68,8 +68,15 @@ let localIdSeq = 0;
  * single caller.
  */
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const { isLoading, error, retry } = staticResource(SEED_NOTES);
-  const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
+  // The mock resolves synchronously, so the seed is already here on the first
+  // render. (TEMPORARY: it holds one demo note — see `seedNotesEndpoint`.)
+  const {
+    data: seed,
+    isLoading,
+    error,
+    retry,
+  } = useEndpoint(seedNotesEndpoint, [], { fallback: NO_NOTES });
+  const [notes, setNotes] = useState<Note[]>(seed);
 
   const addNote = useCallback(async (draft: NoteDraft, presetLocalId?: string) => {
     const now = new Date().toISOString();

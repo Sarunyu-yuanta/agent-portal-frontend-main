@@ -4,8 +4,10 @@
  * Three feeds, kept apart because they answer different questions and land on
  * the grid differently:
  *
- * - **Corporate actions** — the exchange's own taxonomy (XD, XW, XT, …) against
- *   one security. Many on one day, so they are drawn grouped by kind.
+ * - **Corporate actions** — a dated fact about one security: the exchange's own
+ *   taxonomy (XD, XW, XT, …) for a share, a coupon / maturity / closing date
+ *   for a bond, a structured note or a fund. Each carries its asset class.
+ *   Many on one day, so they are drawn grouped by kind.
  * - **Market events** — a seminar, a campaign, anything the desk puts on the
  *   calendar that isn't an exchange fact. One row each.
  * - **Holidays** — a property of the *day*, not a row in it. A non-trading day
@@ -39,10 +41,25 @@ export type IsoDay = string;
 export type CorporateActionFeedItem = {
   id: string;
   date: IsoDay;
-  /** The SET code — "XD", "XW", "XT", "XM", … Open-ended, see above. */
+  /**
+   * Which kind of product the security is — "equity", "fixed-income",
+   * "structured-note", "mutual-fund". Open-ended like `kind`.
+   *
+   * The Calendar groups its filter and legend by this. A SET X-code is a
+   * stock's event; a bond, a structured note and a fund have dates of their
+   * own (coupon, maturity, subscription close), and one flat list of every
+   * code left a reader unable to tell how many kinds of alert there were, or
+   * which product each one was about.
+   */
+  assetClass: string;
+  /** The SET code — "XD", "XW", "XT", "XM", … — or, for a product that is not
+   *  a listed share, the product event's own id ("FI-COUPON", "SN-KO-OBS").
+   *  Open-ended, see above. */
   kind: string;
   /** The security it lands on, as the exchange writes it — "PTT", "AMKR03". */
   symbol: string;
+  /** The product's page in the catalog, when there is one to open. */
+  href?: string;
   /** The issuer's legal name, for the record sheet's header line. Falls back to
    *  the symbol when the feed has none. */
   name?: string;

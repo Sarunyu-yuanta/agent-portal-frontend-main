@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 import { Button } from "@sarunyu/system-one";
-import { FileTextIcon } from "@phosphor-icons/react";
+import { ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
+import { LocaleLink as Link } from "@/i18n/navigation";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { MarketFact } from "@/features/calendar/lib/market-feed";
-import { actionKindName, actionPalette } from "./market-taxonomy";
+import { actionKindName, actionKindTag, actionPalette } from "./market-taxonomy";
 import { useT } from "@/i18n/I18nProvider";
 
 /**
@@ -51,6 +52,7 @@ export function CorporateActionDetailModal({
   symbol,
   companyName,
   rows,
+  href,
   onClose,
 }: {
   /** SET code — "XD", "XW", … Open-ended; see `market-taxonomy`. */
@@ -61,6 +63,9 @@ export function CorporateActionDetailModal({
   /** Already grouped by the feed: a rule is drawn between groups and never
    *  inside one, which is the whole of the separator logic Figma shows. */
   rows: MarketFact[][];
+  /** The product's page in the catalog — a bond, a note, a fund. Adds a link
+   *  under the record; absent for a listed share's X-date. */
+  href?: string | null;
   onClose: () => void;
 }) {
   const t = useT();
@@ -76,6 +81,7 @@ export function CorporateActionDetailModal({
   }, [onClose]);
 
   const tag = tagStyle(kind);
+  const glyph = actionKindTag(kind);
 
   return (
     <div
@@ -94,12 +100,15 @@ export function CorporateActionDetailModal({
       <div className="flex max-h-full w-full max-w-[704px] flex-col items-center gap-6 overflow-hidden rounded-3xl bg-card p-4">
         <div className="flex min-h-0 w-full flex-col gap-4 overflow-y-auto rounded-2xl border border-black/10 p-3">
           <div className="flex flex-wrap items-center gap-2">
+            {/* A product event's tag spells its name out beside the glyph — a
+                lone coin or flag would not say "coupon" or "maturity". */}
             <span
-              className="rounded px-2 py-0.5 text-sm leading-[1.5] font-semibold"
+              className="flex items-center gap-1 rounded px-2 py-0.5 text-sm leading-[1.5] font-semibold [&>svg]:size-4"
               style={{ backgroundColor: tag.bg, color: tag.text }}
               title={actionKindName(kind, t)}
             >
-              {kind}
+              {glyph}
+              {typeof glyph !== "string" && actionKindName(kind, t)}
             </span>
             {/* One line, not a stack: the symbol is the reader's anchor and the
                 legal name only confirms it, so they belong on the same baseline.
@@ -150,9 +159,23 @@ export function CorporateActionDetailModal({
 
         {/* Figma's 343px, but capped at the panel: on a phone-width viewport a
             fixed 343 would push past the 16px gutter the overlay sets. */}
-        <Button variant="primary" className="w-[343px] max-w-full shrink-0" onClick={onClose}>
-          {t.common.close}
-        </Button>
+        <div className="flex w-full flex-wrap justify-center gap-3">
+          {href && (
+            <Link href={href} className="w-[343px] max-w-full shrink-0" onClick={onClose}>
+              <Button
+                variant="outline"
+                className="w-full"
+                rightIcon={<ArrowRightIcon size={16} />}
+                tabIndex={-1}
+              >
+                {t.planner.calendar.alert.viewProduct}
+              </Button>
+            </Link>
+          )}
+          <Button variant="primary" className="w-[343px] max-w-full shrink-0" onClick={onClose}>
+            {t.common.close}
+          </Button>
+        </div>
       </div>
     </div>
   );

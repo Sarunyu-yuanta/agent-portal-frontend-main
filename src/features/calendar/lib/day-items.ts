@@ -1,5 +1,5 @@
 import { dayKey } from "./calendar-grid";
-import { actionKindRank } from "@/features/calendar/components/market-taxonomy";
+import { actionKindRank, assetClassRank } from "@/features/calendar/components/market-taxonomy";
 import { marketFeed } from "./mock-market-feed";
 import type { MarketFact } from "./market-feed";
 import type { Dictionary } from "@/i18n/dictionaries/th";
@@ -19,9 +19,11 @@ import type { Note } from "@/types/note";
  * Three sources, and the list is meant to stay short:
  *
  * - `note` — the user's own handwriting, the only editable one.
- * - `corporate-action` — an exchange fact against a symbol (XD, XW, XT, …).
- *   This replaced the old `dividend` source, which was the same thing said in
- *   prose; see `mock-market-feed`.
+ * - `corporate-action` — a dated fact about one security, of any asset class:
+ *   an exchange X-code against a share (XD, XW, XT, …), or a bond's, a
+ *   structured note's or a fund's own date (coupon, maturity, close). The
+ *   row's `assetClass` says which. This replaced the old `dividend` source,
+ *   which was the same thing said in prose; see `mock-market-feed`.
  * - `event` — a seminar, a campaign, anything dated the desk puts up itself.
  *
  * A **holiday is not here**, deliberately. It has no holders, nothing to open
@@ -62,6 +64,11 @@ export type DayItem = {
   kind: string;
   /** The security a corporate action lands on. `""` for everything else. */
   symbol: string;
+  /** A corporate action's asset class — "equity", "fixed-income", … `""` for
+   *  a note or an event. Groups the Calendar's filter and legend. */
+  assetClass: string;
+  /** The product page a corporate action links to, if it has one. */
+  href: string | null;
   /** The issuer's legal name, for the record sheet's header. `""` unless the
    *  row is a corporate action whose feed carried one. */
   symbolName: string;
@@ -97,6 +104,8 @@ function fromNote(note: Note, t: Dictionary): DayItem {
     noteId: note.id,
     kind: "",
     symbol: "",
+    assetClass: "",
+    href: null,
     symbolName: "",
     facts: [],
   };
@@ -166,6 +175,8 @@ export function groupDayItems(
       noteId: null,
       kind: action.kind,
       symbol: action.symbol,
+      assetClass: action.assetClass,
+      href: action.href ?? null,
       symbolName: action.name ?? action.symbol,
       facts: action.record ?? [],
     });
@@ -184,6 +195,8 @@ export function groupDayItems(
       noteId: null,
       kind: event.category,
       symbol: "",
+      assetClass: "",
+      href: null,
       symbolName: "",
       // One group: an event's extras are a short flat list, and wrapping them
       // is cheaper than teaching the panel two shapes.
@@ -196,13 +209,14 @@ export function groupDayItems(
     // push a live one out of a cell's visible pills. Then by source: an exchange
     // fact is a deadline nobody can reschedule, a desk event is one someone
     // could, and a note is the user's own handwriting — the one they have least
-    // control over reads first. Then, within the corporate actions, the
-    // exchange's own code order and the symbol, so a day's cards come out
+    // control over reads first. Then, within the corporate actions, the asset
+    // class, the code order and the symbol, so a day's cards come out
     // identical on every render.
     list.sort(
       (a, b) =>
         Number(a.done) - Number(b.done) ||
         SOURCE_RANK[a.source] - SOURCE_RANK[b.source] ||
+        assetClassRank(a.assetClass) - assetClassRank(b.assetClass) ||
         actionKindRank(a.kind) - actionKindRank(b.kind) ||
         a.kind.localeCompare(b.kind) ||
         a.symbol.localeCompare(b.symbol),

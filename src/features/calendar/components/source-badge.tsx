@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { CoinsIcon, NotePencilIcon } from "@phosphor-icons/react";
 import type { DayItem, DayItemSource } from "@/features/calendar/lib/day-items";
-import { actionKindName, actionPalette, eventCategory } from "./market-taxonomy";
+import { actionKindName, actionKindTag, actionPalette, eventCategory } from "./market-taxonomy";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { useT } from "@/i18n/I18nProvider";
 
@@ -67,7 +67,9 @@ export function itemBadge(
     const palette = actionPalette(item.kind);
     return {
       icon: (
-        <span className="text-meta leading-none font-semibold tracking-tight">{item.kind}</span>
+        <span className="flex items-center text-meta leading-none font-semibold tracking-tight [&>svg]:size-[15px]">
+          {actionKindTag(item.kind)}
+        </span>
       ),
       label: actionKindName(item.kind, t),
       className: item.done ? DONE_BADGE_TONE : "",
@@ -139,7 +141,7 @@ export function SourceBadgeIcon({
       style={badge.style}
       className={`flex shrink-0 items-center justify-center rounded-full ${
         selfCenter ? "self-center" : ""
-      }${size === "small" ? "size-7" : "size-8"} ${badge.className}`}
+      } ${size === "small" ? "size-7" : "size-8"} ${badge.className}`}
     >
       {badge.icon}
     </span>

@@ -4,17 +4,10 @@ import "@/app/globals.css";
 import "@sarunyu/system-one/styles.css";
 // After the design system's stylesheet, always — it overrides that sheet's sizes.
 import "@/app/typography.css";
-import { Noto_Sans_Thai } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { hasLocale, LOCALES } from "@/i18n/config";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
-
-const notoSansThai = Noto_Sans_Thai({
-  subsets: ["thai", "latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-sans",
-});
 
 export const metadata: Metadata = {
   title: "Yuanta Agent Portal",
@@ -38,7 +31,11 @@ export default async function RootLayout({
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   return (
-    <html lang={lang} className={cn("h-full", "font-sans", notoSansThai.variable)}>
+    // No `next/font` here: system-one's stylesheet loads Noto Sans Thai itself
+    // and sets `--font-sans`, which is what `font-sans` reads. (A `next/font`
+    // copy used to load too, unused — and Turbopack failed the whole app when
+    // Google answered it with a `/l/font?kit=` URL.)
+    <html lang={lang} className={cn("h-full", "font-sans")}>
       <body className="h-full bg-background antialiased">
         <I18nProvider locale={lang}>
           <QueryProvider>{children}</QueryProvider>

@@ -103,9 +103,14 @@ function FilterPillGroup<T extends string>({
 
   if (!scrollable) return group;
 
+  // The group's border is a 1px ring drawn outside its box, and a scroll
+  // container clips whatever lies outside its padding box — so the wrapper
+  // carries 1px of padding for the ring to sit in, and gives the pixel back
+  // with a negative margin so the layout doesn't move. (A `md:overflow-visible`
+  // here never applied: system-one's unlayered `overflow-x-auto` beat it.)
   return (
     <div
-      className="hide-scrollbar max-w-full overflow-x-auto md:overflow-visible"
+      className="hide-scrollbar -m-px max-w-[calc(100%+2px)] overflow-x-auto p-px"
       style={{ scrollbarWidth: "none" }}
     >
       {group}
@@ -214,7 +219,7 @@ export function GlobalBondDetailHero({
           }`}
         >
           <div className="flex min-w-0 flex-col gap-2">
-            <span className="text-xs leading-[22px] whitespace-nowrap text-[rgba(0,0,0,0.75)] md:text-sm md:leading-[26px]">
+            <span className="text-sm leading-[26px] whitespace-nowrap text-[rgba(0,0,0,0.75)]">
               {labels.estimatedYield}
             </span>
             <FilterPillGroup

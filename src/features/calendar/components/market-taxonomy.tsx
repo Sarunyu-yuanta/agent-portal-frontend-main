@@ -2,9 +2,13 @@ import type { ReactNode } from "react";
 import {
   ChalkboardTeacherIcon,
   CoinsIcon,
+  FlagCheckeredIcon,
+  HandCoinsIcon,
   IslandIcon,
+  LockKeyIcon,
   MegaphoneIcon,
   StarIcon,
+  TargetIcon,
 } from "@phosphor-icons/react";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 
@@ -60,32 +64,102 @@ function ramp(hue: string): MarketPalette {
  * codes a reader has to tell apart inside a 14px pill, in the same colour. XM
  * blue and XN violet also match the day card this was drawn from.
  */
-export const ACTION_KINDS: { kind: string; hue: string }[] = [
-  { kind: "XD", hue: "green" },
-  { kind: "XR", hue: "rose" },
-  { kind: "XW", hue: "cyan" },
-  { kind: "XI", hue: "teal" },
-  { kind: "XP", hue: "amber" },
-  { kind: "XA", hue: "fuchsia" },
-  { kind: "XB", hue: "stone" },
-  { kind: "XE", hue: "lime" },
-  { kind: "XM", hue: "blue" },
-  { kind: "XN", hue: "violet" },
-  { kind: "XT", hue: "orange" },
+export const ACTION_KINDS: {
+  kind: string;
+  hue: string;
+  assetClass: string;
+  /** A product event has no exchange code to print, so its pill carries this
+   *  glyph instead. Absent for a SET code, which prints itself. */
+  icon?: ReactNode;
+}[] = [
+  { kind: "XD", hue: "green", assetClass: "equity" },
+  { kind: "XR", hue: "rose", assetClass: "equity" },
+  { kind: "XW", hue: "cyan", assetClass: "equity" },
+  { kind: "XA", hue: "fuchsia", assetClass: "equity" },
+  { kind: "XB", hue: "stone", assetClass: "equity" },
+  { kind: "XE", hue: "lime", assetClass: "equity" },
+  { kind: "XM", hue: "blue", assetClass: "equity" },
+  { kind: "XN", hue: "violet", assetClass: "equity" },
+  { kind: "XT", hue: "orange", assetClass: "equity" },
+
+  // XI and XP are SET codes too, but SET posts them against listed
+  // debentures, not shares — they belong with the bond's other dates.
+  { kind: "XI", hue: "teal", assetClass: "fixed-income" },
+  { kind: "XP", hue: "amber", assetClass: "fixed-income" },
+
+  // Product events. Hues follow the *meaning* across classes — a coupon is sky
+  // whether a bond or a note pays it, a maturity indigo, a close emerald, a
+  // dividend XD's green — so the colour reads the same in every group, and
+  // inside one group no two collide.
+  { kind: "FI-COUPON", hue: "sky", assetClass: "fixed-income", icon: <HandCoinsIcon /> },
+  { kind: "FI-MATURITY", hue: "indigo", assetClass: "fixed-income", icon: <FlagCheckeredIcon /> },
+  { kind: "FI-TRADE-CLOSE", hue: "emerald", assetClass: "fixed-income", icon: <LockKeyIcon /> },
+  { kind: "SN-SUB-CLOSE", hue: "emerald", assetClass: "structured-note", icon: <LockKeyIcon /> },
+  { kind: "SN-COUPON", hue: "sky", assetClass: "structured-note", icon: <HandCoinsIcon /> },
+  { kind: "SN-KO-OBS", hue: "purple", assetClass: "structured-note", icon: <TargetIcon /> },
+  {
+    kind: "SN-MATURITY",
+    hue: "indigo",
+    assetClass: "structured-note",
+    icon: <FlagCheckeredIcon />,
+  },
+  { kind: "MF-IPO-CLOSE", hue: "emerald", assetClass: "mutual-fund", icon: <LockKeyIcon /> },
+  { kind: "MF-DIVIDEND", hue: "green", assetClass: "mutual-fund", icon: <HandCoinsIcon /> },
 ];
 
 /**
+ * The asset classes, in the order the filter and the legend list them —
+ * shares first (dozens of X-dates a month), then the products whose dates the
+ * desk sells against.
+ */
+export const ASSET_CLASSES = ["equity", "fixed-income", "structured-note", "mutual-fund"] as const;
+
+const ASSET_CLASS_ORDER = new Map<string, number>(ASSET_CLASSES.map((key, i) => [key, i]));
+
+/** Sort position of an asset class; one the frontend doesn't know goes last. */
+export function assetClassRank(assetClass: string): number {
+  return ASSET_CLASS_ORDER.get(assetClass) ?? ASSET_CLASSES.length;
+}
+
+/** "หุ้น" / "Equity" for a known class, the slug itself otherwise. */
+export function assetClassName(assetClass: string, t: Dictionary): string {
+  return t.planner.assetClasses[assetClass] ?? assetClass;
+}
+
+/**
+ * The class a code belongs to. The feed says so per record; this is for the
+ * places that hold only a code — the filter's list of known kinds before the
+ * month's feed has sent any. An unknown code is assumed to be an exchange
+ * X-code, i.e. equity.
+ */
+export function actionKindAssetClass(kind: string): string {
+  return ACTION_KIND_CLASS.get(kind) ?? "equity";
+}
+
+/**
+ * What a pill, a badge or a tag prints for a code: the SET code itself, or a
+ * product event's glyph. Sized by the caller (`[&>svg]:size-3` and the like).
+ */
+export function actionKindTag(kind: string): ReactNode {
+  return ACTION_KIND_ICON.get(kind) ?? kind;
+}
+
+/**
  * Hues held back for codes and categories nobody has designed for —
- * deliberately disjoint from the eleven above, so an unrecognised code can never
+ * deliberately disjoint from every hue above, so an unrecognised code can never
  * turn up wearing XD's green.
  *
  * Red is not among them. It is the app's risk colour, and a corporate action the
  * frontend merely hasn't heard of is not a risk.
  */
-const FALLBACK_HUES = ["sky", "emerald", "pink", "indigo", "purple", "yellow", "slate", "camel"];
+const FALLBACK_HUES = ["pink", "yellow", "slate", "camel", "zinc"];
 
 const ACTION_KIND_ORDER = new Map(ACTION_KINDS.map((entry, i) => [entry.kind, i]));
 const ACTION_KIND_HUE = new Map(ACTION_KINDS.map((entry) => [entry.kind, entry.hue]));
+const ACTION_KIND_CLASS = new Map(ACTION_KINDS.map((entry) => [entry.kind, entry.assetClass]));
+const ACTION_KIND_ICON = new Map(
+  ACTION_KINDS.flatMap((entry) => (entry.icon ? [[entry.kind, entry.icon] as const] : [])),
+);
 
 /**
  * Codes already drawn somewhere in the product, held to the exact values that

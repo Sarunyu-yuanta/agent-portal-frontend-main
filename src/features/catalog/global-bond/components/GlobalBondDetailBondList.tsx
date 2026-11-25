@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Button } from "@sarunyu/system-one";
 import { CaretDownIcon, CaretUpIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import {
@@ -259,9 +259,31 @@ export function GlobalBondDetailAccordion({ bonds, onClearFilters }: BondListPro
   );
 }
 
+/** Marks the table's scroller `data-more="true"` while columns sit hidden to
+ *  the right of the pinned action column — on scroll and whenever the
+ *  scroller resizes (the window, or rows arriving after a filter). */
+function useActionColumnEdge() {
+  return useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    const update = () => {
+      el.dataset.more = String(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, []);
+}
+
 export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) {
   const t = useT();
   const cols = t.products.globalBond.columns;
+  const scrollRef = useActionColumnEdge();
   if (bonds.length === 0) return <EmptyBondsCard onClearFilters={onClearFilters} />;
 
   const isLastRow = (i: number) => (i === bonds.length - 1 ? false : undefined);
@@ -271,7 +293,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
       className="w-full overflow-hidden rounded-xl bg-white"
       style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: TABLE_SHADOW }}
     >
-      <div className="overflow-x-auto">
+      <div ref={scrollRef} className="group/scroll overflow-x-auto">
         <div className="flex min-w-[1280px] items-stretch">
           <div className="flex min-w-[220px] flex-1 flex-col">
             <div
@@ -408,7 +430,7 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
             ))}
           </div>
           <div className="flex shrink-0 flex-col">
-            <div className="flex items-center justify-center p-3" style={headerBorder()}>
+            <div className="flex h-11 items-center justify-center px-3" style={headerBorder()}>
               <span className={`${HEADER_CLS} whitespace-nowrap`}>{cols.documents}</span>
             </div>
             {bonds.map((row, i) => (
@@ -417,13 +439,15 @@ export function GlobalBondDetailTable({ bonds, onClearFilters }: BondListProps) 
                 className="flex min-h-[52px] flex-1 items-center justify-center px-3 py-[11px]"
                 style={cellBorder({ bottom: isLastRow(i) })}
               >
-                <FactsheetButton />
+                <FactsheetButton label={t.products.common.termSheet} />
               </div>
             ))}
           </div>
-          <div className="flex shrink-0 flex-col">
+          {/* Pinned right, so the CTAs stay in reach however far the row is
+              scrolled; the edge shadow shows only while columns hide behind it. */}
+          <div className="sticky right-0 z-[1] flex shrink-0 flex-col bg-white transition-shadow group-data-[more=true]/scroll:shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.1)]">
             <div
-              className="flex items-center justify-end p-3"
+              className="flex h-11 items-center justify-end px-3"
               style={headerBorder({ right: false })}
             >
               <span className={`${HEADER_CLS} opacity-0`} aria-hidden>

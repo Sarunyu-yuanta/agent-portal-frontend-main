@@ -19,7 +19,7 @@ export type ThaiStructuredProduct = {
 export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   {
     theme: "Big Data",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "PLTR US",
     bbg2: "SNOW US",
@@ -33,7 +33,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Chips",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "AMD US",
     bbg2: "NVDA US",
@@ -47,7 +47,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Magnificent 7",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "GOOGL US",
     bbg2: "AMZN US",
@@ -61,7 +61,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Streaming Media",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "NFLX US",
     bbg2: "DIS US",
@@ -75,7 +75,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Semiconductor",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "INTC US",
     bbg2: "QCOM US",
@@ -89,7 +89,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Enterprise Software",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "ADBE US",
     bbg2: "ORCL US",
@@ -103,7 +103,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Metaverse",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "RBLX US",
     bbg2: "META US",
@@ -117,7 +117,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Healthcare",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "UNH US",
     bbg2: "NVO US",
@@ -131,7 +131,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Energy",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "XOM US",
     bbg2: "CVX US",
@@ -145,7 +145,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Bank",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "BAC US",
     bbg2: "C US",
@@ -159,7 +159,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Investment",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "JPM US",
     bbg2: "MS US",
@@ -173,7 +173,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Payments",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "V US",
     bbg2: "MA US",
@@ -187,7 +187,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Sharing Economy",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "UBER US",
     bbg2: "ABNB US",
@@ -201,7 +201,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Apparel",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "NKE US",
     bbg2: "LULU US",
@@ -215,7 +215,7 @@ export const THAI_STRUCTURED_PRODUCTS: ThaiStructuredProduct[] = [
   },
   {
     theme: "Food & Beverage",
-    product: "FCN",
+    product: "Thai FCN",
     ccy: "USD",
     bbg1: "MNST US",
     bbg2: "SHAK US",

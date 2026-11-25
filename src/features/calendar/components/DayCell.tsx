@@ -13,6 +13,7 @@ import {
   eventCategory,
   HOLIDAY_PALETTE,
   HolidayIcon,
+  actionKindTag,
 } from "./market-taxonomy";
 import {
   dayLabel,
@@ -244,7 +245,10 @@ export function DayCell({
         onOpen: undefined,
         body: (
           <>
-            <span className="shrink-0 font-semibold">{row.group.kind}</span>
+            {/* The SET code, or a product event's glyph — see `actionKindTag`. */}
+            <span className="flex shrink-0 items-center font-semibold [&>svg]:size-3">
+              {actionKindTag(row.group.kind)}
+            </span>
             <span className="truncate">{symbols.join(", ")}</span>
             {/* Outside the truncation, so a day with nine XDs still says nine
                 even when the cell can only print the first two symbols. */}

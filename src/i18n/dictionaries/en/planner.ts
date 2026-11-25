@@ -28,7 +28,23 @@ const planner = {
       name: "Excluding Transferable Subscription Right",
       short: "Transferable Subscription Right",
     },
+    "FI-COUPON": { name: "Interest payment date", short: "Interest payment" },
+    "FI-MATURITY": { name: "Maturity date", short: "Maturity" },
+    "FI-TRADE-CLOSE": { name: "Last trading date", short: "Last trading" },
+    "SN-SUB-CLOSE": { name: "Subscription close", short: "Subscription close" },
+    "SN-COUPON": { name: "Coupon payment date", short: "Coupon payment" },
+    "SN-KO-OBS": { name: "KO observation date", short: "KO observation" },
+    "SN-MATURITY": { name: "Maturity date", short: "Maturity" },
+    "MF-IPO-CLOSE": { name: "IPO closing date", short: "IPO close" },
+    "MF-DIVIDEND": { name: "Fund dividend payment", short: "Fund dividend" },
   } as Record<string, { name: string; short: string }>,
+
+  assetClasses: {
+    equity: "Equity",
+    "fixed-income": "Fixed Income",
+    "structured-note": "Structured Note",
+    "mutual-fund": "Mutual Fund",
+  } as Record<string, string>,
 
   eventCategories: {
     seminar: "Seminar",
@@ -57,10 +73,18 @@ const planner = {
       holiday: "Market holiday",
       note: "Your notes / reminders",
       doneNote: "Completed reminders",
+      title: "Legend",
+      showAll: "Show all",
+      hide: "Hide",
+      groups: { event: "Events", other: "Other" },
+      groupLabel: (group: string) => `Legend · ${group}`,
     },
     filter: {
       layers: {
-        "corporate-action": "Company events",
+        equity: "Equity",
+        "fixed-income": "Fixed Income",
+        "structured-note": "Structured Note",
+        "mutual-fund": "Mutual Fund",
         event: "Events",
         holiday: "Holidays",
         note: "Reminders",
@@ -92,6 +116,7 @@ const planner = {
       recordLabel: (kindName: string, symbol: string) => `${kindName} detail for ${symbol}`,
       noHolders: "No clients on this item yet",
       noDetails: "No details from the exchange yet",
+      viewProduct: "View product details",
     },
     contact: {
       none: "No contact details",

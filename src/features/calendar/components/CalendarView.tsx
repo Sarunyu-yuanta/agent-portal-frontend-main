@@ -231,16 +231,25 @@ export function CalendarView({
    * (see `market-taxonomy`) — and a row you can see but cannot switch off is a
    * filter that lies about being complete.
    */
-  const { kinds, categories } = useMemo(() => {
-    const kindSet = new Set(ACTION_KINDS.map((entry) => entry.kind));
+  const { kindsByClass, categories } = useMemo(() => {
+    const byClass = new Map<string, Set<string>>();
+    const add = (assetClass: string, kind: string) => {
+      const set = byClass.get(assetClass);
+      if (set) set.add(kind);
+      else byClass.set(assetClass, new Set([kind]));
+    };
+    for (const entry of ACTION_KINDS) add(entry.assetClass, entry.kind);
     const categorySet = new Set<string>();
     for (const items of itemsByDay.values()) {
       for (const item of items) {
-        if (item.source === "corporate-action") kindSet.add(item.kind);
+        if (item.source === "corporate-action") add(item.assetClass, item.kind);
         if (item.source === "event") categorySet.add(item.kind);
       }
     }
-    return { kinds: [...kindSet], categories: [...categorySet] };
+    return {
+      kindsByClass: new Map([...byClass].map(([key, set]) => [key, [...set]])),
+      categories: [...categorySet],
+    };
   }, [itemsByDay]);
 
   /**
@@ -387,7 +396,7 @@ export function CalendarView({
               reminder" because the primary action stays furthest right. */}
           <CalendarFilterMenu
             state={filter}
-            kinds={kinds}
+            kindsByClass={kindsByClass}
             categories={categories}
             onChange={setFilter}
           />

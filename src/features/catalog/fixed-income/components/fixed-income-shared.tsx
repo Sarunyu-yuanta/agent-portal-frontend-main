@@ -149,7 +149,9 @@ export function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function FactsheetButton() {
+/** A row's document button — the factsheet unless the table names another
+ *  document (an issuer's bond list links each bond's term sheet). */
+export function FactsheetButton({ label }: { label?: string } = {}) {
   const t = useT();
   return (
     <Button
@@ -159,7 +161,7 @@ export function FactsheetButton() {
       className="whitespace-nowrap"
       onClick={(e) => e.stopPropagation()}
     >
-      {t.products.common.factsheet}
+      {label ?? t.products.common.factsheet}
     </Button>
   );
 }

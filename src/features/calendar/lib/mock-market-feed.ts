@@ -43,6 +43,10 @@
  */
 
 import holidayData from "@/mocks/market-holidays.json";
+import { FIXED_INCOME_BONDS } from "@/features/catalog/fixed-income/lib/fixed-income-data";
+import { GLOBAL_BOND_ISSUERS } from "@/features/catalog/global-bond/lib/global-bond-data";
+import { getTopPerformers } from "@/features/catalog/mutual-fund/lib/mutual-fund-data";
+import { STRUCTURED_PRODUCTS } from "@/features/catalog/structured-product/lib/structured-product-data";
 import { dayKey } from "./calendar-grid";
 import type {
   CorporateActionFeedItem,
@@ -63,8 +67,13 @@ import type {
  * date — "12/09/26" — and the month those dates fall in is only known once the
  * feed is asked for one.
  */
-type ActionSeed = Omit<CorporateActionFeedItem, "id" | "date" | "record" | "name"> & {
+type ActionSeed = Omit<
+  CorporateActionFeedItem,
+  "id" | "date" | "record" | "name" | "assetClass"
+> & {
   on: number;
+  /** Defaults to `"equity"` — nearly every X-code here is a share's. */
+  assetClass?: string;
   /** Dividend per share, for an XD. Its presence is what makes the record a
    *  dividend sheet rather than the short common one. */
   dividend?: string;
@@ -154,7 +163,14 @@ const ACTION_SEEDS: ActionSeed[] = [
   { on: 12, kind: "XN", symbol: "CTARAF", detail: "Capital return THB 0.35 per unit" },
 
   { on: 16, kind: "XT", symbol: "BBL", detail: "Transferable subscription right" },
-  { on: 16, kind: "XI", symbol: "SCC241A", detail: "Coupon 3.25% · semi-annual" },
+  // A debenture, not a share: SET posts XI against the bond.
+  {
+    on: 16,
+    kind: "XI",
+    assetClass: "fixed-income",
+    symbol: "SCC241A",
+    detail: "Coupon 3.25% · semi-annual",
+  },
 
   { on: 18, kind: "XM", symbol: "AOT", detail: "AGM, 14:00" },
 
@@ -190,6 +206,196 @@ const ACTION_SEEDS: ActionSeed[] = [
   { on: 29, kind: "XN", symbol: "LHHOTEL", detail: "Capital return THB 0.22 per unit" },
 ];
 
+// ── Product events ──────────────────────────────────────────────────────────
+
+/**
+ * Dates that belong to a product rather than to a listed share — a bond's
+ * coupon and maturity, a structured note's subscription close and KO
+ * observation, a fund's IPO close and dividend.
+ *
+ * Built off the catalog's own records so the symbol, the name and the link all
+ * match the product page a reader lands on. Like the X-codes above they are
+ * pinned to fixed days of whichever month is on screen; the record rows carry
+ * the product's terms, and the date row is added at assembly.
+ */
+type ProductSeed = {
+  on: number;
+  kind: string;
+  assetClass: string;
+  symbol: string;
+  name: string;
+  detail: string;
+  href: string;
+  clientIds?: string[];
+  /** The product's terms, grouped as the record sheet rules them. */
+  terms: MarketFact[][];
+};
+
+const bondHref = (id: string) => `/product-catalog/fixed-income/bond/${encodeURIComponent(id)}`;
+const noteHref = (id: string) => `/product-catalog/product/${encodeURIComponent(id)}`;
+const fundHref = (id: string) => `/product-catalog/mutual-fund/${encodeURIComponent(id)}`;
+
+function productSeeds(): ProductSeed[] {
+  const [mqdc, jmt, tmn] = FIXED_INCOME_BONDS;
+  const appleBond = GLOBAL_BOND_ISSUERS.apple?.bonds[0];
+  const [fcnA, fcnB, fcnC] = STRUCTURED_PRODUCTS;
+  const [fundA, fundB] = getTopPerformers("global-equity");
+
+  const bondTerms = (b: typeof mqdc): MarketFact[][] => [
+    [
+      { label: "Coupon Rate", value: b.couponRate },
+      { label: "Coupon Period", value: b.couponPeriod },
+    ],
+    [
+      { label: "Maturity Date", value: b.maturity },
+      { label: "Bond Rating", value: b.bondRating },
+    ],
+  ];
+  const noteTerms = (n: typeof fcnA): MarketFact[][] => [
+    [
+      { label: "Underlying", value: n.underlying },
+      { label: "Coupon (p.a.)", value: n.coupon },
+      { label: "Coupon Period", value: n.couponPeriod },
+    ],
+    [
+      { label: "KO", value: n.ko },
+      { label: "Strike", value: n.strike },
+      { label: "KI", value: n.ki },
+      { label: "Tenor", value: n.detailTenor },
+    ],
+  ];
+  const fundTerms = (f: typeof fundA): MarketFact[][] => [
+    [
+      { label: "NAV", value: `${f.price} ${f.currency}` },
+      { label: "Risk Level", value: String(f.risk) },
+    ],
+  ];
+
+  const seeds: (ProductSeed | false | undefined)[] = [
+    mqdc && {
+      on: 6,
+      kind: "FI-COUPON",
+      assetClass: "fixed-income",
+      symbol: mqdc.symbol,
+      name: mqdc.fullCompanyName,
+      detail: `Coupon ${mqdc.couponRate} · ${mqdc.couponPeriod}`,
+      href: bondHref(mqdc.id),
+      clientIds: ["110003"],
+      terms: bondTerms(mqdc),
+    },
+    jmt && {
+      on: 13,
+      kind: "FI-COUPON",
+      assetClass: "fixed-income",
+      symbol: jmt.symbol,
+      name: jmt.fullCompanyName,
+      detail: `Coupon ${jmt.couponRate} · ${jmt.couponPeriod}`,
+      href: bondHref(jmt.id),
+      terms: bondTerms(jmt),
+    },
+    tmn && {
+      on: 19,
+      kind: "FI-TRADE-CLOSE",
+      assetClass: "fixed-income",
+      symbol: tmn.symbol,
+      name: tmn.fullCompanyName,
+      detail: "Last day to trade before the coupon record date",
+      href: bondHref(tmn.id),
+      clientIds: ["110006"],
+      terms: bondTerms(tmn),
+    },
+    appleBond && {
+      on: 23,
+      kind: "FI-MATURITY",
+      assetClass: "fixed-income",
+      symbol: appleBond.name,
+      name: GLOBAL_BOND_ISSUERS.apple.fullName,
+      detail: `Redemption at par · ${appleBond.currency}`,
+      href: "/product-catalog/global-bond/apple",
+      clientIds: ["110002"],
+      terms: [
+        [
+          { label: "ISIN", value: appleBond.isin },
+          { label: "Coupon Rate", value: appleBond.couponRate },
+        ],
+        [
+          { label: "Maturity Date", value: appleBond.maturity },
+          { label: "Currency", value: appleBond.currency },
+        ],
+      ],
+    },
+
+    fcnB && {
+      on: 5,
+      kind: "SN-SUB-CLOSE",
+      assetClass: "structured-note",
+      symbol: fcnB.underlying,
+      name: fcnB.productName,
+      detail: "Book closes 15:00",
+      href: noteHref(fcnB.id),
+      terms: noteTerms(fcnB),
+    },
+    fcnA && {
+      on: 14,
+      kind: "SN-KO-OBS",
+      assetClass: "structured-note",
+      symbol: fcnA.underlying,
+      name: fcnA.productName,
+      detail: `KO ${fcnA.ko} of initial`,
+      href: noteHref(fcnA.id),
+      clientIds: ["110001", "110004"],
+      terms: noteTerms(fcnA),
+    },
+    fcnA && {
+      on: 14,
+      kind: "SN-COUPON",
+      assetClass: "structured-note",
+      symbol: fcnA.underlying,
+      name: fcnA.productName,
+      detail: `Coupon ${fcnA.coupon} p.a. · ${fcnA.couponPeriod}`,
+      href: noteHref(fcnA.id),
+      clientIds: ["110001", "110004"],
+      terms: noteTerms(fcnA),
+    },
+    fcnC && {
+      on: 27,
+      kind: "SN-MATURITY",
+      assetClass: "structured-note",
+      symbol: fcnC.underlying,
+      name: fcnC.productName,
+      detail: "Final observation and redemption",
+      href: noteHref(fcnC.id),
+      clientIds: ["110005"],
+      terms: noteTerms(fcnC),
+    },
+
+    fundA && {
+      on: 22,
+      kind: "MF-IPO-CLOSE",
+      assetClass: "mutual-fund",
+      symbol: fundA.symbol,
+      name: fundA.name,
+      detail: "Subscriptions close 15:30",
+      href: fundHref(fundA.id),
+      clientIds: ["110001", "110008"],
+      terms: fundTerms(fundA),
+    },
+    fundB && {
+      on: 15,
+      kind: "MF-DIVIDEND",
+      assetClass: "mutual-fund",
+      symbol: fundB.symbol,
+      name: fundB.name,
+      detail: "Dividend THB 0.25 per unit",
+      href: fundHref(fundB.id),
+      terms: fundTerms(fundB),
+    },
+  ];
+  return seeds.filter((seed): seed is ProductSeed => Boolean(seed));
+}
+
+const PRODUCT_SEEDS = productSeeds();
+
 // ── Market events ───────────────────────────────────────────────────────────
 
 type EventSeed = Omit<MarketEventFeedItem, "id" | "date"> & { on: number };
@@ -220,13 +426,6 @@ const EVENT_SEEDS: EventSeed[] = [
     title: "Private Wealth Forum — Q4 allocation",
     detail: "09:00–12:00 · Yuanta Tower, 14th floor",
     clientIds: ["110004", "110007"],
-  },
-  {
-    on: 22,
-    category: "deadline",
-    title: "Yuanta Global Equity Fund — IPO closes",
-    detail: "Subscriptions close 15:30",
-    clientIds: ["110001", "110008"],
   },
   {
     on: 24,
@@ -330,16 +529,28 @@ export function marketFeed(anchorMonth: Date): MarketCalendarFeed {
   };
 
   return {
-    corporateActions: ACTION_SEEDS.map(({ on, dividend, payOn, ...seed }) => {
-      const xDay = clampDay(anchorMonth, on);
-      return {
-        ...seed,
-        id: `ca:${stamp}:${seed.kind}:${seed.symbol}`,
-        date: isoDay(year, monthIndex, xDay),
-        name: ISSUER_NAMES[seed.symbol] ?? seed.symbol,
-        record: recordFor(xDay, dividend, payOn),
-      };
-    }),
+    corporateActions: [
+      ...ACTION_SEEDS.map(({ on, dividend, payOn, assetClass, ...seed }) => {
+        const xDay = clampDay(anchorMonth, on);
+        return {
+          ...seed,
+          assetClass: assetClass ?? "equity",
+          id: `ca:${stamp}:${seed.kind}:${seed.symbol}`,
+          date: isoDay(year, monthIndex, xDay),
+          name: ISSUER_NAMES[seed.symbol] ?? seed.symbol,
+          record: recordFor(xDay, dividend, payOn),
+        };
+      }),
+      ...PRODUCT_SEEDS.map(({ on, terms, ...seed }) => {
+        const day = clampDay(anchorMonth, on);
+        return {
+          ...seed,
+          id: `pe:${stamp}:${seed.kind}:${seed.symbol}`,
+          date: isoDay(year, monthIndex, day),
+          record: [[{ label: "Event Date", value: shortDate(0, day) }], ...terms],
+        };
+      }),
+    ],
     events: EVENT_SEEDS.map(({ on, ...seed }, index) => ({
       ...seed,
       id: `ev:${stamp}:${index}`,
