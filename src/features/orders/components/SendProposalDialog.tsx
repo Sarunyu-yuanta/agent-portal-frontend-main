@@ -36,6 +36,7 @@ import {
   Popover,
   SearchInput,
   Tag,
+  Tooltip,
   useIsMobile,
 } from "@sarunyu/system-one";
 import {
@@ -394,25 +395,42 @@ export function ProposalSteps({
               ))}
               {/* The rule behind the chips, pushed to the row's right end:
                   what it requires in words, the icon marking that there is
-                  more. The whole pair is the trigger, so a phone gets a
-                  target bigger than the icon. A Popover rather than a
-                  Tooltip, because a tooltip only opens on hover and this
-                  dialog is a bottom sheet on a phone. On a narrow screen it
-                  wraps onto its own line, still on the right. */}
-              <Popover
-                side="bottom"
-                align="end"
-                className="max-w-[260px] px-3 py-2 text-meta leading-snug text-foreground"
-                content={t.orders.proposal.tierRequiredWhy(tierLabel(minTier))}
-              >
-                <button
-                  type="button"
-                  className="ml-auto flex shrink-0 cursor-pointer items-center gap-0.5 rounded-full py-1 pr-1 pl-1.5 text-meta font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                  more. Hovering it shows the full rule. A phone has no hover,
+                  so there the same text opens it on a tap instead. On a narrow
+                  screen it wraps onto its own line, still on the right. */}
+              {isMobile ? (
+                <Popover
+                  side="bottom"
+                  align="end"
+                  className="max-w-[260px] px-3 py-2 text-meta leading-snug text-foreground"
+                  content={t.orders.proposal.tierRequiredWhy(tierLabel(minTier))}
                 >
-                  {t.orders.proposal.tierRule(tierLabel(minTier))}
-                  <InfoIcon size={14} weight="bold" aria-hidden />
-                </button>
-              </Popover>
+                  <button
+                    type="button"
+                    className="ml-auto flex shrink-0 cursor-pointer items-center gap-0.5 rounded-full py-1 pr-1 pl-1.5 text-meta font-medium text-muted-foreground"
+                  >
+                    {t.orders.proposal.tierRule(tierLabel(minTier))}
+                    <InfoIcon size={14} weight="bold" aria-hidden />
+                  </button>
+                </Popover>
+              ) : (
+                <Tooltip
+                  side="bottom"
+                  align="end"
+                  delayDuration={150}
+                  className="max-w-[260px] leading-snug"
+                  content={t.orders.proposal.tierRequiredWhy(tierLabel(minTier))}
+                >
+                  {/* Focusable, so the keyboard reaches the explanation too. */}
+                  <span
+                    tabIndex={0}
+                    className="ml-auto flex shrink-0 cursor-help items-center gap-0.5 rounded-full py-1 pr-1 pl-1.5 text-meta font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand-600"
+                  >
+                    {t.orders.proposal.tierRule(tierLabel(minTier))}
+                    <InfoIcon size={14} weight="bold" aria-hidden />
+                  </span>
+                </Tooltip>
+              )}
             </div>
           )}
         </div>
