@@ -5,8 +5,10 @@
  * where it went (`ProposalDetailModal`), so a channel cannot be called one
  * thing when chosen and another when read back.
  *
- * YSInvest is `required`: the client's app is where the offer is recorded
- * against them, so every proposal lands there and the others are in addition.
+ * YSInvest and Voice AI are `comingSoon`: listed so the IC knows they are on
+ * the way, but they can't be picked yet. They sit together at the end, after
+ * the channels that work. Nothing is ticked by default; a send needs at least
+ * one channel.
  */
 
 import type { ElementType } from "react";
@@ -18,7 +20,7 @@ import {
 } from "@phosphor-icons/react";
 import type { ProposalChannel } from "@/types/order";
 
-export const PROPOSAL_CHANNEL_ORDER: ProposalChannel[] = ["app", "email", "line", "voice-ai"];
+export const PROPOSAL_CHANNEL_ORDER: ProposalChannel[] = ["email", "line", "app", "voice-ai"];
 
 export const PROPOSAL_CHANNEL_META: Record<
   ProposalChannel,
@@ -28,15 +30,15 @@ export const PROPOSAL_CHANNEL_META: Record<
     Icon: ElementType;
     /** Icon colour in the picker. */
     color: string;
-    /** Always sent; shown ticked and locked. */
-    required?: boolean;
+    /** Not available yet: listed, labelled "Coming Soon", cannot be ticked. */
+    comingSoon?: boolean;
   }
 > = {
   app: {
     label: "YSInvest",
     Icon: DeviceMobileIcon,
     color: "#0a6ee7",
-    required: true,
+    comingSoon: true,
   },
   email: {
     label: "Email",
@@ -52,10 +54,11 @@ export const PROPOSAL_CHANNEL_META: Record<
     label: "Voice AI",
     Icon: WaveformIcon,
     color: "#7c3aed",
+    comingSoon: true,
   },
 };
 
-/** The channels every send starts with — the required ones. */
-export const DEFAULT_PROPOSAL_CHANNELS: ProposalChannel[] = PROPOSAL_CHANNEL_ORDER.filter(
-  (c) => PROPOSAL_CHANNEL_META[c].required,
+/** The channels that can be picked today, in list order. */
+export const AVAILABLE_PROPOSAL_CHANNELS: ProposalChannel[] = PROPOSAL_CHANNEL_ORDER.filter(
+  (c) => !PROPOSAL_CHANNEL_META[c].comingSoon,
 );

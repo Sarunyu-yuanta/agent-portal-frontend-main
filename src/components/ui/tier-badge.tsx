@@ -15,6 +15,28 @@ const TIER_STYLE: Record<MembershipTier, TierStyle> = {
   signature: { label: "Signature", bg: "#252525", text: "#FFFFFF" },
 };
 
+/** Lowest to highest. A product's minimum tier admits that tier and every one after it. */
+export const TIER_ORDER: readonly MembershipTier[] = [
+  "member",
+  "bronze",
+  "silver",
+  "gold",
+  "platinum",
+  "elite",
+  "prestige",
+  "signature",
+];
+
+/** Whether `tier` is `min` or above. No `min` means no requirement. */
+export function meetsTier(tier: MembershipTier, min?: MembershipTier): boolean {
+  return min === undefined || TIER_ORDER.indexOf(tier) >= TIER_ORDER.indexOf(min);
+}
+
+/** The tier's display name, as its badge spells it. */
+export function tierLabel(tier: MembershipTier): string {
+  return TIER_STYLE[tier].label;
+}
+
 /** A single membership tier pill: colored background, tier icon, and label. */
 export function TierBadge({ tier, className }: { tier: MembershipTier; className?: string }) {
   const style = TIER_STYLE[tier];

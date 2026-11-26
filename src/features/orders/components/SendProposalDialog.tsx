@@ -28,10 +28,21 @@
  */
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Avatar, Button, Checkbox, Tag, useIsMobile } from "@sarunyu/system-one";
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Chip,
+  Popover,
+  SearchInput,
+  Tag,
+  useIsMobile,
+} from "@sarunyu/system-one";
 import {
   CaretDownIcon,
   DevicesIcon,
+  InfoIcon,
+  MagnifyingGlassIcon,
   PaperPlaneTiltIcon,
   UsersIcon,
   XIcon,
@@ -39,13 +50,13 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { SlideSteps } from "@/components/ui/slide-steps";
-import { TierBadge } from "@/components/ui/tier-badge";
+import { TierBadge, meetsTier, tierLabel, type MembershipTier } from "@/components/ui/tier-badge";
 import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
 import {
-  DEFAULT_PROPOSAL_CHANNELS,
+  AVAILABLE_PROPOSAL_CHANNELS,
   PROPOSAL_CHANNEL_META,
   PROPOSAL_CHANNEL_ORDER,
 } from "./proposal-channels";
@@ -59,6 +70,7 @@ import {
 import { useT } from "@/i18n/I18nProvider";
 import type { OrderBook, ProposalChannel } from "@/types/order";
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { proposalMinTier } from "@/features/orders/lib/proposal-eligibility";
 
 /**
  * What a Proposal can be about — any product the IC can put in front of a
@@ -76,7 +88,14 @@ export type ProposalSubject = {
   coupon?: string;
   /** What goes out. Defaults to a structured product's two documents. */
   documents?: string;
+  /** The lowest membership tier that may be offered this product. Clients
+   *  below it are still listed, so the IC can see who is left out and why,
+   *  but they cannot be ticked. Unset: anyone can be offered it. */
+  minTier?: MembershipTier;
 };
+
+/** Which part of the roster the client list shows. */
+type ClientScope = "all" | "eligible" | "ineligible";
 
 export type ProposalStep = "clients" | "channels";
 
@@ -184,42 +203,103 @@ export function ProposalSteps({
   const { proposals } = useOrders();
   const { isPrivate } = usePrivacy();
   const isMobile = useIsMobile();
-  const [picked, setPicked] = useState<Set<string>>(() => new Set(initialPicked));
+  const minTier = product ? proposalMinTier(product) : undefined;
+  // Only clients who can be offered this product can be ticked, including
+  // the one a client profile opened the dialog on.
+  const eligibleOnly = (ids: string[] | undefined) =>
+    new Set(
+      (ids ?? []).filter((id) => {
+        const client = clients.find((c) => c.id === id);
+        // Unknown while the roster loads: kept rather than silently dropped.
+        return client === undefined || meetsTier(client.membershipTier, minTier);
+      }),
+    );
+  const [picked, setPicked] = useState<Set<string>>(() => eligibleOnly(initialPicked));
+  const [search, setSearch] = useState("");
+  const [scope, setScope] = useState<ClientScope>("all");
   const [showRecipients, setShowRecipients] = useState(false);
   // While the send is in flight: the button can't be pressed twice.
   const [sending, setSending] = useState(false);
-  const [channels, setChannels] = useState<Set<ProposalChannel>>(
-    () => new Set(DEFAULT_PROPOSAL_CHANNELS),
-  );
+  const [channels, setChannels] = useState<Set<ProposalChannel>>(() => new Set());
 
   // A different product is a different send: the ticks for the last one must
   // not carry over when a lead step picks another. Reset during render.
   const [productId, setProductId] = useState(product?.id);
   if (product?.id !== productId) {
     setProductId(product?.id);
-    setPicked(new Set(initialPicked));
+    setPicked(eligibleOnly(initialPicked));
+    setSearch("");
+    setScope("all");
     setShowRecipients(false);
-    setChannels(new Set(DEFAULT_PROPOSAL_CHANNELS));
+    setChannels(new Set());
   }
 
-  /** Each client, with where they already stand on this product. */
+  /** Each client, with where they already stand on this product and whether
+   *  their tier allows it. Eligible clients come first; `sort` is stable, so
+   *  the roster's own order holds inside each group. */
   const rows = useMemo(
     () =>
       product
-        ? clients.map((client) => {
-            const sent = latestProposalFor(proposals, product.id, client.id);
-            return {
-              client,
-              sent,
-              outcome: sent && book ? proposalOutcome(sent, book) : null,
-            };
-          })
+        ? clients
+            .map((client) => {
+              const sent = latestProposalFor(proposals, product.id, client.id);
+              return {
+                client,
+                sent,
+                outcome: sent && book ? proposalOutcome(sent, book) : null,
+                eligible: meetsTier(client.membershipTier, minTier),
+              };
+            })
+            .sort((a, b) => Number(b.eligible) - Number(a.eligible))
         : [],
-    [clients, proposals, product, book],
+    [clients, proposals, product, book, minTier],
   );
 
-  const allPicked = rows.length > 0 && picked.size === rows.length;
-  const allChannels = channels.size === PROPOSAL_CHANNEL_ORDER.length;
+  const query = search.trim().toLowerCase();
+  /** The rows the search matches. The chips count these, so their numbers
+   *  describe the list on screen rather than the whole book. */
+  const searched = useMemo(
+    () =>
+      query
+        ? rows.filter(
+            (r) =>
+              maskName(r.client.name, isPrivate).toLowerCase().includes(query) ||
+              r.client.id.toLowerCase().includes(query),
+          )
+        : rows,
+    [rows, query, isPrivate],
+  );
+  const eligibleCount = searched.filter((r) => r.eligible).length;
+  const visibleRows =
+    scope === "all" ? searched : searched.filter((r) => r.eligible === (scope === "eligible"));
+
+  /** "Select all" covers the eligible clients in view. Picks hidden by the
+   *  search stay as they are. */
+  const selectable = visibleRows.filter((r) => r.eligible).map((r) => r.client.id);
+  const allPicked = selectable.length > 0 && selectable.every((id) => picked.has(id));
+  const toggleAll = () =>
+    setPicked((prev) => {
+      const copy = new Set(prev);
+      for (const id of selectable) {
+        if (allPicked) copy.delete(id);
+        else copy.add(id);
+      }
+      return copy;
+    });
+  const clearFilters = () => {
+    setSearch("");
+    setScope("all");
+  };
+  const scopes: { id: ClientScope; label: string; n: number }[] = [
+    { id: "all", label: t.orders.proposal.scopeAll, n: searched.length },
+    { id: "eligible", label: t.orders.proposal.scopeEligible, n: eligibleCount },
+    {
+      id: "ineligible",
+      label: t.orders.proposal.scopeIneligible,
+      n: searched.length - eligibleCount,
+    },
+  ];
+  const allChannels = AVAILABLE_PROPOSAL_CHANNELS.every((c) => channels.has(c));
   /** Who it is going to, for step two — in the roster's order. */
   const recipients = rows
     .filter((r) => picked.has(r.client.id))
@@ -233,7 +313,7 @@ export function ProposalSteps({
 
   const toggleChannel = (c: ProposalChannel, next: boolean) =>
     setChannels((prev) => {
-      if (PROPOSAL_CHANNEL_META[c].required) return prev;
+      if (PROPOSAL_CHANNEL_META[c].comingSoon) return prev;
       const copy = new Set(prev);
       if (next) copy.add(c);
       else copy.delete(c);
@@ -271,17 +351,70 @@ export function ProposalSteps({
   const clientsPane = (
     <div className="flex flex-col gap-4">
       {rows.length > 0 && (
-        <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">
-            {t.orders.proposal.clientList}
-          </span>
-          <Button
-            variant="plain"
+        /* Pinned in the sheet, where the whole modal scrolls: narrowing a long
+           list is what the reader wants most once they have scrolled it. In
+           the dialog only the list below scrolls, so this stays put anyway. */
+        <div
+          className={`flex flex-col gap-3 ${sheet ? "sticky top-0 z-10 -mx-1 bg-white px-1 pt-1 pb-1" : ""}`}
+        >
+          <div className="-mb-1 flex items-center justify-between pl-1">
+            <span className="text-label font-semibold text-muted-foreground">
+              {t.orders.proposal.clientList}
+            </span>
+            <Button
+              variant="plain"
+              size="sm"
+              disabled={selectable.length === 0}
+              onClick={toggleAll}
+            >
+              {allPicked ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
+            </Button>
+          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            onClear={() => setSearch("")}
+            placeholder={t.orders.proposal.searchClient}
             size="sm"
-            onClick={() => setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.client.id)))}
-          >
-            {allPicked ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
-          </Button>
+            className="w-full"
+          />
+          {/* Only when the product has a tier requirement; without one every
+              client is eligible and the chips would all say the same thing. */}
+          {minTier && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {scopes.map((s) => (
+                <Chip
+                  key={s.id}
+                  type="single"
+                  size="small"
+                  label={`${s.label} ${s.n}`}
+                  selected={scope === s.id}
+                  onClick={() => setScope(s.id)}
+                />
+              ))}
+              {/* The rule behind the chips, pushed to the row's right end:
+                  what it requires in words, the icon marking that there is
+                  more. The whole pair is the trigger, so a phone gets a
+                  target bigger than the icon. A Popover rather than a
+                  Tooltip, because a tooltip only opens on hover and this
+                  dialog is a bottom sheet on a phone. On a narrow screen it
+                  wraps onto its own line, still on the right. */}
+              <Popover
+                side="bottom"
+                align="end"
+                className="max-w-[260px] px-3 py-2 text-meta leading-snug text-foreground"
+                content={t.orders.proposal.tierRequiredWhy(tierLabel(minTier))}
+              >
+                <button
+                  type="button"
+                  className="ml-auto flex shrink-0 cursor-pointer items-center gap-0.5 rounded-full py-1 pr-1 pl-1.5 text-meta font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                >
+                  {t.orders.proposal.tierRule(tierLabel(minTier))}
+                  <InfoIcon size={14} weight="bold" aria-hidden />
+                </button>
+              </Popover>
+            </div>
+          )}
         </div>
       )}
 
@@ -301,22 +434,47 @@ export function ProposalSteps({
             title={t.orders.booking.noClients}
           />
         )}
-        {rows.map(({ client, sent, outcome }) => {
+        {/* A search or chip that leaves nothing is a different fact from an
+            empty book, and it comes with a way back. */}
+        {rows.length > 0 && visibleRows.length === 0 && (
+          <EmptyState
+            size="compact"
+            icon={
+              <MagnifyingGlassIcon size={32} className="text-[var(--text-default-placeholder)]" />
+            }
+            title={t.orders.booking.noClientMatch(search.trim())}
+            action={{ label: t.states.clearFilters, onClick: clearFilters }}
+          />
+        )}
+        {visibleRows.map(({ client, sent, outcome, eligible }) => {
           const name = maskName(client.name, isPrivate);
           const checked = picked.has(client.id);
           return (
             <label
               key={client.id}
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
-                checked
-                  ? "border-primary-action/40 bg-primary-action-light"
-                  : "border-border/60 hover:border-border hover:bg-muted/40"
+              className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
+                !eligible
+                  ? "cursor-not-allowed border-border/60 opacity-60"
+                  : checked
+                    ? "border-primary-action/40 bg-primary-action-light cursor-pointer"
+                    : "cursor-pointer border-border/60 hover:border-border hover:bg-muted/40"
               }`}
             >
-              <Checkbox checked={checked} onChange={(next) => toggle(client.id, next)} />
+              <Checkbox
+                checked={checked}
+                disabled={!eligible}
+                onChange={(next) => toggle(client.id, next)}
+              />
               <Avatar type="text" initials={getInitials(name)} size="s" />
-              <span className="min-w-0 flex-1 truncate text-body-sm font-semibold text-foreground">
-                {name}
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-body-sm font-semibold text-foreground">{name}</span>
+                {/* Why it can't be ticked, said on the row itself. The full
+                    rule is behind the info icon beside the chips. */}
+                {!eligible && minTier && (
+                  <span className="truncate text-meta text-muted-foreground">
+                    {t.orders.proposal.tierRequired(tierLabel(minTier))}
+                  </span>
+                )}
               </span>
               {/* Where they already stand. Nothing for a client never offered
                   this — an empty row reads as "ยังไม่ส่ง" without a tag saying
@@ -400,50 +558,68 @@ export function ProposalSteps({
       )}
 
       <div className="flex flex-col gap-2">
-        <div className="-mb-1 flex items-center justify-between pl-1">
-          <span className="text-label font-semibold text-muted-foreground">
-            {t.orders.proposal.channels}
+        <div className="-mb-1 flex items-center justify-between gap-2 pl-1">
+          <span className="flex min-w-0 items-baseline gap-2">
+            <span className="text-label font-semibold text-muted-foreground">
+              {t.orders.proposal.channels}
+            </span>
+            {/* Nothing is ticked to start with, so say what the disabled
+                send button is waiting for. */}
+            {channels.size === 0 && (
+              <span className="truncate text-meta text-muted-foreground">
+                {t.orders.proposal.channelsMin}
+              </span>
+            )}
           </span>
           <Button
             variant="plain"
             size="sm"
-            onClick={() =>
-              setChannels(new Set(allChannels ? DEFAULT_PROPOSAL_CHANNELS : PROPOSAL_CHANNEL_ORDER))
-            }
+            onClick={() => setChannels(new Set(allChannels ? [] : AVAILABLE_PROPOSAL_CHANNELS))}
           >
             {allChannels ? t.orders.proposal.clearPicked : t.orders.proposal.pickAll}
           </Button>
         </div>
         {PROPOSAL_CHANNEL_ORDER.map((c) => {
-          const { label, Icon, color, required } = PROPOSAL_CHANNEL_META[c];
+          const { label, Icon, color, comingSoon } = PROPOSAL_CHANNEL_META[c];
           const hint = t.orders.proposalChannelHint[c];
           const checked = channels.has(c);
           return (
             <label
               key={c}
               className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
-                required ? "cursor-default" : "cursor-pointer"
-              } ${
-                checked
-                  ? "border-primary-action/40 bg-primary-action-light"
-                  : "border-border/60 hover:border-border hover:bg-muted/40"
+                comingSoon
+                  ? "cursor-not-allowed border-border/60 bg-muted/20"
+                  : checked
+                    ? "border-primary-action/40 bg-primary-action-light cursor-pointer"
+                    : "cursor-pointer border-border/60 hover:border-border hover:bg-muted/40"
               }`}
             >
               <Checkbox
                 checked={checked}
-                disabled={required}
+                disabled={comingSoon}
                 onChange={(next) => toggleChannel(c, next)}
               />
+              {/* Dimmed as a group, not the whole row: the Coming Soon pill
+                  stays at full strength, since it is the row's answer. */}
               <span
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white"
-                style={{ color }}
+                className={`flex min-w-0 flex-1 items-center gap-3 ${comingSoon ? "opacity-50" : ""}`}
               >
-                <Icon size={18} weight="fill" />
+                <span
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white"
+                  style={{ color }}
+                >
+                  <Icon size={18} weight="fill" />
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-body-sm font-semibold text-foreground">{label}</span>
+                  <span className="truncate text-meta text-muted-foreground">{hint}</span>
+                </span>
               </span>
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="text-body-sm font-semibold text-foreground">{label}</span>
-                <span className="truncate text-meta text-muted-foreground">{hint}</span>
-              </span>
+              {comingSoon && (
+                <span className="text-primary-action border-primary-action/30 shrink-0 rounded-full border bg-[var(--bg-brand-light)] px-2 py-0.5 text-meta font-semibold whitespace-nowrap">
+                  {t.orders.proposal.comingSoon}
+                </span>
+              )}
             </label>
           );
         })}
@@ -474,7 +650,7 @@ export function ProposalSteps({
           variant="primary"
           size="lg"
           className="w-full"
-          disabled={picked.size === 0 || sending}
+          disabled={picked.size === 0 || channels.size === 0 || sending}
           leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
           onClick={async () => {
             setSending(true);

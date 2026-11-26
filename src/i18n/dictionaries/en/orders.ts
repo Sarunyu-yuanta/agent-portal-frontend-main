@@ -276,6 +276,16 @@ const orders = {
     send: "Send Proposal",
     sendToN: (n: number) =>
       `Send Proposal to ${n} ${plural(n, { one: "client", other: "clients" })}`,
+    searchClient: "Search name or client ID",
+    scopeAll: "All",
+    scopeEligible: "Eligible",
+    scopeIneligible: "Not eligible",
+    tierRequired: (tier: string) => `Requires ${tier} or above`,
+    tierRule: (min: string) => `${min} & above only`,
+    tierRequiredWhy: (min: string) =>
+      `This product can only be offered to ${min} clients or above. Clients below that are still listed, but can't be selected for a Proposal.`,
+    channelsMin: "Pick at least one",
+    comingSoon: "Coming Soon",
     sheetTitle: (underlying: string, coupon: string) =>
       `Send Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
   },

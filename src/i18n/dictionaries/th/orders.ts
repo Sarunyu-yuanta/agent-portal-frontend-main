@@ -297,6 +297,16 @@ const orders = {
     backOfficeNote: "ระบบหลังบ้านจะส่งเอกสารผ่านช่องทางที่เลือก และบันทึกการส่งไว้เพื่อวัดผล",
     send: "ส่ง Proposal",
     sendToN: (n: number) => `ส่ง Proposal ${n} คน`,
+    searchClient: "ค้นหาชื่อหรือรหัสลูกค้า",
+    scopeAll: "ทั้งหมด",
+    scopeEligible: "ส่งได้",
+    scopeIneligible: "ส่งไม่ได้",
+    tierRequired: (tier: string) => `ต้องเป็น ${tier} ขึ้นไป`,
+    tierRule: (min: string) => `เฉพาะ ${min} ขึ้นไป`,
+    tierRequiredWhy: (min: string) =>
+      `สินค้านี้เสนอได้เฉพาะลูกค้าระดับ ${min} ขึ้นไป ลูกค้าที่ระดับต่ำกว่านั้นยังแสดงในรายชื่อ แต่เลือกส่ง Proposal ไม่ได้`,
+    channelsMin: "เลือกอย่างน้อย 1 ช่องทาง",
+    comingSoon: "Coming Soon",
     sheetTitle: (underlying: string, coupon: string) =>
       `ส่ง Proposal · ${underlying}${coupon ? ` ${coupon}` : ""}`,
   },

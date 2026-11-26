@@ -4,6 +4,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { Card } from "@sarunyu/system-one";
 import { formatDate } from "@/i18n/format";
 import { useLocale, useT } from "@/i18n/I18nProvider";
+import { cn } from "@/lib/utils";
 import { skyVars } from "@/features/command-center/lib/time-of-day-sky";
 
 /** Re-read the clock once a minute. The sky moves by a hair per minute, so
@@ -60,7 +61,10 @@ export function GreetingCard({
     <div style={vars} className="flex h-full min-h-0 flex-1 flex-col">
       <Card
         variant="default"
-        className={`greeting-card${vars ? "greeting-card--live" : ""} bg-primary-action-light relative isolate flex h-full min-h-0 flex-1 flex-col justify-center gap-1 overflow-hidden border-border`}
+        className={cn(
+          "greeting-card bg-primary-action-light relative isolate flex h-full min-h-0 flex-1 flex-col justify-center gap-1 overflow-hidden border-border",
+          vars && "greeting-card--live",
+        )}
       >
         {/* The Yuanta mark as a watermark: far larger than the card and pushed
           off its right edge, so only part of it shows and it reads as texture
