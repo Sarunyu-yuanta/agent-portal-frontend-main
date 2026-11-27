@@ -201,6 +201,8 @@ export function ThaiStructuredProductDetail({
               canBook ? (
                 <button
                   type="button"
+                  // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+                  id="booking-open"
                   onClick={() => setBookingOpen(true)}
                   className="flex h-12 w-full max-w-[343px] cursor-pointer items-center justify-center gap-2 rounded-xl border bg-transparent px-4 text-sm font-medium transition-opacity hover:opacity-90"
                   style={{ borderColor: "#0a6ee7", color: "#0a6ee7" }}

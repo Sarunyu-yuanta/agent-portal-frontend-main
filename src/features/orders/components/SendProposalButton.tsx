@@ -41,6 +41,8 @@ export function SendProposalButton({
     <div className={`flex w-full flex-col items-center gap-1.5 ${className}`}>
       <button
         type="button"
+        // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+        id="send-proposal-open"
         onClick={() => proposal.send(subject)}
         // Same colour, height and radius as the send half of
         // `ProductDocumentActions`, so it reads as the same action.

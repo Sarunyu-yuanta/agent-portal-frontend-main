@@ -677,6 +677,8 @@ export function ProposalSteps({
         size="lg"
         className="w-full"
         disabled={picked.size === 0}
+        // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+        id="send-proposal-next"
         onClick={() => setStep("channels")}
       >
         {picked.size > 0 ? t.orders.proposal.nextPicked(picked.size) : t.orders.proposal.next}
@@ -694,6 +696,8 @@ export function ProposalSteps({
           size="lg"
           className="w-full"
           disabled={picked.size === 0 || channels.size === 0 || sending}
+          // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+          id="send-proposal-submit"
           leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
           onClick={async () => {
             setSending(true);

@@ -73,6 +73,8 @@ export function Footer({
           variant={canBook ? "primary" : "disabled"}
           size="md"
           disabled={!canBook}
+          // USABILITY-TEST ONLY (temporary; revert after testing): stable ids for Useberry triggers.
+          id={reviewing ? "booking-submit" : "booking-review"}
           onClick={() => (reviewing ? onBooked(amount) : onReview())}
         >
           {!reviewing ? t.orders.summary.review : booking ? words.actionBusy : words.confirm}

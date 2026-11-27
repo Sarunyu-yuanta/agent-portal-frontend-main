@@ -247,6 +247,8 @@ export function FixedIncomeDetail({
                   size="xl"
                   className="w-full"
                   leftIcon={<PaperPlaneTiltIcon size={16} weight="fill" />}
+                  // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+                  id="send-proposal-open"
                   onClick={() => proposal.send(adapted)}
                 >
                   {t.products.common.sendProposalToClient}
@@ -259,6 +261,8 @@ export function FixedIncomeDetail({
                 before. */}
             {ORDER_BOOKING_ENABLED && bond.action === "invest" ? (
               <QuotaBookButton
+                // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+                id="booking-open"
                 product={adapted}
                 onBook={booking.book}
                 size="xl"

@@ -128,12 +128,15 @@ export function QuotaBookButton({
   size = "xs",
   className,
   label,
+  id,
 }: {
   product: BookableProduct;
   onBook: (product: BookableProduct) => void;
   size?: "xs" | "sm" | "lg" | "xl";
   className?: string;
   label?: string;
+  /** USABILITY-TEST ONLY (temporary; revert after testing): for a page with one of these. */
+  id?: string;
 }) {
   const t = useT();
   label ??= t.orders.words.quota.cta;
@@ -141,6 +144,7 @@ export function QuotaBookButton({
   const open = !book || isBookingOpen(book);
   return (
     <Button
+      id={id}
       variant={open ? "primary" : "disabled"}
       size={size}
       disabled={!open}

@@ -58,6 +58,8 @@ export function ProductDocumentActions({
       >
         <button
           type="button"
+          // USABILITY-TEST ONLY (temporary; revert after testing): stable id for Useberry triggers.
+          id="send-proposal-open"
           onClick={onSendProposal}
           className="flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 text-sm font-medium transition-opacity hover:opacity-90"
         >
