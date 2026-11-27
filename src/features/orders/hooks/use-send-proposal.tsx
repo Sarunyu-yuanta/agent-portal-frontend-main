@@ -128,6 +128,12 @@ export async function sendAndReport(
     }
     onDone();
     onNotice(proposalSentMessage(t, underlying, rows), "success");
+    // USABILITY-TEST ONLY (temporary; revert after testing): marks a sent
+    // Proposal in the URL for Useberry's "URL contains proposal=sent". Next's
+    // own history state is passed on, so the page is not refetched or remounted.
+    const url = new URL(window.location.href);
+    url.searchParams.set("proposal", "sent");
+    window.history.replaceState(window.history.state, "", url);
     return true;
   } catch (err) {
     reportError("[sendProposal]", err);
