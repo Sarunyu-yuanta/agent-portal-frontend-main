@@ -40,12 +40,9 @@ function isUsabilityTest(): boolean {
   }
 }
 
-/** Sets (or, with `null`, clears) `?ut_step=` on the current URL. No-op outside test mode. */
-export function markUtStep(step: string | null): void {
-  if (typeof window === "undefined" || !isUsabilityTest()) return;
+function updateUrl(edit: (params: URLSearchParams) => void): void {
   const url = new URL(window.location.href);
-  if (step === null) url.searchParams.delete(STEP_PARAM);
-  else url.searchParams.set(STEP_PARAM, step);
+  edit(url.searchParams);
   if (url.href === window.location.href) return;
   // Native History API, as `setQueryState` does: Next patches it into its
   // router, so `useSearchParams` stays in sync.
@@ -53,20 +50,42 @@ export function markUtStep(step: string | null): void {
 }
 
 /**
+ * Sets (or, with `null`, clears) `?ut_step=` on the current URL. No-op outside test mode.
+ *
+ * While a modal is open, `ut_open=<key>` is set too — however it was opened —
+ * so an open modal always has the same URL as the link that opens it. It goes
+ * once the modal is done (sent/booked, or closed), so a reload doesn't pop it
+ * open again.
+ */
+export function markUtStep(step: string | null): void {
+  if (typeof window === "undefined" || !isUsabilityTest()) return;
+  const finished = step !== null && (step.endsWith("-sent") || step.endsWith("-booked"));
+  const openKey = step?.startsWith("proposal-") ? "proposal" : "booking";
+  updateUrl((params) => {
+    if (step === null) params.delete(STEP_PARAM);
+    else params.set(STEP_PARAM, step);
+    if (step === null || finished) params.delete(OPEN_PARAM);
+    else params.set(OPEN_PARAM, openKey);
+  });
+}
+
+/**
  * Opens a modal on load when the URL says `?ut_open=<key>` (test mode only), so
  * a test tool that only captures the loaded page can see the modal open.
- * Fires once per mount, and only after `ready` — e.g. once the product loaded.
+ * Checks once per mount, as soon as `ready` (e.g. the product can be booked) —
+ * a `ut_open` written later by a modal the user opened is not a request.
  */
 export function useUtAutoOpen(key: "booking" | "proposal", open: () => void, ready = true): void {
-  const fired = useRef(false);
+  const checked = useRef(false);
   const latest = useRef(open);
   useEffect(() => {
     latest.current = open;
   });
   useEffect(() => {
-    if (fired.current || !ready || !isUsabilityTest()) return;
+    if (checked.current || !ready) return;
+    checked.current = true;
+    if (!isUsabilityTest()) return;
     if (new URLSearchParams(window.location.search).get(OPEN_PARAM) !== key) return;
-    fired.current = true;
     latest.current();
   }, [key, ready]);
 }
