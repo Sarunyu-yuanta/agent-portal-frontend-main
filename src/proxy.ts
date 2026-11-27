@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, hasLocale, LOCALE_COOKIE, matchAcceptLanguage } from "@/i18n/config";
 import { localeOf } from "@/i18n/locale-path";
-import { utBasePath, utSegmentOf } from "@/lib/usability-test-path";
 
 /**
  * Every app URL carries its language as the first segment. One that arrives
@@ -15,15 +14,7 @@ export function proxy(request: NextRequest) {
   const current = localeOf(pathname);
 
   if (current) {
-    // USABILITY-TEST ONLY (temporary; revert after testing): `/…/ut-proposal`
-    // and friends are an open modal over the page underneath (`markUtStep`).
-    // Serve that page; the browser keeps the `/ut-*` URL.
-    let response = NextResponse.next();
-    if (utSegmentOf(pathname)) {
-      const url = request.nextUrl.clone();
-      url.pathname = utBasePath(pathname);
-      response = NextResponse.rewrite(url);
-    }
+    const response = NextResponse.next();
     if (request.cookies.get(LOCALE_COOKIE)?.value !== current) {
       response.cookies.set(LOCALE_COOKIE, current, {
         path: "/",

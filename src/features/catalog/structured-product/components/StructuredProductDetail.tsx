@@ -29,7 +29,6 @@ import { useT } from "@/i18n/I18nProvider";
 import type { Dictionary } from "@/i18n/dictionaries/th";
 import { formatInteger } from "@/lib/format/number";
 import { ORDER_ENTRY_URL } from "@/config/external-links";
-import { useUtAutoOpen } from "@/lib/usability-test";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 
@@ -183,9 +182,6 @@ export function StructuredProductDetail({
   const notice = (message: string, status: ToastStatus) => addToast({ message, status });
   // Shares this page's toast stack rather than standing up a second one.
   const proposal = useSendProposal({ onNotice: notice });
-  // USABILITY-TEST ONLY (temporary; revert after testing): `?ut_open=` opens the modal on load.
-  useUtAutoOpen("booking", () => setBookingOpen(true), ORDER_BOOKING_ENABLED && canBook);
-  useUtAutoOpen("proposal", () => proposal.send(product), ORDER_BOOKING_ENABLED);
 
   useEffect(() => {
     const main = document.querySelector("main");

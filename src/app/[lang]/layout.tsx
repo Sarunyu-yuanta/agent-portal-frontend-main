@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { hasLocale, LOCALES } from "@/i18n/config";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import { UsabilityTestFlag } from "@/components/providers/UsabilityTestFlag";
 
 export const metadata: Metadata = {
   title: "Yuanta Agent Portal",
@@ -38,7 +37,6 @@ export default async function RootLayout({
     // Google answered it with a `/l/font?kit=` URL.)
     <html lang={lang} className={cn("h-full", "font-sans")}>
       <body className="h-full bg-background antialiased">
-        <UsabilityTestFlag />
         <I18nProvider locale={lang}>
           <QueryProvider>{children}</QueryProvider>
         </I18nProvider>

@@ -56,7 +56,6 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import { markUtStep, useUtCloseOnBack } from "@/lib/usability-test";
 import {
   AVAILABLE_PROPOSAL_CHANNELS,
   PROPOSAL_CHANNEL_META,
@@ -124,31 +123,11 @@ export function SendProposalDialog({
 }) {
   const t = useT();
   const [step, setStep] = useState<ProposalStep>("clients");
-  // USABILITY-TEST ONLY (temporary; revert after testing): mirror the step into `?ut_step=` for test tools.
-  // `sent` is set on success and must survive the close that follows.
-  const utSent = useRef(false);
-  useEffect(() => {
-    if (open) {
-      utSent.current = false;
-      markUtStep(`proposal-${step}`);
-    } else if (!utSent.current) {
-      markUtStep(null);
-    }
-  }, [open, step]);
-  // `useSendProposal` unmounts the dialog on close rather than passing `open={false}`.
-  useEffect(
-    () => () => {
-      if (!utSent.current) markUtStep(null);
-    },
-    [],
-  );
   // Closing clears the step; the ticks go with the steps' remount below.
   const setOpen = (next: boolean) => {
     if (!next) setStep("clients");
     onOpenChange(next);
   };
-  // USABILITY-TEST ONLY (temporary; revert after testing): Back closes the dialog.
-  useUtCloseOnBack(open, () => setOpen(false));
 
   return (
     <ResponsiveDialog
@@ -171,11 +150,7 @@ export function SendProposalDialog({
         // IC's picks away whenever the send failed.
         onConfirm={async (clientIds, channels) => {
           const ok = await onConfirm(clientIds, channels);
-          if (ok) {
-            utSent.current = true;
-            markUtStep("proposal-sent");
-            setOpen(false);
-          }
+          if (ok) setOpen(false);
           return ok;
         }}
       />

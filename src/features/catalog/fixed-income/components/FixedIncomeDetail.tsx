@@ -21,7 +21,6 @@ import { ProposalTallyLine } from "@/features/orders/components/ProposalTallyLin
 import { useSendProposal } from "@/features/orders/hooks/use-send-proposal";
 import { QuotaBookButton, useQuotaBooking } from "@/features/orders/hooks/use-quota-booking";
 import { useT } from "@/i18n/I18nProvider";
-import { useUtAutoOpen } from "@/lib/usability-test";
 
 function DetailTable({ bond }: { bond: FixedIncomeBond }) {
   const t = useT();
@@ -119,13 +118,6 @@ export function FixedIncomeDetail({
   const adapted = useMemo(() => fixedIncomeToBookableProduct(bond), [bond]);
   // Shares the booking hook's toast stack rather than standing up a second one.
   const proposal = useSendProposal({ onNotice: booking.notice });
-  // USABILITY-TEST ONLY (temporary; revert after testing): `?ut_open=` opens the modal on load.
-  useUtAutoOpen(
-    "booking",
-    () => booking.book(adapted),
-    ORDER_BOOKING_ENABLED && bond.action === "invest",
-  );
-  useUtAutoOpen("proposal", () => proposal.send(adapted), ORDER_BOOKING_ENABLED);
 
   useEffect(() => {
     const main = document.querySelector("main");

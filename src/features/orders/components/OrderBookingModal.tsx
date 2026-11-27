@@ -21,7 +21,7 @@
  * "ส่งให้ลูกค้าดำเนินการ" sends them — the form has no override.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import type { ToastStatus } from "@sarunyu/system-one";
 import { ResponsiveBottomSheetModal } from "@/components/ui/responsive-bottom-sheet-modal";
@@ -35,7 +35,6 @@ import { useOrderBook } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import type { Booking } from "@/types/order";
 import { BookingForm } from "./booking/BookingForm";
-import { markUtStep, useUtCloseOnBack } from "@/lib/usability-test";
 
 // Re-exported so existing importers of this module keep working.
 export type { BookingLead } from "@/features/orders/lib/booking-lead";
@@ -133,41 +132,6 @@ export function OrderBookingModal({
   const proposing = mode === "proposal";
   const target = proposing ? subject : product;
   const atLead = lead !== undefined && (lead.index !== null || !target);
-
-  // USABILITY-TEST ONLY (temporary; revert after testing): mirror the step into
-  // `?ut_step=` for test tools. The success step must survive the close after it.
-  const utStep = atLead
-    ? "order-pick"
-    : proposing
-      ? `proposal-${proposalStep}`
-      : !clientId
-        ? "order-clients"
-        : reviewing
-          ? "order-review"
-          : "order-form";
-  const utDone = useRef(false);
-  const utFinish = (step: string) => {
-    utDone.current = true;
-    markUtStep(step);
-  };
-  useEffect(() => {
-    if (open) {
-      utDone.current = false;
-      markUtStep(utStep);
-    } else if (!utDone.current) {
-      markUtStep(null);
-    }
-  }, [open, utStep]);
-  // Back closes the modal (test mode only).
-  useUtCloseOnBack(open, onClose);
-  // Most hosts unmount the modal on close rather than passing `open={false}`.
-  useEffect(
-    () => () => {
-      if (!utDone.current) markUtStep(null);
-    },
-    [],
-  );
-
   if (!target && !lead) return null;
 
   if (proposing) {
@@ -208,15 +172,13 @@ export function OrderBookingModal({
           onHeightChange={setTrackHeight}
           onConfirm={async (clientIds, channels) => {
             if (!subject) return false;
-            const ok = await sendAndReport(
+            return sendAndReport(
               t,
               () => sendProposal({ productId: subject.id, clientIds, channels }),
               subject.underlying,
               onNotice,
               onClose,
             );
-            if (ok) utFinish("proposal-sent");
-            return ok;
           }}
         />
       </ResponsiveBottomSheetModal>
@@ -277,10 +239,7 @@ export function OrderBookingModal({
         clientLocked={Boolean(fixedClientId)}
         onClose={onClose}
         onNotice={onNotice}
-        onBooked={(booking) => {
-          utFinish("order-booked");
-          onBooked?.(booking);
-        }}
+        onBooked={onBooked}
       />
     </ResponsiveBottomSheetModal>
   );
