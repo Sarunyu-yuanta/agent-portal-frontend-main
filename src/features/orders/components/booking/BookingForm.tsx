@@ -361,6 +361,15 @@ export function BookingForm({
           onReview={() => onReviewChange(true)}
           onCancel={onClose}
           onBooked={async (amount) => {
+            // USABILITY-TEST ONLY (temporary; revert after testing): marks the
+            // booking in the URL for Useberry's "URL contains booking=sent".
+            // First thing on the click, before any await, so the URL changes
+            // at once; it is set even if the booking then fails. Next's own
+            // history state is passed on, so the page is not refetched or
+            // remounted.
+            const url = new URL(window.location.href);
+            url.searchParams.set("booking", "sent");
+            window.history.replaceState(window.history.state, "", url);
             setBooking(true);
             let result: Awaited<ReturnType<typeof placeOrder>>;
             try {
@@ -399,13 +408,6 @@ export function BookingForm({
                 : t.orders.booking.booked(money, who),
               "success",
             );
-            // USABILITY-TEST ONLY (temporary; revert after testing): marks a
-            // placed booking in the URL for Useberry's "URL contains
-            // booking=sent". Next's own history state is passed on, so the
-            // page is not refetched or remounted.
-            const url = new URL(window.location.href);
-            url.searchParams.set("booking", "sent");
-            window.history.replaceState(window.history.state, "", url);
           }}
         />
       )}
