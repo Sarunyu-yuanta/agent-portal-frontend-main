@@ -17,10 +17,13 @@ import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "./I18nProvider";
 import { localizePath, stripLocale } from "./locale-path";
+import { utBasePath } from "@/lib/usability-test-path";
 
 /** `usePathname()` without the locale prefix — `/en/client-hub` → `/client-hub`. */
 export function useAppPathname(): string {
-  return stripLocale(usePathname() ?? "/");
+  // USABILITY-TEST ONLY (temporary; revert after testing): an open modal adds
+  // a `/ut-*` segment (see `markUtStep`); the page underneath is still this one.
+  return stripLocale(utBasePath(usePathname() ?? "/"));
 }
 
 /** `useRouter()` whose `push`/`replace`/`prefetch` add the current locale. */

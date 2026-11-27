@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { utBasePath, utSegmentOf } from "./usability-test-path";
 
 /**
  * USABILITY-TEST ONLY — temporary; revert this commit once testing is done.
@@ -33,6 +34,8 @@ export function initUsabilityTest(): void {
 function isUsabilityTest(): boolean {
   initUsabilityTest();
   if (new URLSearchParams(window.location.search).get(FLAG_PARAM) === "1") return true;
+  // A `/ut-*` path is a test link in itself — a tester may land on it fresh.
+  if (utSegmentOf(window.location.pathname)) return true;
   try {
     return window.sessionStorage.getItem(STORAGE_KEY) === "1";
   } catch {
@@ -44,42 +47,55 @@ function updateUrl(edit: (url: URL) => void, mode: "push" | "replace" = "replace
   const url = new URL(window.location.href);
   edit(url);
   if (url.href === window.location.href) return;
-  // Native History API, as `setQueryState` does: Next patches it into its
-  // router, so `usePathname` / `useSearchParams` stay in sync.
-  if (mode === "push") window.history.pushState(null, "", url.href);
-  else window.history.replaceState(window.history.state, "", url.href);
+  // The URL changes *around* the router, not through it. Next patches the
+  // History API and treats a changed pathname as a history traversal — it
+  // re-renders the page, which unmounted the modal and undid the URL. Passing
+  // Next's own entry state (it carries `__NA`) makes its patch step aside, so
+  // the page stays as it is and only the address bar moves.
+  const state: unknown = window.history.state;
+  if (mode === "push") window.history.pushState(state, "", url.href);
+  else window.history.replaceState(state, "", url.href);
+}
+
+/** Whether the path says a modal is open (`/ut-proposal`, `/ut-booking`). */
+function modalOpenInPath(pathname: string): boolean {
+  const segment = utSegmentOf(pathname);
+  return segment === "proposal" || segment === "booking";
 }
 
 /**
- * Sets (or, with `null`, clears) `?ut_step=` on the current URL. No-op outside test mode.
+ * Mirrors a modal's step into the URL. No-op outside test mode.
  *
- * While a modal is open, `ut_open=<key>` and `#ut-<key>` are set too — however
- * it was opened — so an open modal always has the same URL as the link that
- * opens it. Opening it by hand *pushes* that URL, so test tools that count
- * history entries see the modal as a screen of its own (and Back closes it —
- * see `useUtCloseOnBack`). Both go once the modal is done (sent/booked, or
- * closed), so a reload doesn't pop it open again.
+ * Useberry tells screens apart by pathname alone, so the modal lives in the
+ * path: opening it *pushes* `/…/ut-proposal` (or `/ut-booking`), its steps
+ * ride along as `?ut_step=`, success pushes `/…/ut-proposal-sent` (or
+ * `/ut-order-booked`), and closing replaces the path back. The proxy rewrites
+ * `/ut-*` paths to the page underneath, so a reload still lands on it, and
+ * `useAppPathname` strips the segment so the breadcrumb and nav never see it.
  */
 export function markUtStep(step: string | null): void {
   if (typeof window === "undefined" || !isUsabilityTest()) return;
   const finished = step !== null && (step.endsWith("-sent") || step.endsWith("-booked"));
   const openKey = step?.startsWith("proposal-") ? "proposal" : "booking";
-  const opening =
-    step !== null && !finished && !new URL(window.location.href).searchParams.has(OPEN_PARAM);
+  const opening = step !== null && !finished && !modalOpenInPath(window.location.pathname);
   updateUrl(
     (url) => {
+      const base = utBasePath(url.pathname);
       const params = url.searchParams;
-      if (step === null) params.delete(STEP_PARAM);
-      else params.set(STEP_PARAM, step);
-      if (step === null || finished) {
-        params.delete(OPEN_PARAM);
-        if (url.hash.startsWith("#ut-")) url.hash = "";
+      params.delete(OPEN_PARAM);
+      if (url.hash.startsWith("#ut-")) url.hash = "";
+      if (step === null) {
+        params.delete(STEP_PARAM);
+        url.pathname = base;
+      } else if (finished) {
+        params.delete(STEP_PARAM);
+        url.pathname = `${base}/ut-${step}`;
       } else {
-        params.set(OPEN_PARAM, openKey);
-        url.hash = `ut-${openKey}`;
+        params.set(STEP_PARAM, step);
+        url.pathname = `${base}/ut-${openKey}`;
       }
     },
-    opening ? "push" : "replace",
+    opening || finished ? "push" : "replace",
   );
 }
 
@@ -95,7 +111,7 @@ export function useUtCloseOnBack(open: boolean, close: () => void): void {
   useEffect(() => {
     if (!open || !isUsabilityTest()) return;
     const onPop = () => {
-      if (!new URL(window.location.href).searchParams.has(OPEN_PARAM)) latest.current();
+      if (!modalOpenInPath(window.location.pathname)) latest.current();
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
@@ -103,10 +119,11 @@ export function useUtCloseOnBack(open: boolean, close: () => void): void {
 }
 
 /**
- * Opens a modal on load when the URL says `?ut_open=<key>` (test mode only), so
- * a test tool that only captures the loaded page can see the modal open.
- * Checks once per mount, as soon as `ready` (e.g. the product can be booked) —
- * a `ut_open` written later by a modal the user opened is not a request.
+ * Opens a modal on load when the URL says so — a `/ut-<key>` path, or the older
+ * `?ut_open=<key>` (test mode only) — so a test tool that only captures the
+ * loaded page can see the modal open. Checks once per mount, as soon as
+ * `ready` (e.g. the product can be booked): a path written later by a modal
+ * the user opened is not a request.
  */
 export function useUtAutoOpen(key: "booking" | "proposal", open: () => void, ready = true): void {
   const checked = useRef(false);
@@ -118,7 +135,9 @@ export function useUtAutoOpen(key: "booking" | "proposal", open: () => void, rea
     if (checked.current || !ready) return;
     checked.current = true;
     if (!isUsabilityTest()) return;
-    if (new URLSearchParams(window.location.search).get(OPEN_PARAM) !== key) return;
-    latest.current();
+    const asked =
+      utSegmentOf(window.location.pathname) === key ||
+      new URLSearchParams(window.location.search).get(OPEN_PARAM) === key;
+    if (asked) latest.current();
   }, [key, ready]);
 }
