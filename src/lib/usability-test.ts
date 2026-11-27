@@ -40,33 +40,66 @@ function isUsabilityTest(): boolean {
   }
 }
 
-function updateUrl(edit: (params: URLSearchParams) => void): void {
+function updateUrl(edit: (url: URL) => void, mode: "push" | "replace" = "replace"): void {
   const url = new URL(window.location.href);
-  edit(url.searchParams);
+  edit(url);
   if (url.href === window.location.href) return;
   // Native History API, as `setQueryState` does: Next patches it into its
-  // router, so `useSearchParams` stays in sync.
-  window.history.replaceState(window.history.state, "", url.href);
+  // router, so `usePathname` / `useSearchParams` stay in sync.
+  if (mode === "push") window.history.pushState(null, "", url.href);
+  else window.history.replaceState(window.history.state, "", url.href);
 }
 
 /**
  * Sets (or, with `null`, clears) `?ut_step=` on the current URL. No-op outside test mode.
  *
- * While a modal is open, `ut_open=<key>` is set too — however it was opened —
- * so an open modal always has the same URL as the link that opens it. It goes
- * once the modal is done (sent/booked, or closed), so a reload doesn't pop it
- * open again.
+ * While a modal is open, `ut_open=<key>` and `#ut-<key>` are set too — however
+ * it was opened — so an open modal always has the same URL as the link that
+ * opens it. Opening it by hand *pushes* that URL, so test tools that count
+ * history entries see the modal as a screen of its own (and Back closes it —
+ * see `useUtCloseOnBack`). Both go once the modal is done (sent/booked, or
+ * closed), so a reload doesn't pop it open again.
  */
 export function markUtStep(step: string | null): void {
   if (typeof window === "undefined" || !isUsabilityTest()) return;
   const finished = step !== null && (step.endsWith("-sent") || step.endsWith("-booked"));
   const openKey = step?.startsWith("proposal-") ? "proposal" : "booking";
-  updateUrl((params) => {
-    if (step === null) params.delete(STEP_PARAM);
-    else params.set(STEP_PARAM, step);
-    if (step === null || finished) params.delete(OPEN_PARAM);
-    else params.set(OPEN_PARAM, openKey);
+  const opening =
+    step !== null && !finished && !new URL(window.location.href).searchParams.has(OPEN_PARAM);
+  updateUrl(
+    (url) => {
+      const params = url.searchParams;
+      if (step === null) params.delete(STEP_PARAM);
+      else params.set(STEP_PARAM, step);
+      if (step === null || finished) {
+        params.delete(OPEN_PARAM);
+        if (url.hash.startsWith("#ut-")) url.hash = "";
+      } else {
+        params.set(OPEN_PARAM, openKey);
+        url.hash = `ut-${openKey}`;
+      }
+    },
+    opening ? "push" : "replace",
+  );
+}
+
+/**
+ * Closes an open modal when the browser's Back leaves its pushed URL (test mode
+ * only) — otherwise Back would change the URL and leave the modal up.
+ */
+export function useUtCloseOnBack(open: boolean, close: () => void): void {
+  const latest = useRef(close);
+  useEffect(() => {
+    latest.current = close;
   });
+  useEffect(() => {
+    if (!open || !isUsabilityTest()) return;
+    const onPop = () => {
+      if (!new URL(window.location.href).searchParams.has(OPEN_PARAM)) latest.current();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [open]);
 }
 
 /**

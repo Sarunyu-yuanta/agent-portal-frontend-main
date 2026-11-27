@@ -56,7 +56,7 @@ import { usePrivacy } from "@/features/shell/store/privacy-context";
 import { useOrders } from "@/features/orders/store/orders-context";
 import { getInitials } from "@/lib/client-utils";
 import { maskName } from "@/lib/mask-name";
-import { markUtStep } from "@/lib/usability-test";
+import { markUtStep, useUtCloseOnBack } from "@/lib/usability-test";
 import {
   AVAILABLE_PROPOSAL_CHANNELS,
   PROPOSAL_CHANNEL_META,
@@ -147,6 +147,8 @@ export function SendProposalDialog({
     if (!next) setStep("clients");
     onOpenChange(next);
   };
+  // USABILITY-TEST ONLY (temporary; revert after testing): Back closes the dialog.
+  useUtCloseOnBack(open, () => setOpen(false));
 
   return (
     <ResponsiveDialog

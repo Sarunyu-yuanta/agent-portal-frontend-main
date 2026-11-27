@@ -35,7 +35,7 @@ import { useOrderBook } from "@/features/orders/hooks/use-order-books";
 import { useT } from "@/i18n/I18nProvider";
 import type { Booking } from "@/types/order";
 import { BookingForm } from "./booking/BookingForm";
-import { markUtStep } from "@/lib/usability-test";
+import { markUtStep, useUtCloseOnBack } from "@/lib/usability-test";
 
 // Re-exported so existing importers of this module keep working.
 export type { BookingLead } from "@/features/orders/lib/booking-lead";
@@ -158,6 +158,8 @@ export function OrderBookingModal({
       markUtStep(null);
     }
   }, [open, utStep]);
+  // Back closes the modal (test mode only).
+  useUtCloseOnBack(open, onClose);
   // Most hosts unmount the modal on close rather than passing `open={false}`.
   useEffect(
     () => () => {
