@@ -20,6 +20,7 @@ import type { ProposalSubject } from "./SendProposalDialog";
 import { ProposalTallyLine } from "./ProposalTallyLine";
 import { useSendProposal } from "@/features/orders/hooks/use-send-proposal";
 import { useT } from "@/i18n/I18nProvider";
+import { useUtAutoOpen } from "@/lib/usability-test";
 
 export function SendProposalButton({
   subject,
@@ -30,6 +31,8 @@ export function SendProposalButton({
 }) {
   const t = useT();
   const proposal = useSendProposal();
+  // USABILITY-TEST ONLY (temporary; revert after testing): `?ut_open=` opens the modal on load.
+  useUtAutoOpen("proposal", () => proposal.send(subject), ORDER_BOOKING_ENABLED);
   // Proposals are part of the order feature; with it off there is nowhere for
   // one to be logged, so the button goes with it.
   if (!ORDER_BOOKING_ENABLED) return null;

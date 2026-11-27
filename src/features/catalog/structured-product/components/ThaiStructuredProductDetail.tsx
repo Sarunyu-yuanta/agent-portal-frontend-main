@@ -22,6 +22,7 @@ import { FCNPresentationModal } from "./FCNPresentationModal";
 import { PackageFilesModal } from "@/features/catalog/components/PackageFilesModal";
 import { useT } from "@/i18n/I18nProvider";
 import { ORDER_ENTRY_URL } from "@/config/external-links";
+import { useUtAutoOpen } from "@/lib/usability-test";
 
 const BORDER_COLOR = "rgba(0,0,0,0.1)";
 
@@ -101,6 +102,9 @@ export function ThaiStructuredProductDetail({
   const adapted = useMemo(() => toBookableProduct(product, t), [product, t]);
   const { data: book } = useOrderBook(adapted.id);
   const canBook = !book || isBookingOpen(book);
+  // USABILITY-TEST ONLY (temporary; revert after testing): `?ut_open=` opens the modal on load.
+  useUtAutoOpen("booking", () => setBookingOpen(true), ORDER_BOOKING_ENABLED && canBook);
+  useUtAutoOpen("proposal", () => proposal.send(adapted), ORDER_BOOKING_ENABLED);
 
   const rows = thaiProductRows(product);
 

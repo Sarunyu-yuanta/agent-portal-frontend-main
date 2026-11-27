@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 /**
  * USABILITY-TEST ONLY — temporary; revert this commit once testing is done.
  *
@@ -15,6 +17,7 @@
 const FLAG_PARAM = "ut";
 const STEP_PARAM = "ut_step";
 const STORAGE_KEY = "usability-test";
+const OPEN_PARAM = "ut_open";
 
 /** Reads `?ut=1` / `?ut=0` from the current URL into sessionStorage. */
 export function initUsabilityTest(): void {
@@ -47,4 +50,23 @@ export function markUtStep(step: string | null): void {
   // Native History API, as `setQueryState` does: Next patches it into its
   // router, so `useSearchParams` stays in sync.
   window.history.replaceState(window.history.state, "", url.href);
+}
+
+/**
+ * Opens a modal on load when the URL says `?ut_open=<key>` (test mode only), so
+ * a test tool that only captures the loaded page can see the modal open.
+ * Fires once per mount, and only after `ready` — e.g. once the product loaded.
+ */
+export function useUtAutoOpen(key: "booking" | "proposal", open: () => void, ready = true): void {
+  const fired = useRef(false);
+  const latest = useRef(open);
+  useEffect(() => {
+    latest.current = open;
+  });
+  useEffect(() => {
+    if (fired.current || !ready || !isUsabilityTest()) return;
+    if (new URLSearchParams(window.location.search).get(OPEN_PARAM) !== key) return;
+    fired.current = true;
+    latest.current();
+  }, [key, ready]);
 }
